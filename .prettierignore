@@ -1,0 +1,6 @@
+# Don't format generated or vendor files
+.next/
+node_modules/
+public/sw.js
+prisma/migrations/
+package-lock.json

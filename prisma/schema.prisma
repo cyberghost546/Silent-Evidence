@@ -1,0 +1,2057 @@
+// ============================================================
+//  Silent Evidence — Prisma Schema
+//
+//  This file defines every database table (called "models" in Prisma)
+//  and all the relationships between them.
+//
+//  HOW PRISMA WORKS (beginner primer):
+//  ------------------------------------
+//  - Each `model` block maps to one table in the database.
+//  - Fields inside a model map to columns in that table.
+//  - `@id` marks the primary key (the unique ID for each row).
+//  - `@unique` means no two rows can have the same value in that column.
+//  - `@default(...)` sets what value is stored when you don't supply one.
+//  - `@relation(...)` defines a foreign-key link between two models.
+//  - `@@index([...])` creates a database index — this speeds up queries
+//    that filter or sort by those columns.
+//  - `@@unique([...])` creates a composite unique constraint across columns
+//    (e.g. a user can only like a story once).
+//  - `onDelete: Cascade` means if the parent row is deleted, all related
+//    child rows are automatically deleted too.
+//
+//  After editing this file run:
+//    npx prisma migrate dev --name <description>
+//  to apply the changes to the database and regenerate the Prisma client.
+// ============================================================
+
+generator client {
+  // Tells Prisma to generate a JavaScript/TypeScript client library
+  // that you import as `import { prisma } from '@/lib/prisma'`
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // The database engine being used — MySQL in production (PlanetScale / Railway)
+  provider = "mysql"
+}
+
+// ============================================================
+//  ENUMS
+//  Enums are a fixed list of allowed values for a field.
+//  Using an enum instead of a plain string prevents typos and
+//  makes the code self-documenting.
+// ============================================================
+
+// Controls what a user is allowed to do on the site.
+// GUEST  = not logged in (read-only access, set programmatically)
+// USER   = registered account (can comment, like, bookmark)
+// AUTHOR = can publish stories (granted by admin or on request)
+// ADMIN  = full access to the admin panel and all data
+enum Role {
+  GUEST
+  USER
+  AUTHOR
+  ADMIN
+}
+
+// The publishing lifecycle of a story.
+// DRAFT     = visible only to the author; not on the public site
+// PUBLISHED = live and readable by anyone (or subscribers for premium)
+// ARCHIVED  = hidden from public but not deleted; author can restore it
+// SCHEDULED = will be auto-published when scheduledAt time arrives
+//             (handled by the cron job at /api/cron/publish-scheduled)
+enum StoryStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+}
+
+// The different events that can trigger a notification bell for a user.
+// Each type maps to a different message template and icon in the UI.
+enum NotificationType {
+  COMMENT        // someone commented on one of your stories
+  REPLY          // someone replied to your comment
+  LIKE           // someone liked your story
+  FOLLOW         // someone started following you
+  MENTION        // someone @mentioned you in a comment
+  COLLABORATE    // someone invited you to co-author a story
+  DIRECT_MESSAGE // you received a private message
+  GROUP_INVITE   // you were invited to join a group
+}
+
+// Role a user can hold inside a community Group.
+// MEMBER    = regular participant
+// MODERATOR = can pin posts and remove members
+// OWNER     = full control; can delete the group
+enum GroupRole {
+  MEMBER
+  MODERATOR
+  OWNER
+}
+
+// Emoji-style reactions a user can leave on a story (in addition to a plain Like).
+// Each type maps to a unique icon in the reaction bar on the story page.
+enum ReactionType {
+  LOVE    // ❤️
+  SCARED  // 😱
+  GHOST   // 👻
+  FIRE    // 🔥
+}
+
+// Horror mood tags used on both stories (the mood of the story) and user profiles
+// (the moods a reader enjoys). Stored as an enum so values are validated by the DB.
+enum Mood {
+  EPIC
+  HEARTWARMING
+  MYSTERIOUS
+  ACTION
+  ROMANTIC
+  COMEDIC
+  DRAMATIC
+  DARK
+}
+
+// What kind of content is being reported
+enum ReportType {
+  COMMENT
+  STORY
+  FORUM_POST
+  FORUM_REPLY
+}
+
+// Why the user is reporting the content
+enum ReportReason {
+  HARASSMENT
+  HATE_SPEECH
+  SPAM
+  INAPPROPRIATE
+  THREATS
+  OTHER
+}
+
+// Tracks whether an admin has handled the report
+enum ReportStatus {
+  PENDING    // not yet reviewed — shows in the admin reports table
+  REVIEWED   // admin has looked at it and taken action
+  DISMISSED  // admin decided no action was needed
+}
+
+// Age group stored on the user account after date-of-birth entry
+// UNDER_13 = born less than 13 years ago (restricted to ALL-rated content only)
+// TEEN     = 13–17 (can read ALL + TEEN content, blocked from MATURE)
+// ADULT    = 18+ (unrestricted)
+enum AgeGroup {
+  UNDER_13
+  TEEN
+  ADULT
+}
+
+// Content rating assigned to each story by the author
+// ALL    = suitable for any age (no gore, no explicit content)
+// TEEN   = mild horror, some violence — 13+ only
+// MATURE = explicit gore, sexual content, extreme horror — 18+ only
+enum ContentRating {
+  ALL
+  TEEN
+  MATURE
+}
+
+// ============================================================
+//  USER
+//  The central model — almost every other model links back to User.
+//  One row = one registered account on Silent Evidence.
+// ============================================================
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique   // used for login and email notifications
+  username  String   @unique   // shown publicly; used in profile URLs (/user/[username])
+  password  String             // bcrypt-hashed — never stored in plain text
+  role           Role     @default(USER)
+  // When true the user's name appears in the "Writer of the Month" spotlight
+  writerOfMonth  Boolean  @default(false)
+  // Verified author — admin-granted checkmark shown on profile and stories
+  isVerified     Boolean  @default(false)
+  // Private profile — only followers can see stories and profile details
+  isPrivate      Boolean  @default(false)
+  // Pinned story — shown at the top of the user's profile
+  pinnedStoryId  Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Age verification — collected during onboarding
+  // dateOfBirth is stored to allow future re-verification if needed
+  dateOfBirth    DateTime?
+  // ageGroup is derived from dateOfBirth at registration/update time
+  // UNDER_13 = under 13, TEEN = 13-17, ADULT = 18+
+  ageGroup       AgeGroup @default(ADULT)
+
+  profile       Profile?
+  stories       Story[]
+  likes         Like[]
+  comments      Comment[]
+  bookmarks     Bookmark[]
+  reactions     Reaction[]
+  notifications Notification[]
+  badges        UserBadge[]
+
+  // Follow relations
+  following       Follow[]         @relation("Follower")
+  followers       Follow[]         @relation("Following")
+  readingHistory  ReadingHistory[]
+  scareRatings    ScareRating[]
+  series          Series[]
+  storyLists      StoryList[]
+  forumPosts      ForumPost[]
+  forumReplies    ForumReply[]
+  challengeEntries ChallengeEntry[]
+  quizAttempts    QuizAttempt[]
+
+  // New feature relations
+  lastWords         LastWord[]
+  battleVotes       BattleVote[]
+  daresSent         StoryDare[]       @relation("DareSender")
+  daresReceived     StoryDare[]       @relation("DareReceiver")
+  squadsOwned       Squad[]
+  squadMemberships  SquadMember[]
+  squadPosts        SquadPost[]
+  villainVotes      VillainVote[]
+  collaborations    StoryCollaborator[]
+
+  // Reports this user has submitted
+  reports           Report[]
+
+  // Payment relations
+  subscription      Subscription?
+  tipsSent          Tip[]             @relation("TipSender")
+  tipsReceived      Tip[]             @relation("TipReceiver")
+  storyPurchases    StoryPurchase[]
+
+  // Direct messages
+  messagesSent      DirectMessage[]   @relation("MessagesSent")
+  messagesReceived  DirectMessage[]   @relation("MessagesReceived")
+
+  // Groups / clubs
+  groupsOwned       Group[]           @relation("GroupsOwned")
+  groupMemberships  GroupMember[]
+  groupPosts        GroupPost[]
+
+  // Polls
+  pollsCreated      Poll[]
+  pollVotes         PollVote[]
+
+  // Writing streak
+  writingStreak     WritingStreak?
+
+  // Reading goal
+  readingGoal       ReadingGoal?
+
+  // Reading streak
+  readingStreak     ReadingStreak?
+
+  // Blocks
+  blockedUsers      BlockedUser[]  @relation("Blocker")
+  blockedBy         BlockedUser[]  @relation("Blocked")
+
+  // Comment reactions
+  commentReactions  CommentReaction[]
+
+  // Password reset tokens
+  passwordResetTokens PasswordResetToken[]
+
+  // Reading speed preference: "slow" (150 wpm), "average" (200 wpm), "fast" (300 wpm)
+  readingSpeed      String  @default("average")
+
+  // Two-factor authentication via email code
+  twoFactorEnabled  Boolean @default(false)
+  twoFactorCodes    TwoFactorCode[]
+
+  // Onboarding completion flag — false until wizard is finished
+  onboardingDone    Boolean @default(false)
+
+  // Weekly newsletter opt-in — true by default, users can unsubscribe in settings
+  newsletterSubscribed Boolean @default(true)
+
+  // How often to receive the comments digest email: "DAILY", "WEEKLY", or "NEVER"
+  // Defaults to "WEEKLY" — existing users get the same behaviour as before
+  digestFrequency     String  @default("WEEKLY")
+
+  // Last time the comment digest email was sent — used to find unseen comments since then
+  lastCommentDigestAt DateTime?
+
+  // Web Push subscriptions for browser push notifications
+  pushSubscriptions   PushSubscription[]
+
+  // Premium story bundle purchases
+  bundlePurchases     BundlePurchase[]
+
+  // Pay-per-chapter purchases
+  chapterPurchases    ChapterPurchase[]
+
+  // Discord account connection (for premium role granting)
+  discordId           String?          // Discord user snowflake ID
+  discordUsername     String?          // Discord username#discriminator
+  discordAccessToken  String?          @db.Text
+  discordRefreshToken String?          @db.Text
+
+  // Writing sprints
+  sprintsJoined       SprintParticipant[]
+
+  // Co-author requests posted by this user
+  coauthorRequests    CoauthorRequest[]
+
+  // Draft share tokens created by this user
+  draftShareTokens    DraftShareToken[]
+
+  // Tag follows — notified when new stories use a followed tag
+  tagFollows          TagFollow[]
+
+  // Book clubs this user owns or is a member of
+  ownedClubs          BookClub[]         @relation("ClubOwner")
+  clubMemberships     BookClubMember[]
+
+  // Fan art uploaded by this user
+  fanArt              FanArt[]
+
+  // Author Q&A — questions asked by this user and questions answered (as author)
+  qaAsked             AuthorQA[]         @relation("QAAsker")
+  qaAnswered          AuthorQA[]         @relation("QAAuthor")
+
+  // Sequel / continuation requests made by this user
+  sequelRequests      SequelRequest[]
+
+  // Beta reader invitations sent and received
+  betaInvitesSent     BetaReaderInvite[] @relation("BetaSender")
+  betaInvitesReceived BetaReaderInvite[] @relation("BetaReceiver")
+
+  // Chain story segments written by this user
+  chainSegments       ChainStorySegment[]
+
+  // Chain stories started by this user
+  chainStories        ChainStory[]
+}
+
+// ============================================================
+//  PROFILE
+//  Optional extended info about a user. Kept separate from User
+//  so the core User table stays lean and fast for auth lookups.
+//  Created on first save (upsert) — not every user has one immediately.
+// ============================================================
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique  // one profile per user
+  bio        String?  @db.Text  // longer text, e.g. "Horror fan since I was 8..."
+  avatar     String?            // URL to the profile picture image
+  website    String?            // optional personal/author website link
+  // Comma-separated list of up to 3 Mood values the user picks as their "Fear Profile"
+  // e.g. "CREEPY,SUPERNATURAL,GORE" — parsed by FearProfilePicker.tsx
+  fearMoods  String?
+  // Author merchandise / Patreon link shown on their profile page
+  merchUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Cascade delete: if the User is deleted, their Profile is deleted too
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  FOLLOW
+//  Represents a "User A follows User B" relationship.
+//  Both directions are stored on the User model via named relations:
+//    user.following — list of people this user follows
+//    user.followers — list of people who follow this user
+// ============================================================
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+
+  followerId  Int      // the user who clicked "Follow"
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId Int      // the user being followed
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  // Ensures a user can only follow another user once
+  @@unique([followerId, followingId])
+  // Index for "who does this user follow?" and "who follows this user?" queries
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ============================================================
+//  CATEGORY
+//  Broad horror sub-genres used to organise stories (e.g. "Paranormal",
+//  "True Stories", "Haunted Places"). Seeded once by the developer;
+//  not user-created. Each story belongs to exactly one category.
+// ============================================================
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique  // display name shown in the UI, e.g. "True Stories"
+  slug        String   @unique  // URL-safe version, e.g. "true-stories" → /category/true-stories
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  stories     Story[]
+}
+
+// ============================================================
+//  TAG
+//  Fine-grained labels authors can attach to stories (e.g. "forest",
+//  "possessed", "based-on-a-true-story"). Unlike categories, many tags
+//  can appear on a single story (many-to-many via the StoryTags relation).
+//  Users can also follow tags to get notified of new stories using them.
+// ============================================================
+
+model Tag {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique  // e.g. "forest horror"
+  slug    String  @unique  // e.g. "forest-horror"
+
+  stories  Story[]     @relation("StoryTags")
+  followers TagFollow[]  // users who follow this tag
+}
+
+// ============================================================
+//  STORY
+//  The main content unit of the platform. Each story is written by one
+//  author, belongs to one category, and can have many likes, comments,
+//  bookmarks, tags, chapters, and purchases.
+// ============================================================
+
+model Story {
+  id          Int         @id @default(autoincrement())
+  title       String
+  slug        String      @unique  // URL-safe title used in /story/[slug]
+  content     String      @db.LongText  // full story body (HTML or Markdown)
+  excerpt     String?     @db.Text      // short teaser shown on listing cards
+  coverImage  String?                   // URL of the header image
+  status      StoryStatus @default(DRAFT)  // controls visibility — see StoryStatus enum
+  featured    Boolean     @default(false)  // admin can pin stories to the featured section
+  language    String      @default("en")   // ISO language code, e.g. "en", "es"
+  views       Int         @default(0)      // incremented each time the story page loads
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  authorId    Int
+  author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+
+  mood            Mood?
+  warnings        String?          @db.Text
+  // Content rating — controls who can read this story based on age group
+  // Defaults to ALL so existing stories are accessible to everyone
+  contentRating   ContentRating    @default(ALL)
+  // AI-computed scare score 1-10 (null until AI rates it)
+  scareScore      Int?
+  // One-sentence reason from the AI explaining the scare score
+  scareReason     String?  @db.Text
+  // Offline saves — readers who saved this for PWA offline reading
+  offlineSaves    OfflineSave[]
+  // Fan art submitted by readers
+  fanArt          FanArt[]
+  // Sequel requests from readers wanting a follow-up
+  sequelRequests  SequelRequest[]
+  scheduledAt     DateTime?
+  // Audio narration — optional MP3 URL for read-along audio player
+  audioUrl        String?
+  // Video — optional YouTube URL or direct video URL attached to this story
+  videoUrl        String?
+  // Multi-part stories — when true, this story has chapters
+  isChaptered     Boolean          @default(false)
+  // Tip goal — author sets a fundraising target (e.g. "$50 = I'll write the sequel")
+  tipGoalAmount   Int?             // Goal in cents, null = no goal set
+  tipGoalTitle    String?          // e.g. "Help me write Part 2!"
+  tipGoalDescription String?       @db.Text
+  creepyOfMonth   Boolean          @default(false)
+  // Death counter — author tags how many characters die in this story
+  deathCount      Int              @default(0)
+  // Paid story — if price > 0 readers must purchase to read full content
+  price           Int?             // Price in cents (e.g. 99 = $0.99). Null = free.
+  isPremiumOnly   Boolean          @default(false) // Only for premium subscribers
+
+  seriesId        Int?
+  series          Series?          @relation(fields: [seriesId], references: [id])
+  seriesOrder     Int?
+
+  locationName    String?
+  latitude        Float?
+  longitude       Float?
+
+  likes           Like[]
+  comments        Comment[]
+  bookmarks       Bookmark[]
+  reactions       Reaction[]
+  notifications   Notification[]
+  tags            Tag[]            @relation("StoryTags")
+  readingHistory  ReadingHistory[]
+  scareRatings    ScareRating[]
+  listItems        StoryListItem[]
+  challengeEntries ChallengeEntry[]
+  collaborators   StoryCollaborator[]
+  chapters        StoryChapter[]
+  dares           StoryDare[]
+  battleEntriesA  StoryBattle[]    @relation("BattleStoryA")
+  battleEntriesB  StoryBattle[]    @relation("BattleStoryB")
+  purchases       StoryPurchase[]
+  bundleItems     StoryBundleItem[]
+
+  // Indexes for common query patterns:
+  // - Browse stories by author, category, mood, or status
+  // - Sort by newest, most viewed, or featured
+  // - Filter by content rating for age-gating
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status, createdAt])
+  @@index([featured, createdAt])
+  @@index([mood])
+  @@index([contentRating])
+  @@index([views])
+  @@index([createdAt])
+  @@index([seriesId, seriesOrder])
+  @@index([creepyOfMonth])
+  @@index([isPremiumOnly])
+  @@index([scheduledAt])
+}
+
+// ============================================================
+//  LIKE
+//  A user clicking the heart/like button on a story.
+//  @@unique ensures each user can only like a story once.
+// ============================================================
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // One like per user per story
+  @@unique([userId, storyId])
+  // Index for "how many likes does this story have?" queries
+  @@index([storyId])
+}
+
+// ============================================================
+//  REACTION
+//  Emoji-style reactions on a story (Love, Scared, Ghost, Fire).
+//  A user can leave one reaction of each type on the same story.
+//  Separate from Like because reactions carry semantic meaning.
+// ============================================================
+
+model Reaction {
+  id        Int          @id @default(autoincrement())
+  type      ReactionType  // which emoji was used — see ReactionType enum
+  createdAt DateTime     @default(now())
+
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId   Int
+  story     Story        @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // One reaction of each type per user per story
+  @@unique([userId, storyId, type])
+  // Index for counting reactions per story
+  @@index([storyId])
+}
+
+// ============================================================
+//  BOOKMARK
+//  Saves a story to the user's personal reading list ("My Bookmarks").
+//  Similar to Like but semantic intent is "read later" not "I enjoyed this".
+// ============================================================
+
+model Bookmark {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // One bookmark per user per story
+  @@unique([userId, storyId])
+  // Index for "user's bookmarks" listing — sorted newest first
+  @@index([userId, createdAt])
+  @@index([storyId])
+}
+
+// ============================================================
+//  COMMENT
+//  Reader or author comment on a story. Supports nested replies
+//  (one level deep) via the self-referencing parentId / replies relation.
+// ============================================================
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  // flagged = a user has reported this comment; admin can review and remove it
+  flagged   Boolean  @default(false)
+  // Authors can pin one comment per story (e.g. a note about inspiration)
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // Self-referencing relation for nested replies.
+  // parentId is null for top-level comments; set to another comment's id for replies.
+  parentId  Int?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
+  // Emoji reactions on this comment
+  reactions CommentReaction[]
+
+  // Indexes for loading comments on a story (sorted newest first) and user comment history
+  @@index([storyId, createdAt])
+  @@index([userId])
+  @@index([parentId])
+}
+
+// ============================================================
+//  NOTIFICATION
+//  In-app bell notifications shown in the header dropdown.
+//  Created automatically by the server when events occur (new like,
+//  new comment, new follower, etc.).
+// ============================================================
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  type      NotificationType  // what kind of event triggered this notification
+  message   String            // human-readable text, e.g. "john_doe liked your story"
+  read      Boolean          @default(false)  // false = unread (shows red badge)
+  createdAt DateTime         @default(now())
+
+  userId    Int      // the user who should see this notification
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Optional link to the story the notification is about.
+  // Null for follow notifications (they don't relate to a specific story).
+  storyId   Int?
+  story     Story?           @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // Index for "user's unread notifications" — the most frequent notification query
+  @@index([userId, read, createdAt])
+}
+
+// ============================================================
+//  BADGE
+//  Achievement badges awarded to users for milestones like
+//  "Published your first story" or "Received 100 likes".
+//  Badge logic lives in /lib/badges.ts — the cron job and story
+//  publish routes call checkAndAwardBadges(userId) after key events.
+// ============================================================
+
+model UserBadge {
+  id        Int      @id @default(autoincrement())
+  // String identifier for the badge type, e.g.:
+  // "FIRST_STORY", "TEN_LIKES", "FIFTY_LIKES", "HUNDRED_VIEWS"
+  // New badge types can be added to /lib/badges.ts without a schema change.
+  type      String
+  awardedAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // A user can only earn each badge type once
+  @@unique([userId, type])
+}
+
+// ============================================================
+//  SCARE RATING
+//  Reader-submitted "how scary was this?" rating (1–5 skulls).
+//  Separate from the AI scareScore on Story — this is human-crowd-sourced.
+//  The average of all ScareRatings for a story is shown on the story page.
+// ============================================================
+
+model ScareRating {
+  id        Int      @id @default(autoincrement())
+  rating    Int      // 1 = barely creepy, 5 = terrifying
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // One rating per user per story (updating replaces the existing row)
+  @@unique([userId, storyId])
+}
+
+// ============================================================
+//  READING HISTORY
+//  Records that a user has visited (started reading) a story.
+//  Used for the "Continue Reading" section and to calculate reading streaks.
+//  @@unique means revisiting a story updates the existing row (via upsert)
+//  rather than creating a duplicate — so readAt reflects the last visit.
+// ============================================================
+
+model ReadingHistory {
+  id      Int      @id @default(autoincrement())
+  readAt  DateTime @default(now())  // timestamp of the most recent visit
+
+  userId  Int
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId Int
+  story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // One record per user per story — upserted on each visit
+  @@unique([userId, storyId])
+  // Index for "user's reading history" sorted by most recent
+  @@index([userId, readAt])
+  @@index([storyId])
+}
+
+// ============================================================
+//  SERIES
+//  A named collection of stories by one author that form a multi-part
+//  narrative (e.g. "The Hollow Road — Parts 1–4"). Stories link to a
+//  series via Story.seriesId and are ordered by Story.seriesOrder.
+// ============================================================
+
+model Series {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique  // URL-safe name, e.g. "the-hollow-road"
+  description String?  @db.Text
+  // Marks the series as complete — no more stories will be added.
+  // Displayed as a "Complete" badge on the series page.
+  isComplete  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  stories     Story[]  // ordered by Story.seriesOrder when displaying
+
+  // Index for listing an author's series
+  @@index([authorId])
+}
+
+// ============================================================
+//  STORY LISTS
+//  User-curated lists of stories (like Spotify playlists but for horror).
+//  Examples: "Best Paranormal 2024", "Stories That Kept Me Up All Night".
+//  Can be public (shareable URL) or private (only the creator sees them).
+// ============================================================
+
+model StoryList {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  isPublic    Boolean  @default(true)  // false = only the owner can see this list
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items       StoryListItem[]
+}
+
+// Junction table: links a StoryList to the stories inside it.
+// `order` lets the user rearrange stories within the list.
+model StoryListItem {
+  id      Int      @id @default(autoincrement())
+  order   Int      @default(0)  // lower numbers appear first in the list
+  addedAt DateTime @default(now())
+
+  listId  Int
+  list    StoryList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  storyId Int
+  story   Story     @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // A story can only appear once per list
+  @@unique([listId, storyId])
+}
+
+// ============================================================
+//  FORUMS
+//  Community discussion boards. Admins create Forums (e.g. "General Chat",
+//  "Story Feedback"). Users create ForumPosts inside them, and other users
+//  respond with ForumReplies.
+// ============================================================
+
+// A top-level forum board (e.g. "Paranormal Experiences", "Writing Tips")
+model Forum {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique  // URL-safe name used in /forums/[slug]
+  description String?   @db.Text
+  icon        String?            // emoji or icon identifier shown next to the forum name
+  order       Int       @default(0)  // display order in the forums list (lower = higher)
+  createdAt   DateTime  @default(now())
+  posts       ForumPost[]
+}
+
+// A discussion thread started by a user inside a Forum
+model ForumPost {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String    @db.Text
+  pinned    Boolean   @default(false)  // moderator/admin can pin important posts to the top
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  forumId   Int
+  forum     Forum     @relation(fields: [forumId], references: [id], onDelete: Cascade)
+
+  authorId  Int
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  replies   ForumReply[]
+
+  // Index for listing posts in a forum (newest first) and by author
+  @@index([forumId, createdAt])
+  @@index([authorId])
+}
+
+// A reply to a ForumPost — single level (no nested replies in forums)
+model ForumReply {
+  id        Int       @id @default(autoincrement())
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  postId    Int
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  authorId  Int
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Index for loading replies on a forum post
+  @@index([postId, createdAt])
+}
+
+// ============================================================
+//  CHALLENGES
+//  Timed writing competitions with a creative prompt. Admins create
+//  challenges with a start/end date. Authors submit stories as entries.
+//  The community can vote on entries during the active period.
+// ============================================================
+
+// The challenge itself — contains the brief and dates
+model Challenge {
+  id          Int       @id @default(autoincrement())
+  title       String    // e.g. "Halloween Horror Sprint 2024"
+  description String    @db.Text  // overview shown on the challenge page
+  prompt      String    @db.Text  // the specific creative writing brief
+  startDate   DateTime             // when entries open
+  endDate     DateTime             // when entries close and voting ends
+  // When false the challenge is hidden from users (admin can draft it before going live)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  entries     ChallengeEntry[]
+}
+
+// One entry per user per challenge — links a user's story to the challenge
+model ChallengeEntry {
+  id          Int       @id @default(autoincrement())
+  votes       Int       @default(0)  // community vote count for this entry
+  createdAt   DateTime  @default(now())
+
+  challengeId Int
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  storyId     Int
+  story       Story     @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // One submission per user per challenge
+  @@unique([challengeId, userId])
+}
+
+// ============================================================
+//  QUIZ
+//  Records each time a user completes the Horror Quiz (HorrorQuiz.tsx).
+//  Stores score and total questions so we can display a percentage and
+//  show a history on the user's profile.
+// ============================================================
+
+model QuizAttempt {
+  id          Int      @id @default(autoincrement())
+  score       Int      // how many questions the user got right
+  total       Int      // total number of questions in that quiz session
+  completedAt DateTime @default(now())
+
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  SLIDESHOW
+//  Hero banner slides shown in the homepage carousel.
+//  Managed by admins via the admin panel. `order` controls sequence;
+//  `active` lets admins hide a slide without deleting it.
+// ============================================================
+
+model Slide {
+  id        Int      @id @default(autoincrement())
+  title     String
+  subtitle  String?
+  image     String   // URL of the background image
+  linkUrl   String?  // optional "Read more" destination URL
+  order     Int      @default(0)   // lower number = shown earlier in the carousel
+  active    Boolean  @default(true) // false = hidden from the carousel
+  createdAt DateTime @default(now())
+}
+
+// ============================================================
+//  READING ROOMS
+//  A real-time shared reading session — one host creates a room with a
+//  short join code and invites friends. All members read the same story
+//  together; their scroll position is synced so everyone stays in step.
+// ============================================================
+
+// A shared room where multiple users can read a story together
+model ReadingRoom {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique  // Short join code e.g. "GHOST42" — shared via link
+  storyId   Int               // the story the group is reading
+  hostId    Int               // the user who created the room
+  active    Boolean  @default(true)  // false when the host ends the session
+  createdAt DateTime @default(now())
+
+  members   ReadingRoomMember[]
+}
+
+// Tracks who is currently in a reading room and their scroll position.
+// Updated via polling or WebSocket whenever a member scrolls.
+model ReadingRoomMember {
+  id         Int         @id @default(autoincrement())
+  roomId     Int
+  room       ReadingRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId     Int
+  username   String      // denormalised here so it can be shown without a User join
+  progress   Int         @default(0)  // 0–100 scroll percentage through the story
+  lastSeen   DateTime    @default(now())  // used to detect inactive members
+
+  // One membership record per user per room
+  @@unique([roomId, userId])
+}
+
+// ============================================================
+//  LAST WORDS — micro-horror posts (max 280 chars)
+// ============================================================
+
+model LastWord {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(280) // Max 280 characters like a tweet
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  likedBy   LastWordLike[]
+
+  // Index for feed sorted by newest, and by user
+  @@index([createdAt])
+  @@index([userId])
+}
+
+// Tracks who liked which Last Word (prevents double likes)
+model LastWordLike {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+
+  lastWordId  Int
+  lastWord    LastWord @relation(fields: [lastWordId], references: [id], onDelete: Cascade)
+
+  userId      Int
+
+  @@unique([lastWordId, userId])
+}
+
+// ============================================================
+//  STORY BATTLES — two stories compete, community votes
+// ============================================================
+
+model StoryBattle {
+  id        Int      @id @default(autoincrement())
+  active    Boolean  @default(true)
+  endsAt    DateTime // Battle end date/time
+  createdAt DateTime @default(now())
+
+  // The two stories fighting each other
+  storyAId  Int
+  storyA    Story    @relation("BattleStoryA", fields: [storyAId], references: [id], onDelete: Cascade)
+
+  storyBId  Int
+  storyB    Story    @relation("BattleStoryB", fields: [storyBId], references: [id], onDelete: Cascade)
+
+  votes     BattleVote[]
+}
+
+// Tracks each user's vote in a battle
+model BattleVote {
+  id        Int         @id @default(autoincrement())
+  votedFor  Int         // storyId the user voted for
+  createdAt DateTime    @default(now())
+
+  battleId  Int
+  battle    StoryBattle @relation(fields: [battleId], references: [id], onDelete: Cascade)
+
+  userId    Int
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([battleId, userId]) // One vote per user per battle
+}
+
+// ============================================================
+//  STORY DARES — dare a friend to read a scary story
+// ============================================================
+
+model StoryDare {
+  id         Int      @id @default(autoincrement())
+  message    String?  @db.Text // Optional personal dare message
+  accepted   Boolean? // null = pending, true = accepted, false = declined
+  createdAt  DateTime @default(now())
+
+  storyId    Int
+  story      Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  senderId   Int
+  sender     User     @relation("DareSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId Int
+  receiver   User     @relation("DareReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Indexes for "dares I sent" and "dares I received"
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+// ============================================================
+//  HORROR SQUADS — private groups to share stories
+// ============================================================
+
+model Squad {
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String   @unique // Short invite code e.g. "CRYPT7"
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  hostId      Int
+  host        User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+
+  members     SquadMember[]
+  posts       SquadPost[]
+}
+
+// Members of a horror squad
+model SquadMember {
+  id        Int      @id @default(autoincrement())
+  joinedAt  DateTime @default(now())
+
+  squadId   Int
+  squad     Squad    @relation(fields: [squadId], references: [id], onDelete: Cascade)
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([squadId, userId])
+}
+
+// Posts/story shares within a squad
+model SquadPost {
+  id        Int      @id @default(autoincrement())
+  content   String?  @db.Text // Optional message with the share
+  storyUrl  String?  // Link to a story being shared
+  createdAt DateTime @default(now())
+
+  squadId   Int
+  squad     Squad    @relation(fields: [squadId], references: [id], onDelete: Cascade)
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Index for loading posts in a squad feed
+  @@index([squadId, createdAt])
+}
+
+// ============================================================
+//  VILLAIN OF THE WEEK — community votes on scariest villain
+// ============================================================
+
+model Villain {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  storyId     Int?     // Optional link to the story they appear in
+  weekOf      DateTime // The week this villain is nominated for
+  createdAt   DateTime @default(now())
+
+  votes       VillainVote[]
+}
+
+// Tracks who voted for which villain
+model VillainVote {
+  id        Int     @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  villainId Int
+  villain   Villain @relation(fields: [villainId], references: [id], onDelete: Cascade)
+
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([villainId, userId]) // One vote per user per villain
+}
+
+// ============================================================
+//  CO-AUTHOR — invite another writer to collaborate on a story
+// ============================================================
+
+model StoryCollaborator {
+  id        Int      @id @default(autoincrement())
+  accepted  Boolean? // null = pending invite, true = accepted, false = declined
+  createdAt DateTime @default(now())
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId])
+}
+
+// ============================================================
+//  SUBSCRIPTION — Premium monthly/yearly membership
+//  Stripe handles the actual billing. This model stores just enough
+//  info to know whether the user's subscription is currently active
+//  and when it renews/expires. Never store payment card data here.
+// ============================================================
+
+model Subscription {
+  id                     Int      @id @default(autoincrement())
+  // Stripe customer and subscription IDs for managing billing.
+  // stripeCustomerId is created once per user when they first subscribe.
+  // stripeSubscriptionId is the recurring subscription object in Stripe.
+  stripeCustomerId       String   @unique
+  stripeSubscriptionId   String?  @unique
+  // Mirrors the Stripe subscription status:
+  // "active" = paying and valid
+  // "canceled" = cancelled but may still be within the paid period
+  // "past_due" = payment failed; grace period
+  // "trialing" = on a free trial
+  status                 String   @default("inactive")
+  // "monthly" or "yearly"
+  plan                   String   @default("monthly")
+  // When the current billing period ends — after this date the subscription
+  // should be considered expired if status is "canceled"
+  currentPeriodEnd       DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // One subscription record per user
+  userId                 Int      @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  TIP — Reader tips an author
+// ============================================================
+
+model Tip {
+  id                   Int      @id @default(autoincrement())
+  // Amount in cents (e.g. 100 = $1.00)
+  amount               Int
+  // Stripe payment intent ID for tracking
+  stripePaymentIntentId String?
+  message              String?  @db.Text
+  createdAt            DateTime @default(now())
+
+  fromUserId           Int
+  from                 User     @relation("TipSender", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  toUserId             Int
+  to                   User     @relation("TipReceiver", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  // Indexes for tip leaderboards and author tip history
+  @@index([toUserId, createdAt])
+  @@index([fromUserId])
+}
+
+// ============================================================
+//  STORY PURCHASE — One-time purchase to unlock a paid story
+// ============================================================
+
+model StoryPurchase {
+  id                    Int      @id @default(autoincrement())
+  // Amount paid in cents
+  amount                Int
+  stripePaymentIntentId String?
+  createdAt             DateTime @default(now())
+
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  storyId               Int
+  story                 Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId]) // Can only purchase once
+}
+
+// ============================================================
+//  REPORT — User reports a comment, story, forum post, or reply
+// ============================================================
+
+model Report {
+  id         Int          @id @default(autoincrement())
+  // What kind of content is being reported (COMMENT, STORY, FORUM_POST, FORUM_REPLY)
+  type       ReportType
+  // ID of the reported item (comment id, story id, forum post id, or forum reply id)
+  targetId   Int
+  // The reason the user is reporting
+  reason     ReportReason
+  // Optional extra context the reporter wants to add
+  note       String?      @db.Text
+  // Admin review status — starts as PENDING
+  status     ReportStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+
+  // The user who submitted the report
+  reporterId Int
+  reporter   User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  // Index for admin dashboard — filter pending reports
+  @@index([status, createdAt])
+}
+
+// ============================================================
+//  CONTACT MESSAGES — messages submitted via the /contact form
+//  Stored so admins can review and reply from the admin panel.
+//  `read` and `resolved` give admins a basic inbox workflow.
+// ============================================================
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   // reply-to address provided by the sender
+  subject   String
+  message   String   @db.Text
+  // read = admin has opened it in the admin inbox
+  // resolved = admin has dealt with it (replied or dismissed)
+  read      Boolean  @default(false)
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ============================================================
+//  SITE SETTINGS
+//  A simple key/value store for site-wide configuration that admins
+//  can change without a code deploy. Current keys in use:
+//    "announcement" — the text shown in the top banner (empty = no banner)
+//  New settings can be added by inserting a new row with a new key.
+// ============================================================
+model SiteSetting {
+  key       String   @id    // unique setting name, e.g. "announcement"
+  value     String   @db.Text  // the setting value (can be long text)
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+//  DIRECT MESSAGES
+//  Private one-to-one messages between users.
+//  The inbox UI queries by receiverId + read to show unread count.
+//  Two named relations ("MessagesSent" / "MessagesReceived") are required
+//  because both fields reference the same User model.
+// ============================================================
+model DirectMessage {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  read       Boolean  @default(false)  // true once the receiver has opened it
+  createdAt  DateTime @default(now())
+
+  senderId   Int
+  sender     User     @relation("MessagesSent",     fields: [senderId],   references: [id], onDelete: Cascade)
+  receiverId Int
+  receiver   User     @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Indexes for inbox/outbox queries — "messages between two users" sorted by time
+  @@index([senderId, receiverId, createdAt])
+  // Index for "how many unread messages do I have?" badge count
+  @@index([receiverId, read])
+}
+
+// ============================================================
+//  GROUPS / CLUBS
+//  Community groups focused on a horror subgenre (e.g. "Supernatural
+//  Fans", "Gore Lovers"). Users join groups to discuss and share stories.
+//  Groups can be public (anyone can join) or private (invite only).
+//  Distinct from Horror Squads — groups are larger, topic-focused communities
+//  whereas Squads are small private friend groups.
+// ============================================================
+model Group {
+  id          Int           @id @default(autoincrement())
+  name        String
+  slug        String        @unique  // URL-safe name for /groups/[slug]
+  description String?       @db.Text
+  coverImage  String?
+  subgenre    String?       // e.g. "Supernatural", "Psychological", "Gore"
+  isPrivate   Boolean       @default(false)  // true = requires invite to join
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  ownerId     Int
+  owner       User          @relation("GroupsOwned", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  members     GroupMember[]
+  posts       GroupPost[]
+  polls       Poll[]        // groups can host community polls
+}
+
+// Junction table: user membership in a group with an assigned role
+model GroupMember {
+  id       Int       @id @default(autoincrement())
+  role     GroupRole @default(MEMBER)  // MEMBER, MODERATOR, or OWNER
+  joinedAt DateTime  @default(now())
+
+  groupId  Int
+  group    Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   Int
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // A user can only be a member of the same group once
+  @@unique([groupId, userId])
+}
+
+// A post/discussion inside a group feed
+model GroupPost {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  groupId   Int
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Index for loading posts in a group feed (newest first)
+  @@index([groupId, createdAt])
+}
+
+// ============================================================
+//  POLLS
+//  Multiple-choice polls that can be community-wide or scoped to a Group.
+//  Each Poll has 2+ PollOptions. Each user casts one PollVote per poll.
+// ============================================================
+
+// The poll question and metadata
+model Poll {
+  id        Int          @id @default(autoincrement())
+  question  String       // e.g. "Which horror sub-genre do you prefer?"
+  endsAt    DateTime?    // null = never expires; poll stays open indefinitely
+  createdAt DateTime     @default(now())
+
+  authorId  Int
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Optional — scoped to a group (groupId set) or site-wide (groupId null)
+  groupId   Int?
+  group     Group?       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  options   PollOption[]
+  votes     PollVote[]
+}
+
+// One selectable answer choice within a poll
+model PollOption {
+  id     Int        @id @default(autoincrement())
+  text   String     // e.g. "Paranormal", "Psychological", "Gore"
+
+  pollId Int
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes  PollVote[]
+}
+
+// Records which option a user chose — one vote per user per poll
+model PollVote {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+
+  pollId    Int
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  optionId  Int
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // One vote per user per poll
+  @@unique([pollId, userId])
+}
+
+// ============================================================
+//  STORY CHAPTERS — optional multi-part structure within a story
+//  Used when Story.isChaptered = true. Each chapter is a distinct
+//  section of the story (e.g. Part 1, Part 2) with its own content
+//  and optional pay-per-chapter price. Ordered by the `order` field.
+// ============================================================
+
+model StoryChapter {
+  id        Int      @id @default(autoincrement())
+  title     String   // e.g. "Chapter 1: The Arrival"
+  content   String   @db.LongText
+  order     Int      @default(0)  // display order — lower numbers appear first
+  // Running view count — incremented each time the chapter reading page is loaded
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // Pay-per-chapter — if price is set, readers must purchase this chapter to read it.
+  // null = chapter is free (even if the story has a price).
+  price           Int?             // Price in cents, e.g. 99 = $0.99
+  chapterPurchases ChapterPurchase[]
+
+  // Index for loading chapters of a story in order
+  @@index([storyId, order])
+}
+
+// ============================================================
+//  WRITING PROMPTS — daily/weekly creative prompts
+//  Admins create prompts to inspire writers. Only one prompt is
+//  `active` at a time (creating a new one deactivates the previous).
+//  Writers submit stories as PromptEntries to respond to the prompt.
+// ============================================================
+model WritingPrompt {
+  id          Int           @id @default(autoincrement())
+  title       String        // Short label e.g. "Weekend Prompt #12"
+  prompt      String        @db.Text  // The full creative brief shown to writers
+  // When true this is the current active prompt shown on the homepage.
+  // Creating a new prompt automatically sets all others to active=false.
+  active      Boolean       @default(true)
+  // Optional end date — after this the prompt is considered expired
+  // and the "Submit" button is hidden on the frontend
+  expiresAt   DateTime?
+  createdAt   DateTime      @default(now())
+
+  entries     PromptEntry[]
+}
+
+// Records that a specific story was submitted as a response to a writing prompt.
+// storyId and userId are stored without FK constraints for flexibility
+// (the story may be deleted without removing prompt credit).
+model PromptEntry {
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+
+  promptId  Int
+  prompt    WritingPrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  storyId   Int  // the story being submitted as a prompt response
+  userId    Int  // the author who submitted it
+
+  // One submission per story per prompt (prevents duplicate entries)
+  @@unique([promptId, storyId])
+}
+
+// ============================================================
+//  READING GOALS — track a user's target stories-per-week/month
+//  Set by the user in their settings. Progress is tracked via
+//  ReadingHistory entries within the chosen period.
+// ============================================================
+model ReadingGoal {
+  id          Int      @id @default(autoincrement())
+  // How many stories the user wants to read in the chosen period
+  target      Int
+  // "weekly" or "monthly" — controls which ReadingHistory entries count
+  period      String   @default("weekly")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // One goal per user
+  userId      Int      @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  BLOCKED USERS
+//  When User A blocks User B:
+//    - B cannot see A's profile or stories
+//    - B cannot comment on A's stories
+//    - B's comments are hidden from A's view
+// ============================================================
+model BlockedUser {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  blockerId Int      // the user who initiated the block
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId Int      // the user who has been blocked
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  // A user can only block another user once
+  @@unique([blockerId, blockedId])
+}
+
+// ============================================================
+//  PASSWORD RESET TOKENS
+//  Generated when a user clicks "Forgot password". The token is
+//  emailed to them as part of a reset link. It expires after a
+//  short window and can only be used once.
+// ============================================================
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique   // random hex string included in the reset URL
+  expiresAt DateTime            // token is invalid after this time
+  used      Boolean  @default(false)  // true once the password has been reset
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  READING STREAK — reward consistent daily reading
+//  Updated each time a user reads a story (via ReadingHistory upsert).
+//  currentStreak resets to 0 if the user misses a day.
+// ============================================================
+model ReadingStreak {
+  id            Int       @id @default(autoincrement())
+  currentStreak Int       @default(0)  // days in a row with at least one story read
+  longestStreak Int       @default(0)  // all-time best streak (never decreases)
+  lastReadAt    DateTime?              // timestamp of the most recent reading session
+  updatedAt     DateTime  @updatedAt
+
+  userId        Int       @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  COMMENT REACTIONS — emoji reactions on individual comments
+// ============================================================
+model CommentReaction {
+  id        Int      @id @default(autoincrement())
+  emoji     String   // e.g. "👍" "😱" "💀" "🔥" "❤️"
+  createdAt DateTime @default(now())
+
+  commentId Int
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+  // Index for loading all reactions on a comment
+  @@index([commentId])
+}
+
+// ============================================================
+//  STORY PRESENCE — tracks who is currently reading a story
+//  Used for the "X reading now" live counter shown on the story page.
+//  Sessions are anonymous — identified by a random token in localStorage,
+//  not by user account — so even logged-out visitors are counted.
+//  Rows older than ~5 minutes are considered stale and excluded from the count.
+// ============================================================
+model StoryPresence {
+  id          Int      @id @default(autoincrement())
+  storyId     Int
+  // Random token generated client-side and stored in localStorage.
+  // Updated (upserted) every ~30 seconds while the user has the story open.
+  sessionId   String
+  lastSeenAt  DateTime @default(now())
+
+  @@unique([storyId, sessionId])
+  @@index([storyId, lastSeenAt])
+}
+
+// ============================================================
+//  TWO-FACTOR AUTH CODES
+//  When 2FA is enabled on a User account, a 6-digit code is emailed
+//  to them on each login attempt. This model stores that code until
+//  it is used or expires. Codes expire after a short window (e.g. 10 min).
+// ============================================================
+model TwoFactorCode {
+  id        Int      @id @default(autoincrement())
+  code      String   // 6-digit numeric string, e.g. "847291"
+  expiresAt DateTime  // code is rejected after this timestamp
+  used      Boolean  @default(false)  // true once the user has entered it successfully
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  WRITING STREAKS
+//  Tracks how many consecutive days an author has published at least
+//  one story. Updated by updateWritingStreak() in /lib/streaks.ts
+//  whenever a story is published (directly or via the cron scheduler).
+// ============================================================
+model WritingStreak {
+  id              Int       @id @default(autoincrement())
+  currentStreak   Int       @default(0)  // days in a row with a published story
+  longestStreak   Int       @default(0)  // all-time personal best (never decreases)
+  lastPublishedAt DateTime?              // timestamp of the most recent publish
+  updatedAt       DateTime  @updatedAt
+
+  userId          Int       @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  PUSH NOTIFICATIONS
+// ============================================================
+// One record per browser/device that has granted notification permission.
+// Stored as the Web Push Protocol subscription object fields.
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  endpoint  String   @unique  // push service URL (browser-specific)
+  p256dh    String            // DH public key for message encryption
+  auth      String            // auth secret for message encryption
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Index for sending push notifications to a user's devices
+  @@index([userId])
+}
+
+// ============================================================
+//  PREMIUM STORY BUNDLES
+//  Admins curate collections of stories and sell them as a single
+//  one-time purchase (e.g. "The Best of 2024 Horror — 10 Stories").
+//  Payment is handled via Stripe Checkout; on success a BundlePurchase
+//  row is created and the user can read all stories in the bundle.
+// ============================================================
+
+// The bundle product itself — title, price, list of included stories
+model StoryBundle {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique   // URL-safe name for /bundles/[slug]
+  description String?  @db.Text
+  coverImage  String?
+  price       Int      // price in cents (e.g. 499 = $4.99)
+  // When false the bundle is hidden from the store but not deleted.
+  // Useful for pulling a bundle while keeping purchase history intact.
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items     StoryBundleItem[]
+  purchases BundlePurchase[]
+}
+
+// Junction table: which stories are included in which bundle
+model StoryBundleItem {
+  id       Int @id @default(autoincrement())
+  bundleId Int
+  storyId  Int
+
+  bundle StoryBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  story  Story       @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // A story can only appear once per bundle
+  @@unique([bundleId, storyId])
+}
+
+// Records a completed purchase — created after Stripe confirms payment.
+// Once this row exists the user can access all stories in the bundle.
+model BundlePurchase {
+  id        Int      @id @default(autoincrement())
+  paidCents Int      // actual amount paid (may differ from bundle.price if discounted)
+  createdAt DateTime @default(now())
+
+  userId   Int
+  bundleId Int
+  user     User        @relation(fields: [userId], references: [id])
+  bundle   StoryBundle @relation(fields: [bundleId], references: [id])
+
+  // A user can only purchase the same bundle once
+  @@unique([userId, bundleId])
+}
+
+// ============================================================
+//  CHAPTER PURCHASE — Pay-per-chapter unlock
+//  When a StoryChapter has a price set, readers must purchase it
+//  before the full content is shown. Payment is via Stripe PaymentIntent.
+//  Flow: create PaymentIntent → reader pays → confirm route creates this row.
+//  Once this row exists the chapter is unlocked for that user.
+// ============================================================
+model ChapterPurchase {
+  id                    Int          @id @default(autoincrement())
+  amount                Int          // Amount paid in cents
+  // Stripe PaymentIntent ID — used to prevent duplicate confirmations
+  stripePaymentIntentId String?
+  createdAt             DateTime     @default(now())
+
+  userId                Int
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  chapterId             Int
+  chapter               StoryChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  // A user can only purchase the same chapter once
+  @@unique([userId, chapterId])
+}
+
+// ============================================================
+//  WRITING SPRINT — Timed writing session
+//  A sprint is a short, focused writing burst where multiple authors
+//  write simultaneously and compare word counts at the end.
+//  Admins create sprints; users join them and update their wordCount
+//  as they write. A leaderboard shows counts in real time.
+// ============================================================
+model WritingSprint {
+  id           Int      @id @default(autoincrement())
+  title        String   // e.g. "Friday Night Sprint"
+  durationMins Int      // Sprint length in minutes (e.g. 15, 30, 60)
+  startsAt     DateTime
+  endsAt       DateTime  // = startsAt + durationMins
+  isActive     Boolean  @default(true)  // false after the sprint ends
+  createdAt    DateTime @default(now())
+
+  participants SprintParticipant[]
+}
+
+// One row per user who joins a sprint.
+// wordCount is updated by the user during the sprint via the sprint UI.
+model SprintParticipant {
+  id         Int           @id @default(autoincrement())
+  wordCount  Int           @default(0)   // words written so far this sprint
+  joinedAt   DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  sprintId   Int
+  sprint     WritingSprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+
+  userId     Int
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // A user can only join the same sprint once
+  @@unique([sprintId, userId])
+}
+
+// ============================================================
+//  CO-AUTHOR REQUEST — Writers seeking collaborators
+//  A public "looking for co-author" post on the collaboration board.
+//  Other writers can read the request and reach out via DM.
+//  isOpen = false once the author has found a collaborator.
+// ============================================================
+model CoauthorRequest {
+  id          Int      @id @default(autoincrement())
+  title       String   // e.g. "Looking for co-author for paranormal series"
+  description String   @db.Text  // detailed brief about the story and what help is needed
+  genres      String?  // Comma-separated mood/genre preferences, e.g. "CREEPY,SUPERNATURAL"
+  isOpen      Boolean  @default(true)  // false = position filled / request closed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  DRAFT SHARE TOKEN — Private read access to unpublished drafts
+//  Authors can generate a share link (containing the token) to let
+//  beta readers or editors view a DRAFT story without publishing it.
+//  The token is validated server-side before showing the draft content.
+// ============================================================
+model DraftShareToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique  // Random hex token embedded in the share URL
+  expiresAt DateTime?         // null = link never expires; set for time-limited access
+  createdAt DateTime @default(now())
+
+  storyId   Int               // the draft story this token grants access to
+  userId    Int               // the author who generated the token
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  TAG FOLLOW — Users subscribe to a tag for story notifications
+// ============================================================
+model TagFollow {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tagId     Int
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tagId])
+}
+
+// ============================================================
+//  BOOK CLUB — Small group reads the same story together
+//  Similar to a real-life book club. One owner creates it, shares the
+//  inviteCode, and members join. The club picks one story at a time
+//  (storyId) and discusses it together (likely via GroupPost or DMs).
+// ============================================================
+model BookClub {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  isPrivate   Boolean  @default(true)  // most clubs are invite-only by default
+  inviteCode  String   @unique         // short alphanumeric code to share with friends
+  createdAt   DateTime @default(now())
+
+  // The story the club is currently reading together.
+  // null = the club hasn't picked a story yet.
+  storyId     Int?
+
+  ownerId     Int
+  owner       User             @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     BookClubMember[]
+}
+
+// Junction table: tracks who belongs to which book club
+model BookClubMember {
+  id       Int      @id @default(autoincrement())
+  joinedAt DateTime @default(now())
+
+  clubId   Int
+  club     BookClub @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // A user can only be a member of the same club once
+  @@unique([clubId, userId])
+}
+
+// ============================================================
+//  FAN ART — Reader-uploaded images for a story
+// ============================================================
+model FanArt {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  caption   String?
+  // Author can feature one piece of fan art to show at the top
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Index for loading fan art on a story page
+  @@index([storyId])
+}
+
+// ============================================================
+//  AUTHOR Q&A — Readers ask authors questions publicly
+//  Shown on the author's public profile page. Readers can ask anything
+//  (inspiration, process, what scared them writing a certain story).
+//  Askers can choose to be anonymous. Authors answer from their dashboard.
+// ============================================================
+model AuthorQA {
+  id          Int       @id @default(autoincrement())
+  question    String    @db.Text
+  answer      String?   @db.Text  // null until the author writes an answer
+  isAnonymous Boolean   @default(false)  // when true, asker's name is hidden
+  createdAt   DateTime  @default(now())
+  answeredAt  DateTime?  // set when the author submits their answer
+
+  // The author being asked (their Q&A page)
+  authorId    Int
+  author      User      @relation("QAAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  // The user who asked — null if anonymous.
+  // onDelete: SetNull means if the asker deletes their account, the question
+  // remains but askerId becomes null (rather than deleting the whole Q&A).
+  askerId     Int?
+  asker       User?     @relation("QAAsker",  fields: [askerId],  references: [id], onDelete: SetNull)
+
+  // Index for loading Q&A on an author's profile (newest first)
+  @@index([authorId, createdAt])
+}
+
+// ============================================================
+//  SEQUEL REQUEST — Readers request a follow-up to a story
+// ============================================================
+model SequelRequest {
+  id        Int      @id @default(autoincrement())
+  message   String?  @db.Text  // optional note from the reader
+  createdAt DateTime @default(now())
+
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId])  // one request per user per story
+}
+
+// ============================================================
+//  STORY PLANNER — Private author outline/notes for a story
+//  A visual drag-and-drop outline tool built into the story editor.
+//  Content is stored as JSON (an array of outline node objects).
+//  Only the story author can see and edit this — it's never public.
+// ============================================================
+model StoryPlanner {
+  id        Int      @id @default(autoincrement())
+  // JSON-encoded outline nodes array, e.g.:
+  // [{"id":"1","title":"The Arrival","content":"MC arrives at cabin","order":0}, ...]
+  content   String   @db.LongText @default("[]")
+  updatedAt DateTime @updatedAt
+
+  // One planner per story
+  storyId   Int      @unique
+}
+
+// ============================================================
+//  BETA READER INVITE — Author invites specific users to review a draft
+//  Before publishing, an author can send invite links to trusted readers
+//  for early feedback. The receiver gets a DraftShareToken-style link
+//  plus a prompt to leave structured feedback stored in `feedback`.
+// ============================================================
+model BetaReaderInvite {
+  id         Int      @id @default(autoincrement())
+  message    String?  @db.Text  // optional personal note from the author to the reader
+  // Lifecycle: PENDING (sent, not yet accepted) → ACCEPTED → DECLINED
+  status     String   @default("PENDING")
+  feedback   String?  @db.Text  // the reviewer's written notes — filled in after reading
+  createdAt  DateTime @default(now())
+  respondedAt DateTime?  // timestamp when the receiver accepted or declined
+
+  storyId    Int       // the draft story being reviewed
+  senderId   Int       // the author who sent the invite
+  sender     User     @relation("BetaSender",   fields: [senderId],   references: [id], onDelete: Cascade)
+  receiverId Int       // the beta reader being invited
+  receiver   User     @relation("BetaReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // One invite per beta reader per story (can re-invite after declining by deleting old row)
+  @@unique([storyId, receiverId])
+}
+
+// ============================================================
+//  CHAIN STORY — Collaborative sequential story writing
+//  One author starts a story; any member of the community can
+//  contribute the next segment. Submitted segments go through a
+//  community vote (approved=false while voting; approved=true when accepted).
+//  The story closes when isOpen=false or maxSegments is reached.
+// ============================================================
+model ChainStory {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  description String?  @db.Text
+  // When false, no more segments are accepted (story is complete or capped)
+  isOpen      Boolean  @default(true)
+  // Maximum number of segments before the story auto-closes
+  maxSegments Int      @default(20)
+  createdAt   DateTime @default(now())
+
+  // The user who started the chain story
+  authorId    Int
+  author      User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  segments    ChainStorySegment[]
+}
+
+// One segment (continuation) of a chain story, written by one author.
+// Multiple segments may be submitted for the same position; the community
+// votes and the winner (most votes) is marked approved=true.
+model ChainStorySegment {
+  id        Int        @id @default(autoincrement())
+  content   String     @db.LongText
+  // false = awaiting community vote; true = accepted and displayed in the story
+  approved  Boolean    @default(false)
+  votes     Int        @default(0)   // vote count from the community
+  order     Int        @default(0)   // which position in the story this segment occupies
+  createdAt DateTime   @default(now())
+
+  chainId   Int
+  chain     ChainStory @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Index for loading segments of a chain story in order
+  @@index([chainId, order])
+}
+
+// ============================================================
+//  BRANCHING STORY NODE — Choose-your-own-horror decision tree
+//  Allows authors to write interactive stories where readers make
+//  choices that change the outcome. The tree is stored as a self-
+//  referencing hierarchy: each node has one parent and zero or more
+//  children. The root node has parentId = null.
+// ============================================================
+model BranchNode {
+  id           Int         @id @default(autoincrement())
+  // The prose shown to the reader when they reach this node
+  content      String      @db.LongText
+  // The button label that leads the reader to this node from its parent.
+  // null for the root node (it's the entry point, not a choice).
+  choiceLabel  String?
+  // When true this is a story ending — no choices are offered
+  isEnding     Boolean     @default(false)
+  // Display order among siblings (multiple choices from the same parent)
+  order        Int         @default(0)
+
+  storyId      Int          // all nodes of the same story share this id
+  parentId     Int?         // null = root node of the story
+  // Self-referencing relation: each node can have a parent and children
+  parent       BranchNode? @relation("BranchTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children     BranchNode[] @relation("BranchTree")
+
+  // Indexes for loading branch tree nodes by story and parent
+  @@index([storyId])
+  @@index([parentId])
+}
+
+// ============================================================
+//  MOOD OF DAY — Admin-pinned daily horror mood for the homepage
+//  The admin picks a Mood from the enum and an optional tagline.
+//  The most recently created MoodOfDay row is shown on the homepage
+//  to set the daily vibe (e.g. "Today's mood: ATMOSPHERIC").
+// ============================================================
+model MoodOfDay {
+  id       Int      @id @default(autoincrement())
+  mood     String   // one of the Mood enum values, e.g. "CREEPY"
+  message  String?  // optional tagline shown on the homepage banner, e.g. "Something watches from the trees…"
+  setAt    DateTime @default(now())
+  setById  Int      // id of the admin user who set it (not a FK for simplicity)
+}
+
+// ============================================================
+//  OFFLINE SAVED STORY — Stories saved for PWA offline reading
+//  When a reader clicks "Save for offline" the story content is
+//  cached in their browser (via Service Worker) and this row is
+//  created so we know which stories they've saved (for the "My Offline
+//  Library" page). The actual content is in the browser cache, not here.
+// ============================================================
+model OfflineSave {
+  id        Int      @id @default(autoincrement())
+  savedAt   DateTime @default(now())
+
+  userId    Int
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // A user can only save the same story once (re-saving is a no-op)
+  @@unique([userId, storyId])
+}

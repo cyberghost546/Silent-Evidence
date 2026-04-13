@@ -1,0 +1,53 @@
+# .github/workflows/ci.yml
+# Continuous Integration pipeline — runs on every push and pull request.
+# Checks: type checking, linting, and formatting.
+# This catches bugs before they reach production without needing to run the full app.
+
+name: CI
+
+# Trigger on every push and pull request to any branch
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  check:
+    name: Type Check, Lint & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js — matches the version used locally
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # Cache npm dependencies so subsequent runs are faster
+          cache: 'npm'
+
+      # 3. Install dependencies (uses package-lock.json for reproducible installs)
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Generate Prisma client — needed for TypeScript to resolve Prisma types
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      # 5. TypeScript type check — catches type errors without building
+      #    --noEmit means it checks types but doesn't output any files
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
+      # 6. ESLint — catches code quality and style issues
+      - name: Lint
+        run: npm run lint
+
+      # 7. Prettier — checks formatting without modifying files
+      #    Fails if any file isn't formatted correctly
+      - name: Check formatting
+        run: npm run format:check

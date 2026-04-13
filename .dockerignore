@@ -1,0 +1,21 @@
+# Dependencies — installed fresh inside Docker
+node_modules
+
+# Next.js build output — rebuilt inside Docker
+.next
+
+# Git history — not needed in the image
+.git
+.gitignore
+
+# Local env file — secrets are passed via docker-compose environment section
+.env
+.env.*
+
+# Editor / OS clutter
+.DS_Store
+*.log
+npm-debug.log*
+
+# Prisma migrations are included, but generated client is rebuilt inside Docker
+# (no exclusion needed — prisma generate runs during build)

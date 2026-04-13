@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm i:*)",
+      "Bash(npm info:*)",
+      "Bash(node -e \"const p = require\\(''c:/Users/chris/Documents/GitHub/Silent-Evidence/node_modules/prisma/config''\\); console.log\\(Object.keys\\(p\\)\\)\")",
+      "Bash(npx tsc:*)",
+      "Bash(find app:*)",
+      "Bash(python3)",
+      "Bash(head -5 /c/Users/chris/Documents/GitHub/Silent-Evidence/app/api/comments/[id]/route.ts)",
+      "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"yes\" npx prisma db push --force-reset)",
+      "Bash(mysql -u root -e \"DROP DATABASE IF EXISTS silent_evidence; CREATE DATABASE silent_evidence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(where mysql:*)",
+      "Bash(\"C:/laragon/bin/mysql/mysql-8.0.30-winx64/bin/mysql.exe\" -u root -e \"DROP DATABASE IF EXISTS silent_evidence; CREATE DATABASE silent_evidence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"C:/laragon/bin/mysql/mariadb-10.6/bin/mysql.exe\" -u root -e \"DROP DATABASE IF EXISTS silent_evidence; CREATE DATABASE silent_evidence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Read(//c/laragon/bin/**)",
+      "Read(//c//**)",
+      "Bash(cmd /c \"dir /s /b C:\\\\laragon\\\\bin\\\\mysql\\\\mysql.exe 2>nul\")",
+      "Bash(node -e ':*)",
+      "Bash(cmd /c \"dir /s /b C:\\\\laragon\\\\data\\\\silent_evidence 2>nul & dir /s /b C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MySQL\\\\MySQL Server 8.0\\\\Data\\\\silent_evidence\\\\\" 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MariaDB\\\\\" 2>nul | head -5\")",
+      "Bash(cmd /c \"rmdir /s /q C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence\")"
+    ]
+  }
+}

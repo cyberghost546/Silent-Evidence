@@ -1,0 +1,77 @@
+services:
+
+  # ── MySQL database ──────────────────────────────────────────────────────────
+  db:
+    image: mysql:8
+    container_name: silent_evidence_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}   # change in .env
+      MYSQL_DATABASE: silent_evidence
+    ports:
+      - "3306:3306"   # expose so you can connect with a GUI tool (e.g. TablePlus)
+    volumes:
+      - db_data:/var/lib/mysql   # persist data between container restarts
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis cache ─────────────────────────────────────────────────────────────
+  # In-memory cache for expensive queries (trending stories, leaderboards, etc.)
+  # Falls back gracefully if unavailable — the app works without it, just slower
+  redis:
+    image: redis:7-alpine
+    container_name: silent_evidence_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data   # persist cache across restarts (RDB snapshots)
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Next.js app ─────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: silent_evidence_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # wait for MySQL to be ready before starting
+      redis:
+        condition: service_healthy   # wait for Redis to be ready
+    ports:
+      - "3000:3000"
+    environment:
+      # Point to the db service (not localhost)
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-secret}@db:3306/silent_evidence
+
+      # Redis cache — points to the redis service container
+      REDIS_URL: redis://redis:6379
+
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET}
+
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+      STRIPE_PREMIUM_MONTHLY_PRICE_ID: ${STRIPE_PREMIUM_MONTHLY_PRICE_ID}
+      STRIPE_PREMIUM_YEARLY_PRICE_ID: ${STRIPE_PREMIUM_YEARLY_PRICE_ID}
+
+volumes:
+  db_data:    # named volume — MySQL data survives container restarts/rebuilds
+  redis_data: # named volume — Redis RDB snapshots persist across restarts
