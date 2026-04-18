@@ -4,7 +4,7 @@
 // Handles mood pill filtering (fetches from /api/stories?mood=) without a page reload.
 // Also renders the CurrentlyReadingBadge on each card.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import MoodFilter from './MoodFilter';
 import CurrentlyReadingBadge from './CurrentlyReadingBadge';
@@ -32,30 +32,71 @@ type Props = {
   readIds: number[];
 };
 
+const PAGE_SIZE = 6;
+
 export default function LatestStoriesSection({ initialStories, readIds }: Props) {
-  const [activeMood, setActiveMood] = useState('');         // '' = show all moods
+  const [activeMood, setActiveMood] = useState('');
   const [stories, setStories]       = useState<Story[]>(initialStories);
   const [loading, setLoading]       = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore]       = useState(initialStories.length === PAGE_SIZE);
+  const skipRef   = useRef(initialStories.length);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const readSet = new Set(readIds);
 
-  // Re-fetch stories whenever the mood filter changes.
-  // Skip on first render — initial stories already come from SSR.
+  // Re-fetch from the top when the mood filter changes
   const fetchStories = useCallback(async (mood: string) => {
     setLoading(true);
+    skipRef.current = 0;
     try {
-      const qs  = mood ? `?mood=${encodeURIComponent(mood)}&take=6` : '?take=6';
+      const qs = mood ? `?mood=${encodeURIComponent(mood)}&take=${PAGE_SIZE}` : `?take=${PAGE_SIZE}`;
       const res = await fetch(`/api/stories${qs}`);
       if (res.ok) {
         const data = await res.json();
         setStories(data);
+        setHasMore(data.length === PAGE_SIZE);
+        skipRef.current = data.length;
       }
     } catch {
-      // Network error — keep existing stories visible
+      // keep existing stories on network error
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Append the next page — triggered by IntersectionObserver hitting the sentinel div
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const moodParam = activeMood ? `&mood=${encodeURIComponent(activeMood)}` : '';
+      const qs = `?take=${PAGE_SIZE}&skip=${skipRef.current}${moodParam}`;
+      const res = await fetch(`/api/stories${qs}`);
+      if (res.ok) {
+        const data = await res.json();
+        setStories(prev => [...prev, ...data]);
+        setHasMore(data.length === PAGE_SIZE);
+        skipRef.current += data.length;
+      }
+    } catch {
+      // silently fail — user can scroll back to retry
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [activeMood, hasMore, loadingMore]);
+
+  // Wire up IntersectionObserver to the sentinel div at the bottom of the list
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   const handleMoodChange = (mood: string) => {
     setActiveMood(mood);
@@ -119,7 +160,10 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
                   <img
                     src={story.coverImage}
                     alt={story.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={e => (e.currentTarget as HTMLImageElement).classList.add('img-loaded')}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 img-lazy"
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
@@ -171,6 +215,15 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Infinite scroll sentinel — IntersectionObserver watches this div */}
+      {hasMore && !loading && (
+        <div ref={sentinelRef} className="h-12 flex items-center justify-center mt-4">
+          {loadingMore && (
+            <span className="text-gray-600 text-sm animate-pulse">Loading more…</span>
+          )}
         </div>
       )}
     </section>

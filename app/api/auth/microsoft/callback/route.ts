@@ -22,13 +22,17 @@ import { prisma } from '@/lib/prisma';
 // This function runs when Microsoft redirects the browser back to our callback URL.
 // "req" contains the URL with the authorization code as a query parameter.
 export async function GET(req: NextRequest) {
-  // Extract the 'code' query parameter from the redirect URL.
-  // Example URL: /api/auth/microsoft/callback?code=M.R3_BAY...&session_state=...
-  const code = req.nextUrl.searchParams.get('code');
+  const code  = req.nextUrl.searchParams.get('code');
+  const state = req.nextUrl.searchParams.get('state');
 
-  // If there's no code, the user likely denied permission or an error occurred.
-  // Redirect to the login page with an error query parameter.
   if (!code) return NextResponse.redirect(new URL('/login?error=microsoft', req.url));
+
+  // Verify the state parameter matches what we stored in the cookie.
+  // This prevents OAuth CSRF attacks.
+  const storedState = req.cookies.get('oauth_state_microsoft')?.value;
+  if (!state || !storedState || state !== storedState) {
+    return NextResponse.redirect(new URL('/login?error=microsoft', req.url));
+  }
 
   // Read the base URL for our site from environment variables.
   // The ! asserts the variable is definitely defined (TypeScript non-null assertion).
@@ -126,8 +130,9 @@ export async function GET(req: NextRequest) {
   res.cookies.set('userId', String(user.id), {
     httpOnly: true,
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+    maxAge: 60 * 60 * 24 * 7,
     sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
   });
 
   // Return the redirect response — the browser stores the cookie and navigates to '/'

@@ -61,6 +61,15 @@ const links = [
   { href: '/admin/spotlight',       label: 'Story Spotlight',      icon: '🔦' },
   { href: '/admin/polls',           label: 'Poll Manager',         icon: '📊' },
   { href: '/admin/audit-log',       label: 'Audit Log',            icon: '📋' },
+  { href: '/admin/calendar',        label: 'Content Calendar',     icon: '📅' },
+  { href: '/admin/email-templates', label: 'Email Templates',      icon: '✉️'  },
+  { href: '/admin/seo',             label: 'SEO Dashboard',        icon: '🔍' },
+  { href: '/admin/heatmap',         label: 'Activity Heatmap',     icon: '🔥' },
+  { href: '/admin/rate-limits',     label: 'Rate Limits',          icon: '🚦' },
+  { href: '/admin/settings',        label: 'Site Settings',        icon: '⚙️'  },
+  { href: '/admin/merge',           label: 'Merge Stories',        icon: '🔀' },
+  { href: '/admin/toxicity',        label: 'AI Toxicity Queue',    icon: '🤖' },
+  { href: '/admin/ip-blocklist',    label: 'IP Blocklist',         icon: '🛡️' },
 ];
 
 export default function AdminSidebar({ username }: { username: string }) {

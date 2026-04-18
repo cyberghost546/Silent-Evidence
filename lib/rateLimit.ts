@@ -4,7 +4,7 @@
 // NOTE: This is per-process only. For multi-server deployments, swap to Redis-backed rate limiting.
 
 // Stores the count of requests and the time the window started for each key
-const store = new Map<string, { count: number; windowStart: number }>();
+export const store = new Map<string, { count: number; windowStart: number }>();
 
 // Clean up old entries every 5 minutes so the Map doesn't grow forever
 setInterval(() => {
@@ -79,19 +79,26 @@ export function checkRateLimit(
 
 /**
  * getClientIp — extracts the real client IP from Next.js request headers.
- * Falls back to '127.0.0.1' if none is found (e.g. local dev with no proxy).
+ *
+ * Only trusted proxy headers are read:
+ *   x-vercel-forwarded-for — set by Vercel's edge network (cannot be spoofed by clients)
+ *   x-real-ip              — set by Nginx/Cloudflare at the network edge
+ *
+ * We deliberately do NOT trust x-forwarded-for because any client can set that
+ * header to an arbitrary value, which would let attackers rotate fake IPs and
+ * bypass rate limiting entirely.
  */
 export function getClientIp(req: Request): string {
-  // x-forwarded-for is set by reverse proxies (Vercel, Nginx, Cloudflare, etc.)
-  const forwarded = req.headers.get('x-forwarded-for');
-  if (forwarded) {
-    // May be a comma-separated list — take the first (original client) IP
-    return forwarded.split(',')[0].trim();
-  }
-  // x-real-ip is set by some proxies (e.g. Nginx with proxy_set_header)
+  // Vercel sets this header at the edge — it reflects the real client IP and
+  // cannot be overridden by the client's own request headers.
+  const vercelIp = req.headers.get('x-vercel-forwarded-for');
+  if (vercelIp) return vercelIp.split(',')[0].trim();
+
+  // Nginx / Cloudflare set x-real-ip at the network boundary — trusted.
   const realIp = req.headers.get('x-real-ip');
   if (realIp) return realIp.trim();
 
+  // Local development fallback — no proxy present.
   return '127.0.0.1';
 }
 

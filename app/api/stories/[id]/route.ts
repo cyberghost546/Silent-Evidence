@@ -72,6 +72,21 @@ async function sendNewsletterAsync({
   }
 }
 
+// GET /api/stories/[id] — returns basic public story info (used by Continue Reading strip)
+export async function GET(_req: Request, { params }: Params) {
+  const { id } = await params;
+  const storyId = Number(id);
+  if (!Number.isFinite(storyId) || storyId <= 0) {
+    return NextResponse.json({ error: 'Invalid story ID.' }, { status: 400 });
+  }
+  const story = await prisma.story.findUnique({
+    where: { id: storyId, status: 'PUBLISHED' },
+    select: { slug: true, title: true, coverImage: true },
+  });
+  if (!story) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
+  return NextResponse.json(story);
+}
+
 export async function PATCH(req: Request, { params }: Params) {
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);

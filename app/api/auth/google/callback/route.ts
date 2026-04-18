@@ -22,14 +22,18 @@ import { prisma } from '@/lib/prisma';
 // This function runs when Google redirects the browser back to our callback URL.
 // "req" contains the URL with the authorization code in the query string.
 export async function GET(req: NextRequest) {
-  // Extract the 'code' query parameter from the URL.
-  // Example URL: /api/auth/google/callback?code=4/0AfJohXn...&scope=...
-  // req.nextUrl.searchParams is a URLSearchParams object for the current URL.
-  const code = req.nextUrl.searchParams.get('code');
+  const code  = req.nextUrl.searchParams.get('code');
+  const state = req.nextUrl.searchParams.get('state');
 
-  // If there's no code, something went wrong (e.g. user denied permission).
-  // Redirect to the login page with an error query param so the UI can show a message.
   if (!code) return NextResponse.redirect(new URL('/login?error=google', req.url));
+
+  // Verify the state parameter matches what we stored in the cookie.
+  // This prevents OAuth CSRF — an attacker tricking a victim into completing
+  // the attacker's own OAuth flow.
+  const storedState = req.cookies.get('oauth_state_google')?.value;
+  if (!state || !storedState || state !== storedState) {
+    return NextResponse.redirect(new URL('/login?error=google', req.url));
+  }
 
   // Read the base URL for our site (e.g. "https://silentevidence.com")
   // The ! asserts this env variable is definitely set (TypeScript non-null assertion)
@@ -124,10 +128,10 @@ export async function GET(req: NextRequest) {
   res.cookies.set('userId', String(user.id), {
     httpOnly: true,
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+    maxAge: 60 * 60 * 24 * 7,
     sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
   });
 
-  // Return the redirect — the browser stores the cookie and navigates to '/'
   return res;
 }

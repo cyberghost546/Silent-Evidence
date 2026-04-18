@@ -55,6 +55,8 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
   const [customWarning, setCustomWarning] = useState('');
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState('');
+  const [aiLoading,    setAiLoading]    = useState(false);
   const [delConfirm,   setDelConfirm]   = useState(false);
   const [saveStatus,   setSaveStatus]   = useState<'idle' | 'saving' | 'saved'>('idle');
   const [uploadingImg, setUploadingImg] = useState(false);
@@ -167,6 +169,25 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
     router.push(status === 'PUBLISHED' ? `/story/${data.slug}` : '/my-stories');
   };
 
+  const getAiSuggestion = async () => {
+    if (!content.trim() || aiLoading) return;
+    setAiLoading(true);
+    setAiSuggestion('');
+    try {
+      const res = await fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, title }),
+      });
+      const data = await res.json();
+      setAiSuggestion(data.suggestion ?? 'No suggestion generated.');
+    } catch {
+      setAiSuggestion('Could not reach the AI. Try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const deleteStory = async () => {
     setLoading(true);
     const res = await fetch(`/api/stories/${story.id}`, { method: 'DELETE' });
@@ -263,6 +284,32 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
           </div>
         </div>
         <RichEditor value={content} onChange={handleContentChange} />
+
+        {/* AI writing suggestion — asks Claude what could happen next */}
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={getAiSuggestion}
+            disabled={aiLoading || !content.trim()}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-900/40 border border-purple-700/50 text-purple-300 hover:bg-purple-900/70 hover:border-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span>{aiLoading ? '✦' : '✦'}</span>
+            {aiLoading ? 'Thinking…' : 'What happens next?'}
+          </button>
+          {aiSuggestion && (
+            <div className="mt-3 p-4 bg-purple-950/30 border border-purple-800/40 rounded-xl">
+              <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-2">AI Suggestion</p>
+              <p className="text-sm text-gray-300 leading-relaxed italic">{aiSuggestion}</p>
+              <button
+                type="button"
+                onClick={() => setAiSuggestion('')}
+                className="mt-2 text-xs text-gray-600 hover:text-gray-400 transition"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div>

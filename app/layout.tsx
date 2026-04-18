@@ -14,6 +14,7 @@ import PWAInstallPrompt from "./components/ui/PWAInstallPrompt";
 import ChatBot from "./components/ui/ChatBot";
 import TutorialGuide from "./components/ui/TutorialGuide";
 import CookieBanner from "./components/ui/CookieBanner";
+import ScrollToTop from "./components/ui/ScrollToTop";
 
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
@@ -114,6 +115,8 @@ export default async function RootLayout({
         <TutorialGuide />
         {/* GDPR cookie consent banner — shown once to new visitors */}
         <CookieBanner />
+        {/* Scroll-to-top button — appears after scrolling 400 px */}
+        <ScrollToTop />
       </body>
     </html>
   );

@@ -25,6 +25,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,6 +64,13 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
 
   // Which user is currently being saved/deleted (shows a spinner)
   const [loading, setLoading]     = useState<number | null>(null);
+  const [selected, setSelected]   = useState<Set<number>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  const toggleSelect = (id: number) =>
+    setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleAll = () =>
+    setSelected(prev => prev.size === filtered.length ? new Set() : new Set(filtered.map(u => u.id)));
 
   // Search box input value
   const [search, setSearch]       = useState('');
@@ -128,6 +136,24 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
     setLoading(userId);
     await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
     setLoading(null);
+    router.refresh();
+  };
+
+  const bulkAction = async (action: 'DELETE' | 'BAN' | 'SUSPEND') => {
+    if (selected.size === 0) return;
+    const label = action === 'DELETE' ? 'Delete' : action === 'BAN' ? 'Ban' : 'Suspend';
+    if (!confirm(`${label} ${selected.size} users?`)) return;
+    setBulkLoading(true);
+    await Promise.all([...selected].map(id => {
+      if (action === 'DELETE') return fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+      return fetch('/api/admin/warnings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: id, action, reason: `Bulk ${label.toLowerCase()} by admin` }),
+      });
+    }));
+    setBulkLoading(false);
+    setSelected(new Set());
     router.refresh();
   };
 
@@ -216,6 +242,23 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
         {search && <> matching <span className="text-red-400">"{search}"</span></>}
       </p>
 
+      {/* ── Bulk action bar — shown when rows are selected ── */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl">
+          <span className="text-sm font-semibold text-red-300">{selected.size} selected</span>
+          <button type="button" onClick={() => bulkAction('SUSPEND')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 hover:bg-yellow-600/30 transition disabled:opacity-50">
+            Suspend
+          </button>
+          <button type="button" onClick={() => bulkAction('BAN')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600/20 border border-orange-600/40 text-orange-400 hover:bg-orange-600/30 transition disabled:opacity-50">
+            Ban
+          </button>
+          <button type="button" onClick={() => bulkAction('DELETE')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 hover:bg-red-600/30 transition disabled:opacity-50">
+            Delete
+          </button>
+          <button type="button" onClick={() => setSelected(new Set())} className="ml-auto text-xs text-gray-500 hover:text-white transition">Clear</button>
+        </div>
+      )}
+
       {/* ── Table ── */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(34,197,94,0.1)]">
         <div className="overflow-x-auto">
@@ -223,6 +266,15 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
             <thead>
               <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider bg-gray-950/50">
 
+                {/* Select-all checkbox */}
+                <th className="px-4 py-3 w-8" aria-label="Select all">
+                  <input type="checkbox"
+                    checked={filtered.length > 0 && selected.size === filtered.length}
+                    onChange={toggleAll}
+                    aria-label="Select all users"
+                    className="accent-red-500 cursor-pointer"
+                  />
+                </th>
                 {/* Sortable column headers */}
                 {[
                   { key: 'id',       label: 'ID',       align: 'left'   },
@@ -249,15 +301,18 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
               {filtered.length === 0 ? (
                 // Empty state when no users match the search
                 <tr>
-                  <td colSpan={8} className="px-5 py-16 text-center text-gray-500">
+                  <td colSpan={9} className="px-5 py-16 text-center text-gray-500">
                     <p className="text-3xl mb-2">🔍</p>
                     <p>No users found matching your search.</p>
                   </td>
                 </tr>
               ) : (
                 filtered.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-800/30 transition group">
-
+                  <tr key={user.id} className={`hover:bg-gray-800/30 transition group ${selected.has(user.id) ? 'bg-red-950/10' : ''}`}>
+                    {/* Row checkbox */}
+                    <td className="px-4 py-3 w-8">
+                      <input type="checkbox" checked={selected.has(user.id)} onChange={() => toggleSelect(user.id)} aria-label={`Select ${user.username}`} className="accent-red-500 cursor-pointer" />
+                    </td>
                     {/* ID — shown as a subtle badge */}
                     <td className="px-4 py-3">
                       <span className="text-xs font-mono text-gray-500 bg-gray-800 border border-gray-700 px-2 py-0.5 rounded-md">

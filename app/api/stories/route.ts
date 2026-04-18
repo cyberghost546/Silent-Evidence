@@ -20,6 +20,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const mood = searchParams.get('mood') || undefined;   // undefined = no filter
   const take = Math.min(Number(searchParams.get('take') ?? 6), 30);
+  const skip = Math.max(Number(searchParams.get('skip') ?? 0), 0);
 
   // Get the viewer's age group to filter content ratings
   const c        = await cookies();
@@ -37,8 +38,8 @@ export async function GET(req: Request) {
     ['ALL', 'TEEN', 'MATURE'];  // ADULT sees everything
 
   try {
-    // Cache key includes ageGroup so different age groups get different cached results
-    const cacheKey = `stories:list:${mood ?? 'all'}:${take}:${ageGroup}`;
+    // Cache key includes ageGroup + skip so different pages get different cached results
+    const cacheKey = `stories:list:${mood ?? 'all'}:${take}:${skip}:${ageGroup}`;
 
     const stories = await cache(cacheKey, TTL.MEDIUM, () =>
       prisma.story.findMany({
@@ -50,6 +51,7 @@ export async function GET(req: Request) {
         },
         orderBy: { createdAt: 'desc' },
         take,
+        skip,
         // Using include avoids N+1 — Prisma fetches relations in a single extra query,
         // not one query per story. _count uses an aggregate subquery, not separate lookups.
         include: {

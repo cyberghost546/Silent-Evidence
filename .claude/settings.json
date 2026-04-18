@@ -18,7 +18,12 @@
       "Bash(cmd /c \"dir /s /b C:\\\\laragon\\\\bin\\\\mysql\\\\mysql.exe 2>nul\")",
       "Bash(node -e ':*)",
       "Bash(cmd /c \"dir /s /b C:\\\\laragon\\\\data\\\\silent_evidence 2>nul & dir /s /b C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MySQL\\\\MySQL Server 8.0\\\\Data\\\\silent_evidence\\\\\" 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MariaDB\\\\\" 2>nul | head -5\")",
-      "Bash(cmd /c \"rmdir /s /q C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence\")"
+      "Bash(cmd /c \"rmdir /s /q C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence\")",
+      "Bash(xargs grep *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",
+      "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\api\\stories\\[id]"
     ]
   }
 }
