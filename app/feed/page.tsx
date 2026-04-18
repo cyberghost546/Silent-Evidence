@@ -101,7 +101,7 @@ export default async function FeedPage() {
               // Fall back to a generated avatar if the author hasn't uploaded one.
               // ui-avatars.com generates an avatar image from initials — very handy!
               const avatar = story.author.profile?.avatar ??
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
               return (
                 // Each card is a full <Link> so clicking anywhere navigates to the story
                 <Link key={story.id} href={`/story/${story.slug}`}

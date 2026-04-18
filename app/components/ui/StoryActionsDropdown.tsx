@@ -30,6 +30,9 @@ export default function StoryActionsDropdown({
   const [open, setOpen]     = useState(false);
   // copied tracks whether the "Copy link" action just ran so we can show "Copied!" feedback
   const [copied, setCopied] = useState(false);
+  // reported tracks whether the user just submitted a report so we can show a thank-you
+  const [reported, setReported]   = useState(false);
+  const [reporting, setReporting] = useState(false);
 
   // ref wraps the whole component so we can detect clicks outside it
   const ref = useRef<HTMLDivElement>(null);
@@ -69,6 +72,21 @@ export default function StoryActionsDropdown({
   // Share to Reddit — pre-fills the submit form with title + URL
   const shareReddit = () =>
     window.open(`https://reddit.com/submit?title=${encodeURIComponent(storyTitle)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+
+  // Report — sends a moderation report and shows a confirmation thank-you message
+  const report = async () => {
+    if (reporting || reported) return;
+    setReporting(true);
+    try {
+      await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId, reason: 'Reported by reader' }),
+      });
+    } catch { /* show feedback regardless of network error */ }
+    setReporting(false);
+    setReported(true);
+  };
 
   return (
     // Wrapper div is position:relative so the dropdown panel positions itself below the button
@@ -169,6 +187,35 @@ export default function StoryActionsDropdown({
             </svg>
             Share on Reddit
           </button>
+
+          {/* Report — lets any logged-in reader flag the story for moderation */}
+          {isLoggedIn && !isAuthor && (
+            <>
+              <div className="h-px bg-gray-800 my-1" />
+              <button
+                type="button"
+                onClick={report}
+                disabled={reporting || reported}
+                className={`flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-lg transition text-left disabled:opacity-60 ${reported ? 'text-green-400' : 'text-red-400 hover:bg-gray-800'}`}
+              >
+                {reported ? (
+                  <>
+                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-green-400">Report received — thanks</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 21l9-18 9 18M9 13h6" />
+                    </svg>
+                    {reporting ? 'Reporting…' : 'Report story'}
+                  </>
+                )}
+              </button>
+            </>
+          )}
 
           {/* Edit — only shown when the logged-in user is the story's author */}
           {isAuthor && (

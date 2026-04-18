@@ -88,7 +88,7 @@ function CommentCard({ comment }: { comment: CommentWithRelations }) {
   // The generated avatar uses the username initials so each one looks unique.
   const avatar =
     comment.user.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.username)}&background=random&color=fff&size=64`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.username)}&background=7f1d1d&color=fff&size=64`;
 
   // LiveTimer expects an ISO 8601 string — convert the Date object here.
   const iso = comment.createdAt.toISOString();

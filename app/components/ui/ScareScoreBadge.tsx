@@ -1,6 +1,6 @@
 'use client';
 // app/components/ui/ScareScoreBadge.tsx
-// Displays the AI hype score for an anime story as a star rating out of 10.
+// Displays the AI scare score for a horror story as a star rating out of 10.
 // If the viewer is the author and no score exists yet, shows a button to
 // request an AI evaluation via POST /api/stories/[id]/scare-score.
 

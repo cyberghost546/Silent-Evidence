@@ -46,8 +46,8 @@ type Group = {
   members: { id: number; role: string }[];
 };
 
-// Anime genre filter tabs for group browsing
-const SUBGENRES = ["All","Paranormal","Supernatural","True Crime","Unexplained Disappearances","Haunted Locations","Near Death Experiences","Unsolved Mysteries","Real Paranormal","Camping Horror","Stalker Stories","Home Invasion","Strange Encounters","Cursed Places","Serial Killers","Sleep Paralysis","Abandoned Places","Cults & Rituals","Witness Accounts","Roadside Horror","Online Horror","Other"];
+// Horror genre filter tabs for group browsing
+const SUBGENRES = ['All', 'Paranormal', 'Supernatural', 'Psychological Horror', 'Slasher', 'Gothic Horror', 'Cosmic Horror', 'Dark Fantasy', 'Other'];
 
 export default function GroupsClient({ groups: initial, userId }: { groups: Group[]; userId: number | null }) {
   // groups — full list, starts from server-fetched data passed as props
@@ -70,7 +70,7 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Groups</h1>
-          <p className="text-sm text-gray-500 mt-1">Anime communities for every genre.</p>
+          <p className="text-sm text-gray-500 mt-1">Horror communities for every genre.</p>
         </div>
         {userId && (
           <button

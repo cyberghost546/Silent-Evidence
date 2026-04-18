@@ -118,6 +118,21 @@ export default function UserMenu({ username, avatar, role }: Props) {
               Write a Story
             </Link>
 
+            {/* Admin Dashboard link — only visible to users whose role is "ADMIN" */}
+            {role === 'ADMIN' && (
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition"
+              >
+                {/* Dashboard icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zm10 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V6zM4 16a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2zm10 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-2z" />
+                </svg>
+                Admin Dashboard
+              </Link>
+            )}
+
             <div className="my-1 border-t border-gray-700" />
 
             <Link
@@ -222,20 +237,41 @@ export default function UserMenu({ username, avatar, role }: Props) {
               Settings
             </Link>
 
-            {/* Admin Dashboard link — only visible to users whose role is "ADMIN" */}
-            {role === 'ADMIN' && (
-              <Link
-                href="/admin"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition"
-              >
-                {/* Dashboard icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zm10 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V6zM4 16a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2zm10 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-2z" />
-                </svg>
-                Admin Dashboard
-              </Link>
-            )}
+
+            {/* Divider */}
+            <div className="my-1 border-t border-gray-700" />
+
+            {/* Site Guide — opens the step-by-step tutorial overlay */}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                window.dispatchEvent(new CustomEvent('open-tutorial'));
+              }}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition"
+            >
+              {/* Book icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Site Guide
+            </button>
+
+            {/* AI Chat — opens The Watcher chatbot */}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                window.dispatchEvent(new CustomEvent('open-chatbot'));
+              }}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition"
+            >
+              {/* Skull icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2C7.03 2 3 6.03 3 11c0 3.1 1.5 5.84 3.82 7.57L7 21h10l.18-2.43C19.5 16.84 21 14.1 21 11c0-4.97-4.03-9-9-9zM9 14v-1H8v-1h1v-1h1v1h1v1h-1v1H9zm6 0h-1v-1h-1v-1h1v-1h1v1h1v1h-1v1zm-3 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+              </svg>
+              Ask The Watcher
+            </button>
 
             {/* Divider */}
             <div className="my-1 border-t border-gray-700" />

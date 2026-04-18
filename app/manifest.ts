@@ -25,8 +25,8 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#111827',
 
     // Color of the status bar at the top of the phone
-    // Color of the status bar — deep red for the horror theme
-    theme_color: '#dc2626',
+    // Color of the status bar — black/green for the horror theme
+    theme_color: '#22c55e',
 
     // App icons in different sizes for different devices
     icons: [

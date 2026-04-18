@@ -19,6 +19,7 @@ import { cookies } from 'next/headers';
 
 // Import the Prisma client to read and write to the database
 import { prisma } from '@/lib/prisma';
+import { revalidateTag } from 'next/cache';
 
 // The key used to store the announcement in the SiteSetting table.
 // Using a constant avoids typos — every reference to this string goes through KEY.
@@ -99,6 +100,9 @@ export async function POST(req: Request) {
     create: { key: KEY, value: message.trim() },
   });
 
+  // Bust the 60-second cache so the new banner shows immediately on all pages
+  revalidateTag('announcement-banner');
+
   // Return a success acknowledgement
   return NextResponse.json({ ok: true });
 }
@@ -116,6 +120,9 @@ export async function DELETE() {
   // deleteMany removes all rows matching the filter — safe even if the row doesn't exist
   // (deleteMany won't throw when 0 rows match, unlike delete() which would)
   await prisma.siteSetting.deleteMany({ where: { key: KEY } });
+
+  // Bust the cache so the banner disappears immediately
+  revalidateTag('announcement-banner');
 
   // Return a success acknowledgement
   return NextResponse.json({ ok: true });

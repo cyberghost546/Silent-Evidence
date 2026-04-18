@@ -31,8 +31,8 @@
 
 import { useState } from 'react';
 
-// Anime genre options for group creation
-const SUBGENRES = ["Paranormal","Supernatural","True Crime","Unexplained Disappearances","Haunted Locations","Near Death Experiences","Unsolved Mysteries","Real Paranormal","Camping Horror","Stalker Stories","Home Invasion","Strange Encounters","Cursed Places","Serial Killers","Sleep Paralysis","Abandoned Places","Cults & Rituals","Witness Accounts","Roadside Horror","Online Horror","Other"];
+// Horror genre options for group creation
+const SUBGENRES = ['Paranormal', 'Supernatural', 'Psychological Horror', 'Slasher', 'Gothic Horror', 'Cosmic Horror', 'Dark Fantasy', 'Other'];
 
 type Group = {
   id: number; name: string; slug: string; description: string | null;

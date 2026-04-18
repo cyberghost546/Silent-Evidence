@@ -17,10 +17,29 @@ import { NextResponse } from 'next/server';
 // Import the Prisma database client to look up and update 2FA code records
 import { prisma } from '@/lib/prisma';
 
+// Import rate-limiting helpers to block brute-force attempts on the 6-digit code.
+// A 6-digit code has only 1,000,000 possibilities — without rate limiting an
+// attacker who has the tempUserId can enumerate all codes in seconds.
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { tooManyRequests } from '@/lib/apiError';
+
 // ── POST handler ──────────────────────────────────────────────────────────────
 // This function runs whenever a POST request is made to /api/auth/2fa/verify.
 // "req" is a standard Web API Request containing the submitted code and user ID.
 export async function POST(req: Request) {
+  // ── Rate limiting ─────────────────────────────────────────────────────────
+  // Allow at most 5 code attempts per IP per 15 minutes.
+  // We key on IP alone first so that an attacker cannot bypass this by rotating
+  // tempUserIds — all guesses from a single IP are counted together.
+  const ip = getClientIp(req);
+  const ipLimit = checkRateLimit(ip, '2fa-verify', {
+    limit: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+  });
+  if (ipLimit.blocked) {
+    return tooManyRequests('Too many verification attempts. Please wait 15 minutes and try again.');
+  }
+
   // Parse the JSON body sent by the 2FA verification form.
   // Expected shape: { tempUserId: number, code: string }
   // tempUserId — the user ID returned by the login endpoint in its 202 response
@@ -34,6 +53,16 @@ export async function POST(req: Request) {
 
   // Convert tempUserId to a proper integer (it may arrive as a string from JSON)
   const userId = Number(tempUserId);
+
+  // Also rate-limit per user ID so that distributed IPs cannot share the attempt
+  // budget against a single victim account (5 attempts per userId per 15 minutes).
+  const userLimit = checkRateLimit(String(userId), '2fa-verify-user', {
+    limit: 5,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (userLimit.blocked) {
+    return tooManyRequests('Too many verification attempts for this account. Please request a new code.');
+  }
 
   // ── Validate the code against the database ────────────────────────────────
   // Look for a TwoFactorCode record that:

@@ -82,7 +82,7 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
             <a href="/story/${story.slug}" style="display:inline-block;margin-top:8px;font-size:11px;color:#8b5cf6">Read →</a>
           </div>`;
 
-        // Place a star marker on the map and bind the anime-styled popup to it
+        // Place a star marker on the map and bind the horror-styled popup to it
         L.marker([story.latitude, story.longitude], { icon: starIcon })
           .addTo(map)
           .bindPopup(popup, { className: 'horror-popup' }); // horror-popup applies custom dark styles

@@ -32,7 +32,7 @@ type Props = {
 function avatarUrl(user: CommentUser) {
   return (
     user.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=22c55e&color=fff&size=64`
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=64`
   );
 }
 

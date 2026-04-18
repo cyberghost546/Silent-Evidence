@@ -42,7 +42,7 @@ export default function AdminOverviewChart({ data }: { data: Day[] }) {
           cursor={{ fill: 'rgba(255,255,255,0.04)' }}
         />
         <Legend wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 12 }} />
-        <Bar dataKey="stories"  name="Stories"  fill="#dc2626" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="stories"  name="Stories"  fill="#22c55e" radius={[3, 3, 0, 0]} />
         <Bar dataKey="users"    name="Users"    fill="#3b82f6" radius={[3, 3, 0, 0]} />
         <Bar dataKey="comments" name="Comments" fill="#10b981" radius={[3, 3, 0, 0]} />
       </BarChart>

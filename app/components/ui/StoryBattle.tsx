@@ -2,7 +2,7 @@
 
 // app/components/ui/StoryBattle.tsx
 // Client component — renders the Story Battles widget.
-// Two anime stories face off in a dramatic VS layout. Users vote for the scarier story.
+// Two horror stories face off in a dramatic VS layout. Users vote for the scarier story.
 // Vote counts and percentage bars update instantly after each vote.
 // A countdown timer shows how long is left in the battle.
 
@@ -321,7 +321,7 @@ export default function StoryBattle({ userId }: Props) {
                 </Link>
               </p>
 
-              {/* Story title — large bold anime font */}
+              {/* Story title — large bold font */}
               <Link
                 href={`/story/${battle.storyA.slug}`}
                 className="text-white font-extrabold text-lg leading-tight line-clamp-2 hover:text-red-300 transition"

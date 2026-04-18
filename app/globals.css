@@ -5,7 +5,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
 /* ── Text selection highlight color ──
    Overrides the browser's default selection color with the site's horror red theme.
    This affects the highlight shown when a user clicks and drags to select text. */
@@ -64,6 +63,32 @@ html.light ::selection {
   scrollbar-color: #dc2626 #111827;
   scrollbar-width: thin;
 }
+
+/* Global dark-theme red override for legacy green utility classes
+   This keeps the horror accent consistent without needing to rewrite
+   every green Tailwind class in the app immediately. */
+html:not(.light) [class*="bg-green-600"] { background-color: #dc2626 !important; }
+html:not(.light) [class*="hover:bg-green-700"]:hover { background-color: #b91c1c !important; }
+html:not(.light) [class*="bg-green-700"] { background-color: #b91c1c !important; }
+html:not(.light) [class*="bg-green-500"]:not(.status-ok) { background-color: #ef4444 !important; }
+html:not(.light) [class*="bg-green-400"] { background-color: #f87171 !important; }
+html:not(.light) [class*="bg-green-900"] { background-color: #7f1d1d !important; }
+html:not(.light) [class*="bg-green-800"] { background-color: #991b1b !important; }
+html:not(.light) [class*="bg-green-950"] { background-color: #581c1c !important; }
+
+html:not(.light) [class*="text-green-400"] { color: #f87171 !important; }
+html:not(.light) [class*="text-green-300"] { color: #fca5a5 !important; }
+html:not(.light) [class*="text-green-500"] { color: #ef4444 !important; }
+html:not(.light) [class*="text-green-600"] { color: #dc2626 !important; }
+
+html:not(.light) [class*="border-green-500"] { border-color: #ef4444 !important; }
+html:not(.light) [class*="border-green-600"] { border-color: #dc2626 !important; }
+html:not(.light) [class*="border-green-700"] { border-color: #b91c1c !important; }
+html:not(.light) [class*="border-green-900"] { border-color: #7f1d1d !important; }
+
+html:not(.light) [class*="hover:border-green-600"]:hover { border-color: #dc2626 !important; }
+html:not(.light) [class*="hover:text-green-400"]:hover { color: #f87171 !important; }
+html:not(.light) [class*="hover:text-green-300"]:hover { color: #fca5a5 !important; }
 
 /* ── Custom scrollbar — light mode ──
    Light gray track, blue thumb to match light mode accent color */
@@ -275,8 +300,75 @@ html.light .text-gray-500 { color: #1f2937 !important; }
 html.light .text-gray-400 { color: #111827 !important; }
 html.light .text-gray-300 { color: #030712 !important; }
 
+/* ── Additional background shades ── */
+html.light .bg-gray-700  { background-color: #e9ecef !important; }
+html.light .bg-gray-600  { background-color: #dee2e6 !important; }
+
+/* ── Body / main text ── */
+html.light .text-gray-200 { color: #1f2937 !important; }
+html.light .text-gray-100 { color: #111827 !important; }
+
+/* ── Hover background states ── */
+html.light .hover\:bg-gray-800:hover { background-color: #e9ecef !important; }
+html.light .hover\:bg-gray-700:hover { background-color: #dee2e6 !important; }
+
+/* ── Semi-transparent card backgrounds (e.g. bg-gray-800\/50) ── */
+html.light [class*="bg-gray-800/"]  { background-color: rgba(244,246,248,0.8) !important; }
+html.light [class*="bg-gray-900/"]  { background-color: rgba(255,255,255,0.8) !important; }
+
+/* ── Story cards & panels ── */
+html.light article,
+html.light [class*="rounded-xl"],
+html.light [class*="rounded-2xl"] {
+  border-color: #e2e6ea;
+}
+
+/* ── Code / mono text ── */
+html.light .font-mono { color: #374151 !important; }
+
+/* ── Badges / pills with dark backgrounds ── */
+html.light [class*="bg-gray-800"][class*="rounded-full"] {
+  background-color: #e9ecef !important;
+  color: #374151 !important;
+}
+
+/* ── Skeleton / pulse placeholders ── */
+html.light .animate-pulse [class*="bg-gray-700"],
+html.light .animate-pulse [class*="bg-gray-800"] {
+  background-color: #dde1e7 !important;
+}
+
+/* ── Focus rings ── */
+html.light [class*="focus:ring-red"] {
+  --tw-ring-color: rgba(37,99,235,0.4) !important;
+}
+
+/* ── Green accent → keep green in light mode (not red) ── */
+html.light [class*="text-green-500"],
+html.light [class*="text-green-400"] {
+  color: #16a34a !important;
+}
+html.light [class*="bg-green-600"],
+html.light [class*="bg-green-700"] {
+  background-color: #16a34a !important;
+}
+html.light [class*="border-green-"] {
+  border-color: #16a34a !important;
+}
+
 /* ── Scrollbar ── */
 html.light ::-webkit-scrollbar { width: 6px; }
 html.light ::-webkit-scrollbar-track { background: #f0f2f5; }
 html.light ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 3px; }
 html.light ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+
+
+/* ── Reader settings — font size and line spacing controlled via JS ── */
+:root {
+  --reader-font-size: 18px;
+  --reader-line-height: 1.75;
+}
+.prose p, .prose li, .prose blockquote {
+  font-size: var(--reader-font-size) !important;
+  line-height: var(--reader-line-height) !important;
+}

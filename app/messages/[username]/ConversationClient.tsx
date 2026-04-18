@@ -57,7 +57,7 @@ type Partner = {
 };
 
 function avatarUrl(username: string, avatar: string | null) {
-  return avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=22c55e&color=fff&size=64`;
+  return avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=64`;
 }
 
 export default function ConversationClient({

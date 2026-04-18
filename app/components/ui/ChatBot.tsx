@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Skull, Eye } from 'lucide-react';
+import { Eye, Skull } from 'lucide-react';
 
 // Message shape — each item in the conversation history.
 // showForgotPassword is set to true when Claude's reply contains [FORGOT_PASSWORD].
@@ -107,6 +107,16 @@ export default function ChatBot() {
   // Controls whether the chat panel is visible
   const [open, setOpen] = useState(false);
 
+  // Whether the floating button has been permanently dismissed (persisted in localStorage)
+  const [dismissed, setDismissed] = useState(false);
+  const [ready, setReady] = useState(false); // prevents SSR flash
+
+  useEffect(() => {
+    setReady(true);
+    const d = localStorage.getItem('se_watcher_dismissed');
+    if (d) setDismissed(true);
+  }, []);
+
   // The conversation history — starts with The Watcher's opening greeting.
   // This greeting is displayed in the UI but is NOT sent to Claude (see route.ts).
   const [messages, setMessages] = useState<Message[]>([
@@ -136,10 +146,21 @@ export default function ChatBot() {
   // Auto-focus the input box when the chat panel is opened
   useEffect(() => {
     if (open) {
-      // Small delay lets the panel finish its CSS transition before focusing
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
+
+  // Listen for the dropdown "Ask The Watcher" button event
+  // Opening via dropdown clears the permanent dismiss so the button comes back
+  useEffect(() => {
+    const handler = () => {
+      localStorage.removeItem('se_watcher_dismissed');
+      setDismissed(false);
+      setOpen(true);
+    };
+    window.addEventListener('open-chatbot', handler);
+    return () => window.removeEventListener('open-chatbot', handler);
+  }, []);
 
   // send — called when the user clicks Send or presses Enter.
   // Adds the user message, then streams Claude's reply into the last message bubble.
@@ -217,35 +238,44 @@ export default function ChatBot() {
     }
   }
 
+  if (!ready) return null;
+
   return (
     <>
-      {/* Floating toggle button — fixed to the bottom-right of the screen on every page */}
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-red-700 hover:bg-red-600 shadow-lg shadow-red-900/50 flex items-center justify-center transition-all duration-200 hover:scale-110"
-        aria-label="Open AI chat"
-      >
-        {/* Shows an X when open, skull icon when closed */}
-        {open ? (
-          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
+      {/* Floating skull button — hidden while panel is open or permanently dismissed */}
+      {!open && !dismissed && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Ask The Watcher"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-red-700 hover:bg-red-600 shadow-lg shadow-black/50 flex items-center justify-center transition-all duration-200 hover:scale-110"
+        >
           <Skull className="w-6 h-6 text-white" />
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Chat panel — only rendered when open */}
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 flex flex-col bg-gray-900 border border-red-900/50 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-red-900/40">
-            <Eye className="w-5 h-5 text-red-400" />
-            <div>
-              <p className="text-sm font-semibold text-red-400">The Watcher</p>
-              <p className="text-xs text-gray-500">Silent Evidence AI Guide</p>
+          <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-red-900/40">
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-red-400" />
+              <div>
+                <p className="text-sm font-semibold text-red-400">The Watcher</p>
+                <p className="text-xs text-gray-500">Silent Evidence AI Guide</p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                setDismissed(true);
+                localStorage.setItem('se_watcher_dismissed', '1');
+              }}
+              className="text-gray-600 hover:text-gray-400 transition text-xl leading-none"
+              aria-label="Close chat"
+            >×</button>
           </div>
 
           {/* Messages list — scrollable, max 320px tall */}

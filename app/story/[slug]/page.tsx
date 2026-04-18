@@ -42,6 +42,7 @@ import StoryMilestones from '@/app/components/ui/StoryMilestones';
 import AgeGate from '@/app/components/ui/AgeGate';
 import ReadAloudButton from '@/app/components/ui/ReadAloudButton';
 import WordCountBadge from '@/app/components/ui/WordCountBadge';
+import ReaderSettings from '@/app/components/ui/ReaderSettings';
 import ScareScoreBadge from '@/app/components/ui/ScareScoreBadge';
 import type { Metadata } from 'next';
 import { checkReadingLimit, FREE_MONTHLY_LIMIT } from '@/lib/readingLimit';
@@ -197,7 +198,7 @@ export default async function StoryPage({ params }: Props) {
   // ui-avatars.com which generates a red initials avatar on the fly.
   const authorAvatar =
     story.author.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -221,7 +222,7 @@ export default async function StoryPage({ params }: Props) {
       <div className="max-w-3xl mx-auto px-4 py-10">
 
         {/* Category breadcrumb */}
-        <Link href={`/category/${story.category.slug}`} className="text-xs font-semibold uppercase tracking-widest text-red-500 hover:text-red-400 transition">
+        <Link href={`/category/${story.category.slug}`} className="text-xs font-semibold uppercase tracking-widest text-green-500 hover:text-green-400 transition">
           {story.category.name}
         </Link>
 
@@ -242,7 +243,7 @@ export default async function StoryPage({ params }: Props) {
         <div className="flex items-center gap-3 mt-5">
           <img src={authorAvatar} alt={story.author.username} className="w-10 h-10 rounded-full object-cover border-2 border-gray-700" />
           <div className="flex-1">
-            <Link href={`/user/${story.author.username}`} className="text-sm font-semibold text-white hover:text-red-400 transition inline-flex items-center gap-1">
+            <Link href={`/user/${story.author.username}`} className="text-sm font-semibold text-white hover:text-green-400 transition inline-flex items-center gap-1">
               {story.author.username}
               {/* Blue checkmark next to verified author names */}
               {story.author.isVerified && <VerifiedBadge />}
@@ -287,7 +288,7 @@ export default async function StoryPage({ params }: Props) {
             <span className="text-xs text-gray-600">with</span>
             {coAuthors.map(c => {
               const coAvatar = c.user.profile?.avatar ??
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user.username)}&background=22c55e&color=fff&size=32`;
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user.username)}&background=dc2626&color=fff&size=32`;
               return (
                 <Link
                   key={c.user.username}
@@ -321,7 +322,7 @@ export default async function StoryPage({ params }: Props) {
               <div className="flex flex-wrap gap-2 mt-4">
                 <span className="text-xs text-gray-500 font-medium self-center">⚠️ Warnings:</span>
                 {w.map(warning => (
-                  <span key={warning} className="text-xs px-2.5 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-full">{warning}</span>
+                  <span key={warning} className="text-xs px-2.5 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full">{warning}</span>
                 ))}
               </div>
             );
@@ -345,7 +346,7 @@ export default async function StoryPage({ params }: Props) {
               <Link
                 key={tag.id}
                 href={`/tag/${tag.slug}`}
-                className="text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-red-600/50 hover:text-red-400 text-gray-400 rounded-full transition"
+                className="text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-green-600/50 hover:text-green-400 text-gray-400 rounded-full transition"
               >
                 #{tag.name}
               </Link>
@@ -370,7 +371,7 @@ export default async function StoryPage({ params }: Props) {
           /* Chaptered story — show a table of contents instead of full content */
           <div className="mt-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="w-1 h-5 bg-red-600 rounded-full" />
+              <span className="w-1 h-5 bg-green-600 rounded-full" />
               <h2 className="text-lg font-bold text-white">Table of Contents</h2>
               <span className="text-xs text-gray-500">{chapters.length} chapters</span>
             </div>
@@ -483,6 +484,8 @@ export default async function StoryPage({ params }: Props) {
       {story.audioUrl && <AudioPlayer audioUrl={story.audioUrl} title={story.title} />}
       {/* Read aloud — browser TTS, sticky bottom bar, only shown when active */}
       <ReadAloudButton content={story.content} />
+      {/* Reader settings — floating Aa button for font size and line spacing */}
+      <ReaderSettings />
       <Footer />
     </main>
   );

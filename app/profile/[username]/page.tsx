@@ -54,7 +54,7 @@ export default async function ProfilePage({ params }: Props) {
   // The red background matches the site's colour scheme.
   const avatar =
     user.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=22c55e&color=fff&size=128`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=128`;
 
   // Format the join date in a friendly way: "March 4, 2024"
   const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {

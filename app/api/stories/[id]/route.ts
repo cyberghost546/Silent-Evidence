@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { checkAndAwardBadges } from '@/lib/badges';
 import { sendMail } from '@/lib/email';
 import { updateWritingStreak } from '@/lib/streaks';
+import { sanitizeContent } from '@/lib/sanitize';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -44,7 +45,7 @@ async function sendNewsletterAsync({
     // Simple HTML email — styled minimally to work in all mail clients
     const html = `
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto;background:#111;color:#eee;border-radius:12px;overflow:hidden;">
-        <div style="background:#dc2626;padding:20px 24px;">
+        <div style="background:#22c55e;padding:20px 24px;">
           <h1 style="margin:0;font-size:20px;color:#fff;">Silent Evidence</h1>
         </div>
         <div style="padding:24px;">
@@ -52,7 +53,7 @@ async function sendNewsletterAsync({
             <strong>${authorName}</strong> just published a new story:
           </p>
           <h2 style="margin:0 0 20px;font-size:22px;color:#f87171;">${displayTitle}</h2>
-          <a href="${storyUrl}" style="display:inline-block;background:#dc2626;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
+          <a href="${storyUrl}" style="display:inline-block;background:#22c55e;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
             Read Now →
           </a>
           <p style="margin-top:24px;font-size:12px;color:#666;">
@@ -92,7 +93,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
   const body = await req.json();
   const title      = typeof body.title      === 'string' ? body.title.trim()      : undefined;
-  const content    = typeof body.content    === 'string' ? body.content.trim()    : undefined;
+  const content    = typeof body.content    === 'string' ? sanitizeContent(body.content.trim()) : undefined;
   const excerpt    = typeof body.excerpt    === 'string' ? body.excerpt.trim()    : undefined;
   const coverImage = typeof body.coverImage === 'string' ? body.coverImage.trim() : undefined;
   const videoUrl   = typeof body.videoUrl   === 'string' ? body.videoUrl.trim()   : undefined;

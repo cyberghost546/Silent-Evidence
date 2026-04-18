@@ -42,7 +42,7 @@ type SearchUser = {
 function avatarUrl(username: string, avatar: string | null | undefined) {
   return (
     avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=22c55e&color=fff&size=64`
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=64`
   );
 }
 

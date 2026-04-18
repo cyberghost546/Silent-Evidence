@@ -41,7 +41,7 @@ export async function checkToxicity(text: string): Promise<{ flagged: boolean; r
 /**
  * checkStoryToxicity — checks a story's title and content snippet for policy violations.
  * Uses a different prompt than comments because horror fiction is allowed — we only flag
- * real-world hate speech, harassment, doxxing, or illegal content, NOT fictional anime.
+ * real-world hate speech, harassment, doxxing, or illegal content, NOT fictional horror.
  *
  * @param title   - The story title
  * @param content - First ~1000 characters of the story body (enough to detect patterns)

@@ -12,6 +12,7 @@
 // This prevents errors in dev environments where SMTP isn't configured.
 
 import nodemailer from 'nodemailer';
+import { prisma } from '@/lib/prisma';
 
 // Build the transporter lazily so it's only created when first needed
 let transporter: nodemailer.Transporter | null = null;
@@ -36,17 +37,23 @@ function getTransporter() {
 }
 
 // Send a single email. Returns true on success, false on failure or if SMTP not configured.
+// Every send attempt (success or failure) is written to the EmailLog table for admin visibility.
 export async function sendMail({
   to,
   subject,
   html,
+  type = 'general',
 }: {
   to: string;
   subject: string;
   html: string;
+  type?: string;   // e.g. "password-reset", "newsletter", "2fa", "notification"
 }): Promise<boolean> {
   const t = getTransporter();
   if (!t) return false; // Silently skip when not configured
+
+  let status = 'sent';
+  let error: string | undefined;
 
   try {
     await t.sendMail({
@@ -55,9 +62,14 @@ export async function sendMail({
       subject,
       html,
     });
-    return true;
   } catch (err) {
     console.error('[email] Failed to send to', to, err);
-    return false;
+    status = 'failed';
+    error = err instanceof Error ? err.message : String(err);
   }
+
+  // Log every send attempt to the EmailLog table (fire-and-forget)
+  prisma.emailLog.create({ data: { to, subject, type, status, error } }).catch(() => {});
+
+  return status === 'sent';
 }

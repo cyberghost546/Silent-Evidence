@@ -88,7 +88,7 @@ export default async function ForumPage({ params }: Props) {
             <Link key={post.id} href={`/forums/${slug}/${post.id}`}
               className="group flex items-start gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/40 rounded-xl p-4 transition">
               <img
-                src={post.author.profile?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username)}&background=22c55e&color=fff&size=40`}
+                src={post.author.profile?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username)}&background=dc2626&color=fff&size=40`}
                 alt={post.author.username} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

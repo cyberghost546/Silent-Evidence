@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
           <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #f3f4f6; background: #111827; padding: 32px; border-radius: 12px;">
             <h1 style="color: #ef4444; font-size: 22px; margin-bottom: 8px;">Password Reset</h1>
             <p style="color: #9ca3af; margin-bottom: 24px;">Hi ${user.username}, click the button below to reset your password. This link expires in 1 hour.</p>
-            <a href="${resetUrl}" style="display: inline-block; background: #dc2626; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Reset Password</a>
+            <a href="${resetUrl}" style="display: inline-block; background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Reset Password</a>
             <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">If you didn't request this, you can safely ignore this email.</p>
             <p style="color: #374151; font-size: 11px; margin-top: 8px;">${resetUrl}</p>
           </div>

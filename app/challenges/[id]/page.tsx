@@ -80,7 +80,7 @@ export default async function ChallengePage({ params }: Props) {
         <div className="bg-gray-800 border border-red-600/20 rounded-2xl p-8 mb-8">
           <div className="flex items-start justify-between gap-4 mb-4">
             <h1 className="text-2xl font-bold text-white">{challenge.title}</h1>
-            <span className={`text-xs font-semibold px-3 py-1 rounded-full flex-shrink-0 ${isActive ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-gray-700 text-gray-400'}`}>
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full flex-shrink-0 ${isActive ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-gray-700 text-gray-400'}`}>
               {isActive ? 'Active' : now > challenge.endDate ? 'Ended' : 'Upcoming'}
             </span>
           </div>

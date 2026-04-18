@@ -25,7 +25,7 @@ import { sendMail } from '@/lib/mailer';
 // Import rate-limiting helpers:
 // checkRateLimit  — checks if an IP has exceeded the allowed request count
 // getClientIp     — extracts the real IP address from the incoming request
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { checkRateLimit, getClientIp, anonymizeIp } from '@/lib/rateLimit';
 
 // Import pre-built error response helpers to keep error responses consistent:
 // badRequest      — 400 response
@@ -104,6 +104,17 @@ export async function POST(req: Request) {
     // return a generic 401 error — we intentionally don't say whether the email
     // or the password was wrong, to avoid helping attackers enumerate accounts.
     if (!user || !(await bcrypt.compare(password, user.password))) {
+      // Record the failed attempt for the security audit log
+      await prisma.loginLog.create({
+        data: {
+          userId:    user?.id ?? null,
+          username:  user?.username ?? null,
+          email,
+          ip: anonymizeIp(ip),
+          userAgent: req.headers.get('user-agent') ?? null,
+          success:   false,
+        },
+      }).catch(() => {}); // fire-and-forget — never block the login response
       return unauthorized('Invalid email or password.');
     }
 
@@ -159,6 +170,18 @@ export async function POST(req: Request) {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 7 days expressed in seconds
     });
+
+    // Record the successful login in the audit log
+    await prisma.loginLog.create({
+      data: {
+        userId:    user.id,
+        username:  user.username,
+        email:     user.email,
+        ip,
+        userAgent: req.headers.get('user-agent') ?? null,
+        success:   true,
+      },
+    }).catch(() => {}); // fire-and-forget
 
     // Return the response — the browser will store the cookie automatically
     return res;

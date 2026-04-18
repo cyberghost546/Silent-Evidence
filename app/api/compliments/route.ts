@@ -49,7 +49,7 @@ const ALLOWED_COMPLIMENTS = new Set([
   "I couldn't stop reading. Incredible story!",
   "The atmosphere you created was perfect 🕯️",
   "This gave me chills. Please write more!",
-  "You have a real talent for anime writing. Keep going 🙌",
+  "You have a real talent for horror writing. Keep going 🙌",
 ]);
 
 // ── POST handler ──────────────────────────────────────────────────────────────

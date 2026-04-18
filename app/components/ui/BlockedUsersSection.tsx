@@ -105,7 +105,7 @@ export default function BlockedUsersSection() {
             <li key={u.id} className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
               <div className="flex items-center gap-3">
                 <img
-                  src={u.profile?.avatar ?? `https://ui-avatars.com/api/?name=${u.username}&background=22c55e&color=fff&size=32`}
+                  src={u.profile?.avatar ?? `https://ui-avatars.com/api/?name=${u.username}&background=dc2626&color=fff&size=32`}
                   alt={u.username}
                   className="w-7 h-7 rounded-full object-cover"
                 />

@@ -49,11 +49,11 @@ const MAX_ROTATION = 18;
 // MOOD_GRADIENTS — maps each Mood enum value to a Tailwind gradient class pair.
 // Used as the background when a story has no cover image.
 const MOOD_GRADIENTS: Record<string, string> = {
-  CREEPY:        'from-gray-800 to-red-950',
-  PARANOID:      'from-gray-900 to-red-950',
+  CREEPY:        'from-gray-800 to-green-950',
+  PARANOID:      'from-gray-900 to-yellow-950',
   DISTURBING:    'from-red-950 to-gray-900',
   ATMOSPHERIC:   'from-indigo-950 to-gray-900',
-  PSYCHOLOGICAL: 'from-red-950 to-gray-900',
+  PSYCHOLOGICAL: 'from-green-950 to-gray-900',
   SUPERNATURAL:  'from-blue-950 to-gray-900',
   GORE:          'from-red-900 to-gray-900',
   JUMPSCARE:     'from-orange-950 to-gray-900',
@@ -330,7 +330,7 @@ export default function SwipeDiscovery({ initialStories }: Props) {
         {/* ── SKIP badge (left-swipe feedback) ─────────────────────────── */}
         {/* Fades in when the user drags past half the swipe threshold to the left */}
         <div
-          className={`absolute top-6 right-4 z-10 px-4 py-1.5 rounded-full border-2 border-red-500 text-red-400 font-extrabold text-lg uppercase tracking-widest rotate-20 transition-opacity duration-200 ${
+          className={`absolute top-6 right-4 z-10 px-4 py-1.5 rounded-full border-2 border-red-500 text-red-400 font-extrabold text-lg uppercase tracking-widest rotate-[20deg] transition-opacity duration-200 ${
             badge === 'skip' ? 'opacity-100' : 'opacity-0'
           }`}
           suppressHydrationWarning // suppress hydration warnings on dynamic opacity
@@ -353,11 +353,11 @@ export default function SwipeDiscovery({ initialStories }: Props) {
               sizes="(max-width: 640px) 100vw, 384px" // responsive sizing hint for the browser
             />
             {/* Gradient overlay at the bottom improves text readability below the image */}
-            <div className="absolute inset-0 bg-linear-to-t from-gray-900/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
           </div>
         ) : (
           // Mood-coloured gradient shown when there is no cover image
-          <div className={`aspect-video w-full bg-linear-to-br ${gradientClass} flex items-center justify-center`}>
+          <div className={`aspect-video w-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
             {/* Faint book emoji as a visual placeholder */}
             <span className="text-6xl opacity-30 pointer-events-none">📖</span>
           </div>

@@ -330,6 +330,13 @@ model User {
 
   // Chain stories started by this user
   chainStories        ChainStory[]
+
+  // Moderation
+  isBanned            Boolean      @default(false)
+  suspendedUntil      DateTime?    // null = not suspended; future date = suspended until then
+  userWarnings        UserWarning[] @relation("WarnedUser")
+  warningsIssued      UserWarning[] @relation("WarnedByAdmin")
+  auditLogsActioned   AuditLog[]
 }
 
 // ============================================================
@@ -1277,6 +1284,26 @@ model SiteSetting {
 }
 
 // ============================================================
+//  COOKIE CONSENT — GDPR compliance log
+//  Records each visitor's cookie preference (accepted / rejected / partial).
+//  userId is nullable so guest (non-logged-in) visitors are captured too.
+//  The admin dashboard at /admin/cookies shows aggregated stats and the raw log.
+// ============================================================
+model CookieConsent {
+  id          Int      @id @default(autoincrement())
+  userId      Int?                   // null for guests
+  choice      String                 // "all" | "essential" | "rejected"
+  analytics   Boolean  @default(false)
+  marketing   Boolean  @default(false)
+  ip          String?                // anonymised IP for geo insights
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([choice])
+}
+
+// ============================================================
 //  DIRECT MESSAGES
 //  Private one-to-one messages between users.
 //  The inbox UI queries by receiverId + read to show unread count.
@@ -2038,6 +2065,27 @@ model MoodOfDay {
 }
 
 // ============================================================
+//  LOGIN LOG — Security audit trail of all login attempts
+//  Records every successful and failed login with IP + user-agent.
+//  Admins view this via /admin/login-logs to spot suspicious activity.
+//  userId is nullable so failed attempts for unknown emails are recorded.
+// ============================================================
+model LoginLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?               // null when the email is not found in the DB
+  username  String?            // denormalised for quick display without a join
+  email     String             // the email address that was submitted
+  ip        String             // client IP address at time of attempt
+  userAgent String?  @db.Text  // browser / device string from the User-Agent header
+  success   Boolean            // true = logged in, false = wrong password / unknown email
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([success, createdAt])
+}
+
+// ============================================================
 //  OFFLINE SAVED STORY — Stories saved for PWA offline reading
 //  When a reader clicks "Save for offline" the story content is
 //  cached in their browser (via Service Worker) and this row is
@@ -2054,4 +2102,73 @@ model OfflineSave {
 
   // A user can only save the same story once (re-saving is a no-op)
   @@unique([userId, storyId])
+}
+
+// ============================================================
+//  USER WARNING — Formal moderation action issued by an admin.
+//  Warnings accumulate on a user's record. Multiple warnings can
+//  trigger a suspension or ban. Admins view these in /admin/warnings.
+// ============================================================
+model UserWarning {
+  id        Int      @id @default(autoincrement())
+  reason    String   @db.Text   // Why the warning was issued
+  issuedAt  DateTime @default(now())
+
+  userId    Int
+  user      User     @relation("WarnedUser",    fields: [userId],   references: [id], onDelete: Cascade)
+  adminId   Int
+  admin     User     @relation("WarnedByAdmin", fields: [adminId],  references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============================================================
+//  BANNED WORD — Site-wide content filter.
+//  Stories and comments containing these words are flagged or blocked
+//  before they reach the database. Managed in /admin/banned-words.
+// ============================================================
+model BannedWord {
+  id        Int      @id @default(autoincrement())
+  word      String   @unique  // The word or phrase to block (stored lowercase)
+  createdAt DateTime @default(now())
+
+  @@index([word])
+}
+
+// ============================================================
+//  AUDIT LOG — Immutable record of every admin action.
+//  Logged automatically when admins delete stories, ban users,
+//  change settings, etc. Viewable in /admin/audit-log.
+// ============================================================
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String               // Short action label e.g. "BAN_USER", "DELETE_STORY"
+  detail    String?  @db.Text   // Human-readable description of what changed
+  targetId  Int?                 // ID of the affected record (user id, story id, etc.)
+  targetType String?             // "User", "Story", "Comment", etc.
+  createdAt DateTime @default(now())
+
+  adminId   Int
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([adminId])
+}
+
+// ============================================================
+//  EMAIL LOG — Record of every email the system has sent.
+//  Stored so admins can audit delivery, debug issues, and track
+//  volume. Viewable in /admin/email-log.
+// ============================================================
+model EmailLog {
+  id        Int      @id @default(autoincrement())
+  to        String               // Recipient email address
+  subject   String
+  type      String               // e.g. "password-reset", "newsletter", "2fa", "notification"
+  status    String   @default("sent")  // "sent" | "failed"
+  error     String?  @db.Text   // Error message if status = "failed"
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type])
 }

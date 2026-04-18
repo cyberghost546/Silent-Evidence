@@ -155,7 +155,7 @@ export default async function SearchPage({ searchParams }: Props) {
               {matchedUsers.map((u) => {
                 const avatar =
                   u.profile?.avatar ??
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(u.username)}&background=22c55e&color=fff&size=64`;
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(u.username)}&background=dc2626&color=fff&size=64`;
                 return (
                   <Link
                     key={u.id}

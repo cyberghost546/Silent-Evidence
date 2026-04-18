@@ -1,7 +1,7 @@
 'use client';
 // Confetti.tsx
 // Purely decorative client component that renders CSS-animated gold and red
-// particles to celebrate the user's new Anime Elite subscription.
+// particles to celebrate the user's new Horror Elite subscription.
 // Uses no third-party libraries — only inline styles + Tailwind.
 
 import { useEffect, useState } from 'react';

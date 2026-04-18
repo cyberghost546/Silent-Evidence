@@ -125,7 +125,7 @@ export default function TrendingStories({ stories }: Props) {
                   <img
                     src={
                       story.author.profile?.avatar ??
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=32`
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=32`
                     }
                     alt={story.author.username}
                     className="w-4 h-4 rounded-full object-cover"

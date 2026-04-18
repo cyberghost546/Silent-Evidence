@@ -38,10 +38,10 @@ async function ensureForums() {
   if (count === 0) {
     await prisma.forum.createMany({
       data: [
-        { name: 'General Discussion', slug: 'general', description: 'Talk about anything horror, paranormal, or unexplained.', icon: '💀', order: 1 },
-        { name: 'True Crime', slug: 'true-crime', description: 'Discuss real cases, investigations, and unsolved mysteries.', icon: '🔍', order: 2 },
+        { name: 'General Discussion', slug: 'general', description: 'Talk about anything horror related.', icon: '✨', order: 1 },
+        { name: 'Horror & Paranormal Recommendations', slug: 'recommendations', description: 'Recommend horror stories, films, books, and more.', icon: '🎬', order: 2 },
         { name: 'Story Feedback & Reviews', slug: 'feedback', description: 'Get feedback on your stories or review others.', icon: '📖', order: 3 },
-        { name: 'Paranormal Encounters', slug: 'paranormal', description: 'Share and discuss personal paranormal experiences.', icon: '👻', order: 4 },
+        { name: 'Fan Art & Creations', slug: 'fan-art', description: 'Share your fan art, illustrations, and creative work.', icon: '🎨', order: 4 },
         { name: 'Writing Tips', slug: 'writing-tips', description: 'Share tips, techniques, and advice for horror writing.', icon: '✍️', order: 5 },
         { name: 'Off Topic', slug: 'off-topic', description: 'Anything goes.', icon: '🌙', order: 6 },
       ],
@@ -88,7 +88,7 @@ export default async function ForumsPage() {
           {forums.map(forum => (
             <Link key={forum.id} href={`/forums/${forum.slug}`}
               className="group flex items-center gap-5 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-5 transition-all duration-200">
-              <div className="text-3xl shrink-0 w-12 text-center">{forum.icon}</div>
+              <div className="text-3xl flex-shrink-0 w-12 text-center">{forum.icon}</div>
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-white group-hover:text-red-300 transition-colors">{forum.name}</h2>
                 {forum.description && <p className="text-sm text-gray-500 mt-0.5">{forum.description}</p>}
@@ -98,7 +98,7 @@ export default async function ForumsPage() {
                   </p>
                 )}
               </div>
-              <div className="text-right shrink-0">
+              <div className="text-right flex-shrink-0">
                 <p className="text-lg font-bold text-white">{forum._count.posts}</p>
                 <p className="text-xs text-gray-600">posts</p>
               </div>

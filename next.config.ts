@@ -9,10 +9,37 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   // Disable browser features not needed by the site
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-  // Force HTTPS for 1 year in production
+  // Force HTTPS for 1 year in production (with preload eligibility)
   ...(process.env.NODE_ENV === 'production'
-    ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' }]
+    ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]
     : []),
+  // Content Security Policy — restricts which sources scripts, styles, and other
+  // resources may be loaded from, dramatically reducing XSS attack surface.
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      // Only allow scripts from this origin and Next.js inline scripts (nonces not used here)
+      "default-src 'self'",
+      // Scripts: self + unsafe-inline required by Next.js App Router hydration
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com",
+      // Styles: self + unsafe-inline required by Tailwind and TipTap
+      "style-src 'self' 'unsafe-inline'",
+      // Images: self + data URIs + Unsplash CDN + UI Avatars + Picsum
+      "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos",
+      // Fonts: self only (no Google Fonts used)
+      "font-src 'self'",
+      // API / WebSocket connections: self + Pusher + Stripe
+      "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
+      // Frames: only Stripe (for payment elements)
+      "frame-src https://js.stripe.com https://hooks.stripe.com",
+      // Disallow all plugins (Flash, etc.)
+      "object-src 'none'",
+      // Disallow <base> tag hijacking
+      "base-uri 'self'",
+      // Only allow forms to submit to this origin
+      "form-action 'self'",
+    ].join('; '),
+  },
 ];
 
 const nextConfig: NextConfig = {
@@ -32,7 +59,7 @@ const nextConfig: NextConfig = {
       // Localhost uploads in development
       { protocol: 'http', hostname: 'localhost' },
       // Add your production domain here e.g.:
-      // { protocol: 'https', hostname: 'animenexus.com' },
+      // { protocol: 'https', hostname: 'silentevidence.com' },
     ],
   },
   async headers() {

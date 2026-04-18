@@ -3,7 +3,7 @@
 // Caches pages so the app works offline and loads faster.
 
 // Cache name — bumped when a new version of the SW is deployed
-const CACHE_NAME = 'animenexus-v1';
+const CACHE_NAME = 'silentevidence-v1';
 
 // Separate cache dedicated to user-saved offline stories.
 // Kept independently so we never accidentally purge it during version upgrades.
@@ -53,7 +53,7 @@ self.addEventListener('activate', (event) => {
 // Fires when the server sends a Web Push message to this subscription.
 // Shows a system notification using the payload from the server.
 self.addEventListener('push', (event) => {
-  let data = { title: 'Anime Nexus', body: 'You have a new notification.', url: '/', icon: '/icon-192.png' };
+  let data = { title: 'Silent Evidence', body: 'You have a new notification.', url: '/', icon: '/icon-192.png' };
 
   // Parse the JSON payload the server sent (see lib/webpush.ts PushPayload type)
   try { if (event.data) data = { ...data, ...JSON.parse(event.data.text()) }; } catch {}

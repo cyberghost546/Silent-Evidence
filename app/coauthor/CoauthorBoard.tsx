@@ -203,7 +203,7 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
 
               {/* Status badge */}
               <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
-                request.isOpen ? 'bg-red-500/15 text-red-400' : 'bg-gray-700 text-gray-500'
+                request.isOpen ? 'bg-green-500/15 text-green-400' : 'bg-gray-700 text-gray-500'
               }`}>
                 {request.isOpen ? 'Open' : 'Closed'}
               </span>

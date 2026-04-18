@@ -10,6 +10,7 @@ import { cache, invalidatePattern, TTL } from '@/lib/cache';
 import { serverError } from '@/lib/apiError';
 import type { Mood } from '@prisma/client';
 import { checkStoryToxicity } from '@/lib/toxicityCheck';
+import { sanitizeContent } from '@/lib/sanitize';
 
 // GET /api/stories?mood=GORE&take=6
 // Returns published stories, optionally filtered by mood, ordered newest first.
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const title       = typeof body.title      === 'string' ? body.title.trim()      : '';
-  const content     = typeof body.content    === 'string' ? body.content.trim()    : '';
+  const content     = typeof body.content    === 'string' ? sanitizeContent(body.content.trim()) : '';
   const excerpt     = typeof body.excerpt    === 'string' ? body.excerpt.trim()    : '';
   const coverImage  = typeof body.coverImage === 'string' ? body.coverImage.trim() : '';
   const categoryId  = body.categoryId;

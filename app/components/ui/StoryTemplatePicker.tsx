@@ -1,6 +1,6 @@
 'use client';
 // app/components/ui/StoryTemplatePicker.tsx
-// Modal-style grid that lets authors pick a anime genre template.
+// Modal-style grid that lets authors pick a horror genre template.
 // Calls onSelect(template) when user picks one, so the parent (StoryForm)
 // can pre-populate the TipTap editor content and the title placeholder.
 

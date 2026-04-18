@@ -142,7 +142,7 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
   // Avatar URL to show in the preview — falls back to initials
   const avatarPreview =
     avatar ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=22c55e&color=fff&size=128`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=128`;
 
   return (
     <div className="space-y-8">

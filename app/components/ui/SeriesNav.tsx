@@ -68,8 +68,8 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
       {/* ── Series header ── */}
       {/* Shows the "Series" label, the series name (links to series index), and the part count */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-red-400">Series</span>
-        <Link href={`/series/${series.slug}`} className="text-sm font-semibold text-white hover:text-red-300 transition">
+        <span className="text-xs font-bold uppercase tracking-widest text-green-400">Series</span>
+        <Link href={`/series/${series.slug}`} className="text-sm font-semibold text-white hover:text-green-300 transition">
           {series.name}
         </Link>
         {/* ml-auto pushes this to the right edge of the flex row */}
@@ -81,7 +81,7 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
           Width is calculated as: (position / total) × 100%.
           e.g. Part 2 of 5 → width = 40% */}
       <div className="w-full h-1 bg-gray-700 rounded-full mb-4">
-        <div className="h-1 bg-red-600 rounded-full transition-all" style={{ width: `${(currentIndex + 1) / total * 100}%` }} />
+        <div className="h-1 bg-green-600 rounded-full transition-all" style={{ width: `${(currentIndex + 1) / total * 100}%` }} />
       </div>
 
       {/* ── Previous / Next navigation ── */}
@@ -105,10 +105,10 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
         {/* Next story — if there is one; otherwise an "End of series" placeholder */}
         {next ? (
           <Link href={`/story/${next.slug}`}
-            className="flex-1 flex items-center justify-end gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-red-600/50 rounded-lg transition group text-right">
+            className="flex-1 flex items-center justify-end gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-green-600/50 rounded-lg transition group text-right">
             <div className="min-w-0">
               <p className="text-xs text-gray-500">Next</p>
-              <p className="text-sm text-white group-hover:text-red-300 transition truncate">{next.title}</p>
+              <p className="text-sm text-white group-hover:text-green-300 transition truncate">{next.title}</p>
             </div>
             {/* flex-shrink-0 prevents the arrow from being squashed by a long title */}
             <span className="text-gray-500 group-hover:text-purple-400 transition text-lg flex-shrink-0">→</span>

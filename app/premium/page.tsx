@@ -1,5 +1,5 @@
 // app/premium/page.tsx
-// Server component — renders the Anime Elite subscription pricing page.
+// Server component — renders the Horror Elite subscription pricing page.
 // Reads the current userId from the cookie to personalise the CTA buttons.
 // All subscription checkout calls happen client-side inside the embedded
 // SubscribeButton component (defined at the bottom of this file) to keep
@@ -38,7 +38,7 @@ const PLANS = [
 
 // Perks shared by both plans — rendered as a checklist inside each card
 const PERKS = [
-  { icon: '⚡', text: 'Anime Elite badge on your profile' },
+  { icon: '⚡', text: 'Horror Elite badge on your profile' },
   { icon: '🔓', text: 'Access all premium-only stories' },
   { icon: '💀', text: 'No ads (coming soon)' },
   { icon: '👑', text: 'Priority placement in leaderboards' },
@@ -89,7 +89,7 @@ export default async function PremiumPage() {
         <h1 className="relative text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
           Become a{' '}
           <span className="bg-gradient-to-r from-yellow-400 to-amber-300 bg-clip-text text-transparent">
-            Anime Elite
+            Horror Elite
           </span>
         </h1>
         <p className="relative text-gray-400 text-lg max-w-xl mx-auto">
@@ -111,7 +111,7 @@ export default async function PremiumPage() {
               {/* Gold lightning bolt to mirror the badge */}
               <span className="text-2xl">⚡</span>
               <div>
-                <p className="font-bold text-yellow-300">You&apos;re a Anime Elite member!</p>
+                <p className="font-bold text-yellow-300">You&apos;re a Horror Elite member!</p>
                 <p className="text-xs text-gray-400">All premium perks are unlocked for your account.</p>
               </div>
             </div>

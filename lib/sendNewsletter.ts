@@ -82,7 +82,7 @@ function buildHtml({
         <tr>
           <td style="background:linear-gradient(135deg,#1a0a0a 0%,#2d0808 100%);padding:32px 32px 24px;">
             <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">💀 Silent Evidence</p>
-            <p style="margin:4px 0 0;font-size:12px;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase;">Weekly Anime Digest</p>
+            <p style="margin:4px 0 0;font-size:12px;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase;">Weekly Horror Digest</p>
           </td>
         </tr>
 

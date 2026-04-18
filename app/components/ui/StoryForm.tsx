@@ -371,10 +371,10 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <p className="text-xs text-gray-600 mt-1">Don't see your series? <a href="/series/new" className="text-red-400 hover:text-red-300 transition">Create one first →</a></p>
       </div>
 
-      {/* Location (for Anime Map) */}
+      {/* Location (for Horror Map) */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          📍 Location <span className="text-gray-500 font-normal">(optional — pins story on the Anime Map)</span>
+          📍 Location <span className="text-gray-500 font-normal">(optional — pins story on the Horror Map)</span>
         </label>
         <input value={locationName} onChange={e => setLocationName(e.target.value)} placeholder="e.g. Amityville, New York"
           suppressHydrationWarning

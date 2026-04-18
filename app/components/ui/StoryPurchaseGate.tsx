@@ -130,7 +130,7 @@ export default function StoryPurchaseGate({
                 ⚡ Premium members only
               </p>
               <p className="text-xs text-gray-500 mb-5">
-                Subscribe to Anime Elite to read all premium stories.
+                Subscribe to Horror Elite to read all premium stories.
               </p>
               <Link
                 href="/premium"

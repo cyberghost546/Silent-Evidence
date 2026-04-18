@@ -65,15 +65,18 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
     return <HeroFallback />;
   }
 
-  // The currently active slide object
-  const slide = slides[current];
+  // The currently active slide object — clamp index so it's always in bounds
+  const slide = slides[Math.min(current, slides.length - 1)];
+
+  // Guard: if slide is somehow undefined, show the fallback
+  if (!slide) return <HeroFallback />;
 
   // imageOk — false if this slide's image previously threw an onError event
   const imageOk = !imgErrors[slide.id];
 
   return (
     // Outer container: full width, fixed height (520px), clips overflowing image edges
-    <div className="relative w-full h-[620px] overflow-hidden bg-gray-950">
+    <div className="relative w-full h-[520px] overflow-hidden bg-gray-950">
 
       {/* Background image — only rendered when imageOk is true.
           key={slide.id} forces React to remount the <img> element when the
@@ -93,7 +96,7 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
           1. Dark gradient fades the image to black at the bottom (makes text readable)
           2. Subtle red radial glow at the top for a horror atmosphere */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(220,38,38,0.08)_0%,transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(34,197,94,0.08)_0%,_transparent_60%)]" />
 
       {/* Thin red accent line along the very top edge — purely decorative */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-600/30 to-transparent" />

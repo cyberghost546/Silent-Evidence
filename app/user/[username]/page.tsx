@@ -111,7 +111,7 @@ export default async function UserProfilePage({ params }: Props) {
 
   const avatar =
     user.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=22c55e&color=fff&size=128`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=128`;
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -119,7 +119,7 @@ export default async function UserProfilePage({ params }: Props) {
 
       {/* ── Hero banner ────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden">
-        {/* Atmospheric background — layered gradients for a anime feel */}
+        {/* Atmospheric background — layered gradients for a horror feel */}
         <div className="absolute inset-0 bg-gray-950" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(220,38,38,0.18)_0%,transparent_70%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(220,38,38,0.06)_0%,transparent_60%)]" />
@@ -151,6 +151,19 @@ export default async function UserProfilePage({ params }: Props) {
                 </h1>
                 {/* Blue checkmark for verified authors */}
                 {user.isVerified && <VerifiedBadge size="md" />}
+
+                {/* Apply for verification — only shown to the profile owner when not yet verified */}
+                {viewerId === user.id && !user.isVerified && (
+                  <Link
+                    href="/apply-for-verification"
+                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Apply for verification
+                  </Link>
+                )}
 
                 {/* Action buttons — only shown to other logged-in users */}
                 {viewerId && viewerId !== user.id && (

@@ -72,7 +72,7 @@ export default async function ForumPostPage({ params }: Props) {
 
   // Inline avatar helper — returns the user's avatar or a generated initials image
   const avatar = (username: string, av?: string | null) =>
-    av ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=22c55e&color=fff&size=40`;
+    av ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=40`;
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">

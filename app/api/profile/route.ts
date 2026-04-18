@@ -11,14 +11,15 @@
 //    - bio       — short personal description (stored in Profile)
 //    - avatar    — profile photo URL (stored in Profile)
 //    - website   — personal website link (stored in Profile)
+//    - fearMoods — comma-separated Mood values stored on Profile
 //
-//  Note: password changes are handled by a separate endpoint
-//  at /api/profile/password.
+// Note: password changes are handled by a separate endpoint
+// at /api/profile/password.
 //
-//  The User and Profile rows are updated separately because they
-//  live in different tables:
+// The User and Profile rows are updated separately because they
+// live in different tables:
 //    - username lives on the User table
-//    - bio, avatar, website live on the related Profile table
+//    - bio, avatar, website, fearMoods live on the related Profile table
 // ============================================================
 
 // Import NextResponse so we can return JSON HTTP responses
@@ -32,7 +33,7 @@ import { prisma } from '@/lib/prisma';
 
 // ── PATCH handler ─────────────────────────────────────────────────────────────
 // Updates profile fields for the currently logged-in user.
-// Expected JSON body: { username: string, bio?: string, avatar?: string, website?: string }
+// Expected JSON body: { username?: string, bio?: string, avatar?: string, website?: string, fearMoods?: string }
 export async function PATCH(req: Request) {
   // Read all cookies from the incoming request
   const cookieStore = await cookies();
@@ -44,68 +45,77 @@ export async function PATCH(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });
 
   // Parse the JSON body to get the fields to update
-  const { username, bio, avatar, website } = await req.json();
+  const { username, bio, avatar, website, fearMoods } = await req.json();
 
-  // Username is required and cannot be blank or only whitespace
-  if (!username?.trim()) {
-    return NextResponse.json({ error: 'Username cannot be empty.' }, { status: 400 });
+  // Username is optional here because other settings may update only profile fields.
+  if (username !== undefined) {
+    if (!username?.trim()) {
+      return NextResponse.json({ error: 'Username cannot be empty.' }, { status: 400 });
+    }
+
+    // Check whether the new username is already taken by a DIFFERENT user.
+    // NOT: { id: userId } means "exclude the current user from this check"
+    // (so a user can re-save the same username without getting a conflict error)
+    const conflict = await prisma.user.findFirst({
+      where: {
+        // Match any user with this username...
+        username,
+        // ...except the current user themselves
+        NOT: { id: userId },
+      },
+    });
+
+    // If another user has this username, reject the request
+    if (conflict) {
+      return NextResponse.json({ error: 'That username is already taken.' }, { status: 409 });
+    }
+
+    // Update the username on the User record.
+    // username lives directly on the User table so it gets its own update call.
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        // Trim surrounding whitespace before saving
+        username: username.trim(),
+      },
+    });
   }
 
-  // Check whether the new username is already taken by a DIFFERENT user.
-  // NOT: { id: userId } means "exclude the current user from this check"
-  // (so a user can re-save the same username without getting a conflict error)
-  const conflict = await prisma.user.findFirst({
-    where: {
-      // Match any user with this username...
-      username,
-      // ...except the current user themselves
-      NOT: { id: userId },
-    },
-  });
+  const profileUpdates: {
+    bio?: string | null;
+    avatar?: string | null;
+    website?: string | null;
+    fearMoods?: string | null;
+  } = {};
 
-  // If another user has this username, reject the request
-  if (conflict) {
-    return NextResponse.json({ error: 'That username is already taken.' }, { status: 409 });
+  if (bio !== undefined) profileUpdates.bio = bio || null;
+  if (avatar !== undefined) profileUpdates.avatar = avatar || null;
+  if (website !== undefined) profileUpdates.website = website || null;
+  if (fearMoods !== undefined) profileUpdates.fearMoods = fearMoods || null;
+
+  if (Object.keys(profileUpdates).length > 0) {
+    await prisma.profile.upsert({
+      where: {
+        // Target the profile belonging to this specific user
+        userId,
+      },
+      // If the profile already exists, update these fields
+      update: profileUpdates,
+      // If no profile exists yet, create one with the fields we have
+      create: {
+        userId,
+        bio: profileUpdates.bio ?? null,
+        avatar: profileUpdates.avatar ?? null,
+        website: profileUpdates.website ?? null,
+        fearMoods: profileUpdates.fearMoods ?? null,
+      },
+    });
   }
 
-  // Update the username on the User record.
-  // username lives directly on the User table so it gets its own update call.
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      // Trim surrounding whitespace before saving
-      username: username.trim(),
-    },
-  });
-
-  // Upsert the Profile row — "upsert" means:
-  //   - If a Profile row already exists for this user → UPDATE it
-  //   - If no Profile row exists yet → CREATE a new one
-  // This handles both new users (who have no profile yet) and existing users.
-  await prisma.profile.upsert({
-    where: {
-      // Target the profile belonging to this specific user
-      userId,
-    },
-    // If the profile already exists, update these fields
-    update: {
-      // Store bio, or null if the field was cleared
-      bio: bio || null,
-      // Store avatar URL, or null if cleared
-      avatar: avatar || null,
-      // Store website URL, or null if cleared
-      website: website || null,
-    },
-    // If no profile exists yet, create one with all the fields
-    create: {
-      // Link to the user
-      userId,
-      bio: bio || null,
-      avatar: avatar || null,
-      website: website || null,
-    },
-  });
-
-  // Return the updated username so the client can update any UI that displays it
-  return NextResponse.json({ username: username.trim() });
+  // Return the updated username when it was included, otherwise return a generic success flag.
+  return NextResponse.json(
+    username !== undefined
+      ? { username: username.trim() }
+      : { success: true }
+  );
 }

@@ -38,9 +38,9 @@ export default function WritingPromptBanner() {
     if (sessionStorage.getItem(key)) { setDismissed(true); setLoading(false); return; }
 
     fetch('/api/writing-prompts')
-      .then(r => r.json())
-      .then(data => { setPrompt(data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(data => { if (data?.id) setPrompt(data); setLoading(false); })
+      .catch(() => setLoading(false)); // hide silently on error — non-critical widget
   }, []);
 
   const dismiss = () => {

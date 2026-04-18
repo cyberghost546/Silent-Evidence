@@ -1,6 +1,6 @@
 'use client';
-// AnimeSquads.tsx
-// Private anime groups where friends share stories with each other.
+// HorrorSquads.tsx
+// Private horror groups where friends share stories with each other.
 // Users can create squads, join with a 6-char code, and post inside their squads.
 // Two tabs: "My Squads" and "Join a Squad"
 
@@ -62,7 +62,7 @@ function timeAgo(dateStr: string): string {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export default function AnimeSquads({ userId }: Props) {
+export default function HorrorSquads({ userId }: Props) {
   // Which top-level tab the user is viewing: my squads or join flow
   const [tab, setTab] = useState<'mine' | 'join'>('mine');
 
@@ -225,9 +225,9 @@ export default function AnimeSquads({ userId }: Props) {
 
   if (!userId) {
     return (
-      <div className="rounded-lg border border-red-900/40 bg-neutral-900/80 p-6 text-center text-red-400">
+      <div className="rounded-lg border border-green-900/40 bg-neutral-900/80 p-6 text-center text-green-400">
         {/* Prompt unauthenticated visitors to log in */}
-        <p className="text-sm">Sign in to join or create an Anime Squad.</p>
+        <p className="text-sm">Sign in to join or create a Horror Squad.</p>
       </div>
     );
   }
@@ -237,24 +237,24 @@ export default function AnimeSquads({ userId }: Props) {
   // When a squad is active, replace the whole widget with the feed
   if (activeSquad) {
     return (
-      <div className="rounded-lg border border-red-900/50 bg-neutral-950 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+      <div className="rounded-lg border border-green-900/50 bg-neutral-950 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
         {/* Feed header: back button, squad name, share code */}
-        <div className="flex items-center justify-between border-b border-red-900/40 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-green-900/40 px-4 py-3">
           <button
             onClick={leaveSquadView}
-            className="text-xs text-red-500 hover:text-red-400 transition-colors"
+            className="text-xs text-green-500 hover:text-green-400 transition-colors"
           >
             ← Back to Squads
           </button>
-          <h3 className="text-sm font-bold text-red-300 tracking-wide">{activeSquad.name}</h3>
+          <h3 className="text-sm font-bold text-green-300 tracking-wide">{activeSquad.name}</h3>
           {/* Show the invite code so members can share it with friends */}
-          <span className="rounded bg-red-950 px-2 py-0.5 font-mono text-xs text-red-400 border border-red-900/50">
+          <span className="rounded bg-green-950 px-2 py-0.5 font-mono text-xs text-green-400 border border-green-900/50">
             {activeSquad.code}
           </span>
         </div>
 
         {/* Member count + list */}
-        <div className="border-b border-red-900/30 px-4 py-2">
+        <div className="border-b border-green-900/30 px-4 py-2">
           <p className="text-xs text-neutral-500">
             {activeSquad.members.length} member{activeSquad.members.length !== 1 ? 's' : ''}:{' '}
             <span className="text-neutral-400">
@@ -264,15 +264,15 @@ export default function AnimeSquads({ userId }: Props) {
         </div>
 
         {/* Post composer — text input + optional story link */}
-        <div className="border-b border-red-900/30 px-4 py-3 space-y-2">
+        <div className="border-b border-green-900/30 px-4 py-3 space-y-2">
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
             placeholder="Share something with your squad..."
             rows={2}
-            className="w-full resize-none rounded bg-neutral-900 border border-red-900/40 px-3 py-2
+            className="w-full resize-none rounded bg-neutral-900 border border-green-900/40 px-3 py-2
                        text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none
-                       focus:border-red-700 transition-colors"
+                       focus:border-green-700 transition-colors"
           />
           <div className="flex gap-2">
             <input
@@ -280,20 +280,20 @@ export default function AnimeSquads({ userId }: Props) {
               value={postStoryUrl}
               onChange={(e) => setPostStoryUrl(e.target.value)}
               placeholder="Story URL (optional)"
-              className="flex-1 rounded bg-neutral-900 border border-red-900/40 px-3 py-1.5
+              className="flex-1 rounded bg-neutral-900 border border-green-900/40 px-3 py-1.5
                          text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none
-                         focus:border-red-700 transition-colors"
+                         focus:border-green-700 transition-colors"
             />
             <button
               onClick={submitPost}
               disabled={postLoading || (!postContent.trim() && !postStoryUrl.trim())}
-              className="rounded bg-red-800 px-4 py-1.5 text-sm font-semibold text-white
-                         hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="rounded bg-green-800 px-4 py-1.5 text-sm font-semibold text-white
+                         hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {postLoading ? 'Posting…' : 'Post'}
             </button>
           </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-green-500">{error}</p>}
         </div>
 
         {/* Post feed — list of squad posts, newest first */}
@@ -307,7 +307,7 @@ export default function AnimeSquads({ userId }: Props) {
               <div key={post.id} className="px-4 py-3 hover:bg-neutral-900/50 transition-colors">
                 {/* Post author + timestamp */}
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-xs font-semibold text-red-400">{post.username}</span>
+                  <span className="text-xs font-semibold text-green-400">{post.username}</span>
                   <span className="text-xs text-neutral-600">{timeAgo(post.createdAt)}</span>
                 </div>
                 {/* Post message text */}
@@ -320,8 +320,8 @@ export default function AnimeSquads({ userId }: Props) {
                     href={post.storyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1 block truncate rounded border border-red-900/40 bg-red-950/30
-                               px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:border-red-700
+                    className="mt-1 block truncate rounded border border-green-900/40 bg-green-950/30
+                               px-3 py-1.5 text-xs text-green-400 hover:text-green-300 hover:border-green-700
                                transition-colors"
                   >
                     {/* Link icon + truncated URL */}
@@ -339,23 +339,23 @@ export default function AnimeSquads({ userId }: Props) {
   // ── Main widget (tab view) ────────────────────────────────────────────────
 
   return (
-    <div className="rounded-lg border border-red-900/50 bg-neutral-950 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+    <div className="rounded-lg border border-green-900/50 bg-neutral-950 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
       {/* Widget header */}
-      <div className="border-b border-red-900/40 px-4 py-3">
-        <h2 className="text-sm font-bold tracking-widest text-red-500 uppercase">
-          Anime Squads
+      <div className="border-b border-green-900/40 px-4 py-3">
+        <h2 className="text-sm font-bold tracking-widest text-green-500 uppercase">
+          Horror Squads
         </h2>
-        <p className="mt-0.5 text-xs text-neutral-500">Private groups for sharing anime stories with friends</p>
+        <p className="mt-0.5 text-xs text-neutral-500">Private groups for sharing horror stories with friends</p>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex border-b border-red-900/30">
+      <div className="flex border-b border-green-900/30">
         {/* "My Squads" tab */}
         <button
           onClick={() => { setTab('mine'); setError(''); }}
           className={`flex-1 py-2 text-xs font-semibold transition-colors ${
             tab === 'mine'
-              ? 'border-b-2 border-red-600 text-red-400'
+              ? 'border-b-2 border-green-600 text-green-400'
               : 'text-neutral-500 hover:text-neutral-300'
           }`}
         >
@@ -366,7 +366,7 @@ export default function AnimeSquads({ userId }: Props) {
           onClick={() => { setTab('join'); setError(''); }}
           className={`flex-1 py-2 text-xs font-semibold transition-colors ${
             tab === 'join'
-              ? 'border-b-2 border-red-600 text-red-400'
+              ? 'border-b-2 border-green-600 text-green-400'
               : 'text-neutral-500 hover:text-neutral-300'
           }`}
         >
@@ -377,7 +377,7 @@ export default function AnimeSquads({ userId }: Props) {
       {/* Tab content area */}
       <div className="p-4">
         {error && (
-          <p className="mb-3 rounded bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-400">
+          <p className="mb-3 rounded bg-green-950/40 border border-green-900/40 px-3 py-2 text-xs text-green-400">
             {error}
           </p>
         )}
@@ -388,8 +388,8 @@ export default function AnimeSquads({ userId }: Props) {
             {/* Create Squad button — toggles the inline create form */}
             <button
               onClick={() => { setShowCreateForm((v) => !v); setError(''); }}
-              className="w-full rounded border border-red-900/50 bg-red-950/30 py-2 text-xs
-                         font-semibold text-red-400 hover:bg-red-950/60 hover:border-red-700
+              className="w-full rounded border border-green-900/50 bg-green-950/30 py-2 text-xs
+                         font-semibold text-green-400 hover:bg-green-950/60 hover:border-green-700
                          transition-colors"
             >
               {showCreateForm ? '✕ Cancel' : '+ Create a New Squad'}
@@ -397,8 +397,8 @@ export default function AnimeSquads({ userId }: Props) {
 
             {/* Inline create form — shown when showCreateForm is true */}
             {showCreateForm && (
-              <div className="rounded border border-red-900/40 bg-neutral-900 p-3 space-y-2">
-                <p className="text-xs font-semibold text-red-400 mb-1">New Squad</p>
+              <div className="rounded border border-green-900/40 bg-neutral-900 p-3 space-y-2">
+                <p className="text-xs font-semibold text-green-400 mb-1">New Squad</p>
                 {/* Squad name input */}
                 <input
                   type="text"
@@ -406,9 +406,9 @@ export default function AnimeSquads({ userId }: Props) {
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Squad name (e.g. Shonen Club)"
                   maxLength={60}
-                  className="w-full rounded bg-neutral-800 border border-red-900/30 px-3 py-2
+                  className="w-full rounded bg-neutral-800 border border-green-900/30 px-3 py-2
                              text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none
-                             focus:border-red-700 transition-colors"
+                             focus:border-green-700 transition-colors"
                 />
                 {/* Optional description */}
                 <textarea
@@ -417,15 +417,15 @@ export default function AnimeSquads({ userId }: Props) {
                   placeholder="Description (optional)"
                   rows={2}
                   maxLength={200}
-                  className="w-full resize-none rounded bg-neutral-800 border border-red-900/30
+                  className="w-full resize-none rounded bg-neutral-800 border border-green-900/30
                              px-3 py-2 text-sm text-neutral-200 placeholder-neutral-600
-                             focus:outline-none focus:border-red-700 transition-colors"
+                             focus:outline-none focus:border-green-700 transition-colors"
                 />
                 <button
                   onClick={createSquad}
                   disabled={loading || !newName.trim()}
-                  className="w-full rounded bg-red-800 py-2 text-sm font-bold text-white
-                             hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed
+                  className="w-full rounded bg-green-800 py-2 text-sm font-bold text-white
+                             hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed
                              transition-colors"
                 >
                   {loading ? 'Creating…' : 'Create Squad'}
@@ -449,21 +449,21 @@ export default function AnimeSquads({ userId }: Props) {
             {squads.map((squad) => (
               <div
                 key={squad.id}
-                // Violet glow border on each card for the anime aesthetic
-                className="rounded-lg border border-red-900/50 bg-neutral-900
+                // Violet glow border on each card
+                className="rounded-lg border border-green-900/50 bg-neutral-900
                            shadow-[0_0_10px_rgba(139,92,246,0.1)] hover:shadow-[0_0_16px_rgba(139,92,246,0.25)]
                            transition-shadow p-3"
               >
                 {/* Squad name + host */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-bold text-red-300">{squad.name}</p>
+                    <p className="text-sm font-bold text-green-300">{squad.name}</p>
                     <p className="text-xs text-neutral-500">
                       by {squad.hostUsername} &bull; {squad.memberCount} member{squad.memberCount !== 1 ? 's' : ''}
                     </p>
                   </div>
                   {/* Invite code badge */}
-                  <span className="shrink-0 rounded bg-red-950 px-2 py-0.5 font-mono text-xs text-red-400 border border-red-900/50">
+                  <span className="shrink-0 rounded bg-green-950 px-2 py-0.5 font-mono text-xs text-green-400 border border-green-900/50">
                     {squad.code}
                   </span>
                 </div>
@@ -474,8 +474,8 @@ export default function AnimeSquads({ userId }: Props) {
                 {/* Enter button — loads the squad feed view */}
                 <button
                   onClick={() => enterSquad(squad.code)}
-                  className="mt-2 rounded bg-red-900/40 border border-red-900/50 px-4 py-1.5
-                             text-xs font-semibold text-red-400 hover:bg-red-900/70 hover:text-red-300
+                  className="mt-2 rounded bg-green-900/40 border border-green-900/50 px-4 py-1.5
+                             text-xs font-semibold text-green-400 hover:bg-green-900/70 hover:text-green-300
                              transition-colors"
                 >
                   Enter ›
@@ -499,15 +499,15 @@ export default function AnimeSquads({ userId }: Props) {
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
                 placeholder="ANIME7"
                 maxLength={6}
-                className="flex-1 rounded bg-neutral-900 border border-red-900/40 px-3 py-2
-                           font-mono text-sm tracking-widest text-red-300 placeholder-neutral-600
-                           uppercase focus:outline-none focus:border-red-700 transition-colors"
+                className="flex-1 rounded bg-neutral-900 border border-green-900/40 px-3 py-2
+                           font-mono text-sm tracking-widest text-green-300 placeholder-neutral-600
+                           uppercase focus:outline-none focus:border-green-700 transition-colors"
               />
               <button
                 onClick={joinSquad}
                 disabled={loading || joinCode.length !== 6}
-                className="rounded bg-red-800 px-4 py-2 text-sm font-bold text-white
-                           hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed
+                className="rounded bg-green-800 px-4 py-2 text-sm font-bold text-white
+                           hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed
                            transition-colors"
               >
                 {loading ? 'Joining…' : 'Join'}

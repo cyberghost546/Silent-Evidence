@@ -42,12 +42,15 @@ const QUOTES = [
 ];
 
 export default function HorrorQuoteOfDay() {
-  // Pick a quote based on the day of the year so it changes daily
-  // but stays the same for everyone visiting on the same day
+  // Pick a quote based on the day of the year.
+  // This makes the quote change daily without needing an API or database.
   const quote = useMemo(() => {
     const now  = new Date();
+    // Build a reference date at "day 0" so we can calculate the day-of-year number.
     const start = new Date(now.getFullYear(), 0, 0);
+    // Convert the time difference into a whole-day index.
     const dayOfYear = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    // Use modulo (%) so the quotes loop if the year has more days than our quote list.
     return QUOTES[dayOfYear % QUOTES.length];
   }, []);
 
@@ -59,7 +62,7 @@ export default function HorrorQuoteOfDay() {
         <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Quote of the Day</h2>
       </div>
 
-      {/* Quote text — italic serif for atmosphere */}
+      {/* Main quote text */}
       <blockquote className="relative">
         {/* Decorative opening quote mark */}
         <span className="absolute -top-2 -left-1 text-5xl text-red-900/40 font-serif leading-none select-none">&ldquo;</span>

@@ -59,7 +59,7 @@ export default function TipLeaderboard() {
         {authors.map((author, i) => {
           const avatarSrc =
             author.avatar ??
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(author.username)}&background=22c55e&color=fff&size=32`;
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(author.username)}&background=dc2626&color=fff&size=32`;
 
           return (
             <li key={author.username} className="flex items-center gap-3">

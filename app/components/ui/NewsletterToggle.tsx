@@ -38,7 +38,7 @@ export default function NewsletterToggle({ initialSubscribed }: Props) {
   return (
     <div className="flex items-center justify-between py-3 border border-gray-800 rounded-xl px-4 bg-gray-900">
       <div>
-        <p className="text-sm font-medium text-white">Weekly Anime Digest</p>
+        <p className="text-sm font-medium text-white">Weekly Horror Digest</p>
         <p className="text-xs text-gray-500 mt-0.5">
           Top stories of the week, delivered every Monday.
         </p>

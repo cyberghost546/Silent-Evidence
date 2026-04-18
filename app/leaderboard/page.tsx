@@ -4,10 +4,16 @@
 // Because all the data comes from the database at request time, the page is
 // always up to date — no client-side fetching needed.
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
+
+export const metadata: Metadata = {
+  title: 'Leaderboard — Silent Evidence',
+  description: 'The top horror story writers on Silent Evidence, ranked by reader likes. Who reigns supreme in the darkness?',
+};
 
 export default async function LeaderboardPage() {
   // Fetch every user who has at least one published story, including:

@@ -12,14 +12,29 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 // PWA install prompt — shows "Add to Home Screen" banner when the app is installable
 import PWAInstallPrompt from "./components/ui/PWAInstallPrompt";
 import ChatBot from "./components/ui/ChatBot";
-// Tutorial — first-visit walkthrough overlay, also accessible via the ? button
-import Tutorial from "./components/ui/Tutorial";
+import TutorialGuide from "./components/ui/TutorialGuide";
+import CookieBanner from "./components/ui/CookieBanner";
+
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 // Validates required env vars at startup — throws a clear error if any are missing
 import { validateEnv } from "@/lib/env";
 
 // Run validation once when the server starts up
 validateEnv();
+
+// Cache the announcement banner for 60 seconds — avoids a DB hit on every page load.
+// The cache is invalidated automatically when the admin updates the banner via the API.
+const getAnnouncement = unstable_cache(
+  async () => {
+    const row = await prisma.siteSetting
+      .findUnique({ where: { key: 'announcement' } })
+      .catch(() => null);
+    return row?.value ?? '';
+  },
+  ['announcement-banner'],
+  { revalidate: 60, tags: ['announcement-banner'] }
+);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,47 +46,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://silentevidence.com';
-
 export const metadata: Metadata = {
-  title: {
-    // Individual pages set their own title; this is the fallback and template
-    default: "Silent Evidence",
-    template: "%s — Silent Evidence",
-  },
-  description: "A community for real horror stories — true crime, paranormal encounters, unexplained disappearances, and campfire tales from people who were actually there.",
-  metadataBase: new URL(SITE_URL),
-
-  // OpenGraph — controls how the link looks when shared on Facebook, Discord, WhatsApp etc.
-  openGraph: {
-    type:        "website",
-    siteName:    "Silent Evidence",
-    title:       "Silent Evidence — Real Horror Stories",
-    description: "True crime, paranormal encounters, and campfire tales from people who were actually there.",
-    url:         SITE_URL,
-    images: [
-      {
-        url:    "/icons/icon-512x512.png",
-        width:  512,
-        height: 512,
-        alt:    "Silent Evidence",
-      },
-    ],
-  },
-
-  // Twitter/X card — shown when a link is shared on Twitter/X
-  twitter: {
-    card:        "summary_large_image",
-    title:       "Silent Evidence — Real Horror Stories",
-    description: "True crime, paranormal encounters, and campfire tales from people who were actually there.",
-    images:      ["/icons/icon-512x512.png"],
-  },
-
+  title: "Silent Evidence",
+  description: "A community for horror story readers and writers. Explore the darkness.",
   // PWA meta tags — tell iOS/Android this is an installable app
   appleWebApp: {
-    capable:         true,
-    statusBarStyle:  "black-translucent",
-    title:           "Silent Evidence",
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Silent Evidence",
   },
   // Prevents phone from treating phone numbers as links
   formatDetection: { telephone: false },
@@ -92,11 +74,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch the current announcement message (empty string = no banner shown)
-  const announcementRow = await prisma.siteSetting
-    .findUnique({ where: { key: 'announcement' } })
-    .catch(() => null);
-  const announcement = announcementRow?.value ?? '';
+  // Fetch the current announcement message — cached for 60 s to avoid per-request DB hits
+  const announcement = await getAnnouncement();
 
   return (
     <html
@@ -131,8 +110,10 @@ export default async function RootLayout({
         <PWAInstallPrompt />
         {/* AI chatbot — floating widget available on every page */}
         <ChatBot />
-        {/* Tutorial — auto-opens on first visit, reopenable via the ? button */}
-        <Tutorial />
+        {/* Step-by-step tutorial guide — auto-opens for first-time visitors */}
+        <TutorialGuide />
+        {/* GDPR cookie consent banner — shown once to new visitors */}
+        <CookieBanner />
       </body>
     </html>
   );

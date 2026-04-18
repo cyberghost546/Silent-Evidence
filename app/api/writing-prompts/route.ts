@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
           role: 'user',
           content:
             'Generate a single compelling horror story writing prompt in 2-3 sentences. ' +
-            'It should be specific, imaginative, and inspire creativity. ' +
+            'It should be specific, atmospheric, and inspire dread or unease. ' +
             'Respond with JSON: {"title": "short label (max 8 words)", "prompt": "the full prompt text"}',
         },
       ],
@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
 
     const text = msg.content[0].type === 'text' ? msg.content[0].text : '';
     const parsed = JSON.parse(text.match(/\{[\s\S]*\}/)?.[0] ?? '{}');
-    // Fall back to a default anime prompt if AI response parsing fails
-    promptText = parsed.prompt ?? 'Write an horror-inspired story about an unexpected adventure.';
+    // Fall back to a default horror prompt if AI response parsing fails
+    promptText = parsed.prompt ?? 'Write a horror story about something that should not exist but does.';
     title = parsed.title ?? `Prompt #${Date.now()}`;
   }
 

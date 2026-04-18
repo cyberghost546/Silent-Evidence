@@ -47,8 +47,8 @@ export default function JoinBanner() {
 
         {/* ── Subheading / pitch copy ────────────────────────────────────── */}
         <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-          Something you witnessed. A place that felt wrong. A night you can't explain.
-          Silent Evidence is where real horror finds its voice.
+          An epic adventure. A heartfelt romance. A world only you can imagine.
+          Silent Evidence is the place to share it.
         </p>
 
         {/* ── CTA button row ─────────────────────────────────────────────── */}
@@ -59,7 +59,7 @@ export default function JoinBanner() {
           {/* Primary CTA — takes the visitor to the registration page */}
           <Link
             href="/register"
-            className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm"
+            className="w-full sm:w-auto px-8 py-3.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition text-sm"
           >
             Create a free account
           </Link>

@@ -1,7 +1,7 @@
 // app/series/new/page.tsx
 // Page for creating a new story series.
 // Only logged-in users can access this — redirects to /login if not authenticated.
-// A series groups related stories together (e.g. a multi-part anime saga).
+// A series groups related stories together (e.g. a multi-part horror saga).
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';

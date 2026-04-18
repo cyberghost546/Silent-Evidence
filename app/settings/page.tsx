@@ -88,7 +88,7 @@ export default async function SettingsPage() {
         <div className="mt-10">
           <div className="mb-6">
             <h2 className="text-lg font-bold text-white">Fear Profile</h2>
-            <p className="text-gray-500 text-sm mt-1">What kind of horror speaks to you?</p>
+            <p className="text-gray-500 text-sm mt-1">What kind of horror draws you in?</p>
             <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
           </div>
           <FearProfilePicker initialFearMoods={user.profile?.fearMoods ?? ''} />

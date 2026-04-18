@@ -21,13 +21,11 @@ import RecentComments from "./components/ui/RecentComments";
 import WriterOfMonth from "./components/ui/WriterOfMonth";
 import TrendingTags from "./components/ui/TrendingTags";
 import StoryOfTheWeek from "./components/ui/StoryOfTheWeek";
-import AnimeCalendar from "./components/ui/HorrorCalendar";
+import HorrorCalendar from "./components/ui/HorrorCalendar";
 import FollowSuggestions from "./components/ui/FollowSuggestions";
 import WritingPromptBanner from "./components/ui/WritingPromptBanner";
 import TipLeaderboard from "./components/ui/TipLeaderboard";
 import HomepageVideos from "./components/ui/HomepageVideos";
-import CommunityStats from "./components/ui/CommunityStats";
-import HorrorQuoteOfDay from "./components/ui/HorrorQuoteOfDay";
 
 export default function Home() {
   return (
@@ -72,12 +70,11 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 pb-14 grid lg:grid-cols-3 gap-6 lg:gap-10">
         {/* standalone prop tells LatestStories to render its own heading and controls */}
         <div className="lg:col-span-2"><LatestStories standalone /></div>
-        {/* Sidebar: trending stories + quote of the day + tip leaderboard + horror calendar */}
+        {/* Sidebar: trending stories + tip leaderboard + horror calendar */}
         <div className="space-y-6">
           <TrendingStories />
-          <HorrorQuoteOfDay />
           <TipLeaderboard />
-          <AnimeCalendar />
+          <HorrorCalendar />
         </div>
       </div>
 

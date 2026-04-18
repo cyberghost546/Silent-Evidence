@@ -9,7 +9,7 @@ import HorrorSquads from '@/app/components/ui/HorrorSquads';
 
 export const metadata = {
   title: 'Horror Squads — Silent Evidence',
-  description: 'Create a private horror squad and share real stories with your crew',
+  description: 'Create a private horror squad and share horror stories with your friends.',
 };
 
 export default async function SquadsPage() {

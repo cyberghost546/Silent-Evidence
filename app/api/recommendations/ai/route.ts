@@ -5,7 +5,7 @@
 // reading history and preferences to Claude, which returns:
 //   - A ranked list of story IDs from the candidate pool
 //   - A short, atmospheric explanation for each pick (e.g. "You lingered on psychological
-//     anime — this one hits different.")
+//     horror — this one hits different.")
 //
 // Rate: Claude is called at most once per user per 30 minutes (cached in Redis).
 // Requires ANTHROPIC_API_KEY to be set. Falls back to basic scoring if not configured.

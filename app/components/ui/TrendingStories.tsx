@@ -53,8 +53,22 @@ export default async function TrendingStories() {
     });
   });
 
-  // If there are truly no stories at all, render nothing rather than an empty widget
-  if (list.length === 0) return null;
+  // If there are truly no stories at all, show a friendly placeholder
+  if (list.length === 0) {
+    return (
+      <section className="pb-14">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-1 h-6 bg-orange-500 rounded-full" />
+          <h2 className="text-2xl font-bold text-white">Trending</h2>
+        </div>
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 text-center">
+          <p className="text-3xl mb-3">🔥</p>
+          <p className="text-gray-400 text-sm">No trending stories yet this week.</p>
+          <p className="text-gray-600 text-xs mt-1">Check back soon — or be the first to write one.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="pb-14">

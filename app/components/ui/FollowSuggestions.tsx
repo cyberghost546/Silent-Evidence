@@ -19,12 +19,13 @@ export default function FollowSuggestions() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [followed, setFollowed] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch('/api/suggestions')
-      .then((r) => r.json())
-      .then((data) => { setSuggestions(data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((data) => { setSuggestions(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => { setError(true); setLoading(false); });
   }, []);
 
   // Toggle follow state for a suggested author
@@ -62,6 +63,7 @@ export default function FollowSuggestions() {
     );
   }
 
+  if (error) return null; // silently hide — not critical enough to show an error to users
   if (suggestions.length === 0) return null;
 
   return (
@@ -75,7 +77,7 @@ export default function FollowSuggestions() {
           const isFollowed = followed.has(author.id);
           const avatarSrc =
             author.profile?.avatar ??
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(author.username)}&background=22c55e&color=fff&size=64`;
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(author.username)}&background=dc2626&color=fff&size=64`;
 
           return (
             <div

@@ -35,7 +35,7 @@ export default function PollsClient({ polls: initial, userId }: { polls: Poll[];
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">Community Polls</h1>
-          <p className="text-sm text-gray-500 mt-1">Vote on anime topics and story outcomes.</p>
+          <p className="text-sm text-gray-500 mt-1">Vote on horror topics and story outcomes.</p>
         </div>
         {userId && (
           <button

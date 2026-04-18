@@ -22,11 +22,11 @@ export default function CurrentlyReadingBadge({ storyId }: Props) {
   if (count === null || count < 2) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-red-400 bg-red-400/10 border border-red-400/20 rounded-full px-2 py-0.5">
+    <span className="inline-flex items-center gap-1 text-xs text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2 py-0.5">
       {/* Pulsing green dot */}
       <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-400" />
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-400" />
       </span>
       {count} reading
     </span>

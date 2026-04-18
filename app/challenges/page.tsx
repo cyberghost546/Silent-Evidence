@@ -75,7 +75,7 @@ export default async function ChallengesPage() {
                   className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-6 transition-all duration-200">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <h2 className="text-lg font-bold text-white group-hover:text-red-300 transition-colors">{c.title}</h2>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${isEnded ? 'bg-gray-700 text-gray-400' : isActive ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}`}>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${isEnded ? 'bg-gray-700 text-gray-400' : isActive ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}`}>
                       {isEnded ? 'Ended' : isActive ? `${daysLeft}d left` : 'Upcoming'}
                     </span>
                   </div>

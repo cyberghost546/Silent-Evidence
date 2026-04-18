@@ -29,7 +29,7 @@
 
 import { useState } from 'react';
 
-// The available reaction emojis — anime-themed
+// The available reaction emojis
 const EMOJIS = ['👍', '😱', '💀', '🔥', '❤️'];
 
 type Props = {

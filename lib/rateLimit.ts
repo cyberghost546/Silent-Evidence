@@ -94,3 +94,31 @@ export function getClientIp(req: Request): string {
 
   return '127.0.0.1';
 }
+
+/**
+ * anonymizeIp — masks the last octet of an IPv4 address (or last group of IPv6)
+ * before storing in the database. Satisfies GDPR data minimisation requirements
+ * while still letting admins spot network-level patterns.
+ *
+ * Examples:
+ *   "203.0.113.42"          → "203.0.113.x"
+ *   "2001:db8::1"           → "2001:db8::x"
+ *   "127.0.0.1"             → "127.0.0.x"
+ */
+export function anonymizeIp(ip: string): string {
+  if (!ip) return 'x.x.x.x';
+  // IPv4 — replace last octet
+  if (ip.includes('.')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      parts[3] = 'x';
+      return parts.join('.');
+    }
+  }
+  // IPv6 — replace last colon-group
+  if (ip.includes(':')) {
+    const idx = ip.lastIndexOf(':');
+    return ip.substring(0, idx + 1) + 'x';
+  }
+  return ip;
+}

@@ -74,7 +74,7 @@ export default async function BundleDetailPage({ params }: Props) {
           {/* Purchase / owned state */}
           <div className="mt-6">
             {alreadyOwned ? (
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 font-semibold rounded-xl text-sm">
+              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500/10 border border-green-500/30 text-green-400 font-semibold rounded-xl text-sm">
                 <Check className="w-4 h-4" /> You own this bundle
               </span>
             ) : (

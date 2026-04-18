@@ -1,5 +1,5 @@
 // scripts/seed-stories.ts
-// Generates anime stories using Claude AI and seeds them into the database.
+// Generates horror stories using Claude AI and seeds them into the database.
 // Run with: npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/seed-stories.ts
 //
 // Prerequisites:
@@ -12,7 +12,7 @@
 //   npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/seed-stories.ts --count 50  # generates 50 stories
 //
 // The script creates stories attributed to existing users and distributes them
-// across categories and moods for a well-populated anime platform.
+// across categories and moods for a well-populated horror platform.
 
 import { PrismaClient } from '@prisma/client';
 import Anthropic from '@anthropic-ai/sdk';
@@ -20,7 +20,7 @@ import Anthropic from '@anthropic-ai/sdk';
 const prisma = new PrismaClient();
 const ai = new Anthropic();
 
-// All available anime moods — stories are distributed across these
+// All available horror moods — stories are distributed across these
 const MOODS = ['CREEPY', 'PARANOID', 'DISTURBING', 'ATMOSPHERIC', 'PSYCHOLOGICAL', 'SUPERNATURAL', 'GORE', 'JUMPSCARE'] as const;
 
 // Content ratings — weighted toward ALL so most content is accessible
@@ -28,9 +28,9 @@ const RATINGS = ['ALL', 'ALL', 'ALL', 'TEEN', 'TEEN', 'MATURE'] as const;
 
 // Story length targets — variety keeps the platform interesting
 const LENGTH_PROMPTS = [
-  'Write a short anime story (about 500-800 words).',
-  'Write a medium-length anime story (about 1000-1500 words).',
-  'Write a longer anime story (about 2000-2500 words).',
+  'Write a short horror story (about 500-800 words).',
+  'Write a medium-length horror story (about 1000-1500 words).',
+  'Write a longer horror story (about 2000-2500 words).',
 ] as const;
 
 // Converts a title into a URL-safe slug with a random suffix
@@ -45,7 +45,7 @@ function slugify(title: string): string {
   return `${base}-${suffix}`;
 }
 
-// Generates a single anime story using Claude AI
+// Generates a single horror story using Claude AI
 async function generateStory(mood: string, categoryName: string): Promise<{
   title: string;
   content: string;
@@ -60,7 +60,7 @@ async function generateStory(mood: string, categoryName: string): Promise<{
     messages: [
       {
         role: 'user',
-        content: `You are a anime fiction author for a platform called Anime Nexus. ${lengthPrompt}
+        content: `You are a horror fiction author for a platform called Silent Evidence. ${lengthPrompt}
 
 Requirements:
 - Mood: ${mood.toLowerCase()}
@@ -69,7 +69,7 @@ Requirements:
 - Include a compelling title
 - Write an excerpt (1-2 sentences that hook the reader without spoilers)
 - If the story contains graphic content, provide a brief content warning
-- Make it genuinely scary and well-written — this is for a curated anime platform
+- Make it genuinely scary and well-written — this is for a curated horror platform
 - DO NOT include the title in the body text — it will be displayed separately
 
 Reply with JSON only:
@@ -96,7 +96,7 @@ async function main() {
   const countArg = process.argv.find(a => a.startsWith('--count'));
   const count = countArg ? parseInt(countArg.split('=')[1] || process.argv[process.argv.indexOf('--count') + 1] || '10') : 10;
 
-  console.log(`\nGenerating ${count} anime stories with Claude AI...\n`);
+  console.log(`\nGenerating ${count} horror stories with Claude AI...\n`);
 
   // Fetch existing users and categories from the database
   const users = await prisma.user.findMany({

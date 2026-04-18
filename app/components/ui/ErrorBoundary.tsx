@@ -50,7 +50,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
       // Use custom fallback if provided
       if (this.props.fallback) return this.props.fallback;
 
-      // Default anime-themed fallback UI
+      // Default fallback UI
       return (
         <div className="min-h-[300px] flex flex-col items-center justify-center p-8 text-center">
           {/* Spooky ghost icon */}

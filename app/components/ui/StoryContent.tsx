@@ -74,16 +74,16 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
       </div>
 
       {/* ── 3. Story body ───────────────────────────────────────────────────
-          Split on double-newline to turn plain-text paragraphs into <p> elements.
+          Content is stored as HTML (written in TipTap or seeded as HTML strings).
+          dangerouslySetInnerHTML renders the HTML tags correctly instead of
+          displaying them as raw text. The content comes from our own database
+          (author-submitted or admin-seeded) so XSS risk is controlled at write time.
           prose prose-invert applies the Tailwind Typography stylesheet with
           white text suitable for dark backgrounds.                             */}
-      <div className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed space-y-5">
-        {displayContent.split('\n\n').map((paragraph, i) => (
-          // Each paragraph block becomes its own <p> element
-          // The index `i` is used as the key because paragraphs have no unique IDs
-          <p key={i}>{paragraph}</p>
-        ))}
-      </div>
+      <div
+        className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: displayContent }}
+      />
     </>
   );
 }

@@ -30,14 +30,14 @@ export default async function QuizPage() {
           <span className="w-1 h-7 bg-red-600 rounded-full" />
           <div>
             <h1 className="text-2xl font-bold text-white">Horror Trivia Quiz</h1>
-            <p className="text-sm text-gray-500 mt-0.5">10 questions on true crime, paranormal cases, and horror history.</p>
+            <p className="text-sm text-gray-500 mt-0.5">10 questions. How well do you know horror?</p>
           </div>
         </div>
 
         {userBest && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-5 py-3 mb-6 flex items-center gap-3">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-5 py-3 mb-6 flex items-center gap-3">
             <span className="text-xl">🏆</span>
-            <p className="text-sm text-red-400">Your best score: <strong>{userBest.score}/{userBest.total}</strong></p>
+            <p className="text-sm text-green-400">Your best score: <strong>{userBest.score}/{userBest.total}</strong></p>
           </div>
         )}
 

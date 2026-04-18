@@ -16,21 +16,21 @@ type HorrorDate = {
 
 // Well-known horror dates — recurring every year
 const HORROR_DATES: HorrorDate[] = [
-  { month: 1,  day: 13, label: 'Friday the 13th (Jan)',       icon: '🔪' }, // If Jan 13 falls on a Friday
-  { month: 2,  day: 2,  label: 'Groundhog Day',               icon: '👁️' }, // Eerie time-loop origins
-  { month: 3,  day: 13, label: 'Friday the 13th (Mar)',       icon: '🔪' }, // Unlucky day
-  { month: 4,  day: 30, label: "Walpurgis Night",             icon: '🧙' }, // Ancient witch festival
-  { month: 5,  day: 13, label: 'Friday the 13th (May)',       icon: '🔪' }, // Unlucky day
-  { month: 6,  day: 6,  label: "Devil's Day (6/6)",           icon: '😈' }, // 6th day of 6th month
-  { month: 7,  day: 13, label: 'Friday the 13th (Jul)',       icon: '🔪' }, // Unlucky day
-  { month: 8,  day: 1,  label: 'Lammas / Lughnasadh',         icon: '🌾' }, // Harvest ritual
-  { month: 9,  day: 13, label: 'Friday the 13th (Sep)',       icon: '🔪' }, // Unlucky day
-  { month: 10, day: 13, label: 'Friday the 13th (Oct)',       icon: '🔪' }, // Spookiest month
-  { month: 10, day: 30, label: 'Mischief Night',              icon: '🌑' }, // Night before Halloween
-  { month: 10, day: 31, label: 'Halloween',                   icon: '🎃' }, // The big one
-  { month: 11, day: 1,  label: 'Day of the Dead',             icon: '💀' }, // Día de los Muertos
-  { month: 11, day: 2,  label: 'All Souls\' Day',             icon: '🕯️' }, // Honor the dead
-  { month: 12, day: 21, label: 'Winter Solstice',             icon: '🌒' }, // Longest night of the year
+  { month: 1,  day: 13, label: 'Friday the 13th',           icon: '🔪' },
+  { month: 2,  day: 2,  label: 'Groundhog Day',             icon: '🌀' }, // The endless loop horror trope
+  { month: 3,  day: 13, label: 'Friday the 13th',           icon: '🔪' },
+  { month: 4,  day: 1,  label: 'All Fools Day',             icon: '🃏' }, // The trickster archetype
+  { month: 5,  day: 1,  label: "Walpurgis Night",           icon: '🕯️' }, // Eve of witches
+  { month: 6,  day: 6,  label: "The Omen Day (6/6)",        icon: '😈' }, // Satanic horror nod
+  { month: 7,  day: 13, label: 'Friday the 13th',           icon: '🔪' },
+  { month: 8,  day: 1,  label: 'Lammas — Harvest Dread',   icon: '🌾' }, // Ancient harvest rite
+  { month: 9,  day: 22, label: 'Autumnal Equinox',          icon: '🍂' }, // Darkness grows longer
+  { month: 10, day: 13, label: 'Friday the 13th',           icon: '🔪' },
+  { month: 10, day: 31, label: 'Halloween',                 icon: '🎃' }, // The big one
+  { month: 11, day: 1,  label: "All Saints' Day",           icon: '💀' }, // Day of the dead
+  { month: 12, day: 13, label: 'Friday the 13th',           icon: '🔪' },
+  { month: 12, day: 21, label: 'Winter Solstice — Dark Night', icon: '🌑' }, // Longest night of the year
+  { month: 12, day: 31, label: 'Year-End Horror Awards',   icon: '🏆' },
 ];
 
 // Calculate the number of days from `now` until the next occurrence of month/day.
@@ -55,7 +55,7 @@ function formatDate(month: number, day: number, year: number) {
 }
 
 // Main calendar component — renders the next 5 upcoming horror events
-export default function AnimeCalendar() {
+export default function HorrorCalendar() {
   // Memoize the sorted/sliced list so it only recomputes when the component mounts
   const upcoming = useMemo(() => {
     const now = new Date();
@@ -97,13 +97,13 @@ export default function AnimeCalendar() {
               </p>
             </div>
 
-            {/* Days-until pill — red highlight for today/soon, muted for later */}
+            {/* Days-until pill — green highlight for today/soon, muted for later */}
             <div className={`flex-shrink-0 text-xs font-bold px-2 py-1 rounded-full ${
               event.days === 0
-                ? 'bg-red-600 text-white'                                     // happening today
+                ? 'bg-green-600 text-white'                                     // happening today
                 : event.days <= 7
-                  ? 'bg-red-600/20 text-red-400 border border-red-600/30'    // within a week
-                  : 'bg-gray-800 text-gray-500'                               // further out
+                  ? 'bg-green-600/20 text-green-400 border border-green-600/30' // within a week
+                  : 'bg-gray-800 text-gray-500'                                   // further out
             }`}>
               {event.days === 0 ? 'Today!' : `${event.days}d`}
             </div>

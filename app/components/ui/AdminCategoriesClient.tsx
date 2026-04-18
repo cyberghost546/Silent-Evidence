@@ -1,30 +1,38 @@
 'use client';
-// ============================================================
-// FILE: AdminCategoriesClient.tsx
-// PURPOSE: Admin panel page for managing story categories.
-//          Shows all categories in a grid with story counts.
-//          Admins can add new categories and delete existing ones.
-//
-// HOW TO REUSE IN ANOTHER PROJECT:
-//   - Pass an array of category objects as the `categories` prop (loaded
-//     server-side by the parent page).
-//   - After any create/delete, router.refresh() re-runs the server component
-//     so the fresh data is fetched without a full page reload.
-//   - The auto-slug pattern in handleNameChange (lowercasing, stripping
-//     special chars, replacing spaces with dashes) is a common utility you
-//     can reuse anywhere you need URL-friendly identifiers.
-// ============================================================
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Shape of a category object as returned by the server query
 type Category = {
   id: number;
   name: string;
-  slug: string;           // URL-safe identifier, e.g. "supernatural-horror"
+  slug: string;
   description: string | null;
-  _count: { stories: number }; // how many stories belong to this category
+  _count: { stories: number };
+};
+
+// Emoji map — keyed by slug so each category gets a matching icon
+const CATEGORY_ICONS: Record<string, string> = {
+  'ghost-stories':     '👻',
+  'psychological':     '🧠',
+  'supernatural':      '🌀',
+  'paranormal':        '🔮',
+  'slasher-horror':    '🔪',
+  'cosmic-horror':     '🌌',
+  'body-horror':       '🧬',
+  'urban-legends':     '🌆',
+  'true-crime':        '🔍',
+  'tech-horror':       '💻',
+  'survival-horror':   '🪓',
+  'occult-witchcraft': '🕯️',
+  'monsters-creatures':'🐉',
+  'dark-fantasy':      '⚔️',
+  'folk-horror':       '🌾',
+  'found-footage':     '📹',
+  'dark-romance':      '🥀',
+  'post-apocalyptic':  '☢️',
+  'haunted-places':    '🏚️',
+  'sci-fi-horror':     '🚀',
 };
 
 export default function AdminCategoriesClient({ categories }: { categories: Category[] }) {
@@ -113,25 +121,51 @@ export default function AdminCategoriesClient({ categories }: { categories: Cate
 
       {/* Category grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((cat) => (
-          <div key={cat.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-2 hover:border-gray-700 transition">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="font-medium text-white truncate">{cat.name}</p>
-                <p className="text-xs text-gray-600 truncate">/{cat.slug}</p>
+        {categories.map((cat) => {
+          const icon = CATEGORY_ICONS[cat.slug] ?? '🏷️';
+          return (
+            <div
+              key={cat.id}
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3
+                         hover:border-gray-600 transition group"
+            >
+              {/* Icon + name + delete */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-xl shrink-0">{icon}</span>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white truncate">{cat.name}</p>
+                    <p className="text-xs text-gray-600 truncate font-mono">/category/{cat.slug}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => deleteCategory(cat.id, cat.name)}
+                  disabled={loading === cat.id}
+                  className="text-xs text-gray-600 hover:text-red-400 disabled:opacity-40
+                             transition shrink-0 opacity-0 group-hover:opacity-100"
+                >
+                  {loading === cat.id ? '…' : 'Delete'}
+                </button>
               </div>
-              <button
-                onClick={() => deleteCategory(cat.id, cat.name)}
-                disabled={loading === cat.id}
-                className="text-xs text-red-500 hover:text-red-400 disabled:opacity-40 transition flex-shrink-0"
-              >
-                Delete
-              </button>
+
+              {/* Description */}
+              {cat.description && (
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                  {cat.description}
+                </p>
+              )}
+
+              {/* Story count badge */}
+              <div className="mt-auto">
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full
+                                 bg-gray-800 border border-gray-700 text-gray-400">
+                  📖 {cat._count.stories} {cat._count.stories === 1 ? 'story' : 'stories'}
+                </span>
+              </div>
             </div>
-            {cat.description && <p className="text-xs text-gray-500 line-clamp-2">{cat.description}</p>}
-            <p className="text-xs text-gray-600 mt-auto">{cat._count.stories} stories</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

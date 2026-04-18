@@ -9,8 +9,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-// Horror moods matching the Mood enum in schema.prisma
-
+// Available horror moods matching the Mood enum in schema.prisma
 const MOODS = [
   { value: 'EPIC',          label: 'Epic',          icon: '⚔️' },
   { value: 'HEARTWARMING',  label: 'Heartwarming',  icon: '💖' },
@@ -199,14 +198,14 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* ── Step 3: Anime mood preferences ──────────────── */}
+        {/* ── Step 3: Horror mood preferences ──────────────── */}
         {step === 3 && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
               <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 3 of 4</p>
               <h1 className="text-2xl font-bold text-white">What scares you? 😱</h1>
               <p className="text-gray-400 text-sm mt-1">
-                Pick the moods that draw you in so we can recommend the right stories.
+                Pick your favorite horror types so we can recommend stories you'll love.
               </p>
             </div>
 

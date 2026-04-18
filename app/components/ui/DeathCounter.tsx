@@ -1,6 +1,6 @@
 // app/components/ui/DeathCounter.tsx
 // Server component — queries the total chapter/episode count across all published stories
-// and renders a stylish animated anime stat for the homepage.
+// and renders a stylish animated horror stat for the homepage.
 // No "use client" directive — this runs entirely on the server.
 
 import { prisma } from '@/lib/prisma';
@@ -25,7 +25,7 @@ export default async function DeathCounter() {
       {/* Outer container — dark card with a green pulse glow on hover */}
       <div
         className="
-          relative overflow-hidden rounded-2xl border border-red-900/40 bg-gray-950
+          relative overflow-hidden rounded-2xl border border-green-900/40 bg-gray-950
           shadow-[0_0_40px_rgba(124,58,237,0.12)]
           flex flex-col sm:flex-row items-center justify-center gap-6
           py-10 px-8 text-center sm:text-left
@@ -52,7 +52,7 @@ export default async function DeathCounter() {
           <p
             className="
               text-4xl sm:text-5xl font-extrabold tracking-tight
-              text-red-500
+              text-green-500
               drop-shadow-[0_0_12px_rgba(124,58,237,0.6)]
               animate-pulse
             "
@@ -65,7 +65,7 @@ export default async function DeathCounter() {
             chapters written across all stories
           </p>
 
-          {/* Small flavour text in the anime site's encouraging voice */}
+          {/* Small flavour text in the site's encouraging voice */}
           <p className="mt-1 text-xs text-gray-600 italic">
             …and counting. The adventure continues.
           </p>

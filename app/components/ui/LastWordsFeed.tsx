@@ -1,8 +1,8 @@
 'use client';
 // ============================================================
 //  LastWordsFeed.tsx
-//  Anime quote micro-post feed — users post their favorite
-//  anime quotes (max 280 chars). Like a quote-themed Twitter feed.
+//  Horror quote micro-post feed — users post their favorite
+//  horror quotes (max 280 chars). Like a quote-themed Twitter feed.
 //
 //  Props:
 //    userId — the currently logged-in user's id, or null if guest
@@ -226,32 +226,32 @@ export default function LastWordsFeed({ userId }: Props) {
 
       {/* ── Section header ─────────────────────────────────── */}
       <div className="mb-6 text-center">
-        {/* Main title — red color for the horror theme */}
-        <h2 className="text-3xl font-bold text-red-500 tracking-widest uppercase font-serif">
+        {/* Main title */}
+        <h2 className="text-3xl font-bold text-green-500 tracking-widest uppercase font-serif">
           Last Words
         </h2>
         {/* Subtitle explaining the character limit */}
         <p className="text-gray-400 text-sm mt-1 italic">
-          280 characters. Drop your scariest thought.
+          280 characters. Drop your best quote.
         </p>
-        {/* Decorative divider */}
-        <div className="mt-3 flex justify-center gap-2 text-red-500 text-xs tracking-widest">
-          ─ 💀 ─ 💀 ─ 💀 ─
+        {/* Decorative sparkle divider — replaces the old blood-drip */}
+        <div className="mt-3 flex justify-center gap-2 text-green-500 text-xs tracking-widest">
+          ─ ✦ ─ ✦ ─ ✦ ─
         </div>
       </div>
 
       {/* ── Compose box ────────────────────────────────────── */}
       {/* Card containing the textarea and submit button */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 shadow-lg shadow-red-900/20">
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 shadow-lg shadow-green-900/20">
 
         {/* Textarea for writing a new quote */}
         <textarea
           className="w-full bg-gray-900 text-gray-100 rounded-md p-3 resize-none
-                     border border-gray-700 focus:outline-none focus:border-red-600
+                     border border-gray-700 focus:outline-none focus:border-green-600
                      placeholder-gray-600 text-sm leading-relaxed"
           rows={3}
           maxLength={MAX_CHARS}
-          placeholder="Drop your scariest thought, last words, or horror quote..."
+          placeholder="Drop your favorite horror quote..."
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           // Allow Ctrl+Enter as a keyboard shortcut to submit
@@ -262,34 +262,35 @@ export default function LastWordsFeed({ userId }: Props) {
 
         {/* Character counter row */}
         <div className="flex items-center justify-between mt-2">
-          {/* Counter turns red when fewer than 30 chars remain */}
+          {/* Counter turns green when fewer than 30 chars remain */}
           <span
             className={`text-xs font-mono tabular-nums transition-colors ${
               charsLeft < 30
-                ? 'text-red-500 font-bold'
+                ? 'text-green-500 font-bold'
                 : 'text-gray-500'
             }`}
           >
             {charsLeft} / {MAX_CHARS}
           </span>
 
-          {/* Submit button — red themed */}
+          {/* Submit button — green themed */}
           <button
             onClick={handleSubmit}
             disabled={submitting || draft.trim().length === 0}
-            className="flex items-center gap-2 bg-red-700 hover:bg-red-600 disabled:opacity-40
+            className="flex items-center gap-2 bg-green-700 hover:bg-green-600 disabled:opacity-40
                        disabled:cursor-not-allowed text-white text-sm font-semibold
                        px-4 py-2 rounded-md transition-colors duration-200"
           >
-            <span aria-hidden>💀</span>
+            {/* Sparkle icon */}
+            <span aria-hidden>✨</span>
             {/* Show loading state while posting */}
-            {submitting ? 'Posting...' : 'Post'}
+            {submitting ? 'Posting...' : 'Post Quote'}
           </button>
         </div>
 
         {/* Inline error message for the compose box */}
         {error && (
-          <p className="mt-2 text-red-400 text-xs">{error}</p>
+          <p className="mt-2 text-green-400 text-xs">{error}</p>
         )}
       </div>
 
@@ -341,9 +342,9 @@ export default function LastWordsFeed({ userId }: Props) {
                 // Violet glow card + optional fade-in for newly posted entries
                 className={`
                   bg-gray-800 border border-gray-700 rounded-lg p-4
-                  shadow-md shadow-red-900/20
+                  shadow-md shadow-green-900/20
                   transition-shadow duration-300
-                  hover:shadow-lg hover:shadow-red-800/30
+                  hover:shadow-lg hover:shadow-green-800/30
                   hover:border-gray-600
                   ${isNew ? 'animate-fadeIn' : ''}
                 `}
@@ -378,13 +379,13 @@ export default function LastWordsFeed({ userId }: Props) {
                   <button
                     onClick={() => handleLike(word.id)}
                     aria-label={ls.liked ? 'Unlike' : 'Like'}
-                    // Toggle between red (liked) and gray (not liked) styles
+                    // Toggle between green (liked) and gray (not liked) styles
                     className={`
                       flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full
                       border transition-all duration-200
                       ${ls.liked
-                        ? 'border-red-700 bg-red-900/40 text-red-400'
-                        : 'border-gray-700 bg-gray-900/60 text-gray-500 hover:border-red-800 hover:text-red-500'
+                        ? 'border-green-700 bg-green-900/40 text-green-400'
+                        : 'border-gray-700 bg-gray-900/60 text-gray-500 hover:border-green-800 hover:text-green-500'
                       }
                     `}
                   >

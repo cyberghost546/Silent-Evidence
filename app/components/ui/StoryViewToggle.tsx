@@ -97,7 +97,7 @@ export default function StoryViewToggle({ stories, footer }: Props) {
           <button
             onClick={() => switchView('grid')} // switch to grid layout on click
             title="Grid view"                  // tooltip shown on hover
-            className={`p-1.5 rounded-md transition ${view === 'grid' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            className={`p-1.5 rounded-md transition ${view === 'grid' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
           >
             <GridIcon /> {/* 2×2 squares icon */}
           </button>
@@ -106,7 +106,7 @@ export default function StoryViewToggle({ stories, footer }: Props) {
           <button
             onClick={() => switchView('list')} // switch to list layout on click
             title="List view"                  // tooltip shown on hover
-            className={`p-1.5 rounded-md transition ${view === 'list' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            className={`p-1.5 rounded-md transition ${view === 'list' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
           >
             <ListIcon /> {/* Three horizontal lines icon */}
           </button>
@@ -126,14 +126,14 @@ export default function StoryViewToggle({ stories, footer }: Props) {
             // which generates an initials-based placeholder image.
             const authorAvatar =
               story.author.profile?.avatar ??
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
             return (
               // The whole card is a Next.js Link so the entire tile is clickable
               <Link
                 key={story.id}                    // unique key required by React for list rendering
                 href={`/story/${story.slug}`}      // navigate to the story page on click
-                className="group flex flex-col bg-gray-800 border border-gray-700/60 hover:border-red-600/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_rgba(34,197,94,0.25)] hover:-translate-y-0.5"
+                className="group flex flex-col bg-gray-800 border border-gray-700/60 hover:border-green-600/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_rgba(34,197,94,0.25)] hover:-translate-y-0.5"
               >
                 {/* ── Cover image area ────────────────────────────────────── */}
                 <div className="relative h-52 overflow-hidden flex-shrink-0">
@@ -165,10 +165,10 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                 <div className="flex flex-col gap-2 p-5 flex-1">
 
                   {/* Category label — small uppercase text in green */}
-                  <span className="text-xs font-bold uppercase tracking-widest text-red-400">{story.category.name}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-green-400">{story.category.name}</span>
 
                   {/* Story title — truncated to 2 lines with CSS line-clamp */}
-                  <h3 className="text-base font-bold text-white group-hover:text-red-300 transition leading-snug line-clamp-2">
+                  <h3 className="text-base font-bold text-white group-hover:text-green-300 transition leading-snug line-clamp-2">
                     {story.title}
                   </h3>
 
@@ -219,14 +219,14 @@ export default function StoryViewToggle({ stories, footer }: Props) {
             // Same avatar fallback logic as the grid view above
             const authorAvatar =
               story.author.profile?.avatar ??
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
             return (
               // Horizontal card — thumbnail on left, text on right
               <Link
                 key={story.id}                    // unique React key
                 href={`/story/${story.slug}`}      // navigate to story page
-                className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-red-900/10"
+                className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-green-600/50 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-green-900/10"
               >
                 {/* ── Thumbnail strip ─────────────────────────────────────── */}
                 {/* Fixed width on the left; scales on sm breakpoint */}
@@ -252,11 +252,11 @@ export default function StoryViewToggle({ stories, footer }: Props) {
 
                   {/* Category badge row */}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-red-400">{story.category.name}</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-green-400">{story.category.name}</span>
                   </div>
 
                   {/* Story title — capped to 2 lines */}
-                  <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition leading-snug line-clamp-2">
+                  <h3 className="text-sm font-semibold text-white group-hover:text-green-300 transition leading-snug line-clamp-2">
                     {story.title}
                   </h3>
 

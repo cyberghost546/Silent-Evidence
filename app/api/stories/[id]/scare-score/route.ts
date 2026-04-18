@@ -98,7 +98,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
       messages: [
         {
           role:    'user',
-          content: `You are an horror story critic. Rate the following story excerpt on a HYPE SCORE from 1 (mildly interesting) to 10 (absolutely epic and unforgettable).
+          content: `You are a horror story critic. Rate the following story excerpt on a SCARE SCORE from 1 (mildly unsettling) to 10 (absolutely terrifying and unforgettable).
 
 Respond with ONLY this JSON format (no markdown, no explanation outside the JSON):
 {"score": <number 1-10>, "reason": "<one sentence explaining the score>"}

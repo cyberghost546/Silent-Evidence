@@ -26,7 +26,7 @@ interface Props {
 
 // Maps mood values to color classes for the mood badge
 const MOOD_COLORS: Record<string, string> = {
-  CREEPY:          'text-red-400 bg-red-500/10 border-red-500/20',
+  CREEPY:          'text-green-400 bg-green-500/10 border-green-500/20',
   PARANOID:        'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   DISTURBING:      'text-red-400 bg-red-500/10 border-red-500/20',
   ATMOSPHERIC:     'text-blue-400 bg-blue-500/10 border-blue-500/20',
@@ -68,10 +68,10 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
     <section className="py-8">
       {/* Section header with AI indicator */}
       <div className="flex items-center gap-3 mb-6">
-        <span className="w-1 h-6 bg-red-500 rounded-full" />
+        <span className="w-1 h-6 bg-green-500 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Chosen for You</h2>
         {/* AI badge — lets users know this is AI-curated */}
-        <span className="text-xs font-semibold text-red-300 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+        <span className="text-xs font-semibold text-green-300 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
           <span>✦</span> AI Curated
         </span>
       </div>
@@ -93,7 +93,7 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
           {recs.map(rec => (
             <div
               key={rec.id}
-              className="group bg-gray-800 border border-gray-700 hover:border-red-500/40 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.10)] hover:shadow-[0_8px_30px_rgba(139,92,246,0.25)]"
+              className="group bg-gray-800 border border-gray-700 hover:border-green-500/40 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.10)] hover:shadow-[0_8px_30px_rgba(139,92,246,0.25)]"
             >
               {/* Category + Mood badges */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -111,7 +111,7 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
 
               {/* Story title — links to the story page */}
               <Link href={`/story/${rec.id}`} className="block">
-                <h3 className="text-sm font-bold text-white group-hover:text-red-300 transition line-clamp-2 mb-2 leading-snug">
+                <h3 className="text-sm font-bold text-white group-hover:text-green-300 transition line-clamp-2 mb-2 leading-snug">
                   {rec.title}
                 </h3>
               </Link>

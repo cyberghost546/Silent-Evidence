@@ -4,7 +4,7 @@
 // author name, and mood badge — so shared links look compelling on
 // Twitter, Facebook, Discord, iMessage, etc.
 //
-// Usage: /api/og?slug=my-anime-story
+// Usage: /api/og?slug=my-story-slug
 // Called automatically by the story page's generateMetadata function.
 
 import { ImageResponse } from 'next/og';
@@ -12,7 +12,7 @@ import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
-// Mood emoji mapping — matches the anime Mood enum values for visual flair on OG cards
+// Mood emoji mapping — matches the Mood enum values for visual flair on OG cards
 const MOOD_EMOJI: Record<string, string> = {
   EPIC: '⚔️',
   HEARTWARMING: '💖',
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '60px',
-          // Dark gradient background with a subtle green tint — matches the anime theme
+          // Dark gradient background with a subtle purple tint — matches the Silent Evidence theme
           background: 'linear-gradient(145deg, #0a0a0a 0%, #0f0520 50%, #0a0a0a 100%)',
           color: '#ffffff',
           fontFamily: 'system-ui, sans-serif',
@@ -157,7 +157,7 @@ export async function GET(req: Request) {
               gap: '8px',
               fontSize: '20px',
               fontWeight: 700,
-              color: '#dc2626',
+              color: '#22c55e',
             }}
           >
             Silent Evidence
@@ -172,7 +172,7 @@ export async function GET(req: Request) {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, transparent, #dc2626, transparent)',
+            background: 'linear-gradient(90deg, transparent, #22c55e, transparent)',
           }}
         />
       </div>

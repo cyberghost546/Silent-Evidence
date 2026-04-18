@@ -87,7 +87,7 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
           ${highlight
             /* Yearly plan: gold gradient to match its premium emphasis */
             ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-gray-900 hover:from-yellow-300 hover:to-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
-            /* Monthly plan: standard green anime CTA */
+            /* Monthly plan: standard green CTA */
             : 'bg-red-600 hover:bg-red-700 text-white border border-red-500'
           }
         `}

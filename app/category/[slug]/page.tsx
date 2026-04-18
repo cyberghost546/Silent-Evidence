@@ -119,8 +119,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       {/* Dark hero section with a subtle red radial glow behind the category name */}
       <div className="relative bg-gray-950 overflow-hidden">
         {/* Layered radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,_rgba(34,197,94,0.18)_0%,_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_80%,_rgba(34,197,94,0.06)_0%,_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(220,38,38,0.16)_0%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_80%,rgba(220,38,38,0.06)_0%,transparent_70%)]" />
 
         <div className="max-w-6xl mx-auto px-4 pt-12 pb-14 relative">
 
@@ -133,8 +133,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
           {/* Category icon + name + description */}
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-3xl flex-shrink-0">
-              {icon}
+            <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-3xl shrink-0">
+              {CategoryIcon}
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
@@ -152,7 +152,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           {/* Stats row — story count on the left, sort toggle on the right */}
           <div className="flex items-center gap-6 mt-6">
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               <span className="text-sm text-gray-400">
                 <span className="text-white font-semibold">{total}</span>{' '}
                 {total === 1 ? 'story' : 'stories'}
@@ -166,7 +166,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 // Active state: red background when this sort is selected
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
                   sort !== 'popular'
-                    ? 'bg-red-600 text-white'
+                    ? 'bg-green-600 text-white'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -176,7 +176,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 href={`/category/${slug}?sort=popular`}
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
                   sort === 'popular'
-                    ? 'bg-red-600 text-white'
+                    ? 'bg-green-600 text-white'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -187,7 +187,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         </div>
 
         {/* Gradient fade at the bottom of the hero so it blends into the story grid */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-900 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-gray-900 to-transparent" />
       </div>
 
       {/* ── Story grid ───────────────────────────────────────────────── */}
@@ -200,7 +200,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <p className="text-sm mt-1">Be the first to write one.</p>
             <Link
               href="/write"
-              className="inline-block mt-6 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition"
+              className="inline-block mt-6 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-xl transition"
             >
               Write a Story
             </Link>

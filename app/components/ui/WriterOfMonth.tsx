@@ -31,7 +31,7 @@ export default async function WriterOfMonth() {
 
   // Build avatar URL — fallback to initials avatar if none set
   const avatar = writer.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(writer.username)}&background=22c55e&color=fff&size=128`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(writer.username)}&background=dc2626&color=fff&size=128`;
 
   return (
     <section className="max-w-6xl mx-auto px-4 pb-14">

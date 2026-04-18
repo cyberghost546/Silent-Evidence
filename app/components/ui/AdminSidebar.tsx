@@ -33,6 +33,7 @@ const links = [
   { href: '/admin/generate',     label: 'AI Generator', icon: '🤖' },
   { href: '/admin/comments',     label: 'Moderation',  icon: '🚩' },
   { href: '/admin/reports',      label: 'Reports',     icon: '⚠️'  },
+  { href: '/admin/login-logs',   label: 'Login Logs',  icon: '🔐' },
   { href: '/admin/analytics',    label: 'Analytics',   icon: '📈' },
   { href: '/admin/challenges',   label: 'Challenges',  icon: '⚔️'  },
   { href: '/admin/slides',       label: 'Slideshow',   icon: '🖼️'  },
@@ -43,7 +44,23 @@ const links = [
   { href: '/admin/newsletter',    label: 'Newsletter',      icon: '📰' },
   { href: '/admin/digest',        label: 'Comment Digest',  icon: '💬' },
   { href: '/admin/bundles',       label: 'Bundles',         icon: '📦' },
-  { href: '/admin/prompts',       label: 'Writing Prompts', icon: '✍️' },
+  { href: '/admin/prompts',         label: 'Writing Prompts',     icon: '✍️' },
+  { href: '/admin/cookies',         label: 'Cookie Consent',      icon: '🍪' },
+  // ── New pages ──
+  { href: '/admin/verification',    label: 'Verification',         icon: '✅' },
+  { href: '/admin/revenue',         label: 'Revenue',              icon: '💰' },
+  { href: '/admin/banned-words',    label: 'Content Filter',       icon: '🚫' },
+  { href: '/admin/warnings',        label: 'Warnings & Bans',      icon: '⛔' },
+  { href: '/admin/search',          label: 'Admin Search',         icon: '🔎' },
+  { href: '/admin/tags',            label: 'Tag Manager',          icon: '🏷️' },
+  { href: '/admin/scheduled',       label: 'Scheduled Stories',    icon: '🕐' },
+  { href: '/admin/email-log',       label: 'Email Log',            icon: '📧' },
+  { href: '/admin/health',          label: 'Site Health',          icon: '❤️' },
+  { href: '/admin/mood',            label: 'Mood of Day',          icon: '🌑' },
+  { href: '/admin/featured-authors',label: 'Featured Authors',     icon: '⭐' },
+  { href: '/admin/spotlight',       label: 'Story Spotlight',      icon: '🔦' },
+  { href: '/admin/polls',           label: 'Poll Manager',         icon: '📊' },
+  { href: '/admin/audit-log',       label: 'Audit Log',            icon: '📋' },
 ];
 
 export default function AdminSidebar({ username }: { username: string }) {
@@ -62,6 +79,7 @@ export default function AdminSidebar({ username }: { username: string }) {
         </div>
         {/* Close button — mobile only */}
         <button
+          type="button"
           onClick={() => setMobileOpen(false)}
           className="md:hidden p-1 text-gray-500 hover:text-white transition"
           aria-label="Close menu"
@@ -95,14 +113,21 @@ export default function AdminSidebar({ username }: { username: string }) {
       </nav>
 
       {/* Bottom: logged-in user + back to site link */}
-      <div className="px-4 py-4 border-t border-gray-800 space-y-2">
+      <div className="px-4 py-4 border-t border-gray-800 space-y-3">
         <Link
           href="/"
-          className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition"
+          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-semibold
+                     bg-gray-800 border border-gray-700 text-gray-300
+                     hover:bg-gray-700 hover:text-white transition"
         >
-          ← Back to site
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Site
         </Link>
-        <p className="text-xs text-gray-600 truncate">Logged in as <span className="text-gray-400">{username}</span></p>
+        <p className="text-xs text-gray-600 truncate px-1">
+          Logged in as <span className="text-gray-400">{username}</span>
+        </p>
       </div>
     </>
   );
@@ -112,6 +137,7 @@ export default function AdminSidebar({ username }: { username: string }) {
       {/* Mobile top bar with hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center gap-3">
         <button
+          type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
           className="p-1 text-gray-400 hover:text-white transition"

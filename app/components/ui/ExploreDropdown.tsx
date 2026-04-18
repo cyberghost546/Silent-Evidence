@@ -8,7 +8,7 @@ import { useState, useRef, useEffect } from 'react';
 const items = [
   { href: '/for-you',      label: 'For You',      icon: '✨', desc: 'Personalised story picks' },
   { href: '/feed',         label: 'My Feed',      icon: '📰', desc: 'Stories from who you follow' },
-  { href: '/discover',     label: 'Discover',     icon: '🌟', desc: 'Browse horror stories' },
+  { href: '/discover',     label: 'Discover',     icon: '🌟', desc: 'Swipe through horror stories' },
   { href: '/challenges',   label: 'Challenges',   icon: '⚔️', desc: 'Writing challenges' },
   { href: '/map',          label: 'Horror Map',   icon: '🗺️', desc: 'Stories by location' },
   { href: '/quiz',         label: 'Trivia Quiz',  icon: '🧩', desc: 'Test your horror knowledge' },

@@ -71,7 +71,7 @@ export default function ChallengeActions({ challengeId, isActive, isLoggedIn, us
     </div>
   );
   if (submitted) return (
-    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5 text-sm text-red-400">
+    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5 text-sm text-green-400">
       ✓ Your entry has been submitted. Good luck!
     </div>
   );

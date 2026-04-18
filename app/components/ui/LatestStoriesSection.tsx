@@ -111,7 +111,7 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
               <div className="h-44 overflow-hidden relative">
                 {/* "Already read" badge for logged-in users */}
                 {readSet.has(story.id) && (
-                  <span className="absolute top-2 right-2 z-10 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-900/80 text-red-400 border border-red-500/40 backdrop-blur-sm">
+                  <span className="absolute top-2 right-2 z-10 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-900/80 text-green-400 border border-green-500/40 backdrop-blur-sm">
                     ✓ Read
                   </span>
                 )}

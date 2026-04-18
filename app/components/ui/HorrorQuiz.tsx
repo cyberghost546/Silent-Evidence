@@ -14,16 +14,16 @@ import { useState } from 'react';
 //   options — four possible answers (A, B, C, D)
 //   answer  — the index (0-based) of the correct option
 const QUESTIONS = [
-  { q: 'What is the name of the hotel in Stephen King\'s "The Shining"?', options: ['Bates Motel', 'Overlook Hotel', 'Black Lodge', 'Bly Manor'], answer: 1 },
-  { q: 'Which U.S. state has the highest number of reported Bigfoot sightings?', options: ['Oregon', 'Alaska', 'California', 'Washington'], answer: 3 },
-  { q: 'The Zodiac Killer was active primarily in which decade?', options: ['1950s', '1960s', '1970s', '1980s'], answer: 1 },
-  { q: 'What does "EVP" stand for in paranormal investigation?', options: ['Electronic Voice Phenomenon', 'Extrasensory Visual Perception', 'Eerie Vibration Pattern', 'Energy Vortex Point'], answer: 0 },
-  { q: 'The Amityville Horror case took place in which U.S. state?', options: ['Connecticut', 'New York', 'New Jersey', 'Massachusetts'], answer: 1 },
-  { q: 'Which famous disappearance involves Flight 19 and a group of U.S. Navy planes?', options: ['Devil\'s Sea', 'Bermuda Triangle', 'Dragon\'s Triangle', 'Lake Erie'], answer: 1 },
-  { q: 'What creature is said to roam the Pine Barrens of New Jersey?', options: ['Chupacabra', 'Mothman', 'Jersey Devil', 'Skinwalker'], answer: 2 },
-  { q: 'The Dyatlov Pass incident, where 9 hikers died mysteriously, occurred in which country?', options: ['Norway', 'Canada', 'Russia', 'Finland'], answer: 2 },
-  { q: 'Ed and Lorraine Warren investigated which haunted house case?', options: ['Annabelle', 'Amityville', 'Enfield Poltergeist', 'All of the above'], answer: 3 },
-  { q: 'What is the study of ghosts and hauntings called?', options: ['Demonology', 'Parapsychology', 'Necromancy', 'Thanatology'], answer: 1 },
+  { q: 'In "The Shining", what does Jack Torrance type over and over?', options: ['Here\'s Johnny', 'All work and no play makes Jack a dull boy', 'Redrum', 'Come play with us'], answer: 1 },
+  { q: 'Which horror film features a villain who can only be killed if you say his name five times in a mirror?', options: ['Candyman', 'Bloody Mary', 'The Ring', 'Sinister'], answer: 0 },
+  { q: 'What is the name of the demon in "The Exorcist"?', options: ['Pazuzu', 'Astaroth', 'Belial', 'Belphegor'], answer: 0 },
+  { q: 'In "Halloween" (1978), what is Michael Myers\'s original Halloween mask made from?', options: ['A clown mask', 'A Captain Kirk mask painted white', 'A werewolf mask', 'A skull mask'], answer: 1 },
+  { q: 'What creature hunts by sound in "A Quiet Place"?', options: ['Blind cave monsters', 'Telepathic aliens', 'Sound-sensitive creatures', 'Vampires'], answer: 2 },
+  { q: 'In "Get Out", what is the hypnotic state victims are put in called?', options: ['The Abyss', 'The Sunken Place', 'The Deep', 'The Void'], answer: 1 },
+  { q: 'Which author wrote "It", "The Shining", and "Pet Sematary"?', options: ['Dean Koontz', 'H.P. Lovecraft', 'Stephen King', 'Clive Barker'], answer: 2 },
+  { q: 'What is the name of the videotape that kills viewers 7 days after watching in "The Ring"?', options: ['Ringu', 'Samara\'s Tape', 'It has no name', 'The Cursed Tape'], answer: 2 },
+  { q: 'In "Hereditary", what ancient demon is the family being groomed to host?', options: ['Paimon', 'Malphas', 'Barbatos', 'Zagan'], answer: 0 },
+  { q: 'Which H.P. Lovecraft creation is described as a cosmic entity sleeping under the Pacific Ocean?', options: ['Nyarlathotep', 'Cthulhu', 'Shub-Niggurath', 'Azathoth'], answer: 1 },
 ];
 
 // The quiz moves through three distinct screens (phases):
@@ -99,14 +99,13 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
   // Intro screen — shown before the quiz starts
   if (phase === 'intro') return (
     <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
+      {/* Horror-themed emoji intro */}
       <div className="text-6xl mb-4">💀</div>
-      <h2 className="text-xl font-bold text-white mb-2">Horror Trivia Challenge</h2>
-      <p className="text-gray-400 mb-6">10 questions on true crime, paranormal cases, and horror history. No time limit.</p>
-      <button
-        type="button"
-        onClick={() => setPhase('quiz')}
-        className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm"
-      >
+      <h2 className="text-xl font-bold text-white mb-2">Are You a True Horror Fan?</h2>
+      <p className="text-gray-400 mb-6">10 questions covering horror films, books, and lore. No time limit.</p>
+      {/* Start button */}
+      <button onClick={() => setPhase('quiz')}
+        className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition text-sm">
         Start Quiz
       </button>
     </div>
@@ -116,34 +115,34 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
   if (phase === 'result') return (
     <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
       {/* Trophy/emoji based on performance tier */}
-      <div className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 50 ? '💀' : '😨'}</div>
+      <div className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '💀'}</div>
       <h2 className="text-2xl font-bold text-white mb-1">{score} / {QUESTIONS.length}</h2>
       <p className="text-gray-400 mb-2">{pct}% correct</p>
       {/* Motivational message based on score percentage */}
       <p className="text-lg text-white mb-6">
-        {pct >= 90 ? 'Horror Expert! 🏅' : pct >= 70 ? 'True Investigator! 🔍' : pct >= 50 ? 'Getting darker... 🕯️' : 'Keep digging into the darkness! 📖'}
+        {pct >= 90 ? 'Horror Master! 🏅' : pct >= 70 ? 'True Fright Fan! ⭐' : pct >= 50 ? 'Getting there... 🕯️' : 'Keep reading! 📖'}
       </p>
       {/* Confirmation that score was saved */}
-      {saved && <p className="text-xs text-red-400 mb-4">✓ Score saved to leaderboard</p>}
+      {saved && <p className="text-xs text-green-400 mb-4">✓ Score saved to leaderboard</p>}
       {/* Prompt to log in if the user is not authenticated */}
       {!isLoggedIn && <p className="text-xs text-gray-500 mb-4">Log in to save your score to the leaderboard</p>}
       {/* Review all questions with correct/incorrect indicators */}
       <div className="flex flex-col gap-3 mb-6">
         {QUESTIONS.map((q, i) => (
-          <div key={i} className={`flex items-start gap-3 text-left p-3 rounded-xl text-sm ${answers[i] === q.answer ? 'bg-red-500/10 border border-red-500/20' : 'bg-gray-700/30 border border-gray-700'}`}>
-            <span className="shrink-0 mt-0.5">{answers[i] === q.answer ? '✅' : '❌'}</span>
+          <div key={i} className={`flex items-start gap-3 text-left p-3 rounded-xl text-sm ${answers[i] === q.answer ? 'bg-green-500/10 border border-green-500/20' : 'bg-green-500/10 border border-green-500/20'}`}>
+            <span className="flex-shrink-0 mt-0.5">{answers[i] === q.answer ? '✅' : '❌'}</span>
             <div>
               <p className="text-gray-300 text-xs mb-1">{q.q}</p>
               {/* Always show the correct answer */}
               <p className="text-xs font-semibold text-white">{q.options[q.answer]}</p>
               {/* Show user's incorrect answer if they got it wrong */}
-              {answers[i] !== q.answer && <p className="text-xs text-red-400">You answered: {q.options[answers[i] ?? 0]}</p>}
+              {answers[i] !== q.answer && <p className="text-xs text-green-400">You answered: {q.options[answers[i] ?? 0]}</p>}
             </div>
           </div>
         ))}
       </div>
       {/* Button to restart the quiz */}
-      <button type="button" onClick={restart} className="px-6 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg transition">
+      <button onClick={restart} className="px-6 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg transition">
         Try Again
       </button>
     </div>
@@ -157,9 +156,9 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
         <span>Question {current + 1} of {QUESTIONS.length}</span>
         <span>{current} answered</span>
       </div>
-      {/* Red progress bar showing how far along the quiz the user is */}
+      {/* Violet progress bar showing how far along the quiz the user is */}
       <div className="w-full h-1.5 bg-gray-700 rounded-full mb-6">
-        <div className="h-1.5 bg-red-600 rounded-full transition-all" style={{ width: `${(current / QUESTIONS.length) * 100}%` }} />
+        <div className="h-1.5 bg-green-600 rounded-full transition-all" style={{ width: `${(current / QUESTIONS.length) * 100}%` }} />
       </div>
 
       {/* Current question text */}
@@ -175,11 +174,11 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
 
           // Buttons are disabled as soon as an answer is chosen — prevents changing mid-question
           return (
-            <button key={i} type="button" onClick={() => choose(i)} disabled={selected !== null}
+            <button key={i} onClick={() => choose(i)} disabled={selected !== null}
               className={`w-full text-left px-5 py-3.5 rounded-xl border text-sm font-medium transition ${
-                isCorrect ? 'bg-red-500/20 border-red-500 text-red-300' :   // red = correct
-                isWrong   ? 'bg-gray-600/30 border-gray-500 text-gray-400' : // muted = wrong pick
-                isSelected ? 'bg-gray-700 border-gray-500 text-white' :      // selected but not yet revealed
+                isCorrect ? 'bg-green-500/20 border-green-500 text-green-300' : // green = correct
+                isWrong   ? 'bg-red-500/20 border-red-500 text-red-300' :       // red = wrong pick
+                isSelected ? 'bg-gray-700 border-gray-500 text-white' :         // selected but not yet revealed
                 'bg-gray-900 border-gray-700 hover:border-gray-500 hover:bg-gray-800 text-gray-300 disabled:cursor-default'
               }`}>
               {/* Letter label (A, B, C, D) before the answer text */}
@@ -191,8 +190,8 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
 
       {/* Next/Results button — only shown after the user selects an answer */}
       {selected !== null && (
-        <button type="button" onClick={advance}
-          className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm">
+        <button onClick={advance}
+          className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition text-sm">
           {current < QUESTIONS.length - 1 ? 'Next Question →' : 'See Results'}
         </button>
       )}

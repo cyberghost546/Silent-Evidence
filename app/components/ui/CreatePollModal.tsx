@@ -85,7 +85,7 @@ export default function CreatePollModal({
             <input
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="What's your favourite horror sub-genre?"
+              placeholder="What's your favourite horror genre?"
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>

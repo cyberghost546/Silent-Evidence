@@ -41,7 +41,7 @@ export default function PremiumSuccessPage() {
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-3 leading-tight">
             Welcome to{' '}
             <span className="bg-gradient-to-r from-yellow-400 to-amber-300 bg-clip-text text-transparent">
-              Anime Elite!
+              Horror Elite!
             </span>
           </h1>
 
@@ -66,7 +66,7 @@ export default function PremiumSuccessPage() {
           {/* ── Perks reminder ─────────────────────────────────────────────── */}
           <ul className="text-left space-y-3 mb-10 max-w-xs mx-auto">
             {[
-              { icon: '⚡', text: 'Anime Elite badge is now showing on your profile' },
+              { icon: '⚡', text: 'Horror Elite badge is now showing on your profile' },
               { icon: '🔓', text: 'All premium stories are unlocked' },
               { icon: '👑', text: 'You have priority in leaderboards' },
               { icon: '🩸', text: 'Exclusive blood theme available in settings' },

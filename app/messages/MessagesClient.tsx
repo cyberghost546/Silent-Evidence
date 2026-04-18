@@ -39,7 +39,7 @@ type Conversation = {
 
 function avatarUrl(partner: Conversation['partner']) {
   return partner.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.username)}&background=22c55e&color=fff&size=64`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.username)}&background=dc2626&color=fff&size=64`;
 }
 
 export default function MessagesClient({

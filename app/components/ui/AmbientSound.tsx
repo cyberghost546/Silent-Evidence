@@ -1,7 +1,7 @@
 "use client";
 
 // AmbientSound.tsx — A fixed floating button in the bottom-right corner that lets readers
-// toggle eerie background audio while reading anime stories.
+// toggle eerie background audio while reading horror stories.
 //
 // All audio is generated programmatically via the Web Audio API — no external file URLs needed.
 // Three moods are available:

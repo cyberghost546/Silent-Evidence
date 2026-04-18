@@ -7,13 +7,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Real-life horror categories — things people actually experienced and talk about
+// Horror category options — each maps to a /category/[slug] page
 const options = [
-  'True Crime', 'Unexplained Disappearances', 'Haunted Locations', 'Near Death Experiences',
-  'Unsolved Mysteries', 'Real Paranormal', 'Camping Horror', 'Stalker Stories',
-  'Home Invasion', 'Strange Encounters', 'Cursed Places', 'Serial Killers',
-  'Sleep Paralysis', 'Abandoned Places', 'Cults & Rituals', 'Witness Accounts',
-  'Roadside Horror', 'Child Disappearances', 'Cryptids & Sightings', 'Online Horror',
+  'Paranormal', 'Supernatural', 'Psychological Horror', 'Slasher Horror',
+  'Body Horror', 'Cosmic Horror', 'True Crime', 'Urban Legends',
+  'Tech Horror', 'Gothic Horror', 'Survival Horror', 'Dark Fantasy',
+  'Thriller', 'Mystery', 'Haunted', 'Demon & Possession',
+  'Creepypasta', 'True Horror', 'Monster', 'Apocalyptic',
+  'Occult', 'Serial Killer',
 ];
 
 export default function CategoryDropdown() {

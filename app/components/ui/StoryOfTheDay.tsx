@@ -35,7 +35,7 @@ export default async function StoryOfTheDay() {
   if (!story) return null;
 
   const authorAvatar = story.author.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
   return (
     <section className="max-w-6xl mx-auto px-4 pb-14">

@@ -124,7 +124,7 @@ export default function AgeVerificationForm() {
                 { icon: '🟢', age: '18+',       desc: 'Full access — all stories including mature content' },
               ].map(row => (
                 <div key={row.age} className="flex items-start gap-2.5 text-xs text-gray-400">
-                  <span className="shrink-0">{row.icon}</span>
+                  <span className="flex-shrink-0">{row.icon}</span>
                   <span><span className="text-gray-300 font-medium">{row.age}:</span> {row.desc}</span>
                 </div>
               ))}
