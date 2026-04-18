@@ -136,7 +136,7 @@ export default function TutorialGuide() {
 
       {/* ── Step panel ── */}
       {open && (
-        <div className="fixed bottom-24 left-6 z-50 w-80 sm:w-96 flex flex-col
+        <div className="fixed bottom-24 left-3 sm:left-6 z-50 w-[calc(100vw-24px)] max-w-sm sm:max-w-96 flex flex-col
                         bg-gray-900 border border-green-900/50 rounded-xl
                         shadow-2xl shadow-black/60 overflow-hidden">
 

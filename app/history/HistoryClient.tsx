@@ -29,10 +29,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { readingTime } from '@/lib/readingTime';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { readingTime } from '@/lib/readingTime';
-
 type Story = {
   id: number;
   title: string;

@@ -1,19 +1,26 @@
 'use client';
 // app/components/ui/SearchBar.tsx
 // The search icon and drop-down search panel shown in the site header.
+// The backdrop and panel are rendered via a React portal at document.body so they
+// are never affected by the sticky header's stacking/containing context.
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 
 export default function SearchBar() {
   const [open, setOpen]       = useState(false);
   const [query, setQuery]     = useState('');
   const [focused, setFocused] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const router   = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const btnRef   = useRef<HTMLButtonElement>(null);
+
+  // Portal requires the DOM to be available
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
@@ -47,35 +54,20 @@ export default function SearchBar() {
     setQuery('');
   };
 
-  return (
+  const overlay = (
     <>
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-label="Search"
-        className={`p-2 rounded-xl transition ${
-          open ? 'text-white bg-red-600 shadow-lg shadow-red-500/30' : 'text-gray-400 hover:text-white hover:bg-gray-800'
-        }`}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-        </svg>
-      </button>
-
+      {/* Dark backdrop — clicking it closes the panel */}
       <div
-        onClick={() => {
-          setOpen(false);
-          setFocused(false);
-        }}
-        className={`fixed inset-0 z-30 transition ${
+        onClick={() => { setOpen(false); setFocused(false); }}
+        className={`fixed inset-0 z-9998 transition ${
           open ? 'bg-black/70 pointer-events-auto' : 'bg-transparent pointer-events-none'
         }`}
       />
 
+      {/* Search panel — positioned below the header (57px = h-[57px] header height) */}
       <div
         ref={panelRef}
-        className={`fixed inset-x-0 top-14.25 z-40 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-14.25 z-9999 transition-all duration-300 ${
           open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
@@ -103,7 +95,7 @@ export default function SearchBar() {
                 placeholder="Search stories, authors, tags..."
                 autoComplete="off"
                 suppressHydrationWarning
-                className="flex-1 bg-transparent text-white placeholder-gray-500 text-base font-light focus:outline-none"
+                className="flex-1 min-w-0 bg-transparent text-white placeholder-gray-500 text-base font-light focus:outline-none"
               />
 
               <button
@@ -113,7 +105,7 @@ export default function SearchBar() {
                   setQuery('');
                   inputRef.current?.focus();
                 }}
-                className={`flex h-8 w-8 items-center justify-center rounded-full transition ${
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition ${
                   query ? 'text-gray-300 hover:bg-gray-800' : 'opacity-0 pointer-events-none'
                 }`}
               >
@@ -124,7 +116,7 @@ export default function SearchBar() {
 
               <button
                 type="submit"
-                className="ml-auto rounded-full bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-[0.98]"
+                className="shrink-0 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-[0.98]"
               >
                 Search
               </button>
@@ -153,6 +145,28 @@ export default function SearchBar() {
           </p>
         </div>
       </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Search icon button — always in the header */}
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-label="Search"
+        className={`p-2 rounded-xl transition ${
+          open ? 'text-white bg-red-600 shadow-lg shadow-red-500/30' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+        }`}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+        </svg>
+      </button>
+
+      {/* Portal: renders backdrop + panel directly under <body>, escaping the sticky header */}
+      {mounted && createPortal(overlay, document.body)}
     </>
   );
 }

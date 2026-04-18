@@ -1,20 +1,11 @@
-// app/api/stories/cover/route.ts
-// POST — receives an uploaded cover image, saves it to public/uploads/covers/,
-// and returns the public URL so the edit form can store it on the story.
-
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
-// Max file size: 8 MB (covers can be larger than avatars)
-const MAX_SIZE = 8 * 1024 * 1024;
-
-// Only allow common image formats
+const MAX_SIZE      = 8 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 export async function POST(req: Request) {
-  // Only logged-in users can upload
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
   if (!userId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });
@@ -22,31 +13,13 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const file = formData.get('file') as File | null;
 
-  if (!file) return NextResponse.json({ error: 'No file provided.' }, { status: 400 });
+  if (!file)                              return NextResponse.json({ error: 'No file provided.' }, { status: 400 });
+  if (!ALLOWED_TYPES.includes(file.type)) return NextResponse.json({ error: 'Only JPG, PNG, WebP and GIF images are allowed.' }, { status: 400 });
+  if (file.size > MAX_SIZE)               return NextResponse.json({ error: 'Image must be smaller than 8 MB.' }, { status: 400 });
 
-  // Validate file type
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: 'Only JPG, PNG, WebP and GIF images are allowed.' }, { status: 400 });
-  }
+  const buffer   = Buffer.from(await file.arrayBuffer());
+  const publicId = `cover-${userId}-${Date.now()}`;
 
-  // Validate file size
-  if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: 'Image must be smaller than 8 MB.' }, { status: 400 });
-  }
-
-  // Read the file into a buffer
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  // Build a unique filename using the user ID and a timestamp
-  const ext      = file.type.split('/')[1].replace('jpeg', 'jpg');
-  const filename = `${userId}-${Date.now()}.${ext}`;
-
-  // Save to public/uploads/covers/ so Next.js serves it at /uploads/covers/filename
-  const uploadDir = join(process.cwd(), 'public', 'uploads', 'covers');
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(join(uploadDir, filename), buffer);
-
-  // Return the public URL
-  const url = `/uploads/covers/${filename}`;
+  const url = await uploadToCloudinary(buffer, 'silent-evidence/covers', publicId);
   return NextResponse.json({ url });
 }

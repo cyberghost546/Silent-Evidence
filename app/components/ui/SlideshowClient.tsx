@@ -76,7 +76,7 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
 
   return (
     // Outer container: full width, fixed height (520px), clips overflowing image edges
-    <div className="relative w-full h-[520px] overflow-hidden bg-gray-950">
+    <div className="relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden bg-gray-950">
 
       {/* Background image — only rendered when imageOk is true.
           key={slide.id} forces React to remount the <img> element when the
@@ -103,7 +103,7 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
 
       {/* Slide text content — pinned to the bottom-left of the hero.
           text-on-image is a global CSS class that forces white text regardless of theme. */}
-      <div className="absolute inset-0 flex flex-col justify-end px-8 pb-14 max-w-4xl text-on-image">
+      <div className="absolute inset-0 flex flex-col justify-end px-4 sm:px-8 pb-8 sm:pb-14 max-w-4xl text-on-image">
 
         {/* "Featured Story" label — small uppercase pill above the title */}
         <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-red-400 mb-4">
@@ -112,13 +112,13 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
         </span>
 
         {/* Main slide title */}
-        <h2 className="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-3 drop-shadow-lg">
+        <h2 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-white leading-tight mb-3 drop-shadow-lg">
           {slide.title}
         </h2>
 
         {/* Optional subtitle / tagline */}
         {slide.subtitle && (
-          <p className="text-gray-300 text-base md:text-lg mb-6 max-w-xl leading-relaxed">
+          <p className="text-gray-300 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 max-w-xl leading-relaxed hidden sm:block">
             {slide.subtitle}
           </p>
         )}
@@ -191,7 +191,7 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
 // It renders a branded static hero with two CTA buttons instead.
 function HeroFallback() {
   return (
-    <div className="relative w-full h-[520px] overflow-hidden bg-gray-950">
+    <div className="relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden bg-gray-950">
       {/* Layered radial glows create depth without needing an actual image */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(220,38,38,0.12)_0%,_transparent_70%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(220,38,38,0.08)_0%,_transparent_50%)]" />
@@ -209,7 +209,7 @@ function HeroFallback() {
         </span>
 
         {/* Site name */}
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+        <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
           Silent Evidence
         </h1>
 

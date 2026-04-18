@@ -28,10 +28,10 @@ export async function POST(req: Request) {
       where: { flagged: false },
       orderBy: { createdAt: 'desc' },
       take: 30,
-      select: { id: true, body: true, userId: true, user: { select: { username: true } } },
+      select: { id: true, content: true, userId: true, user: { select: { username: true } } },
     });
     for (const c of comments) {
-      items.push({ type: 'comment', id: c.id, text: c.body, authorId: c.userId, authorName: c.user.username });
+      items.push({ type: 'comment', id: c.id, text: c.content, authorId: c.userId, authorName: c.user.username });
     }
   }
 

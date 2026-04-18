@@ -38,11 +38,6 @@ import Link from 'next/link';
 import PollCard from '@/app/components/ui/PollCard';
 import CreatePollModal from '@/app/components/ui/CreatePollModal';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import PollCard from '@/app/components/ui/PollCard';
-import CreatePollModal from '@/app/components/ui/CreatePollModal';
-
 type Member = {
   id: number; role: string; joinedAt: string;
   user: { id: number; username: string; profile: { avatar: string | null } | null };

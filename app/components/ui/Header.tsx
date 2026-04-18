@@ -152,10 +152,8 @@ export default async function Header() {
 
 
 
-        {/* SEARCH BAR (hidden on very small screens) */}
-        <div className="hidden sm:block">
-          <SearchBar />
-        </div>
+        {/* SEARCH BAR */}
+        <SearchBar />
 
 
 
@@ -186,20 +184,20 @@ export default async function Header() {
         ) : (
 
           // If user is NOT logged in
-          <div className="hidden sm:flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-1.5">
 
-            {/* Login button */}
+            {/* Login — visible on all screen sizes */}
             <Link
               href="/login"
-              className="px-3 py-1.5 border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg"
+              className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg transition"
             >
               Log In
             </Link>
 
-            {/* Register button */}
+            {/* Sign Up — hidden on very small screens (it's in the hamburger menu) */}
             <Link
               href="/register"
-              className="px-3 py-1.5 bg-red-700 text-white hover:bg-red-600 rounded-lg"
+              className="hidden sm:block px-3 py-1.5 text-sm bg-red-700 text-white hover:bg-red-600 rounded-lg transition"
             >
               Sign Up
             </Link>

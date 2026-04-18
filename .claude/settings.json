@@ -19,7 +19,19 @@
       "Bash(node -e ':*)",
       "Bash(cmd /c \"dir /s /b C:\\\\laragon\\\\data\\\\silent_evidence 2>nul & dir /s /b C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MySQL\\\\MySQL Server 8.0\\\\Data\\\\silent_evidence\\\\\" 2>nul & dir /s /b \\\\\"C:\\\\ProgramData\\\\MariaDB\\\\\" 2>nul | head -5\")",
       "Bash(cmd /c \"rmdir /s /q C:\\\\xampp\\\\mysql\\\\data\\\\silent_evidence\")",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(npx web-push *)",
+      "Bash(npm install *)",
+      "Bash(vercel --version)",
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "Bash(vercel deploy *)",
+      "Bash(DATABASE_URL=\"mysql://root:tGFfmhoCxExraeLqTgClUEpqEkxkfJaQ@monorail.proxy.rlwy.net:50814/railway\" npx prisma db push)",
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('base64'\\)\\)\")",
+      "Bash(vercel env *)",
+      "Bash(grep -v \"^#\\\\|^$\\\\|DATABASE_URL\\\\|JWT_SECRET\" \"c:\\\\Users\\\\chris\\\\Documents\\\\GitHub\\\\Horror_Blog_Website\\\\.env\")",
+      "Bash(DATABASE_URL=\"mysql://root:tGFfmhoCxExraeLqTgClUEpqEkxkfJaQ@monorail.proxy.rlwy.net:50814/railway\" npx prisma db execute --stdin)",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",

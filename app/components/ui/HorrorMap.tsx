@@ -83,7 +83,7 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
           </div>`;
 
         // Place a star marker on the map and bind the horror-styled popup to it
-        L.marker([story.latitude, story.longitude], { icon: starIcon })
+        L.marker([story.latitude, story.longitude], { icon: skullIcon })
           .addTo(map)
           .bindPopup(popup, { className: 'horror-popup' }); // horror-popup applies custom dark styles
       });

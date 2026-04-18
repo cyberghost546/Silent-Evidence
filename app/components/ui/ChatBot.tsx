@@ -256,7 +256,7 @@ export default function ChatBot() {
 
       {/* Chat panel — only rendered when open */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 flex flex-col bg-gray-900 border border-red-900/50 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
+        <div className="fixed bottom-24 right-3 sm:right-6 z-50 w-[calc(100vw-24px)] max-w-sm sm:max-w-96 flex flex-col bg-gray-900 border border-red-900/50 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-red-900/40">
             <div className="flex items-center gap-2">

@@ -18,6 +18,7 @@ import Footer from '@/app/components/ui/Footer';
 import StoryInteractions from '@/app/components/ui/StoryInteractions';
 import StoryContent from '@/app/components/ui/StoryContent';
 import ReadingProgress from '@/app/components/ui/ReadingProgress';
+import BackToTop from '@/app/components/ui/BackToTop';
 import ReadingTracker from '@/app/components/ui/ReadingTracker';
 import StoryActionsDropdown from '@/app/components/ui/StoryActionsDropdown';
 import RelatedStories from '@/app/components/ui/RelatedStories';
@@ -203,6 +204,7 @@ export default async function StoryPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-gray-900 text-white">
       <ReadingProgress storyId={story.id} />
+      <BackToTop />
       {userId && <ReadingTracker storyId={story.id} />}
       <Header />
 
@@ -333,7 +335,7 @@ export default async function StoryPage({ params }: Props) {
         {story.mood && (
           <div className="mt-3">
             <a href={`/mood/${story.mood.toLowerCase()}`} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-gray-500 text-gray-400 rounded-full transition">
-              {{CREEPY:'🕷️',PARANOID:'👁️',DISTURBING:'😱',ATMOSPHERIC:'🌫️',PSYCHOLOGICAL:'🧠',SUPERNATURAL:'👻',GORE:'🩸',JUMPSCARE:'⚡'}[story.mood] ?? ''}
+              {({EPIC:'⚡',HEARTWARMING:'❤️',MYSTERIOUS:'🌫️',ACTION:'⚔️',ROMANTIC:'🌹',COMEDIC:'😂',DRAMATIC:'🎭',DARK:'🌑'} as Record<string,string>)[story.mood] ?? ''}
               {' '}{story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
             </a>
           </div>

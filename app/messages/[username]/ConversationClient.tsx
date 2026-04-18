@@ -37,9 +37,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-
 type Message = {
   id: number;
   content: string;

@@ -101,7 +101,7 @@ export async function POST(req: Request) {
   });
 
   // Bust the 60-second cache so the new banner shows immediately on all pages
-  revalidateTag('announcement-banner');
+  revalidateTag('announcement-banner', 'default');
 
   // Return a success acknowledgement
   return NextResponse.json({ ok: true });
@@ -122,7 +122,7 @@ export async function DELETE() {
   await prisma.siteSetting.deleteMany({ where: { key: KEY } });
 
   // Bust the cache so the banner disappears immediately
-  revalidateTag('announcement-banner');
+  revalidateTag('announcement-banner', 'default');
 
   // Return a success acknowledgement
   return NextResponse.json({ ok: true });

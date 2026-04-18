@@ -15,6 +15,7 @@ export default async function HomepageVideos() {
       id:        true,
       title:     true,
       slug:      true,
+      excerpt:   true,
       videoUrl:  true,
       views:     true,
       createdAt: true,

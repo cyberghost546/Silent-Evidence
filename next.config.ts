@@ -43,11 +43,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Required for Docker: outputs a self-contained server in .next/standalone
-  output: 'standalone',
-  turbopack: {
-    root: __dirname,
-  },
   // Allow Next.js <Image> to optimize images from these external domains.
   // Add any CDN or storage domains your cover images are hosted on.
   images: {

@@ -141,7 +141,7 @@ export default function NotificationBell() {
 
         {/* Dropdown panel — only rendered when open */}
         {open && (
-          <div className="absolute right-0 mt-2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+          <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-16px)] bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
               <span className="text-sm font-semibold text-white">Notifications</span>
               {unread > 0 && (

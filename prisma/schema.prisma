@@ -171,6 +171,8 @@ model User {
   role           Role     @default(USER)
   // When true the user's name appears in the "Writer of the Month" spotlight
   writerOfMonth  Boolean  @default(false)
+  // Email address verified via verification link
+  emailVerified  Boolean  @default(false)
   // Verified author — admin-granted checkmark shown on profile and stories
   isVerified     Boolean  @default(false)
   // Private profile — only followers can see stories and profile details
@@ -199,10 +201,11 @@ model User {
   // Follow relations
   following       Follow[]         @relation("Follower")
   followers       Follow[]         @relation("Following")
-  readingHistory  ReadingHistory[]
-  scareRatings    ScareRating[]
-  series          Series[]
-  storyLists      StoryList[]
+  readingHistory         ReadingHistory[]
+  scareRatings           ScareRating[]
+  series                 Series[]
+  storyLists             StoryList[]
+  emailVerificationTokens EmailVerificationToken[]
   forumPosts      ForumPost[]
   forumReplies    ForumReply[]
   challengeEntries ChallengeEntry[]
@@ -1943,7 +1946,7 @@ model StoryPlanner {
   id        Int      @id @default(autoincrement())
   // JSON-encoded outline nodes array, e.g.:
   // [{"id":"1","title":"The Arrival","content":"MC arrives at cabin","order":0}, ...]
-  content   String   @db.LongText @default("[]")
+  content   String   @db.LongText
   updatedAt DateTime @updatedAt
 
   // One planner per story
@@ -2171,4 +2174,15 @@ model EmailLog {
 
   @@index([createdAt])
   @@index([type])
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
