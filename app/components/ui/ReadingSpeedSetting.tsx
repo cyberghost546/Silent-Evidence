@@ -1,132 +1,93 @@
 'use client';
-/**
- * ReadingSpeedSetting.tsx
- *
- * WHAT THIS FILE DOES:
- * Renders three reading-speed preset buttons (Slow / Average / Fast).
- * When the user clicks one it immediately saves their preference to the
- * server via PATCH /api/user/reading-speed and shows a brief "Saved ✓"
- * confirmation. The selected speed is stored on the User record in the
- * database and is used site-wide to calculate personalised read-time
- * estimates on story cards (e.g. "3 min read" becomes "5 min read" for a
- * slow reader).
- *
- * HOW TO REUSE IN A FUTURE PROJECT:
- * 1. Copy the SPEEDS array and adjust wpm values to suit your content.
- * 2. Change the PATCH endpoint to whatever your API uses.
- * 3. Drop <ReadingSpeedSetting initialSpeed="average" /> into any
- *    account settings page — it's entirely self-contained.
- *
- * Example usage:
- *   <ReadingSpeedSetting initialSpeed={user.readingSpeed ?? 'average'} />
- */
 
 import { useState } from 'react';
 
-// SPEEDS — the three preset options shown as button cards.
-// Each object has:
-//   value  — the string saved to the DB / sent to the API
-//   label  — the human-readable button label
-//   wpm    — words per minute (used for display only; the API does the math)
-//   icon   — emoji shown above the label
-//   desc   — short description shown below the label
 const SPEEDS = [
   {
     value: 'slow',
     label: 'Slow',
-    wpm: 150,
-    icon: '🐢',
-    desc: '~150 words/min — I like to savour every word',
+    wpm:   150,
+    desc:  '~150 wpm — savour every word',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+      </svg>
+    ),
   },
   {
     value: 'average',
     label: 'Average',
-    wpm: 238,
-    icon: '📖',
-    desc: '~238 words/min — standard reading pace',
+    wpm:   238,
+    desc:  '~238 wpm — standard pace',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+      </svg>
+    ),
   },
   {
     value: 'fast',
     label: 'Fast',
-    wpm: 350,
-    icon: '⚡',
-    desc: '~350 words/min — I read quickly',
+    wpm:   350,
+    desc:  '~350 wpm — quick reader',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+      </svg>
+    ),
   },
 ];
 
-// Props — only one: the speed string already saved in the database for this user.
-// Pass 'average' as a safe default if the user hasn't chosen yet.
 type Props = { initialSpeed: string };
 
 export default function ReadingSpeedSetting({ initialSpeed }: Props) {
-  // speed — which of the three presets is currently active.
-  // useState initialises it from the prop (the server-fetched value).
-  const [speed, setSpeed]   = useState(initialSpeed || 'average');
-
-  // saving — true while the fetch is in-flight; used to prevent double-clicks
-  // and to show the "Saving…" status text.
+  const [speed,  setSpeed]  = useState(initialSpeed || 'average');
   const [saving, setSaving] = useState(false);
-
-  // saved — true for 2 seconds after a successful save so the user sees "✓ Saved".
   const [saved,  setSaved]  = useState(false);
 
-  // save — called when the user clicks a speed button.
-  // It immediately updates the local state (optimistic UI) then persists to the DB.
   const save = async (val: string) => {
-    setSpeed(val);    // update the highlighted button right away
+    setSpeed(val);
     setSaving(true);
     setSaved(false);
-
-    // PATCH request: sends { readingSpeed: "slow" | "average" | "fast" }
     const res = await fetch('/api/user/reading-speed', {
-      method: 'PATCH',
+      method:  'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ readingSpeed: val }),
+      body:    JSON.stringify({ readingSpeed: val }),
     });
-
     setSaving(false);
-
     if (res.ok) {
       setSaved(true);
-      // Automatically hide the "Saved" badge after 2 seconds so it doesn't linger
       setTimeout(() => setSaved(false), 2000);
     }
   };
 
   return (
-    <div>
-      {/* Three-column grid — one button per preset.
-          The active button gets a red border + tinted background to show selection. */}
+    <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        {SPEEDS.map((s) => (
+        {SPEEDS.map(s => (
           <button
             key={s.value}
             type="button"
             onClick={() => save(s.value)}
-            className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition ${
+            className={`flex flex-col items-start gap-2 p-4 rounded-xl border text-left transition ${
               speed === s.value
-                ? 'border-red-500 bg-red-500/10 text-white'   // selected state
-                : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white' // idle state
+                ? 'border-red-500 bg-red-500/10 text-white'
+                : 'border-gray-700 text-gray-400 hover:border-gray-600 hover:text-white'
             }`}
           >
-            {/* Large emoji icon — turtle / book / lightning bolt */}
-            <span className="text-3xl">{s.icon}</span>
-            {/* Speed label */}
-            <span className="text-sm font-semibold">{s.label}</span>
-            {/* Short description + wpm figure */}
-            <span className="text-xs text-gray-500">{s.desc}</span>
+            <span className={speed === s.value ? 'text-red-400' : 'text-gray-500'}>{s.icon}</span>
+            <div>
+              <p className="text-sm font-semibold">{s.label}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{s.desc}</p>
+            </div>
           </button>
         ))}
       </div>
 
-      {/* Status indicator area — shows three possible states:
-          1. "Saving…"  while the request is in-flight
-          2. "✓ Saved"  for 2 seconds after a successful save
-          3. Helper tip  when idle                                          */}
-      <p className="text-xs text-gray-600 mt-3">
+      <p className="text-xs text-gray-600">
         {saving && 'Saving…'}
-        {saved && <span className="text-green-500">✓ Saved</span>}
-        {!saving && !saved && 'Reading times on stories will adjust to your pace.'}
+        {saved  && <span className="text-gray-400">Saved</span>}
+        {!saving && !saved && 'Reading time estimates on stories will adjust to your pace.'}
       </p>
     </div>
   );

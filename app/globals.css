@@ -98,6 +98,13 @@ html.light ::selection {
   );
 }
 
+.profile-banner-grid {
+  background-image:
+    linear-gradient(#fff 1px, transparent 1px),
+    linear-gradient(90deg, #fff 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
 /* ── Site-wide zoom lock ──
    Makes the entire site render as if the browser is zoomed to 90%.
    zoom is the simplest cross-Chrome/Edge solution.

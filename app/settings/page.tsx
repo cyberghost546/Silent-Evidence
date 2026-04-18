@@ -1,7 +1,4 @@
 // app/settings/page.tsx
-// Server component — loads the current user's data and passes it to the form.
-// Redirects to /login if the user is not logged in.
-
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -18,143 +15,148 @@ import DigestFrequencySelector from '@/app/components/ui/DigestFrequencySelector
 import DiscordConnect from '@/app/components/ui/DiscordConnect';
 import Link from 'next/link';
 
+const AGE_CONFIG = {
+  UNDER_13: { label: 'Kids Mode',   sub: 'General content only',         color: 'text-blue-400',   dot: 'bg-blue-400'   },
+  TEEN:     { label: 'Teen Access', sub: 'General and teen-rated content', color: 'text-yellow-400', dot: 'bg-yellow-400' },
+  ADULT:    { label: 'Full Access', sub: 'Unrestricted access to all content', color: 'text-green-400',  dot: 'bg-green-400'  },
+} as const;
+
+function Section({ id, title, desc, children }: { id: string; title: string; desc: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-24">
+      <div className="mb-5">
+        <h2 className="text-base font-semibold text-white tracking-tight">{title}</h2>
+        <p className="text-sm text-gray-500 mt-0.5">{desc}</p>
+      </div>
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6">
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export default async function SettingsPage() {
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
-
   if (!userId) redirect('/login');
 
-  // Fetch the current user including their profile so the form shows existing values
   const user = await prisma.user.findUnique({
     where:   { id: userId },
     include: { profile: true, subscription: { select: { status: true } } },
-    // isPrivate needed for the private profile toggle
   });
-
   if (!user) redirect('/login');
+
+  const age = AGE_CONFIG[user.ageGroup as keyof typeof AGE_CONFIG] ?? AGE_CONFIG.ADULT;
+
+  const navLinks = [
+    { href: '#profile',       label: 'Profile'         },
+    { href: '#age',           label: 'Age & Content'   },
+    { href: '#fear-profile',  label: 'Fear Profile'    },
+    { href: '#reading-speed', label: 'Reading Speed'   },
+    { href: '#notifications', label: 'Notifications'   },
+    { href: '#blocked',       label: 'Blocked Users'   },
+    { href: '#discord',       label: 'Discord'         },
+    { href: '#account',       label: 'Account'         },
+  ];
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
       <Header />
 
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-5xl mx-auto px-4 py-10">
 
-        {/* Page header */}
+        {/* Page title */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Edit Profile</h1>
-          <p className="text-gray-500 text-sm mt-1">Update your personal information and avatar.</p>
-          <div className="mt-4 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage your profile, preferences, and account.</p>
         </div>
 
-        {/* Pass current values to the form as initial data */}
-        <EditProfileForm
-          initialData={{
-            username: user.username,
-            bio:      user.profile?.bio     ?? '',
-            avatar:   user.profile?.avatar  ?? '',
-            website:  user.profile?.website ?? '',
-          }}
-        />
+        <div className="flex gap-10">
 
-        {/* Age & Content Rating section */}
-        <div className="mt-10">
-          <div className="mb-4">
-            <h2 className="text-lg font-bold text-white">Age & Content Access</h2>
-            <p className="text-gray-500 text-sm mt-1">Controls which stories you can read based on their content rating.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          <div className="border border-gray-800 rounded-xl p-4 bg-gray-900 flex items-center justify-between gap-4">
-            <div>
-              {/* Show current age group with icon */}
-              {user.ageGroup === 'UNDER_13' && <p className="text-sm font-semibold text-blue-400">🔵 Kids Mode (under 13)</p>}
-              {user.ageGroup === 'TEEN'     && <p className="text-sm font-semibold text-yellow-400">🟡 Teen Access (13–17)</p>}
-              {user.ageGroup === 'ADULT'    && <p className="text-sm font-semibold text-green-400">🟢 Full Access (18+)</p>}
-              <p className="text-xs text-gray-500 mt-0.5">
-                {user.ageGroup === 'UNDER_13' && 'You can read general stories rated for all ages.'}
-                {user.ageGroup === 'TEEN'     && 'You can read general and teen-rated content.'}
-                {user.ageGroup === 'ADULT'    && 'You have unrestricted access to all content.'}
-              </p>
-            </div>
-            <Link
-              href="/verify-age"
-              className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg px-3 py-2 transition flex-shrink-0"
-            >
-              Update Age
-            </Link>
-          </div>
-        </div>
+          {/* Sidebar nav — sticky, desktop only */}
+          <aside className="hidden lg:block w-44 shrink-0">
+            <nav className="sticky top-24 flex flex-col gap-0.5">
+              {navLinks.map(({ href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg px-3 py-2 transition"
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+          </aside>
 
-        {/* Fear Profile section — lets user pick up to 3 horror moods */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Fear Profile</h2>
-            <p className="text-gray-500 text-sm mt-1">What kind of horror draws you in?</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          <FearProfilePicker initialFearMoods={user.profile?.fearMoods ?? ''} />
-        </div>
-        {/* Reading Speed section */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Reading Speed</h2>
-            <p className="text-gray-500 text-sm mt-1">Adjust how reading times are estimated for you.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          <ReadingSpeedSetting initialSpeed={user.readingSpeed} />
-        </div>
+          {/* Main content */}
+          <div className="flex-1 min-w-0 space-y-8">
 
-        {/* Newsletter section */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Notifications</h2>
-            <p className="text-gray-500 text-sm mt-1">Choose which emails you receive from us.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          <div className="space-y-3">
-            <NewsletterToggle initialSubscribed={user.newsletterSubscribed} />
-            {/* Digest frequency — how often to receive comment summary emails */}
-            <DigestFrequencySelector
-              initialFrequency={(user.digestFrequency ?? 'WEEKLY') as 'DAILY' | 'WEEKLY' | 'NEVER'}
-            />
-            {/* Push toggle is purely client-side — no server data needed */}
-            <PushNotificationToggle />
-          </div>
-        </div>
+            <Section id="profile" title="Profile" desc="Update your public profile information and avatar.">
+              <EditProfileForm
+                initialData={{
+                  username: user.username,
+                  bio:      user.profile?.bio     ?? '',
+                  avatar:   user.profile?.avatar  ?? '',
+                  website:  user.profile?.website ?? '',
+                }}
+              />
+            </Section>
 
-        {/* Blocked Users section */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Blocked Users</h2>
-            <p className="text-gray-500 text-sm mt-1">Block users to hide their content and prevent them from interacting with you.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          <BlockedUsersSection />
-        </div>
+            <Section id="age" title="Age & Content Access" desc="Controls which stories you can read based on content rating.">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${age.dot}`} />
+                  <div>
+                    <p className={`text-sm font-semibold ${age.color}`}>{age.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{age.sub}</p>
+                  </div>
+                </div>
+                <Link
+                  href="/verify-age"
+                  className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg px-3 py-2 transition shrink-0"
+                >
+                  Update
+                </Link>
+              </div>
+            </Section>
 
-        {/* Discord connection */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Discord</h2>
-            <p className="text-gray-500 text-sm mt-1">Connect your Discord account to join the community server.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
-          </div>
-          {/* Pass current Discord username (null if not connected) and premium status */}
-          <DiscordConnect
-            discordUsername={user.discordUsername ?? null}
-            isPremium={user.subscription?.status === 'active'}
-          />
-        </div>
+            <Section id="fear-profile" title="Fear Profile" desc="Choose up to 3 moods that define your horror taste.">
+              <FearProfilePicker initialFearMoods={user.profile?.fearMoods ?? ''} />
+            </Section>
 
-        {/* Account settings — privacy, change password, delete account */}
-        <div className="mt-10">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Account</h2>
-            <p className="text-gray-500 text-sm mt-1">Manage your account security and privacy settings.</p>
-            <div className="mt-3 h-px bg-gradient-to-r from-red-600/50 to-transparent" />
+            <Section id="reading-speed" title="Reading Speed" desc="Adjust how reading time estimates are calculated for you.">
+              <ReadingSpeedSetting initialSpeed={user.readingSpeed} />
+            </Section>
+
+            <Section id="notifications" title="Notifications" desc="Choose which emails and alerts you receive.">
+              <div className="space-y-3">
+                <NewsletterToggle initialSubscribed={user.newsletterSubscribed} />
+                <DigestFrequencySelector
+                  initialFrequency={(user.digestFrequency ?? 'WEEKLY') as 'DAILY' | 'WEEKLY' | 'NEVER'}
+                />
+                <PushNotificationToggle />
+              </div>
+            </Section>
+
+            <Section id="blocked" title="Blocked Users" desc="Block users to hide their content and stop interactions.">
+              <BlockedUsersSection />
+            </Section>
+
+            <Section id="discord" title="Discord" desc="Connect your Discord account to join the community server.">
+              <DiscordConnect
+                discordUsername={user.discordUsername ?? null}
+                isPremium={user.subscription?.status === 'active'}
+              />
+            </Section>
+
+            <Section id="account" title="Account" desc="Manage your password, privacy, and account deletion.">
+              <AccountSettings isPrivate={user.isPrivate} twoFactorEnabled={user.twoFactorEnabled} />
+            </Section>
+
           </div>
-          <AccountSettings isPrivate={user.isPrivate} twoFactorEnabled={user.twoFactorEnabled} />
         </div>
       </div>
+
       <Footer />
     </main>
   );
