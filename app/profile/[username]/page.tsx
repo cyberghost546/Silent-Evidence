@@ -5,7 +5,9 @@ import Link          from 'next/link';
 import { prisma }    from '@/lib/prisma';
 import Header        from '@/app/components/ui/Header';
 import Footer        from '@/app/components/ui/Footer';
+import UserAvatar    from '@/app/components/ui/UserAvatar';
 import { readingTime } from '@/lib/readingTime';
+import { getTheme } from '@/app/lib/themes';
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -49,6 +51,25 @@ export default async function ProfilePage({ params }: Props) {
 
   if (!user) return notFound();
 
+  // Reading stats — only shown on own profile to respect privacy
+  const [readCount, streak, topMoods] = await Promise.all([
+    prisma.readingHistory.count({ where: { userId: user.id } }),
+    prisma.readingStreak.findUnique({ where: { userId: user.id } }),
+    prisma.readingHistory.findMany({
+      where: { userId: user.id },
+      select: { story: { select: { mood: true } } },
+      take: 100,
+      orderBy: { readAt: 'desc' },
+    }),
+  ]);
+
+  // Count mood frequency from last 100 reads
+  const moodFreqMap = new Map<string, number>();
+  for (const h of topMoods) {
+    if (h.story?.mood) moodFreqMap.set(h.story.mood, (moodFreqMap.get(h.story.mood) ?? 0) + 1);
+  }
+  const favMood = [...moodFreqMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
   const cookieStore  = await cookies();
   const loggedInId   = Number(cookieStore.get('userId')?.value ?? 0);
   const isOwnProfile = loggedInId === user.id;
@@ -65,6 +86,7 @@ export default async function ProfilePage({ params }: Props) {
     month: 'long', year: 'numeric',
   });
 
+  const theme           = getTheme(user.profile?.profileTheme ?? 'default');
   const pinnedStory     = user.pinnedStoryId ? (user.stories.find(s => s.id === user.pinnedStoryId) ?? null) : null;
   const unpinnedStories = pinnedStory ? user.stories.filter(s => s.id !== pinnedStory.id) : user.stories;
   const totalLikes      = user.stories.reduce((s, st) => s + st._count.likes, 0);
@@ -77,9 +99,9 @@ export default async function ProfilePage({ params }: Props) {
 
       {/* ── Hero Banner ──────────────────────────────────────────────────────── */}
       <div className="relative h-56 sm:h-72 overflow-hidden bg-gray-900">
-        {/* layered gradients for depth */}
-        <div className="absolute inset-0 bg-gradient-to-br from-red-950 via-gray-900 to-gray-950" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_40%,rgba(220,38,38,0.18),transparent)]" />
+        {/* layered gradients — colour driven by user's chosen theme */}
+        <div className={`absolute inset-0 bg-linear-to-br ${theme.hero}`} />
+        <div className={`absolute inset-0 ${theme.heroRadial}`} />
         <div className="absolute inset-0 opacity-[0.04] profile-banner-grid" />
         {/* bottom fade to page bg */}
         <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-gray-950" />
@@ -121,12 +143,15 @@ export default async function ProfilePage({ params }: Props) {
 
         {/* Avatar + name strip */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-5 -mt-16 mb-8">
-          {/* Avatar with glow ring */}
-          <div className="relative shrink-0 self-start sm:self-auto">
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-red-600/50 to-transparent blur-md" />
-            <img src={avatar} alt={user.username}
-              className="relative w-32 h-32 rounded-full object-cover border-4 border-gray-950 shadow-2xl" />
-          </div>
+          {/* Avatar — theme colour + optional border animation */}
+          <UserAvatar
+            src={avatar}
+            username={user.username}
+            size={128}
+            theme={user.profile?.profileTheme ?? 'default'}
+            border={user.profile?.avatarBorder ?? 'none'}
+            className="self-start sm:self-auto"
+          />
 
           {/* Name block */}
           <div className="flex-1 sm:pb-1 min-w-0">
@@ -246,6 +271,43 @@ export default async function ProfilePage({ params }: Props) {
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Reading Stats */}
+              {(readCount > 0 || streak) && (
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-600">Reading Stats</p>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-gray-800 rounded-xl p-3 text-center">
+                      <p className="text-xl font-extrabold text-white">{fmt(readCount)}</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">Stories Read</p>
+                    </div>
+                    <div className="bg-gray-800 rounded-xl p-3 text-center">
+                      <p className="text-xl font-extrabold text-white">
+                        {streak?.currentStreak ?? 0}
+                        <span className="text-sm font-normal text-gray-500">d</span>
+                      </p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">Current Streak</p>
+                    </div>
+                  </div>
+
+                  {streak && streak.longestStreak > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500">Best streak</span>
+                      <span className="text-amber-400 font-semibold">🔥 {streak.longestStreak} days</span>
+                    </div>
+                  )}
+
+                  {favMood && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500">Favourite mood</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border ${MOOD_COLORS[favMood] ?? 'bg-gray-800 text-gray-400 border-gray-700'}`}>
+                        {favMood.charAt(0) + favMood.slice(1).toLowerCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

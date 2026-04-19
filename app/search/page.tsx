@@ -8,10 +8,19 @@ import SearchStories from './SearchStories';
 
 const PAGE_SIZE = 12;
 
+// Reading time bands in minutes (approximate word-count thresholds)
+const READ_TIME_BANDS: Record<string, [number, number]> = {
+  short:  [0,  5],
+  medium: [5, 15],
+  long:   [15, 999],
+};
+
 type Props = {
   searchParams: Promise<{
     q?: string;
     category?: string;
+    mood?: string;
+    readTime?: string;
     sort?: string;
     page?: string;
   }>;
@@ -21,8 +30,12 @@ export default async function SearchPage({ searchParams }: Props) {
   const sp = await searchParams;
   const query    = sp.q?.trim() ?? '';
   const catSlug  = sp.category ?? '';
+  const mood     = sp.mood ?? '';
+  const readTime = sp.readTime ?? '';
   const sort     = sp.sort ?? 'newest';
   const page     = Math.max(1, Number(sp.page ?? 1));
+
+  const rtBand = READ_TIME_BANDS[readTime] ?? null;
 
   // Get the viewer's ID so we can show the Follow button on user results
   const cookieStore = await cookies();
@@ -52,6 +65,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const whereBase = {
     status: 'PUBLISHED' as const,
     ...(catSlug ? { category: { slug: catSlug } } : {}),
+    ...(mood ? { mood: mood as never } : {}),
     ...(query ? {
       OR: [
         { title:    { contains: query } },
@@ -59,6 +73,7 @@ export default async function SearchPage({ searchParams }: Props) {
         { content:  { contains: query } },
         { category: { name: { contains: query } } },
         { author:   { username: { contains: query } } },
+        { tags:     { some: { name: { contains: query } } } },
       ],
     } : {}),
   };
@@ -67,12 +82,13 @@ export default async function SearchPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const currentPage = Math.min(page, Math.max(1, totalPages));
 
-  const results = (query || catSlug)
+  const rawResults = hasFilters
     ? await prisma.story.findMany({
         where: whereBase,
         orderBy,
-        skip: (currentPage - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
+        // Fetch extra when reading-time filter is active so we still get PAGE_SIZE after filtering
+        skip: rtBand ? 0 : (currentPage - 1) * PAGE_SIZE,
+        take: rtBand ? 200 : PAGE_SIZE,
         select: {
           id: true, slug: true, title: true, excerpt: true, coverImage: true, content: true, createdAt: true,
           author:   { select: { username: true } },
@@ -82,20 +98,36 @@ export default async function SearchPage({ searchParams }: Props) {
       })
     : [];
 
+  // Apply reading-time filter in memory (200 wpm average, 5 chars per word)
+  const filtered = rtBand
+    ? rawResults.filter(s => {
+        const mins = (s.content?.length ?? 0) / 5 / 200;
+        return mins >= rtBand[0] && mins < rtBand[1];
+      })
+    : rawResults;
+
+  const results = rtBand
+    ? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+    : filtered;
+
   // Build URL for filters (preserving other params)
   function filterHref(overrides: Record<string, string>) {
-    const params = new URLSearchParams();
-    if (query)   params.set('q',        query);
-    if (catSlug) params.set('category', catSlug);
-    if (sort)    params.set('sort',     sort);
-    params.set('page', '1');
+    const p = new URLSearchParams();
+    if (query)    p.set('q',        query);
+    if (catSlug)  p.set('category', catSlug);
+    if (mood)     p.set('mood',     mood);
+    if (readTime) p.set('readTime', readTime);
+    if (sort)     p.set('sort',     sort);
+    p.set('page', '1');
     for (const [k, v] of Object.entries(overrides)) {
-      if (v) params.set(k, v); else params.delete(k);
+      if (v) p.set(k, v); else p.delete(k);
     }
-    return `/search?${params.toString()}`;
+    return `/search?${p.toString()}`;
   }
 
-  const hasFilters = query || catSlug;
+  const MOODS = ['GOTHIC','PARANORMAL','COSMIC','SLASHER','PSYCHOLOGICAL','SUPERNATURAL','GORE','DARK_COMEDY'];
+
+  const hasFilters = query || catSlug || mood || readTime;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
@@ -126,6 +158,36 @@ export default async function SearchPage({ searchParams }: Props) {
                 <Link key={c.slug} href={filterHref({ category: c.slug })}
                   className={`px-3 py-1 text-xs rounded-full border transition ${catSlug === c.slug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
                   {c.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Mood filter */}
+          <div className="flex items-center gap-2 w-full">
+            <span className="text-xs text-gray-500 uppercase tracking-widest shrink-0">Mood</span>
+            <div className="flex flex-wrap gap-1">
+              <Link href={filterHref({ mood: '' })}
+                className={`px-3 py-1 text-xs rounded-full border transition ${!mood ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+                Any
+              </Link>
+              {MOODS.map(m => (
+                <Link key={m} href={filterHref({ mood: m })}
+                  className={`px-3 py-1 text-xs rounded-full border transition ${mood === m ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+                  {m.charAt(0) + m.slice(1).toLowerCase().replace('_', ' ')}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Reading time filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 uppercase tracking-widest shrink-0">Length</span>
+            <div className="flex gap-1">
+              {[['', 'Any'], ['short', '< 5 min'], ['medium', '5–15 min'], ['long', '15+ min']].map(([val, label]) => (
+                <Link key={val} href={filterHref({ readTime: val })}
+                  className={`px-3 py-1 text-xs rounded-full border transition ${readTime === val ? 'bg-blue-700 border-blue-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+                  {label}
                 </Link>
               ))}
             </div>

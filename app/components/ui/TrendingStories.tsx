@@ -18,39 +18,51 @@ export default async function TrendingStories() {
   // window don't hammer the database — TTL.MEDIUM is typically 5 minutes.
   // The string 'trending:stories' is the unique cache key for this data.
   const list = await cache('trending:stories', TTL.MEDIUM, async () => {
-    // Calculate what "7 days ago" looks like as a Date object
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
-    // Fetch the top 5 most-viewed published stories from the past week.
-    // We sort by views first (most views wins), then by newest as a tiebreaker.
-    const recent = await prisma.story.findMany({
-      where: { status: 'PUBLISHED', createdAt: { gte: sevenDaysAgo } },
-      orderBy: [{ views: 'desc' }, { createdAt: 'desc' }],
-      take: 5,
+    // Fetch candidate stories published in the last 30 days
+    const stories = await prisma.story.findMany({
+      where: { status: 'PUBLISHED', createdAt: { gte: thirtyDaysAgo } },
+      take: 60,
       select: {
-        id: true, title: true, slug: true, views: true, coverImage: true,
+        id: true, title: true, slug: true, views: true, coverImage: true, createdAt: true,
         author: { select: { username: true } },
         category: { select: { name: true, slug: true } },
+        likes: { where: { createdAt: { gte: fortyEightHoursAgo } }, select: { id: true } },
+        comments: { where: { createdAt: { gte: fortyEightHoursAgo } }, select: { id: true } },
         _count: { select: { likes: true } },
       },
     });
 
-    // Fallback to all-time trending if fewer than 3 stories this week.
-    // This prevents the widget looking empty on quiet weeks.
-    if (recent.length >= 3) return recent;
+    const now = Date.now();
+    const scored = stories
+      .map(s => {
+        const ageDays = (now - s.createdAt.getTime()) / 86400000;
+        const recency = ageDays < 1 ? 20 : ageDays < 3 ? 10 : ageDays < 7 ? 5 : 0;
+        const score = s.likes.length * 5 + s.comments.length * 8 + s.views * 0.1 + recency;
+        const { likes, comments, ...rest } = s;
+        void likes; void comments;
+        return { ...rest, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
 
-    // All-time fallback — just sorts by total views across all time
-    return prisma.story.findMany({
+    if (scored.length >= 3) return scored;
+
+    // Cold-start fallback: no recent activity → most-viewed all time
+    const fallback = await prisma.story.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: [{ views: 'desc' }],
+      orderBy: { views: 'desc' },
       take: 5,
       select: {
-        id: true, title: true, slug: true, views: true, coverImage: true,
+        id: true, title: true, slug: true, views: true, coverImage: true, createdAt: true,
         author: { select: { username: true } },
         category: { select: { name: true, slug: true } },
         _count: { select: { likes: true } },
       },
     });
+    return fallback.map(s => ({ ...s, score: s.views }));
   });
 
   // If there are truly no stories at all, show a friendly placeholder

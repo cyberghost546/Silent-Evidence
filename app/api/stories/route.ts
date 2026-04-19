@@ -104,7 +104,10 @@ export async function POST(req: Request) {
   const locationName = body.locationName ?? null;
   const latitude     = body.latitude ?? null;
   const longitude    = body.longitude ?? null;
-  const videoUrl     = typeof body.videoUrl === 'string' ? body.videoUrl.trim() : null;
+  const videoUrl        = typeof body.videoUrl  === 'string' ? body.videoUrl.trim()  : null;
+  const audioUrl        = typeof body.audioUrl  === 'string' ? body.audioUrl.trim()  : null;
+  const isPremiumOnly   = body.isPremiumOnly === true;
+  const earlyAccessUntil = body.earlyAccessUntil ? new Date(body.earlyAccessUntil) : null;
 
   if (!title || !content || !categoryId) {
     return NextResponse.json({ error: 'Title, category, and content are required.' }, { status: 400 });
@@ -149,7 +152,10 @@ export async function POST(req: Request) {
       locationName: locationName || null,
       latitude:     latitude ?? null,
       longitude:    longitude ?? null,
-      videoUrl:     videoUrl || null,
+      videoUrl:        videoUrl || null,
+      audioUrl:        audioUrl || null,
+      isPremiumOnly,
+      earlyAccessUntil: earlyAccessUntil || null,
       authorId:     userId,
       categoryId:  Number(categoryId),
     },

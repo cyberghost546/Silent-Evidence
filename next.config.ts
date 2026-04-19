@@ -51,10 +51,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'ui-avatars.com' },
       // picsum.photos — used for placeholder/seed images in development
       { protocol: 'https', hostname: 'picsum.photos' },
+      // Unsplash — used for story cover images and slideshow backgrounds
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'source.unsplash.com' },
       // Localhost uploads in development
       { protocol: 'http', hostname: 'localhost' },
-      // Add your production domain here e.g.:
-      // { protocol: 'https', hostname: 'silentevidence.com' },
     ],
   },
   async headers() {

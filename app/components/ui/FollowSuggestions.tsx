@@ -11,8 +11,9 @@ type Suggestion = {
   id: number;
   username: string;
   isVerified: boolean;
+  matchScore?: number;
   profile: { avatar: string | null; bio: string | null } | null;
-  _count: { followers: number; stories: number };
+  _count: { followedBy: number; stories: number };
 };
 
 export default function FollowSuggestions() {
@@ -22,7 +23,7 @@ export default function FollowSuggestions() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch('/api/suggestions')
+    fetch('/api/users/suggested')
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data) => { setSuggestions(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
@@ -57,7 +58,7 @@ export default function FollowSuggestions() {
     return (
       <div className="flex gap-3 overflow-x-auto pb-2 animate-pulse">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex-shrink-0 w-44 h-52 bg-gray-800 rounded-2xl" />
+          <div key={i} className="shrink-0 w-44 h-52 bg-gray-800 rounded-2xl" />
         ))}
       </div>
     );
@@ -82,7 +83,7 @@ export default function FollowSuggestions() {
           return (
             <div
               key={author.id}
-              className="flex-shrink-0 w-44 bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col items-center gap-3"
+              className="shrink-0 w-44 bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col items-center gap-3"
             >
               {/* Avatar */}
               <Link href={`/user/${author.username}`}>
@@ -101,7 +102,7 @@ export default function FollowSuggestions() {
                 >
                   {author.username}
                   {author.isVerified && (
-                    <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}

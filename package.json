@@ -38,6 +38,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^1.8.0",
     "mariadb": "^3.5.2",
+    "nanoid": "^5.1.9",
     "next": "16.2.0",
     "nodemailer": "^8.0.4",
     "pusher": "^5.3.3",

@@ -31,11 +31,33 @@
       "Bash(vercel env *)",
       "Bash(grep -v \"^#\\\\|^$\\\\|DATABASE_URL\\\\|JWT_SECRET\" \"c:\\\\Users\\\\chris\\\\Documents\\\\GitHub\\\\Horror_Blog_Website\\\\.env\")",
       "Bash(DATABASE_URL=\"mysql://root:tGFfmhoCxExraeLqTgClUEpqEkxkfJaQ@monorail.proxy.rlwy.net:50814/railway\" npx prisma db execute --stdin)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/monsters/[slug]\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/monsters/[slug]\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/qa/[sessionId]/questions\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/qa/[sessionId]/answer\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/qa/[sessionId]/upvote\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/qa/[username]\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/recipes/[slug]\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/recipes/[slug]\")",
+      "Bash(2>&1)",
+      "Bash(mysql -u root silent_evidence -e \"SELECT COUNT\\(*\\) as user_count FROM User;\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git remote *)",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/api/book-club/[id]\")",
+      "Bash(mkdir -p \"c:/Users/chris/Documents/GitHub/Horror_Blog_Website/app/book-club/[id]\")",
+      "Bash(npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' -e ' *)",
+      "Bash(mysql -u root silent_evidence -e \"SELECT id, name FROM Category LIMIT 10;\")",
+      "Bash(mysql -u root silent_evidence -e \"SELECT id, username FROM User LIMIT 5;\")",
+      "Bash(npx ts-node *)",
+      "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {PrismaClient} = require\\('\\\\''@prisma/client'\\\\''\\); const p = new PrismaClient\\(\\); p.category.findMany\\(\\).then\\(r => console.log\\(JSON.stringify\\(r\\)\\)\\).catch\\(e => console.error\\(e.message\\)\\).finally\\(\\(\\) => p.$disconnect\\(\\)\\);')"
     ],
     "additionalDirectories": [
       "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",
-      "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\api\\stories\\[id]"
+      "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\api\\stories\\[id]",
+      "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\api\\admin\\calendar\\events"
     ]
   }
 }

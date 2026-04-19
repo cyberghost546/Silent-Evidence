@@ -13,6 +13,7 @@ import NewsletterToggle from '@/app/components/ui/NewsletterToggle';
 import PushNotificationToggle from '@/app/components/ui/PushNotificationToggle';
 import DigestFrequencySelector from '@/app/components/ui/DigestFrequencySelector';
 import DiscordConnect from '@/app/components/ui/DiscordConnect';
+import PremiumAppearancePicker from '@/app/components/ui/PremiumAppearancePicker';
 import Link from 'next/link';
 
 const AGE_CONFIG = {
@@ -55,6 +56,7 @@ export default async function SettingsPage() {
     { href: '#reading-speed', label: 'Reading Speed'   },
     { href: '#notifications', label: 'Notifications'   },
     { href: '#blocked',       label: 'Blocked Users'   },
+    { href: '#appearance',    label: 'Appearance'      },
     { href: '#discord',       label: 'Discord'         },
     { href: '#account',       label: 'Account'         },
   ];
@@ -140,6 +142,14 @@ export default async function SettingsPage() {
 
             <Section id="blocked" title="Blocked Users" desc="Block users to hide their content and stop interactions.">
               <BlockedUsersSection />
+            </Section>
+
+            <Section id="appearance" title="Profile Appearance" desc="Customise your profile theme and avatar border animation. Premium members only.">
+              <PremiumAppearancePicker
+                initialTheme={user.profile?.profileTheme ?? 'default'}
+                initialBorder={user.profile?.avatarBorder ?? 'none'}
+                isPremium={user.subscription?.status === 'active'}
+              />
             </Section>
 
             <Section id="discord" title="Discord" desc="Connect your Discord account to join the community server.">

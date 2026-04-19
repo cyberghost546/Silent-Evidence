@@ -49,6 +49,7 @@ import ScareScoreBadge from '@/app/components/ui/ScareScoreBadge';
 import type { Metadata } from 'next';
 import { checkReadingLimit, FREE_MONTHLY_LIMIT } from '@/lib/readingLimit';
 import ReadingPaywall from '@/app/components/ui/ReadingPaywall';
+import PremiumAudioPlayer from '@/app/components/ui/PremiumAudioPlayer';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://silentevidence.com';
 
@@ -357,6 +358,27 @@ export default async function StoryPage({ params }: Props) {
           </div>
         )}
 
+        {/* Early access gate — free users see a countdown until the embargo lifts */}
+        {!hasPremium && userId !== story.author.id && story.earlyAccessUntil && new Date(story.earlyAccessUntil) > new Date() && (
+          <div className="mt-10 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8 text-center">
+            <p className="text-3xl mb-3">📖</p>
+            <h3 className="text-lg font-bold text-white mb-2">Premium Early Access</h3>
+            <p className="text-sm text-gray-400 mb-1">This story is available to premium members now.</p>
+            <p className="text-sm text-gray-500 mb-6">
+              Free access opens on{' '}
+              <span className="text-purple-300 font-medium">
+                {new Date(story.earlyAccessUntil).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </span>
+            </p>
+            <a
+              href="/premium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition text-sm"
+            >
+              ⚡ Read Now with Premium
+            </a>
+          </div>
+        )}
+
         {/* Premium paywall — shown when story is premium-only and the viewer is not subscribed */}
         {story.isPremiumOnly && !hasPremium && userId !== story.author.id ? (
           <div className="mt-10 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
@@ -402,6 +424,7 @@ export default async function StoryPage({ params }: Props) {
             </a>
           </div>
         ) : (
+          <>
           {/* Spotify soundtrack widget — shown above story content when author has set a playlist */}
           {'spotifyPlaylistUrl' in story && story.spotifyPlaylistUrl && (
             <StorySoundtrack spotifyPlaylistUrl={story.spotifyPlaylistUrl as string} />
@@ -421,6 +444,16 @@ export default async function StoryPage({ params }: Props) {
               <StoryContent content={story.content} excerpt={story.excerpt} storyLang={story.language ?? 'en'} />
             )}
           </AgeGate>
+          </>
+        )}
+
+        {/* Audio narration — premium player shown when author has uploaded audio */}
+        {story.audioUrl && (
+          <PremiumAudioPlayer
+            audioUrl={story.audioUrl}
+            storyTitle={story.title}
+            hasPremium={hasPremium}
+          />
         )}
 
         {/* Reading Room — lets logged-in users read together with friends */}

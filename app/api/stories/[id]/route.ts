@@ -111,7 +111,12 @@ export async function PATCH(req: Request, { params }: Params) {
   const content    = typeof body.content    === 'string' ? sanitizeContent(body.content.trim()) : undefined;
   const excerpt    = typeof body.excerpt    === 'string' ? body.excerpt.trim()    : undefined;
   const coverImage = typeof body.coverImage === 'string' ? body.coverImage.trim() : undefined;
-  const videoUrl   = typeof body.videoUrl   === 'string' ? body.videoUrl.trim()   : undefined;
+  const videoUrl        = typeof body.videoUrl  === 'string' ? body.videoUrl.trim()  : undefined;
+  const audioUrl        = typeof body.audioUrl  === 'string' ? body.audioUrl.trim()  : undefined;
+  const isPremiumOnly   = typeof body.isPremiumOnly === 'boolean' ? body.isPremiumOnly : undefined;
+  const earlyAccessUntil = body.earlyAccessUntil !== undefined
+    ? (body.earlyAccessUntil ? new Date(body.earlyAccessUntil) : null)
+    : undefined;
   const status     = body.status;
   const categoryId = body.categoryId ? Number(body.categoryId) : undefined;
 
@@ -141,7 +146,10 @@ export async function PATCH(req: Request, { params }: Params) {
   if (content      !== undefined) data.content      = content;
   if (excerpt      !== undefined) data.excerpt      = excerpt || null;
   if (coverImage   !== undefined) data.coverImage   = coverImage || null;
-  if (videoUrl     !== undefined) data.videoUrl     = videoUrl || null;
+  if (videoUrl          !== undefined) data.videoUrl          = videoUrl || null;
+  if (audioUrl          !== undefined) data.audioUrl          = audioUrl || null;
+  if (isPremiumOnly     !== undefined) data.isPremiumOnly     = isPremiumOnly;
+  if (earlyAccessUntil  !== undefined) data.earlyAccessUntil  = earlyAccessUntil;
   if (status       !== undefined) data.status       = status;
   if (categoryId   !== undefined) data.categoryId   = categoryId;
   if (scheduledAt  !== undefined) data.scheduledAt  = scheduledAt;

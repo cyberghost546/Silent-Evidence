@@ -4,6 +4,7 @@
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -26,11 +27,14 @@ export default async function ChapterPage({ params }: Props) {
   const { slug, order: orderStr } = await params;
   const order = Number(orderStr);
 
+  const cookieStore = await cookies();
+  const userId = Number(cookieStore.get('userId')?.value ?? 0) || null;
+
   // Fetch the story and all its chapters so we can build prev/next links
   const story = await prisma.story.findUnique({
     where: { slug, status: 'PUBLISHED', isChaptered: true },
     select: { id: true, title: true, slug: true, language: true,
-              author: { select: { username: true } } },
+              author: { select: { id: true, username: true } } },
   });
   if (!story) return notFound();
 
@@ -49,6 +53,14 @@ export default async function ChapterPage({ params }: Props) {
     where: { storyId: story.id, order },
   });
   if (!chapter) return notFound();
+
+  // Check premium subscription — chapters beyond the first require an active subscription
+  const isAuthor = userId === story.author.id;
+  const userSubscription = userId
+    ? await prisma.subscription.findUnique({ where: { userId }, select: { status: true } })
+    : null;
+  const hasPremium = userSubscription?.status === 'active';
+  const isLockedChapter = currentIndex > 0 && !hasPremium && !isAuthor;
 
   // Increment this chapter's view counter (fire and forget — doesn't block render)
   prisma.storyChapter.update({ where: { id: chapter.id }, data: { views: { increment: 1 } } }).catch(() => {});
@@ -75,8 +87,30 @@ export default async function ChapterPage({ params }: Props) {
           <p className="text-sm text-gray-500 mt-2">by {story.author.username}</p>
         </div>
 
-        {/* Chapter content — reuses the StoryContent component for consistent prose styling */}
-        <StoryContent content={chapter.content} storyLang={story.language ?? 'en'} />
+        {/* Chapter content — chapters beyond chapter 1 require a premium subscription */}
+        {isLockedChapter ? (
+          <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-10 text-center mt-4">
+            <p className="text-4xl mb-4">🔒</p>
+            <h3 className="text-xl font-bold text-white mb-2">Premium Members Only</h3>
+            <p className="text-sm text-gray-400 mb-2">
+              Chapter 1 is free for everyone. Continue the story by upgrading to premium.
+            </p>
+            <p className="text-xs text-gray-600 mb-6">Unlock all chapters on every story, plus every other premium perk.</p>
+            <a
+              href="/premium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-sm"
+            >
+              ⚡ Unlock All Chapters
+            </a>
+            <div className="mt-4">
+              <Link href={`/story/${slug}/chapter/${allChapters[0].order}`} className="text-xs text-gray-500 hover:text-gray-400 transition underline">
+                ← Re-read Chapter 1 for free
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <StoryContent content={chapter.content} storyLang={story.language ?? 'en'} />
+        )}
 
         {/* ── Chapter navigation ── */}
         <div className="mt-12 flex items-center justify-between gap-4 border-t border-gray-800 pt-8">
@@ -121,21 +155,25 @@ export default async function ChapterPage({ params }: Props) {
         <div className="mt-10 bg-gray-900 border border-gray-800 rounded-2xl p-5">
           <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Table of Contents</p>
           <div className="space-y-1">
-            {allChapters.map((c, i) => (
-              <Link
-                key={c.id}
-                href={`/story/${slug}/chapter/${c.order}`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
-                  c.order === order
-                    ? 'bg-red-600/15 text-red-400 font-semibold'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
-              >
-                <span className="text-xs text-gray-600 w-5 flex-shrink-0">{i + 1}</span>
-                <span className="truncate">{c.title}</span>
-                {c.order === order && <span className="ml-auto text-xs">← here</span>}
-              </Link>
-            ))}
+            {allChapters.map((c, i) => {
+              const locked = i > 0 && !hasPremium && !isAuthor;
+              return (
+                <Link
+                  key={c.id}
+                  href={`/story/${slug}/chapter/${c.order}`}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
+                    c.order === order
+                      ? 'bg-red-600/15 text-red-400 font-semibold'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <span className="text-xs text-gray-600 w-5 shrink-0">{i + 1}</span>
+                  <span className="truncate">{c.title}</span>
+                  {locked && <span className="ml-auto text-xs text-yellow-600">🔒</span>}
+                  {!locked && c.order === order && <span className="ml-auto text-xs">← here</span>}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

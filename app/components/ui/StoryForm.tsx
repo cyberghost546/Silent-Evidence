@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import StoryTemplatePicker from './StoryTemplatePicker';
 
 const RichEditor = dynamic(() => import('./RichEditor'), { ssr: false });
+const AIWritingAssistant = dynamic(() => import('./AIWritingAssistant'), { ssr: false });
 
 type Category = { id: number; name: string };
 
@@ -29,6 +30,9 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
   const [seriesOrder, setSeriesOrder] = useState('');
   const [userSeries, setUserSeries] = useState<{id:number;name:string}[]>([]);
   const [seriesLoaded, setSeriesLoaded] = useState(false);
+  const [isPremiumOnly, setIsPremiumOnly]       = useState(false);
+  const [earlyAccessUntil, setEarlyAccessUntil] = useState('');
+  const [audioUrl, setAudioUrl]                 = useState('');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude]     = useState('');
   const [longitude, setLongitude]   = useState('');
@@ -164,7 +168,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       const res = await fetch('/api/stories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, categoryId: Number(categoryId), excerpt, content, coverImage: coverImage || null, videoUrl: videoUrl || null, status, language, mood: mood || null, contentRating, warnings: warnings.length ? JSON.stringify(warnings) : null, scheduledAt: scheduledAt || null, seriesId: seriesId ? Number(seriesId) : null, seriesOrder: seriesOrder ? Number(seriesOrder) : null, locationName: locationName || null, latitude: latitude ? Number(latitude) : null, longitude: longitude ? Number(longitude) : null }),
+        body: JSON.stringify({ title, categoryId: Number(categoryId), excerpt, content, coverImage: coverImage || null, videoUrl: videoUrl || null, audioUrl: audioUrl || null, status, language, mood: mood || null, contentRating, warnings: warnings.length ? JSON.stringify(warnings) : null, scheduledAt: scheduledAt || null, seriesId: seriesId ? Number(seriesId) : null, seriesOrder: seriesOrder ? Number(seriesOrder) : null, locationName: locationName || null, latitude: latitude ? Number(latitude) : null, longitude: longitude ? Number(longitude) : null, isPremiumOnly, earlyAccessUntil: earlyAccessUntil || null }),
       });
       const data = await res.json();
       setLoading(false);
@@ -350,6 +354,11 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
           onChange={handleContentChange}
           placeholder="Start writing your story here…"
         />
+        <AIWritingAssistant
+          title={title}
+          content={content}
+          onInsert={(text) => setContent(prev => prev + text)}
+        />
       </div>
 
       {/* Series */}
@@ -465,9 +474,67 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         )}
       </div>
 
+      {/* Audio narration URL */}
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          🎙️ Audio Narration URL <span className="text-gray-500 font-normal">(optional — MP3 link for premium listeners)</span>
+        </label>
+        <input
+          type="url"
+          value={audioUrl}
+          onChange={(e) => setAudioUrl(e.target.value)}
+          placeholder="https://example.com/narration.mp3"
+          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
+        />
+        <p className="text-xs text-gray-600 mt-1">Only premium members will be able to play this audio.</p>
+      </div>
+
+      {/* Premium options */}
+      <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 space-y-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-yellow-500/70">Premium Options</p>
+
+        {/* Members-only toggle */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-gray-300">🔒 Members-Only Story</p>
+            <p className="text-xs text-gray-500 mt-0.5">Only premium subscribers can read this story. It will never be made free.</p>
+          </div>
+          <button
+            type="button"
+            aria-label={isPremiumOnly ? 'Disable members-only' : 'Enable members-only'}
+            onClick={() => setIsPremiumOnly(v => !v)}
+            className={`shrink-0 w-11 h-6 rounded-full border transition relative ${isPremiumOnly ? 'bg-yellow-500 border-yellow-400' : 'bg-gray-800 border-gray-700'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${isPremiumOnly ? 'left-5' : 'left-0.5'}`} />
+          </button>
+        </div>
+
+        {/* Early access window */}
+        <div>
+          <label htmlFor="earlyAccessUntil" className="block text-sm font-medium text-gray-300 mb-1">
+            📖 Early Access Until <span className="text-gray-500 font-normal">(optional)</span>
+          </label>
+          <input
+            id="earlyAccessUntil"
+            type="datetime-local"
+            value={earlyAccessUntil}
+            onChange={(e) => setEarlyAccessUntil(e.target.value)}
+            min={new Date().toISOString().slice(0, 16)}
+            suppressHydrationWarning
+            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
+          />
+          <p className="text-xs text-gray-600 mt-1">Free users cannot read until this date passes. Leave blank for immediate public access.</p>
+          {earlyAccessUntil && (
+            <p className="text-xs text-yellow-400/70 mt-1">
+              Free readers unlocked on {new Date(earlyAccessUntil).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Status + Submit */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-        <div className="flex rounded-lg overflow-hidden border border-gray-700 text-sm flex-shrink-0">
+        <div className="flex rounded-lg overflow-hidden border border-gray-700 text-sm shrink-0">
           <button
             type="button"
             onClick={() => setStatus('DRAFT')}

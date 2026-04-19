@@ -5,6 +5,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ── Avatar border animations ───────────────────────────────── */
+@keyframes avatar-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes avatar-flicker {
+  0%, 100% { opacity: 1; }
+  20%       { opacity: 0.4; }
+  40%       { opacity: 0.9; }
+  60%       { opacity: 0.3; }
+  80%       { opacity: 0.8; }
+}
+.avatar-border-spin    { animation: avatar-spin    4s linear infinite; }
+.avatar-border-flicker { animation: avatar-flicker 2s ease-in-out infinite; }
+.avatar-border-pulse   { animation: pulse          2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
 /* ═══════════════════════════════════════════════════════════════
    PWA / APP MODE — safe area insets + standalone tweaks
    ═══════════════════════════════════════════════════════════════
