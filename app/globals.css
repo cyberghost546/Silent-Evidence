@@ -5,6 +5,63 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PWA / APP MODE — safe area insets + standalone tweaks
+   ═══════════════════════════════════════════════════════════════
+
+   viewport-fit=cover (set in layout.tsx) lets the page extend
+   under the iPhone notch and Dynamic Island.
+   env(safe-area-inset-*) adds the exact padding back so content
+   is never hidden under hardware UI elements.
+
+   The sticky header gets padding-top so it clears the status bar.
+   The body gets padding-bottom so content clears the home indicator.
+   ─────────────────────────────────────────────────────────────── */
+
+/* Push the sticky header down by the height of the iOS status bar */
+@supports (padding-top: env(safe-area-inset-top)) {
+  header.sticky {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+
+  /* Extra bottom padding on the whole page so content never hides
+     behind the iPhone home indicator or Android nav bar */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Floating elements (chat button, scroll-to-top, install prompt)
+     should also sit above the home indicator */
+  .fixed.bottom-4,
+  .fixed.bottom-6,
+  .fixed.bottom-8 {
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* In standalone mode (installed as an app) hide any "Install app" prompts
+   that would be confusing since the app is already installed */
+@media (display-mode: standalone) {
+  [data-pwa-install-prompt] {
+    display: none !important;
+  }
+
+  /* Slightly taller header tap target feels more native in app mode */
+  header.sticky {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
+/* Smooth scrolling everywhere — feels more native on mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent tap highlight flash on interactive elements (feels more native) */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ── Text selection highlight color ──
    Overrides the browser's default selection color with the site's horror red theme.
    This affects the highlight shown when a user clicks and drags to select text. */

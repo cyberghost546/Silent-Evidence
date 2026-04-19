@@ -60,14 +60,10 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
-// Viewport config — tells the browser to match the device's screen width
+// Viewport config — viewport-fit=cover is set via the <meta> tag above so the
+// notch/Dynamic Island safe-area CSS works. themeColor here colors Android's status bar.
 export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  // Theme color — colors the browser chrome on Android
-  // Deep red accent matches the horror theme
-  themeColor: "#dc2626",
+  themeColor: "#111827",
 };
 
 export default async function RootLayout({
@@ -86,15 +82,18 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* iOS specific — makes it look like a native app when added to home screen */}
+        {/* iOS — makes it behave like a native app when added to home screen */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Silent Evidence" />
-        {/* Apple touch icon — the icon shown on iOS home screen */}
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        {/* Splash screen background color on iOS — deep red for horror theme */}
+        {/* Apple touch icon — icon shown on iOS home screen (must point to a real file) */}
+        <link rel="apple-touch-icon" href="/icons/web-app-manifest-192x192.png" />
+        {/* Windows tile */}
         <meta name="msapplication-TileColor" content="#dc2626" />
-        <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+        <meta name="msapplication-TileImage" content="/icons/web-app-manifest-192x192.png" />
+        {/* Viewport-fit=cover lets content extend under the iPhone notch/Dynamic Island.
+            The actual padding is applied via env(safe-area-inset-*) in globals.css */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       {/* overflow-x-hidden prevents any content from causing a horizontal scrollbar */}
       <body className="min-h-full flex flex-col bg-gray-900 overflow-x-hidden w-full" suppressHydrationWarning>
