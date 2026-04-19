@@ -254,6 +254,7 @@ export default function LastWordsFeed({ userId }: Props) {
           placeholder="Drop your favorite horror quote..."
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
+          suppressHydrationWarning
           // Allow Ctrl+Enter as a keyboard shortcut to submit
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleSubmit();

@@ -37,6 +37,7 @@ import VerifiedBadge from '@/app/components/ui/VerifiedBadge';
 import LiveReaderCount from '@/app/components/ui/LiveReaderCount';
 import AudioPlayer from '@/app/components/ui/AudioPlayer';
 import VideoEmbed from '@/app/components/ui/VideoEmbed';
+import StorySoundtrack from '@/app/components/ui/StorySoundtrack';
 import StoryAnalytics from '@/app/components/ui/StoryAnalytics';
 import TipGoalWidget from '@/app/components/ui/TipGoalWidget';
 import StoryMilestones from '@/app/components/ui/StoryMilestones';
@@ -401,7 +402,12 @@ export default async function StoryPage({ params }: Props) {
             </a>
           </div>
         ) : (
-          /* Regular story — wrapped in age gate for content rating enforcement */
+          {/* Spotify soundtrack widget — shown above story content when author has set a playlist */}
+          {'spotifyPlaylistUrl' in story && story.spotifyPlaylistUrl && (
+            <StorySoundtrack spotifyPlaylistUrl={story.spotifyPlaylistUrl as string} />
+          )}
+
+          {/* Regular story — wrapped in age gate for content rating enforcement */}
           <AgeGate
             contentRating={(story.contentRating ?? 'ALL') as 'ALL' | 'TEEN' | 'MATURE'}
             ageGroup={(currentUser?.ageGroup ?? null) as 'UNDER_13' | 'TEEN' | 'ADULT' | null}

@@ -340,6 +340,11 @@ model User {
   userWarnings        UserWarning[] @relation("WarnedUser")
   warningsIssued      UserWarning[] @relation("WarnedByAdmin")
   auditLogsActioned   AuditLog[]
+
+  // New features
+  confessions         Confession[]
+  liveQASessions      LiveQASession[]
+  recipes             HorrorRecipe[]
 }
 
 // ============================================================
@@ -473,6 +478,8 @@ model Story {
   audioUrl        String?
   // Video — optional YouTube URL or direct video URL attached to this story
   videoUrl        String?
+  // Soundtrack — optional Spotify playlist URL shown while reading
+  spotifyPlaylistUrl String?
   // Multi-part stories — when true, this story has chapters
   isChaptered     Boolean          @default(false)
   // Tip goal — author sets a fundraising target (e.g. "$50 = I'll write the sequel")
@@ -2185,4 +2192,259 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// ============================================================
+//  CONFESSION BOOTH — anonymous horror confessions
+//  Users post a short horror confession (anonymous or named).
+//  Others react with skull/ghost/scream emojis.
+// ============================================================
+model Confession {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  isAnonymous Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  reactions   ConfessionReaction[]
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+// Emoji reactions on a confession (one emoji type per user per confession)
+model ConfessionReaction {
+  id           Int        @id @default(autoincrement())
+  emoji        String     // "😱" "💀" "👻" "🕯️"
+  createdAt    DateTime   @default(now())
+
+  confessionId Int
+  confession   Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
+  userId       Int
+
+  @@unique([confessionId, userId, emoji])
+  @@index([confessionId])
+}
+
+// ============================================================
+//  HORROR BINGO — community bingo card of horror tropes
+//  Admin creates BingoTemplates (25 cells). Each user gets their
+//  own BingoCard for a template; BingoCellCheck records which
+//  cells they've marked off.
+// ============================================================
+model BingoTemplate {
+  id        Int      @id @default(autoincrement())
+  title     String   // e.g. "Classic Horror Tropes 2024"
+  // JSON array of 25 cell label strings, e.g. ["Jump scare","Final girl",...]
+  cells     String   @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  cards     BingoCard[]
+}
+
+// One card per user per template — tracks their progress
+model BingoCard {
+  id         Int           @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+
+  templateId Int
+  template   BingoTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  userId     Int
+
+  checks     BingoCellCheck[]
+
+  @@unique([templateId, userId])
+  @@index([userId])
+}
+
+// Records which cells a user has checked off on their bingo card
+model BingoCellCheck {
+  id        Int       @id @default(autoincrement())
+  cellIndex Int       // 0–24 position in the 5×5 grid
+  checkedAt DateTime  @default(now())
+
+  cardId    Int
+  card      BingoCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, cellIndex])
+}
+
+// ============================================================
+//  MONSTER ENCYCLOPEDIA — community wiki of horror monsters
+//  Admin-curated entries linking monsters to stories on the site.
+// ============================================================
+model Monster {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique   // URL-safe, used in /monsters/[slug]
+  description String   @db.Text
+  origin      String?            // e.g. "Japanese folklore", "Stephen King"
+  image       String?
+  // Category: "Supernatural" | "Creature" | "Psychological" | "Paranormal"
+  type        String
+  scareFactor Int      @default(5)  // 1–10 admin rating
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  storyLinks  MonsterStoryLink[]
+
+  @@index([type])
+  @@index([scareFactor])
+}
+
+// Links a monster to stories on the site that feature them
+model MonsterStoryLink {
+  id        Int     @id @default(autoincrement())
+  monsterId Int
+  monster   Monster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  storyId   Int     // references Story.id
+
+  @@unique([monsterId, storyId])
+  @@index([monsterId])
+}
+
+// ============================================================
+//  SCREAM AWARDS — yearly community voting
+//  Admin creates a ScreamAward for a year with categories.
+//  Nominations are seeded by admin; users vote once per category.
+// ============================================================
+model ScreamAward {
+  id         Int      @id @default(autoincrement())
+  year       Int      @unique   // e.g. 2025
+  isOpen     Boolean  @default(false)  // admin opens/closes voting
+  closedAt   DateTime?
+  createdAt  DateTime @default(now())
+
+  categories ScreamAwardCategory[]
+}
+
+// One award category, e.g. "Scariest Story", "Best Villain", "Best Twist"
+model ScreamAwardCategory {
+  id      Int         @id @default(autoincrement())
+  name    String
+
+  awardId Int
+  award   ScreamAward @relation(fields: [awardId], references: [id], onDelete: Cascade)
+
+  nominations ScreamNomination[]
+
+  @@unique([awardId, name])
+}
+
+// A nominated entry within a category
+model ScreamNomination {
+  id         Int                 @id @default(autoincrement())
+  label      String              // story title or author username shown in ballot
+  storyId    Int?                // set when the nomination is a story
+  authorId   Int?                // set when the nomination is an author
+  createdAt  DateTime            @default(now())
+
+  categoryId Int
+  category   ScreamAwardCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  votes      ScreamVote[]
+
+  @@index([categoryId])
+}
+
+// One vote per user per category (enforced by @@unique on categoryId+userId via application logic)
+model ScreamVote {
+  id             Int              @id @default(autoincrement())
+  createdAt      DateTime         @default(now())
+
+  nominationId   Int
+  nomination     ScreamNomination @relation(fields: [nominationId], references: [id], onDelete: Cascade)
+  userId         Int
+
+  @@unique([nominationId, userId])
+  @@index([nominationId])
+}
+
+// ============================================================
+//  LIVE AUTHOR Q&A — scheduled real-time question sessions
+//  Author creates a session; readers submit questions and upvote.
+//  Author answers top questions live. Powered by Pusher when available.
+// ============================================================
+model LiveQASession {
+  id        Int      @id @default(autoincrement())
+  title     String   // e.g. "Live Q&A — Ask me anything about The Hollow Road"
+  isActive  Boolean  @default(true)
+  startsAt  DateTime
+  endsAt    DateTime?
+  createdAt DateTime @default(now())
+
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  questions LiveQAQuestion[]
+
+  @@index([authorId])
+  @@index([isActive, startsAt])
+}
+
+// A question submitted by a reader during a live Q&A session
+model LiveQAQuestion {
+  id          Int           @id @default(autoincrement())
+  question    String        @db.Text
+  answer      String?       @db.Text  // null until the author answers
+  isAnonymous Boolean       @default(false)
+  upvotes     Int           @default(0)
+  answered    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  sessionId   Int
+  session     LiveQASession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  askerId     Int?          // null when isAnonymous = true
+
+  @@index([sessionId, createdAt])
+  @@index([sessionId, upvotes])
+}
+
+// ============================================================
+//  HORROR RECIPE / RITUAL — themed food, drinks, and rituals
+//  Community-submitted recipes with a horror twist.
+//  type: "food" | "drink" | "ritual"
+// ============================================================
+model HorrorRecipe {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  // JSON array of ingredient strings, e.g. ["2 cups blood orange juice", ...]
+  ingredients String   @db.Text
+  // JSON array of step strings
+  steps       String   @db.LongText
+  image       String?
+  type        String   @default("food")       // "food" | "drink" | "ritual"
+  difficulty  String   @default("medium")     // "easy" | "medium" | "hard"
+  prepMins    Int?
+  servings    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  reactions   RecipeReaction[]
+
+  @@index([type])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+// Emoji reactions on a recipe (one emoji type per user per recipe)
+model RecipeReaction {
+  id        Int          @id @default(autoincrement())
+  emoji     String       // "🔥" "💀" "😋" "👻"
+  createdAt DateTime     @default(now())
+
+  recipeId  Int
+  recipe    HorrorRecipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  @@unique([recipeId, userId, emoji])
+  @@index([recipeId])
 }
