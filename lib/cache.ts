@@ -14,34 +14,39 @@
 import Redis from 'ioredis';
 
 // ── Redis client ──────────────────────────────────────────────────────────────
-// Singleton pattern — reuse the same connection across hot reloads in dev
-let redis: Redis | null = null;
+// Singleton pattern — reuse the same connection across hot reloads in dev.
+// Returns null if Redis is unavailable so every caller falls back to the DB.
 
 function getRedis(): Redis | null {
-  // If no REDIS_URL is configured, caching is disabled — all fetches go to the DB
   if (!process.env.REDIS_URL) return null;
 
-  // In Next.js dev mode, the module can be re-evaluated on hot reload.
-  // Store the client on globalThis to avoid creating multiple connections.
   const g = globalThis as typeof globalThis & { __redis?: Redis };
+
   if (!g.__redis) {
     g.__redis = new Redis(process.env.REDIS_URL, {
-      // Retry strategy: wait 2 seconds between attempts, give up after 3 attempts
-      maxRetriesPerRequest: 3,
-      retryStrategy: (times) => (times > 3 ? null : 2000),
-      // Don't crash the app if Redis is temporarily unavailable
+      maxRetriesPerRequest: 0,   // fail fast — don't queue commands while reconnecting
+      retryStrategy: (times) => (times >= 3 ? null : 500),  // 3 attempts, 500 ms apart
       enableOfflineQueue: false,
       lazyConnect: true,
     });
 
-    // Log errors but don't throw — the app should work without Redis
     g.__redis.on('error', (err: Error) => {
       console.warn('[cache] Redis error:', err.message);
     });
+
+    // Connect exactly once. Any failure is caught here — never becomes an
+    // unhandled rejection that could crash Next.js router initialisation.
+    g.__redis.connect().catch((err: Error) => {
+      console.warn('[cache] Redis connect failed:', err.message);
+    });
   }
-  g.__redis.connect().catch(() => {}); // connect lazily, ignore already-connected errors
-  redis = g.__redis;
-  return redis;
+
+  // If Redis gave up retrying the client ends up in 'end' state.
+  // Return null so every cache call transparently falls back to the DB.
+  const status = g.__redis.status;
+  if (status === 'end' || status === 'close') return null;
+
+  return g.__redis;
 }
 
 // ── Cache prefix — namespaces all keys to avoid collisions ───────────────────
@@ -149,6 +154,23 @@ export async function invalidatePattern(pattern: string): Promise<void> {
     } while (cursor !== '0');
   } catch (err) {
     console.warn('[cache] Redis SCAN/DEL failed for pattern', pattern, err);
+  }
+}
+
+/**
+ * hasRecentView — deduplicates story view counts by IP + storyId.
+ * Returns true (already counted) or false (first view — go ahead and increment).
+ * Uses a 1-hour Redis TTL. Falls back to false (always count) when Redis is down.
+ */
+export async function hasRecentView(storyId: number, ip: string): Promise<boolean> {
+  const client = getRedis();
+  if (!client || client.status !== 'ready') return false;
+  const key = `${PREFIX}view:${storyId}:${ip.replace(/:/g, '-')}`;
+  try {
+    const set = await client.set(key, '1', 'EX', 3600, 'NX'); // NX = only set if not exists
+    return set === null; // null means key already existed → already counted
+  } catch {
+    return false;
   }
 }
 

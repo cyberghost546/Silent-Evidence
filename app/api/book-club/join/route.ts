@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { unauthorized, serverError } from '@/lib/apiError';
+import { hasPremiumAccess } from '@/lib/premiumCheck';
 
 export async function POST(req: Request) {
   try {
@@ -24,12 +25,9 @@ export async function POST(req: Request) {
 
     if (!club) return NextResponse.json({ error: 'Club not found or invalid invite code' }, { status: 404 });
 
-    // Premium clubs require an active subscription
-    if (club.isPremium) {
-      const sub = await prisma.subscription.findUnique({ where: { userId }, select: { status: true } });
-      if (sub?.status !== 'active') {
-        return NextResponse.json({ error: 'This is a premium-only club. Upgrade to join.' }, { status: 403 });
-      }
+    // Premium clubs require admin or active subscription
+    if (club.isPremium && !await hasPremiumAccess(userId)) {
+      return NextResponse.json({ error: 'This is a premium-only club. Upgrade to join.' }, { status: 403 });
     }
 
     // Upsert — safe if they're already a member

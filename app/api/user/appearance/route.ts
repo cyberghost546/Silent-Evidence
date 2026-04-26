@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { unauthorized, serverError } from '@/lib/apiError';
 import { THEMES, BORDERS } from '@/app/lib/themes';
+import { hasPremiumAccess } from '@/lib/premiumCheck';
 
 const VALID_THEMES  = Object.keys(THEMES);
 const VALID_BORDERS = Object.keys(BORDERS);
@@ -15,9 +16,8 @@ export async function PATCH(req: Request) {
     const userId = Number(cookieStore.get('userId')?.value ?? 0);
     if (!userId) return unauthorized();
 
-    // Only premium subscribers can change cosmetics
-    const sub = await prisma.subscription.findUnique({ where: { userId }, select: { status: true } });
-    if (sub?.status !== 'active') {
+    // Admins and premium subscribers can change cosmetics
+    if (!await hasPremiumAccess(userId)) {
       return NextResponse.json({ error: 'Premium subscription required.' }, { status: 403 });
     }
 

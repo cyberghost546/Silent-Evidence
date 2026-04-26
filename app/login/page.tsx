@@ -61,15 +61,41 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
+
+      {/* Floating ember particles */}
+      <div aria-hidden="true">
+        <span className="ember ember-1" />
+        <span className="ember ember-2" />
+        <span className="ember ember-3" />
+        <span className="ember ember-4" />
+        <span className="ember ember-5" />
+        <span className="ember ember-6" />
+        <span className="ember ember-7" />
+        <span className="ember ember-8" />
+        <span className="ember ember-9" />
+        <span className="ember ember-10" />
+        <span className="ember ember-11" />
+      </div>
+
+      {/* Back to site */}
+      <Link
+        href="/"
+        className="absolute top-5 left-5 flex items-center gap-2 text-sm text-gray-500 hover:text-white transition group"
+      >
+        <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        Back to site
+      </Link>
 
       <div className="relative w-full max-w-md">
 
         {/* Card with red glow shadow */}
-        <div className="relative">
+        <div className="relative login-card-enter">
           {/* Red glow layer behind card */}
-          <div className="absolute -inset-px rounded-2xl bg-linear-to-b from-red-600/40 to-transparent opacity-80 blur-sm" />
-          <div className="absolute inset-0 rounded-2xl shadow-[0_0_80px_rgba(220,38,38,0.45)]" />
+          <div className="absolute -inset-px rounded-2xl bg-linear-to-b from-red-600/40 to-transparent blur-sm glow-breathe" />
+          <div className="absolute inset-0 rounded-2xl shadow-[0_0_80px_rgba(220,38,38,0.45)] glow-breathe" />
 
           <div className="relative bg-gray-900/90 backdrop-blur-sm border border-gray-800 rounded-2xl p-8">
 

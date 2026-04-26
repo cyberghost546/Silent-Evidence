@@ -13,6 +13,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { hasPremiumAccess } from '@/lib/premiumCheck';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import StoryInteractions from '@/app/components/ui/StoryInteractions';
@@ -46,8 +47,11 @@ import ReadAloudButton from '@/app/components/ui/ReadAloudButton';
 import WordCountBadge from '@/app/components/ui/WordCountBadge';
 import ReaderSettings from '@/app/components/ui/ReaderSettings';
 import ScareScoreBadge from '@/app/components/ui/ScareScoreBadge';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { checkReadingLimit, FREE_MONTHLY_LIMIT } from '@/lib/readingLimit';
+import { hasRecentView } from '@/lib/cache';
+import { headers } from 'next/headers';
 import ReadingPaywall from '@/app/components/ui/ReadingPaywall';
 import PremiumAudioPlayer from '@/app/components/ui/PremiumAudioPlayer';
 
@@ -129,8 +133,12 @@ export default async function StoryPage({ params }: Props) {
 
   if (!story) return notFound();
 
-  // Increment view count (fire and forget)
-  prisma.story.update({ where: { id: story.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  // Deduplicated view counter — skip if same IP already counted within the last hour
+  const reqHeaders = await headers();
+  const viewerIp = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? reqHeaders.get('x-real-ip') ?? 'unknown';
+  if (!await hasRecentView(story.id, viewerIp)) {
+    prisma.story.update({ where: { id: story.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  }
 
   // Fetch accepted co-authors — shown in the byline next to the primary author
   const coAuthors = await prisma.storyCollaborator.findMany({
@@ -147,11 +155,8 @@ export default async function StoryPage({ params }: Props) {
       })
     : [];
 
-  // Check if this user has an active premium subscription (for premium-only stories)
-  const userSubscription = userId
-    ? await prisma.subscription.findUnique({ where: { userId }, select: { status: true } })
-    : null;
-  const hasPremium = userSubscription?.status === 'active';
+  // Admins always get full access; otherwise check active subscription
+  const hasPremium = await hasPremiumAccess(userId);
 
   // Free tier reading limit check — non-premium users get FREE_MONTHLY_LIMIT stories/month
   const readingLimit = await checkReadingLimit(userId, story.id);
@@ -197,14 +202,24 @@ export default async function StoryPage({ params }: Props) {
   // so the ReactionBar can show which buttons are already "active" for this user.
   const userReactionTypes = (userReactionsList ?? []).map((r: { type: string }) => r.type);
 
-  // Build the author avatar URL. If they haven't uploaded a photo, fall back to
-  // ui-avatars.com which generates a red initials avatar on the fly.
-  const authorAvatar =
-    story.author.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
+  const authorAvatar = story.author.profile?.avatar ?? null;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: story.title,
+    description: story.excerpt ?? undefined,
+    image: story.coverImage ?? undefined,
+    datePublished: story.createdAt.toISOString(),
+    dateModified: story.updatedAt.toISOString(),
+    author: { '@type': 'Person', name: story.author.username, url: `${BASE_URL}/user/${story.author.username}` },
+    publisher: { '@type': 'Organization', name: 'Silent Evidence', url: BASE_URL },
+    url: `${BASE_URL}/story/${story.slug}`,
+  };
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ReadingProgress storyId={story.id} />
       <BackToTop />
       {userId && <ReadingTracker storyId={story.id} />}
@@ -217,8 +232,15 @@ export default async function StoryPage({ params }: Props) {
 
       {/* Cover image — max height capped so tall images don't dominate */}
       {story.coverImage && (
-        <div className="w-full relative flex justify-center bg-gray-950">
-          <img src={story.coverImage} alt={story.title} className="max-h-[500px] w-auto object-contain block" />
+        <div className="w-full relative bg-gray-950 h-[420px] sm:h-[500px]">
+          <Image
+            src={story.coverImage}
+            alt={story.title}
+            fill
+            priority
+            className="object-contain"
+            sizes="100vw"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
         </div>
       )}
@@ -245,7 +267,13 @@ export default async function StoryPage({ params }: Props) {
 
         {/* Author + meta row */}
         <div className="flex items-center gap-3 mt-5">
-          <img src={authorAvatar} alt={story.author.username} className="w-10 h-10 rounded-full object-cover border-2 border-gray-700" />
+          {authorAvatar ? (
+            <Image src={authorAvatar} alt={story.author.username} width={40} height={40} className="w-10 h-10 rounded-full object-cover border-2 border-gray-700 shrink-0" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-red-700 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm shrink-0">
+              {story.author.username.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="flex-1">
             <Link href={`/user/${story.author.username}`} className="text-sm font-semibold text-white hover:text-green-400 transition inline-flex items-center gap-1">
               {story.author.username}
@@ -290,20 +318,22 @@ export default async function StoryPage({ params }: Props) {
         {coAuthors.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="text-xs text-gray-600">with</span>
-            {coAuthors.map(c => {
-              const coAvatar = c.user.profile?.avatar ??
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user.username)}&background=dc2626&color=fff&size=32`;
-              return (
-                <Link
-                  key={c.user.username}
-                  href={`/user/${c.user.username}`}
-                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition"
-                >
-                  <img src={coAvatar} alt={c.user.username} className="w-5 h-5 rounded-full object-cover" />
-                  {c.user.username}
-                </Link>
-              );
-            })}
+            {coAuthors.map(c => (
+              <Link
+                key={c.user.username}
+                href={`/user/${c.user.username}`}
+                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition"
+              >
+                {c.user.profile?.avatar ? (
+                  <Image src={c.user.profile.avatar} alt={c.user.username} width={20} height={20} className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-red-700 flex items-center justify-center text-white font-bold shrink-0 text-[9px]">
+                    {c.user.username.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {c.user.username}
+              </Link>
+            ))}
           </div>
         )}
 

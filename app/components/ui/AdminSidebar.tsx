@@ -34,6 +34,7 @@ const links = [
   { href: '/admin/comments',     label: 'Moderation',  icon: '🚩' },
   { href: '/admin/reports',      label: 'Reports',     icon: '⚠️'  },
   { href: '/admin/login-logs',   label: 'Login Logs',  icon: '🔐' },
+  { href: '/admin/login-map',    label: 'Login Map',   icon: '🗺️' },
   { href: '/admin/analytics',    label: 'Analytics',   icon: '📈' },
   { href: '/admin/challenges',   label: 'Challenges',  icon: '⚔️'  },
   { href: '/admin/slides',       label: 'Slideshow',   icon: '🖼️'  },

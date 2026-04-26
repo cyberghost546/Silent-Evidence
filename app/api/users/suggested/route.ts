@@ -64,14 +64,14 @@ export async function GET() {
           id: { notIn: [...followedIds] },
           stories: { some: { status: 'PUBLISHED' } },
         },
-        orderBy: { followedBy: { _count: 'desc' } },
+        orderBy: { followers: { _count: 'desc' } },
         take: 10,
         select: {
           id: true,
           username: true,
           isVerified: true,
           profile: { select: { avatar: true, bio: true } },
-          _count: { select: { stories: true, followedBy: true } },
+          _count: { select: { stories: true, followers: true } },
         },
       });
       return NextResponse.json(popular.map(u => ({ ...u, matchScore: 0 })));
@@ -131,7 +131,7 @@ export async function GET() {
         username: true,
         isVerified: true,
         profile: { select: { avatar: true, bio: true } },
-        _count: { select: { stories: true, followedBy: true } },
+        _count: { select: { stories: true, followers: true } },
       },
     });
 

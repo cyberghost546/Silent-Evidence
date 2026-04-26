@@ -269,6 +269,7 @@ model User {
   // Two-factor authentication via email code
   twoFactorEnabled  Boolean @default(false)
   twoFactorCodes    TwoFactorCode[]
+  sessionVersion    Int     @default(0)  // increment to invalidate all active sessions
 
   // Onboarding completion flag — false until wizard is finished
   onboardingDone    Boolean @default(false)
@@ -522,6 +523,7 @@ model Story {
   battleEntriesB  StoryBattle[]    @relation("BattleStoryB")
   purchases       StoryPurchase[]
   bundleItems     StoryBundleItem[]
+  bookClubs       BookClub[]
 
   // Indexes for common query patterns:
   // - Browse stories by author, category, mood, or status
@@ -1876,6 +1878,7 @@ model BookClub {
   // The story the club is currently reading together.
   // null = the club hasn't picked a story yet.
   storyId     Int?
+  story       Story?           @relation(fields: [storyId], references: [id], onDelete: SetNull)
 
   ownerId     Int
   owner       User             @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -2106,6 +2109,10 @@ model LoginLog {
   ip        String             // client IP address at time of attempt
   userAgent String?  @db.Text  // browser / device string from the User-Agent header
   success   Boolean            // true = logged in, false = wrong password / unknown email
+  country   String?            // geo-resolved country name
+  city      String?            // geo-resolved city name
+  lat       Float?             // latitude from IP geolocation
+  lng       Float?             // longitude from IP geolocation
   createdAt DateTime @default(now())
 
   @@index([createdAt])

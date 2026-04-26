@@ -208,10 +208,61 @@ html.light ::selection {
   background: #ef4444; /* brighter red on hover */
 }
 
-/* Firefox — dark mode */
-* {
-  scrollbar-color: #dc2626 #111827;
-  scrollbar-width: thin;
+/* ── Admin bar chart fill (dynamic width via CSS variable) ─── */
+.bar-fill { width: var(--fill, 0%); }
+
+/* ── Login page animations ──────────────────────────────────── */
+@keyframes ember-rise {
+  0%   { transform: translateY(0)      translateX(0)    scale(1);   opacity: 0.8; }
+  50%  { transform: translateY(-45vh)  translateX(12px) scale(0.7); opacity: 0.5; }
+  100% { transform: translateY(-95vh)  translateX(-6px) scale(0.2); opacity: 0;   }
+}
+@keyframes login-card-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1;    }
+}
+.login-card-enter {
+  animation: login-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+.glow-breathe {
+  animation: glow-breathe 3s ease-in-out infinite;
+  will-change: opacity;
+}
+.ember {
+  position: absolute;
+  bottom: -4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #dc2626;
+  box-shadow: 0 0 6px 3px rgba(220, 38, 38, 0.45);
+  animation: ember-rise linear infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.ember-1  { left: 8%;  animation-duration: 6s;    animation-delay: 0s;    }
+.ember-2  { left: 18%; animation-duration: 8.5s;  animation-delay: 1.2s;  }
+.ember-3  { left: 28%; animation-duration: 7s;    animation-delay: 2.5s;  }
+.ember-4  { left: 40%; animation-duration: 9s;    animation-delay: 0.5s;  }
+.ember-5  { left: 52%; animation-duration: 6.5s;  animation-delay: 3.1s;  }
+.ember-6  { left: 62%; animation-duration: 8s;    animation-delay: 1.8s;  }
+.ember-7  { left: 74%; animation-duration: 7.5s;  animation-delay: 0.9s;  }
+.ember-8  { left: 83%; animation-duration: 6.8s;  animation-delay: 2.2s;  }
+.ember-9  { left: 92%; animation-duration: 9.5s;  animation-delay: 1.5s;  }
+.ember-10 { left: 33%; animation-duration: 11s;   animation-delay: 4s;    width: 5px; height: 5px; }
+.ember-11 { left: 70%; animation-duration: 10s;   animation-delay: 2.8s;  width: 4px; height: 4px; }
+
+/* Firefox — dark mode (wrapped in @supports so unsupporting browsers skip it) */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-color: #dc2626 #111827;
+    scrollbar-width: thin;
+  }
 }
 
 /* Global dark-theme red override for legacy green utility classes
@@ -256,9 +307,11 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 
 /* Firefox — light mode */
-html.light * {
-  scrollbar-color: #2563eb #e2e8f0;
-  scrollbar-width: thin;
+@supports (scrollbar-color: auto) {
+  html.light * {
+    scrollbar-color: #2563eb #e2e8f0;
+    scrollbar-width: thin;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -499,6 +552,7 @@ html.light [class*="bg-gray-800"][class*="rounded-full"] {
   content: '';
   position: absolute;
   inset: 0;
+  will-change: transform;
   background: linear-gradient(
     90deg,
     transparent 0%,

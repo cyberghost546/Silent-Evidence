@@ -34,6 +34,7 @@ import { checkRateLimit, getClientIp, anonymizeIp } from '@/lib/rateLimit';
 // zodError        — 400 response with Zod validation error details
 // serverError     — 500 response for unexpected failures
 import { badRequest, unauthorized, tooManyRequests, zodError, serverError } from '@/lib/apiError';
+import { lookupGeoIp } from '@/lib/geoip';
 
 // ── Zod schema — validates and sanitizes the request body ─────────────────────
 // z.object() defines an object shape with typed fields; safeParse() will check
@@ -104,17 +105,21 @@ export async function POST(req: Request) {
     // return a generic 401 error — we intentionally don't say whether the email
     // or the password was wrong, to avoid helping attackers enumerate accounts.
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      // Record the failed attempt for the security audit log
-      await prisma.loginLog.create({
+      // Record the failed attempt — geo-lookup runs in parallel, never blocks response
+      lookupGeoIp(ip).then(geo => prisma.loginLog.create({
         data: {
           userId:    user?.id ?? null,
           username:  user?.username ?? null,
           email,
-          ip: anonymizeIp(ip),
+          ip:        anonymizeIp(ip),
           userAgent: req.headers.get('user-agent') ?? null,
           success:   false,
+          country:   geo?.country ?? null,
+          city:      geo?.city    ?? null,
+          lat:       geo?.lat     ?? null,
+          lng:       geo?.lng     ?? null,
         },
-      }).catch(() => {}); // fire-and-forget — never block the login response
+      })).catch(() => {});
       return unauthorized('Invalid email or password.');
     }
 
@@ -171,17 +176,21 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 days expressed in seconds
     });
 
-    // Record the successful login in the audit log
-    await prisma.loginLog.create({
+    // Record the successful login — geo-lookup runs in parallel, never blocks response
+    lookupGeoIp(ip).then(geo => prisma.loginLog.create({
       data: {
         userId:    user.id,
         username:  user.username,
         email:     user.email,
-        ip,
+        ip:        anonymizeIp(ip),
         userAgent: req.headers.get('user-agent') ?? null,
         success:   true,
+        country:   geo?.country ?? null,
+        city:      geo?.city    ?? null,
+        lat:       geo?.lat     ?? null,
+        lng:       geo?.lng     ?? null,
       },
-    }).catch(() => {}); // fire-and-forget
+    })).catch(() => {});
 
     // Return the response — the browser will store the cookie automatically
     return res;

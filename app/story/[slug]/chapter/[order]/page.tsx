@@ -6,6 +6,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { hasPremiumAccess } from '@/lib/premiumCheck';
+import { hasRecentView } from '@/lib/cache';
+import { headers } from 'next/headers';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import StoryContent from '@/app/components/ui/StoryContent';
@@ -54,16 +57,17 @@ export default async function ChapterPage({ params }: Props) {
   });
   if (!chapter) return notFound();
 
-  // Check premium subscription — chapters beyond the first require an active subscription
-  const isAuthor = userId === story.author.id;
-  const userSubscription = userId
-    ? await prisma.subscription.findUnique({ where: { userId }, select: { status: true } })
-    : null;
-  const hasPremium = userSubscription?.status === 'active';
+  // Admins + premium subscribers can read all chapters; everyone else is limited to chapter 1
+  const isAuthor   = userId === story.author.id;
+  const hasPremium = await hasPremiumAccess(userId);
   const isLockedChapter = currentIndex > 0 && !hasPremium && !isAuthor;
 
-  // Increment this chapter's view counter (fire and forget — doesn't block render)
-  prisma.storyChapter.update({ where: { id: chapter.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  // Deduplicated chapter view counter
+  const reqHeaders = await headers();
+  const viewerIp = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? reqHeaders.get('x-real-ip') ?? 'unknown';
+  if (!await hasRecentView(chapter.id * -1, viewerIp)) {
+    prisma.storyChapter.update({ where: { id: chapter.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  }
 
   const prev = allChapters[currentIndex - 1] ?? null;
   const next = allChapters[currentIndex + 1] ?? null;
@@ -120,7 +124,7 @@ export default async function ChapterPage({ params }: Props) {
               className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-sm text-white transition"
             >
               <span>←</span>
-              <span className="truncate max-w-[160px]">{prev.title}</span>
+              <span className="truncate max-w-40">{prev.title}</span>
             </Link>
           ) : <span />}
 
@@ -137,7 +141,7 @@ export default async function ChapterPage({ params }: Props) {
               href={`/story/${slug}/chapter/${next.order}`}
               className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 border border-red-600 rounded-xl text-sm text-white font-semibold transition"
             >
-              <span className="truncate max-w-[160px]">{next.title}</span>
+              <span className="truncate max-w-40">{next.title}</span>
               <span>→</span>
             </Link>
           ) : (

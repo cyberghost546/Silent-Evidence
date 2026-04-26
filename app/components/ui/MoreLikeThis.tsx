@@ -13,6 +13,7 @@
 //   mood       — optional mood tag; if provided, step 1 attempts a mood match first
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { readingTime } from '@/lib/readingTime';
 
@@ -81,14 +82,14 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
             {/* Cover image area — shows mood emoji fallback when no image is set */}
             <div className="h-36 overflow-hidden relative">
               {story.coverImage ? (
-                <img src={story.coverImage} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={story.coverImage} alt={story.title} fill sizes="(max-width:640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-3xl">
+                <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-900 flex items-center justify-center text-3xl">
                   {story.mood ? moodEmoji[story.mood] : '📖'}
                 </div>
               )}
               {/* Gradient overlay ensures the bottom of the image fades cleanly */}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-800/80 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-gray-800/80 to-transparent" />
             </div>
 
             {/* Card body: title, author, reading time, like count */}

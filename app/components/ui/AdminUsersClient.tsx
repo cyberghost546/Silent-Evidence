@@ -34,8 +34,8 @@ type User = {
   username: string;
   email: string;
   role: string;
-  // Whether this user has the verified author checkmark
   isVerified: boolean;
+  isPremium: boolean;
   createdAt: Date;
   _count: { stories: number; comments: number };
 };
@@ -75,8 +75,8 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
   // Search box input value
   const [search, setSearch]       = useState('');
 
-  // Which role filter is active (empty string = show all)
   const [roleFilter, setRoleFilter] = useState('');
+  const [premiumOnly, setPremiumOnly] = useState(false);
 
   // Which column to sort by and in what direction
   const [sortBy, setSortBy]       = useState<'id' | 'username' | 'stories' | 'comments' | 'joined'>('id');
@@ -96,7 +96,9 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
       )
       // 2. Filter by selected role
       .filter(u => !roleFilter || u.role === roleFilter)
-      // 3. Sort by chosen column
+      // 3. Filter by premium status
+      .filter(u => !premiumOnly || u.isPremium)
+      // 4. Sort by chosen column
       .sort((a, b) => {
         let val = 0;
         if (sortBy === 'id')       val = a.id - b.id;
@@ -106,7 +108,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
         if (sortBy === 'joined')   val = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         return sortDir === 'asc' ? val : -val;
       });
-  }, [users, search, roleFilter, sortBy, sortDir]);
+  }, [users, search, roleFilter, premiumOnly, sortBy, sortDir]);
 
   // Clicking a column header toggles sort direction or switches column
   const handleSort = (col: typeof sortBy) => {
@@ -170,7 +172,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
     total:   users.length,
     admins:  users.filter(u => u.role === 'ADMIN').length,
     authors: users.filter(u => u.role === 'AUTHOR').length,
-    regular: users.filter(u => u.role === 'USER').length,
+    premium: users.filter(u => u.isPremium).length,
   }), [users]);
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -181,10 +183,10 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
       {/* ── Summary stat cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Users',  value: stats.total,   color: 'text-white',       icon: '👥' },
-          { label: 'Admins',       value: stats.admins,  color: 'text-red-400',   icon: '👑' },
+          { label: 'Total Users',  value: stats.total,   color: 'text-white',         icon: '👥' },
+          { label: 'Admins',       value: stats.admins,  color: 'text-red-400',     icon: '👑' },
           { label: 'Authors',      value: stats.authors, color: 'text-blue-400',    icon: '✍️' },
-          { label: 'Regular',      value: stats.regular, color: 'text-gray-400',    icon: '👤' },
+          { label: 'Premium',      value: stats.premium, color: 'text-yellow-400',  icon: '⚡' },
         ].map(({ label, value, color, icon }) => (
           <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 shadow-[0_4px_20px_rgba(34,197,94,0.1)]">
             <span className="text-2xl">{icon}</span>
@@ -218,14 +220,15 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           )}
         </div>
 
-        {/* Role filter pills */}
+        {/* Role filter pills + Premium pill */}
         <div className="flex items-center gap-2 flex-wrap">
           {['', ...ROLES].map(r => (
             <button
               key={r || 'ALL'}
+              type="button"
               onClick={() => setRoleFilter(r)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
-                roleFilter === r
+                roleFilter === r && !premiumOnly
                   ? 'bg-red-600 border-red-600 text-white'
                   : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
               }`}
@@ -233,6 +236,17 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
               {r || 'All'} {r && roleIcon[r]}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => { setPremiumOnly(v => !v); setRoleFilter(''); }}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
+              premiumOnly
+                ? 'bg-yellow-500 border-yellow-500 text-black'
+                : 'border-gray-700 text-gray-400 hover:border-yellow-500/60 hover:text-yellow-400'
+            }`}
+          >
+            ⚡ Premium
+          </button>
         </div>
       </div>
 
@@ -328,6 +342,9 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                           {user.username[0].toUpperCase()}
                         </div>
                         <span className="font-semibold text-white">{user.username}</span>
+                        {user.isPremium && (
+                          <span className="text-[10px] font-bold text-black bg-yellow-400 px-1.5 py-0.5 rounded-full leading-none">⚡</span>
+                        )}
                       </div>
                     </td>
 

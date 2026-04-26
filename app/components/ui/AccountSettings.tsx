@@ -101,6 +101,15 @@ export default function AccountSettings({ isPrivate: initialIsPrivate, twoFactor
 
   // ── Delete Account ───────────────────────────────────────────────────────
   // deleteConfirm holds what the user typed — must equal "DELETE" to unlock the button
+  // ── Log out all devices ──────────────────────────────────────────────────
+  const [logoutAllLoading, setLogoutAllLoading] = useState(false);
+  const logoutAllDevices = async () => {
+    setLogoutAllLoading(true);
+    const res = await fetch('/api/user/invalidate-sessions', { method: 'POST' });
+    if (res.ok) { router.push('/login'); router.refresh(); }
+    setLogoutAllLoading(false);
+  };
+
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError]     = useState('');
@@ -234,6 +243,27 @@ export default function AccountSettings({ isPrivate: initialIsPrivate, twoFactor
             </button>
           </div>
         )}
+      </div>
+
+      {/* ── Log Out All Devices ─────────────────────────────────────────── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Log Out All Devices</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Immediately invalidates every active session, including this one.
+              Use this if you think your account has been compromised.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={logoutAllDevices}
+            disabled={logoutAllLoading}
+            className="ml-4 shrink-0 px-3 py-2 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition disabled:opacity-50"
+          >
+            {logoutAllLoading ? 'Logging out…' : 'Log out all'}
+          </button>
+        </div>
       </div>
 
       {/* ── Delete Account ───────────────────────────────────────────────── */}

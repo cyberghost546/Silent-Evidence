@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { readingTime } from '@/lib/readingTime';
 
 type Story = {
@@ -103,15 +104,13 @@ export default function FollowingFeedClient({ isLoggedIn }: { isLoggedIn: boolea
       {stories.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {stories.map(story => {
-            const avatar = story.author.profile?.avatar ??
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=40`;
+            const avatarUrl = story.author.profile?.avatar ?? null;
             return (
               <Link key={story.id} href={`/story/${story.slug}`}
                 className="group bg-gray-800 border border-gray-700 hover:border-red-600/60 rounded-xl overflow-hidden transition-all duration-300 flex flex-col">
                 <div className="h-44 overflow-hidden relative">
                   {story.coverImage ? (
-                    <img src={story.coverImage} alt={story.title} loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <Image src={story.coverImage} alt={story.title} fill sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-900 flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
@@ -126,7 +125,13 @@ export default function FollowingFeedClient({ isLoggedIn }: { isLoggedIn: boolea
                   <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition-colors leading-snug line-clamp-2">{story.title}</h3>
                   {story.excerpt && <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{story.excerpt}</p>}
                   <div className="flex items-center gap-2 mt-auto pt-2">
-                    <img src={avatar} alt={story.author.username} className="w-5 h-5 rounded-full object-cover" />
+                    {avatarUrl ? (
+                      <Image src={avatarUrl} alt={story.author.username} width={20} height={20} className="w-5 h-5 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-red-700 flex items-center justify-center text-white font-bold shrink-0 text-[9px]">
+                        {story.author.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <span className="text-xs text-gray-500">{story.author.username}</span>
                     <span className="text-gray-700 text-xs">·</span>
                     <span className="text-xs text-gray-600">{readingTime(story.content)}</span>

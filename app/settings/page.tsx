@@ -47,6 +47,9 @@ export default async function SettingsPage() {
   });
   if (!user) redirect('/login');
 
+  // Admins get all premium perks without a subscription
+  const isPremium = user.role === 'ADMIN' || user.subscription?.status === 'active';
+
   const age = AGE_CONFIG[user.ageGroup as keyof typeof AGE_CONFIG] ?? AGE_CONFIG.ADULT;
 
   const navLinks = [
@@ -148,14 +151,14 @@ export default async function SettingsPage() {
               <PremiumAppearancePicker
                 initialTheme={user.profile?.profileTheme ?? 'default'}
                 initialBorder={user.profile?.avatarBorder ?? 'none'}
-                isPremium={user.subscription?.status === 'active'}
+                isPremium={isPremium}
               />
             </Section>
 
             <Section id="discord" title="Discord" desc="Connect your Discord account to join the community server.">
               <DiscordConnect
                 discordUsername={user.discordUsername ?? null}
-                isPremium={user.subscription?.status === 'active'}
+                isPremium={isPremium}
               />
             </Section>
 

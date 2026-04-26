@@ -23,7 +23,7 @@ export default async function SquadsPage() {
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Page heading */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">🩸 Horror Squads</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Anime Nexus</h1>
           <p className="text-gray-400">
             Create a private group with your friends. Share stories, discuss your fears, stay scared together.
           </p>

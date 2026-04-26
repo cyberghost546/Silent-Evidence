@@ -36,6 +36,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const page     = Math.max(1, Number(sp.page ?? 1));
 
   const rtBand = READ_TIME_BANDS[readTime] ?? null;
+  const hasFilters = query || catSlug || mood || readTime;
 
   // Get the viewer's ID so we can show the Follow button on user results
   const cookieStore = await cookies();
@@ -126,8 +127,6 @@ export default async function SearchPage({ searchParams }: Props) {
   }
 
   const MOODS = ['GOTHIC','PARANORMAL','COSMIC','SLASHER','PSYCHOLOGICAL','SUPERNATURAL','GORE','DARK_COMEDY'];
-
-  const hasFilters = query || catSlug || mood || readTime;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
