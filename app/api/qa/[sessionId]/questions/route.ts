@@ -1,3 +1,8 @@
+// app/api/qa/[sessionId]/questions/route.ts
+// GET  — returns all questions for a Q&A session, sorted: unanswered first,
+//         then by upvotes desc, then by creation time asc (oldest first).
+// POST — submits a new question to the session. Supports anonymous questions.
+//        Questions under 5 characters are rejected.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

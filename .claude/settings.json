@@ -52,7 +52,9 @@
       "Bash(mysql -u root silent_evidence -e \"SELECT id, name FROM Category LIMIT 10;\")",
       "Bash(mysql -u root silent_evidence -e \"SELECT id, username FROM User LIMIT 5;\")",
       "Bash(npx ts-node *)",
-      "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {PrismaClient} = require\\('\\\\''@prisma/client'\\\\''\\); const p = new PrismaClient\\(\\); p.category.findMany\\(\\).then\\(r => console.log\\(JSON.stringify\\(r\\)\\)\\).catch\\(e => console.error\\(e.message\\)\\).finally\\(\\(\\) => p.$disconnect\\(\\)\\);')"
+      "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {PrismaClient} = require\\('\\\\''@prisma/client'\\\\''\\); const p = new PrismaClient\\(\\); p.category.findMany\\(\\).then\\(r => console.log\\(JSON.stringify\\(r\\)\\)\\).catch\\(e => console.error\\(e.message\\)\\).finally\\(\\(\\) => p.$disconnect\\(\\)\\);')",
+      "Read(//tmp/**)",
+      "Bash(python3 -c ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",

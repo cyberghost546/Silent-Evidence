@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/RecipesFeed.tsx
+// Browsable feed of horror-themed recipes (food, drinks, rituals).
+// Fetches from GET /api/recipes?type=<food|drink|ritual> on mount and whenever the
+// type filter tab changes. Reactions (emoji) are sent via POST /api/recipes/[id]/react.
+// Each card shows difficulty, prep time, servings, and the author's username.
+// To reuse: drop <RecipesFeed /> on any page — it manages its own state and data fetching.
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';

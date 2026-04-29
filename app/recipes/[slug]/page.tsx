@@ -1,3 +1,8 @@
+// app/recipes/[slug]/page.tsx
+// Detail page for a single horror recipe — shows the full ingredients list,
+// step-by-step instructions, and reaction counts.
+// ingredients and steps come from the API as JSON strings and are parsed to arrays.
+// generateMetadata fetches the recipe to set SEO title/description.
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';

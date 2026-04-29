@@ -1,3 +1,9 @@
+// app/story/[slug]/edit/page.tsx
+// Story editing page — only accessible to the story's author.
+// Redirects to /login if not authenticated, or notFound() if the story doesn't
+// belong to the current user. Passes the full story data plus all categories
+// to StoryEditForm. Also renders CollaboratorPanel, ChapterManager, DraftSharePanel,
+// StoryPlannerPanel, and StoryExportButtons as additional editing tools.
 import { notFound, redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

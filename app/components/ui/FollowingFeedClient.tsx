@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/FollowingFeedClient.tsx
+// Paginated story feed showing posts from authors the current user follows.
+// Uses an IntersectionObserver sentinel div to auto-load more stories as the user scrolls
+// (infinite scroll) instead of a "Load More" button.
+// Fetches from GET /api/following/feed?take=12&skip=N.
+// Props: isLoggedIn — passed from the server component so we can show a login prompt client-side.
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';

@@ -1,3 +1,8 @@
+// app/qa/[username]/page.tsx
+// Live Q&A session page for a specific author — readers submit questions and
+// the author answers them in real time. Questions are polled every 10 seconds.
+// Reads the current user's session to determine isAuthor (so the author sees
+// answer boxes). Returns notFound() if the username or their active session doesn't exist.
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';

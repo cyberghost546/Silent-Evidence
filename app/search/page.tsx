@@ -1,3 +1,9 @@
+// app/search/page.tsx
+// Full-text story search page with filters for category, mood, reading time band,
+// content rating, and sort order. All filtering is done via DB query on the server
+// using URL search params (?q=, ?category=, ?mood=, etc.).
+// Pagination is handled with ?page= — PAGE_SIZE stories per page.
+// SearchStories is the client component that handles the filter UI interactions.
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';

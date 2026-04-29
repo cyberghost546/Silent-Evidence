@@ -1,4 +1,9 @@
 'use client';
+// app/components/ui/ReadingSpeedSetting.tsx
+// Settings widget where users choose their reading speed (Slow / Average / Fast / Speed Reader).
+// The selected WPM is saved to localStorage under the key "readingSpeed" and is read by
+// the readingTime() utility to show personalised estimated read times on story cards.
+// No props needed — reads and writes localStorage directly. Drop anywhere in a settings page.
 
 import { useState } from 'react';
 

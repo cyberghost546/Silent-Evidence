@@ -1,4 +1,11 @@
 'use client';
+// app/components/ui/LiveQARoom.tsx
+// Real-time Q&A widget embedded on a story or author page.
+// Readers can submit questions (anonymously or named); the author sees an answer box for each.
+// Questions are polled every 10 seconds via GET /api/qa/[sessionId]/questions so new entries
+// appear without a page refresh. Upvote hits POST /api/qa/[sessionId]/upvote;
+// answering hits POST /api/qa/[sessionId]/answer.
+// Props: sessionId, title, authorUsername, isAuthor (controls who sees the answer box).
 
 import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';

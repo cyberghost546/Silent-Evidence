@@ -1,3 +1,8 @@
+// app/monsters/[slug]/page.tsx
+// Detail page for a single monster from the encyclopedia.
+// Fetches the monster by slug, including linked stories.
+// generateMetadata uses the same DB query pattern to set the <title> and
+// description for SEO. Returns notFound() if the slug doesn't exist.
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';

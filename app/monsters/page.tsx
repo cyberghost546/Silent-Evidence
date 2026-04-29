@@ -1,3 +1,7 @@
+// app/monsters/page.tsx
+// Monster Encyclopedia page — a browsable bestiary of horror monsters.
+// Users can filter by type and search by name. All data fetching and
+// filtering logic lives inside the MonsterEncyclopedia component.
 import { Metadata } from 'next';
 import MonsterEncyclopedia from '@/app/components/ui/MonsterEncyclopedia';
 

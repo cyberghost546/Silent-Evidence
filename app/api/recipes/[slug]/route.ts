@@ -1,3 +1,8 @@
+// app/api/recipes/[slug]/route.ts
+// GET — returns the full detail of a single horror recipe by its slug.
+// ingredients and steps are stored as JSON strings in the DB and are parsed
+// back to arrays before being returned so the client gets usable data.
+// Aggregated emoji reactionCounts are computed from the reactions relation.
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

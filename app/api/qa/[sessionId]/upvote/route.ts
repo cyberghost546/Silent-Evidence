@@ -1,3 +1,7 @@
+// app/api/qa/[sessionId]/upvote/route.ts
+// POST — increments the upvote count on a question within a Q&A session.
+// No auth required — anyone can upvote (rate limiting not implemented here).
+// questionId must belong to the given sessionId (enforced by the updateMany where clause).
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

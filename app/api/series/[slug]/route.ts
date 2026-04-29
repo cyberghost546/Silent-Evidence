@@ -1,3 +1,8 @@
+// app/api/series/[slug]/route.ts
+// GET — returns a full series with its published stories in reading order
+//       (ordered by seriesOrder asc). Used by the series detail page and
+//       the SeriesNav component to show the chapter list on story pages.
+//       Returns 404 if the slug doesn't match any series.
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

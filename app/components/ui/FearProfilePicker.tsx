@@ -1,4 +1,9 @@
 'use client';
+// app/components/ui/FearProfilePicker.tsx
+// Settings widget that lets a user pick up to 3 preferred story "moods" (e.g. Dark, Mysterious, Action).
+// Selections are saved via PATCH /api/profile as a comma-separated fearMoods string.
+// The saved preferences power personalised story recommendations.
+// Props: initialFearMoods — comma-separated string of pre-selected mood values from the DB.
 
 import { useState } from 'react';
 

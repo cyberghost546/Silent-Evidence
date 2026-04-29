@@ -1,10 +1,15 @@
-// This file builds the slim "community stats" strip on the homepage.
-// It runs on the server because all of the numbers come from the database.
+// app/components/ui/CommunityStats.tsx
+// Slim stats strip shown on the homepage below the header.
+// Displays total published stories, total members, total categories,
+// and (if > 0) how many stories were published in the last 24 hours.
+// This is a server component — all four counts come from the DB via Promise.all
+// so they run in parallel rather than sequentially.
+// To add a new stat, add another prisma count to the Promise.all and a <StatCell /> below.
 
 import { prisma } from '@/lib/prisma';
 
-// This small helper component renders one stat box.
-// Each box has an icon, a value, and a label.
+// StatCell — renders one icon + number + label tile in the strip.
+// Reusable: pass any emoji as icon, any number or string as value.
 function StatCell({
   icon,
   value,
@@ -32,26 +37,19 @@ function StatCell({
   );
 }
 
-// This helper formats numbers with commas.
-// Example: 1200 becomes "1,200".
+// fmt — formats a number with locale-appropriate commas, e.g. 1200 → "1,200"
 function fmt(n: number) {
   return n.toLocaleString('en-US');
 }
 
-// Main stats-strip component.
 export default async function CommunityStats() {
-  // Run all count queries at the same time for better performance.
+  // Run all four counts in parallel — Promise.all fires all queries simultaneously
+  // so total wait time = slowest query, not sum of all queries.
+  // Each query falls back to 0 via .catch() so a DB error never crashes the page.
   const [storyCount, memberCount, categoryCount, todayCount] = await Promise.all([
-    // Count all published stories.
     prisma.story.count({ where: { status: 'PUBLISHED' } }).catch(() => 0),
-
-    // Count all registered users.
     prisma.user.count().catch(() => 0),
-
-    // Count all categories.
     prisma.category.count().catch(() => 0),
-
-    // Count stories created in the last 24 hours.
     prisma.story
       .count({
         where: {

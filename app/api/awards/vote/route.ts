@@ -1,3 +1,8 @@
+// app/api/awards/vote/route.ts
+// POST — casts a vote for a Scream Award nomination.
+// One vote per user per award category is enforced: we check whether the user
+// has already voted on any nomination in the same category and block them if so.
+// Session is read via iron-session (se_session cookie).
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

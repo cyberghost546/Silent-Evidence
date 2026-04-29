@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/StoryForm.tsx
+// The full story creation form used on the /write page.
+// Handles title, category, excerpt, cover image, mood, language, content (via RichEditor),
+// autosave to localStorage every 30 seconds, AI writing assistant, template picker,
+// and final POST to /api/stories to publish or save as draft.
+// Props: categories — list of {id, name} fetched server-side; initialExcerpt — pre-filled excerpt.
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LANGUAGES } from '@/lib/languages';

@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/MonsterEncyclopedia.tsx
+// Browsable encyclopedia of horror monsters fetched from GET /api/monsters.
+// Supports filtering by type (Supernatural, Creature, Psychological, Paranormal)
+// and a text search input — both filter client-side after the initial fetch.
+// Each monster card shows a scare-factor rating displayed as skull icons.
+// To reuse: drop <MonsterEncyclopedia /> on any page — it fetches its own data.
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';

@@ -1,4 +1,9 @@
 'use client';
+// app/components/ui/ScrollToTop.tsx
+// Floating button (bottom-right, red) that scrolls to the top of the page.
+// Appears only after the user scrolls past 400px.
+// Similar to BackToTop.tsx but positioned on the right side — used in the root layout
+// so it's always visible site-wide, while BackToTop is for page-specific use.
 
 import { useEffect, useState } from 'react';
 

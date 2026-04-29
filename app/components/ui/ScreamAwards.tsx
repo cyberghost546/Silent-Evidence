@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/ScreamAwards.tsx
+// Annual community awards widget — shows award categories with their nominations and vote counts.
+// Fetches the current open award from GET /api/awards/current.
+// Each nomination can be voted on via POST /api/awards/vote (one vote per nomination per user).
+// Already-voted nomination IDs are tracked in myVotes state to prevent double voting.
+// To reuse: drop <ScreamAwards /> on any page — it fetches the active award automatically.
 
 import { useState, useEffect, useCallback } from 'react';
 

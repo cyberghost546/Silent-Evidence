@@ -1,3 +1,8 @@
+// app/api/bingo/route.ts
+// GET  — returns the currently active bingo template plus the logged-in user's
+//        checked cells (empty array for guests).
+// POST — creates a new bingo template (admin use). Template cells are a 25-element
+//        array of horror trope strings stored as JSON.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

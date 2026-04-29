@@ -1,3 +1,7 @@
+// app/api/qa/[sessionId]/answer/route.ts
+// POST — lets the Q&A session author post an answer to a specific question.
+// Marks the question as answered and stores the answer text.
+// Only the session owner (the author whose userId matches the session) can answer.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

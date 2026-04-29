@@ -1,3 +1,8 @@
+// app/api/profile/avatar/route.ts
+// POST — uploads a user's profile avatar to Cloudinary and saves the returned
+//        URL to their UserProfile row in the DB (upserts if the profile row
+//        doesn't exist yet). File limit: 5 MB, JPG/PNG/WebP/GIF only.
+//        The uploaded URL is returned so the client can update the preview immediately.
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { uploadToCloudinary } from '@/lib/cloudinary';

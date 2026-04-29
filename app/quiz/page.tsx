@@ -1,3 +1,7 @@
+// app/quiz/page.tsx
+// Horror Trivia Quiz page — users answer multiple-choice questions about horror.
+// The server fetches the top 10 high scores from the DB to show a leaderboard
+// alongside the quiz. The HorrorQuiz component handles the quiz flow client-side.
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import HorrorQuiz from '@/app/components/ui/HorrorQuiz';

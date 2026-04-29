@@ -1,3 +1,7 @@
+// app/api/monsters/route.ts
+// GET — returns all monsters from the DB, ordered by scareFactor desc then name asc.
+// Supports ?type=Supernatural|Creature|Psychological|Paranormal and ?q=search term
+// for client-side filtering in MonsterEncyclopedia. No auth required — public data.
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

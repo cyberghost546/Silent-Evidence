@@ -1,3 +1,8 @@
+// app/api/admin/spotlight/route.ts
+// Admin-only endpoints for the Author Spotlight feature.
+// GET  — searches published stories by title query (?q=) for the admin to pick from.
+// POST — saves the spotlight (sets a story as the currently featured author spotlight).
+// Only ADMIN users can call these — requireAdmin() returns null → 403 for everyone else.
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

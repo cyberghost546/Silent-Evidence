@@ -1,3 +1,7 @@
+// app/privacy/page.tsx
+// Static Privacy Policy page — contains the site's data collection and usage policy.
+// No data fetching needed; content is hard-coded in the JSX below.
+// To update the policy text, edit the sections directly in this file.
 import Header from '@/app/components/ui/Header';
 
 export const metadata = { title: 'Privacy Policy — Silent Evidence' };

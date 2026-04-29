@@ -1,3 +1,9 @@
+// app/api/confessions/react/route.ts
+// POST — adds or removes an emoji reaction on a confession (toggle).
+// Only the four horror-themed emojis in ALLOWED_EMOJIS are accepted —
+// any other emoji gets a 400 response to prevent spam.
+// If the user already reacted with the same emoji, the reaction is deleted (un-react).
+// Session is read via iron-session (se_session cookie); login is required.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

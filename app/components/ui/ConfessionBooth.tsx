@@ -1,4 +1,10 @@
 'use client';
+// app/components/ui/ConfessionBooth.tsx
+// Interactive confession feed where users can post short anonymous (or named) confessions
+// and react to others with horror-themed emoji (😱 💀 👻 🕯️).
+// Fetches confessions from GET /api/confessions on mount, then re-fetches after each post or react.
+// Posting hits POST /api/confessions; reactions hit POST /api/confessions/react.
+// To reuse: drop <ConfessionBooth /> on any page — no props needed.
 
 import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';

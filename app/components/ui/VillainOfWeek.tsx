@@ -160,9 +160,9 @@ export default function VillainOfWeek({ userId }: Props) {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <section className="max-w-6xl mx-auto px-4 pb-14">
+    <section>
       {/* Section heading */}
-      <div className="flex items-center justify-between gap-3 mb-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-3">
           {/* Red accent bar matching the site's other section headings */}
           <span className="w-1 h-6 bg-red-600 rounded-full" />
@@ -174,7 +174,7 @@ export default function VillainOfWeek({ userId }: Props) {
         <button
           onClick={() => setShowForm((prev) => !prev)}
           className="text-sm font-semibold text-red-400 border border-red-700/50 px-4 py-1.5 rounded-full
-                     hover:bg-red-900/30 transition"
+                     hover:bg-red-900/30 transition shrink-0"
         >
           {showForm ? 'Cancel' : '+ Nominate a Villain'}
         </button>

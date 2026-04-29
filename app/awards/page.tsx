@@ -1,3 +1,7 @@
+// app/awards/page.tsx
+// The Scream Awards voting page — an annual community awards event where users
+// vote for the best horror stories, authors, and moments of the year.
+// All voting logic and data fetching lives in the ScreamAwards component.
 import { Metadata } from 'next';
 import ScreamAwards from '@/app/components/ui/ScreamAwards';
 

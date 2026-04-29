@@ -1,3 +1,6 @@
+// app/terms/page.tsx
+// Static Terms of Service page — hard-coded legal content, no data fetching.
+// To update the terms text, edit the sections directly in this file.
 import Header from '@/app/components/ui/Header';
 
 export const metadata = { title: 'Terms of Service — Silent Evidence' };

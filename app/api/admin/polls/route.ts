@@ -1,3 +1,9 @@
+// app/api/admin/polls/route.ts
+// Admin-only endpoints for managing community polls.
+// POST — creates a new poll with a question, options, and optional end date.
+// GET  — lists all polls in the DB (admin panel view).
+// requireAdmin() is a local helper that checks the session cookie and
+// returns the admin's userId or null — returning null triggers a 403.
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

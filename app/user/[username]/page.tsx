@@ -1,3 +1,9 @@
+// app/user/[username]/page.tsx
+// Public user profile page — shows a user's bio, stats (followers, following,
+// stories, total likes), earned badges, writing streak, and their published stories.
+// The page checks whether the logged-in viewer is already following this user
+// so the FollowButton starts in the correct state.
+// Returns notFound() if the username doesn't exist.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';

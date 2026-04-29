@@ -1,3 +1,9 @@
+// app/components/ui/StoryOfTheDay.tsx
+// Server component — picks one published story to highlight as "Story of the Day".
+// Uses today's date as a deterministic offset (dayIndex % totalCount) so every visitor
+// sees the same story all day without storing anything in the DB.
+// The selected story is cached for 1 hour (TTL.LONG) to avoid per-request DB queries.
+// Returns null if there are no published stories yet.
 import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';

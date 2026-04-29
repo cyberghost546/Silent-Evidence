@@ -1,15 +1,13 @@
-// This file builds the top bar you see on every page
+// app/components/ui/Header.tsx
+// Site-wide sticky header — rendered at the top of every page.
+// This is an async server component; it reads the session cookie to decide
+// whether to show the logged-in nav (avatar, notifications, DMs) or the
+// guest nav (Log In / Sign Up). Forums are fetched from the DB to populate
+// the ForumsDropdown. To add a top-nav link, add it to the <ul> below.
 
-// This lets you click links without refreshing the page
 import Link from 'next/link';
-
-// This lets us read a small note (cookie) from the browser
 import { cookies } from 'next/headers';
-
-// This lets us talk to the database
 import { prisma } from '@/lib/prisma';
-
-// These are small pieces of UI we reuse
 import CategoryDropdown from './CategoryDropdown';
 import ExploreDropdown from './ExploreDropdown';
 import ForumsDropdown from './ForumsDropdown';
@@ -20,197 +18,100 @@ import DMIcon from './DMIcon';
 import ThemeToggle from './ThemeToggle';
 import MobileNav from './MobileNav';
 
-
-// This builds the header
-// async means we can get data before showing the page
 export default async function Header() {
-
-  // Get the cookie from the browser
+  // Read the session cookie to get the current user's DB id (0 = guest)
   const cookieStore = await cookies();
-
-  // Try to read userId from the cookie
-  // If nothing is there, use 0 (means not logged in)
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
 
-
-
-  // Get all forums from the database
+  // Fetch forums in display order for the ForumsDropdown menu
   const forums = await prisma.forum.findMany({
-    orderBy: { order: 'asc' }, // sort them nicely
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      icon: true,
-      description: true
-    },
+    orderBy: { order: 'asc' },
+    select: { id: true, name: true, slug: true, icon: true, description: true },
   });
 
-
-
-  // Check if user is logged in
-  // If yes → get their data
-  // If no → user = null
+  // Only hit the DB for user data when someone is actually logged in
   const user = userId
     ? await prisma.user.findUnique({
         where: { id: userId },
         select: {
           username: true,
           role: true,
-          profile: {
-            select: { avatar: true } // get their profile picture
-          },
+          profile: { select: { avatar: true } },
         },
       })
     : null;
 
-
-
-  // Decide which profile picture to show
+  // Fall back to a generated initial-avatar when the user hasn't uploaded a photo
   const avatar = user
-    ? (
-        // If user uploaded a picture → use it
-        user.profile?.avatar
-
-        // If not → make a fake one using their name
-        ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=64`
-      )
+    ? (user.profile?.avatar ??
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=64`)
     : null;
 
-
-
   return (
-
-    // Main header box
-    // sticky = stays at the top when you scroll
+    // sticky top-0 keeps the header pinned while the user scrolls
     <header className="sticky top-0 z-50 bg-gray-900 text-white px-4 md:px-6 py-3 border-b border-gray-800">
-
-      {/* This holds everything inside the header */}
       <nav className="max-w-6xl mx-auto flex items-center gap-3 md:gap-6">
 
-
-
-        {/* LOGO (click → go to home page) */}
-        <Link
-          href="/"
-          className="text-lg md:text-xl font-bold text-red-500 hover:text-red-400 transition"
-        >
+        {/* Logo — links to homepage */}
+        <Link href="/" className="text-lg md:text-xl font-bold text-red-500 hover:text-red-400 transition">
           Silent Evidence
         </Link>
 
-
-
-        {/* MENU (only shows on bigger screens) */}
+        {/* Desktop nav links — hidden on mobile (MobileNav handles those) */}
         <ul className="hidden md:flex items-center gap-4 text-sm">
-
-          {/* Go to home */}
           <li>
-            <Link href="/" className="hover:text-gray-300">
-              Home
-            </Link>
+            <Link href="/" className="hover:text-gray-300">Home</Link>
           </li>
-
-          {/* Open category menu */}
           <li>
+            {/* Dropdown listing all story categories from the DB */}
             <CategoryDropdown />
           </li>
-
-          {/* Open forums menu */}
           <li>
+            {/* Dropdown listing all forums fetched above */}
             <ForumsDropdown forums={forums} />
           </li>
-
-          {/* Special button for videos */}
           <li>
-            <Link
-              href="/videos"
-              className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700"
-            >
+            {/* Videos gets a red pill to make it stand out */}
+            <Link href="/videos" className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700">
               Videos
             </Link>
           </li>
-
-          {/* Explore more stuff */}
           <li>
             <ExploreDropdown />
           </li>
-
-          {/* About page */}
           <li>
-            <Link href="/about" className="hover:text-gray-300">
-              About
-            </Link>
+            <Link href="/about" className="hover:text-gray-300">About</Link>
           </li>
-
-
         </ul>
 
-
-
-        {/* This pushes everything else to the right */}
+        {/* Spacer — pushes search + user controls to the right */}
         <div className="flex-1" />
 
-
-
-        {/* SEARCH BAR */}
         <SearchBar />
 
-
-
-        {/* LOGIN PART */}
+        {/* Logged-in state: show theme toggle, DMs, notifications, and avatar menu */}
         {user && avatar ? (
-
-          // If user is logged in
           <div className="flex items-center gap-2 md:gap-3">
-
-            {/* Switch dark/light mode */}
             <ThemeToggle />
-
-            {/* Messages */}
             <DMIcon />
-
-            {/* Notifications */}
             <NotificationBell />
-
-            {/* Profile menu (avatar + dropdown) */}
-            <UserMenu
-              username={user.username}
-              avatar={avatar}
-              role={user.role}
-            />
-
+            <UserMenu username={user.username} avatar={avatar} role={user.role} />
           </div>
-
         ) : (
-
-          // If user is NOT logged in
+          /* Guest state: show Log In and Sign Up buttons */
           <div className="flex items-center gap-1.5">
-
-            {/* Login — visible on all screen sizes */}
-            <Link
-              href="/login"
-              className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg transition"
-            >
+            <Link href="/login" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg transition">
               Log In
             </Link>
-
-            {/* Sign Up — hidden on very small screens (it's in the hamburger menu) */}
-            <Link
-              href="/register"
-              className="hidden sm:block px-3 py-1.5 text-sm bg-red-700 text-white hover:bg-red-600 rounded-lg transition"
-            >
+            {/* Sign Up is hidden on very small screens — it appears inside MobileNav instead */}
+            <Link href="/register" className="hidden sm:block px-3 py-1.5 text-sm bg-red-700 text-white hover:bg-red-600 rounded-lg transition">
               Sign Up
             </Link>
-
           </div>
         )}
 
-
-
-        {/* Mobile menu (hamburger button on small screens) */}
+        {/* Hamburger menu — shown on mobile, contains the full nav */}
         <MobileNav isLoggedIn={!!user} />
-
-
 
       </nav>
     </header>

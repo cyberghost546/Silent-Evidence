@@ -1,3 +1,7 @@
+// app/series/[slug]/page.tsx
+// Series detail page — shows a named series with all its published stories
+// listed in reading order (seriesOrder asc). Each story card shows the
+// estimated reading time. Returns notFound() if the slug doesn't match a series.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';

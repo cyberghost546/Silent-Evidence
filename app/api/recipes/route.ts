@@ -1,3 +1,10 @@
+// app/api/recipes/route.ts
+// GET  — returns all horror recipes, optionally filtered by ?type=food|drink|ritual.
+//        Each recipe includes aggregated emoji reaction counts (reactions table → reactionCounts map).
+// POST — creates a new recipe for the logged-in user. Requires title, description, ingredients,
+//        and steps. Generates a unique slug from the title + timestamp.
+//        ingredients and steps are stored as JSON strings in the DB.
+
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

@@ -23,7 +23,7 @@
 //     searchable, filterable, sortable table.
 // ============================================================
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -83,32 +83,27 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
   const [sortDir, setSortDir]     = useState<'asc' | 'desc'>('asc');
 
   // ── Filter + sort the users list whenever search/filter/sort changes ──
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-
-    return [...users]
-      // 1. Filter by search query (matches id, username, or email)
-      .filter(u =>
+  const filtered = [...users]
+    .filter(u => {
+      const q = search.toLowerCase();
+      return (
         !q ||
         String(u.id).includes(q) ||
         u.username.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q)
-      )
-      // 2. Filter by selected role
-      .filter(u => !roleFilter || u.role === roleFilter)
-      // 3. Filter by premium status
-      .filter(u => !premiumOnly || u.isPremium)
-      // 4. Sort by chosen column
-      .sort((a, b) => {
-        let val = 0;
-        if (sortBy === 'id')       val = a.id - b.id;
-        if (sortBy === 'username') val = a.username.localeCompare(b.username);
-        if (sortBy === 'stories')  val = a._count.stories - b._count.stories;
-        if (sortBy === 'comments') val = a._count.comments - b._count.comments;
-        if (sortBy === 'joined')   val = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        return sortDir === 'asc' ? val : -val;
-      });
-  }, [users, search, roleFilter, premiumOnly, sortBy, sortDir]);
+      );
+    })
+    .filter(u => !roleFilter || u.role === roleFilter)
+    .filter(u => !premiumOnly || u.isPremium)
+    .sort((a, b) => {
+      let val = 0;
+      if (sortBy === 'id')       val = a.id - b.id;
+      if (sortBy === 'username') val = a.username.localeCompare(b.username);
+      if (sortBy === 'stories')  val = a._count.stories - b._count.stories;
+      if (sortBy === 'comments') val = a._count.comments - b._count.comments;
+      if (sortBy === 'joined')   val = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return sortDir === 'asc' ? val : -val;
+    });
 
   // Clicking a column header toggles sort direction or switches column
   const handleSort = (col: typeof sortBy) => {

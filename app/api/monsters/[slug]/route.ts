@@ -1,3 +1,7 @@
+// app/api/monsters/[slug]/route.ts
+// GET — returns the full detail of a single monster by its slug.
+// Includes the storyLinks relation so the detail page can list stories
+// that feature this monster. Returns 404 if the slug doesn't exist.
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

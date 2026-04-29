@@ -1,3 +1,7 @@
+// app/confessions/page.tsx
+// The Confession Booth page — users post short anonymous (or named) horror
+// confessions and react to others with horror-themed emoji.
+// All state and API calls are handled inside the ConfessionBooth component.
 import { Metadata } from 'next';
 import ConfessionBooth from '@/app/components/ui/ConfessionBooth';
 

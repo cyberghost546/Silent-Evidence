@@ -181,7 +181,8 @@ export default async function Home() {
 
       {/* Main 2-col grid: latest stories + sidebar */}
       <div className="max-w-6xl mx-auto px-4 pb-14 grid lg:grid-cols-3 gap-6 lg:gap-10">
-        <div className="lg:col-span-2">
+        {/* min-w-0 prevents grid items from expanding beyond their track to fit content */}
+        <div className="lg:col-span-2 min-w-0">
           <Suspense fallback={
             <div className="space-y-4">
               <Skeleton className="h-6 w-36 mb-2" />
@@ -191,7 +192,7 @@ export default async function Home() {
             <LatestStories standalone />
           </Suspense>
         </div>
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           <Suspense fallback={<SidebarFallback />}>
             <TrendingStories />
             <TipLeaderboard />

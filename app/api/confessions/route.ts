@@ -1,3 +1,11 @@
+// app/api/confessions/route.ts
+// GET  — returns the 50 most recent confessions, with per-emoji reaction counts aggregated
+//        from the reactions table. Anonymous confessions omit the author field.
+// POST — creates a new confession for the current session user (login optional;
+//        isAnonymous defaults to true). Content must be 5–500 characters.
+// Session is read via iron-session (se_session cookie) rather than the plain userId cookie
+// used by most other routes — both patterns work the same way under the hood.
+
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

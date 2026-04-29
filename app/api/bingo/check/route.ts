@@ -1,3 +1,8 @@
+// app/api/bingo/check/route.ts
+// POST — toggles a single bingo cell checked/unchecked for the current user.
+// The cell is identified by templateId + cellIndex (0–24 for a 5×5 grid).
+// If a BingoCard row doesn't exist yet, it is created first.
+// Checked cells are stored as a JSON array of cell indexes on the BingoCard.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

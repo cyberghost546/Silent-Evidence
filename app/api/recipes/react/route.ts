@@ -1,3 +1,8 @@
+// app/api/recipes/react/route.ts
+// POST — toggles an emoji reaction on a horror recipe.
+// Only the four emojis in ALLOWED are accepted. If the user has already reacted
+// with the same emoji it is removed (un-react); otherwise it is created.
+// Login required via iron-session.
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

@@ -1,3 +1,8 @@
+// app/api/stories/cover/route.ts
+// POST — uploads a story cover image to Cloudinary and returns the public URL.
+// The StoryForm and StoryEditForm call this when the author picks a cover image,
+// then store the returned URL in the story data before saving.
+// File limit: 8 MB, JPG/PNG/WebP/GIF only. Login required.
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { uploadToCloudinary } from '@/lib/cloudinary';

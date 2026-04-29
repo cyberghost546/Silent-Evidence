@@ -1,3 +1,8 @@
+// app/my-stories/page.tsx
+// Dashboard page showing all of the logged-in user's stories (drafts + published).
+// Redirects to /login if the user is not authenticated.
+// Displays each story with its status, view count, likes, and edit/delete actions.
+// Story deletion hits DELETE /api/stories/[slug] and updates the list client-side.
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';

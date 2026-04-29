@@ -1,3 +1,9 @@
+// app/api/Slide/upload/route.ts
+// POST — uploads a slideshow image to Cloudinary and returns the public URL.
+// Only logged-in users can upload (admin role is not strictly enforced here
+// since slide creation in AdminSlidesClient already happens through admin UI).
+// File limits: max 8 MB, only JPG/PNG/WebP/GIF accepted.
+// The returned URL is stored in the slide record by the caller.
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { uploadToCloudinary } from '@/lib/cloudinary';

@@ -1,3 +1,8 @@
+// app/tag/[slug]/page.tsx
+// Tag browsing page — shows all published stories that have been tagged with
+// a specific tag. The TagFollowButton lets logged-in users follow the tag
+// so its stories appear in their personalised feed. TagStories handles
+// client-side pagination of the story list.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';

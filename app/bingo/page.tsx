@@ -1,3 +1,8 @@
+// app/bingo/page.tsx
+// Horror Bingo page — readers check off horror tropes as they read stories
+// and try to complete a bingo pattern on the 5×5 card.
+// The bingo template (cell text) is set by an admin; checked cells are stored per user.
+// All game logic lives in the HorrorBingo component.
 import { Metadata } from 'next';
 import HorrorBingo from '@/app/components/ui/HorrorBingo';
 

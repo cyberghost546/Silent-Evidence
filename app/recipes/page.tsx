@@ -1,3 +1,7 @@
+// app/recipes/page.tsx
+// Horror Recipes & Rituals page — a community cookbook of horror-themed food,
+// drinks, and rituals. Users can filter by type and react with emoji.
+// All data fetching and filtering logic lives inside RecipesFeed.
 import { Metadata } from 'next';
 import RecipesFeed from '@/app/components/ui/RecipesFeed';
 
