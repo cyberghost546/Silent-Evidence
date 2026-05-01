@@ -32,6 +32,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 // ── Type definitions ──────────────────────────────────────────────────────────
 
@@ -285,7 +286,7 @@ export default function AdminBundlesClient({ initialBundles, allStories }: Props
         <div className="space-y-3">
           {bundles.map(b => (
             <div key={b.id} className={`flex gap-4 items-start bg-gray-900 border rounded-xl p-4 ${b.active ? 'border-gray-800' : 'border-gray-800 opacity-60'}`}>
-              {b.coverImage && <img src={b.coverImage} alt={b.title} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />}
+              {b.coverImage && <Image src={b.coverImage} alt={b.title} width={64} height={48} className="object-cover rounded-lg shrink-0" />}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-semibold text-white">{b.title}</p>

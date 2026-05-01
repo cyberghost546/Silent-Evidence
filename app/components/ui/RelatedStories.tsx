@@ -19,6 +19,7 @@
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 
 // Props: the category to match, and the story to exclude from results.
@@ -65,10 +66,10 @@ export default async function RelatedStories({ categoryId, currentStoryId }: Pro
             className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]"
           >
             {/* Cover image area — fixed height of 128px (h-32) */}
-            <div className="h-32 overflow-hidden">
+            <div className="relative h-32 overflow-hidden">
               {s.coverImage ? (
                 // group-hover:scale-105 zooms the image slightly when the card is hovered
-                <img src={s.coverImage} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={s.coverImage} alt={s.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
                 // Fallback: dark gradient with a book icon when no cover image is set
                 <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">

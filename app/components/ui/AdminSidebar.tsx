@@ -42,6 +42,7 @@ const links = [
   { href: '/admin/announcement',   label: 'Announcement',   icon: '📢' },
   { href: '/admin/story-of-week', label: 'Story of Week',  icon: '🏆' },
   { href: '/admin/contact',       label: 'Contact Inbox',  icon: '✉️'  },
+  { href: '/admin/user-support',  label: 'User Support',   icon: '🆘'  },
   { href: '/admin/newsletter',    label: 'Newsletter',      icon: '📰' },
   { href: '/admin/digest',        label: 'Comment Digest',  icon: '💬' },
   { href: '/admin/bundles',       label: 'Bundles',         icon: '📦' },
@@ -50,6 +51,7 @@ const links = [
   // ── New pages ──
   { href: '/admin/verification',    label: 'Verification',         icon: '✅' },
   { href: '/admin/revenue',         label: 'Revenue',              icon: '💰' },
+  { href: '/admin/premium',         label: 'Premium Members',      icon: '👑' },
   { href: '/admin/banned-words',    label: 'Content Filter',       icon: '🚫' },
   { href: '/admin/warnings',        label: 'Warnings & Bans',      icon: '⛔' },
   { href: '/admin/search',          label: 'Admin Search',         icon: '🔎' },

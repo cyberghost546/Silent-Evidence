@@ -36,6 +36,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Message = {
   id: number;
@@ -125,7 +126,7 @@ export default function ConversationClient({
       {/* Partner header */}
       <div className="flex items-center gap-3 pb-4 mb-4 border-b border-gray-800">
         <Link href={`/user/${partner.username}`}>
-          <img src={partnerAvatar} alt={partner.username} className="w-10 h-10 rounded-full object-cover" />
+          <Image src={partnerAvatar} alt={partner.username} width={40} height={40} className="rounded-full object-cover" />
         </Link>
         <Link href={`/user/${partner.username}`} className="font-semibold text-white hover:text-red-400 transition">
           {partner.username}
@@ -145,7 +146,7 @@ export default function ConversationClient({
           return (
             <div key={msg.id} className={`flex items-end gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}>
               {!isOwn && (
-                <img src={partnerAvatar} alt={partner.username} className="w-7 h-7 rounded-full object-cover flex-shrink-0 mb-1" />
+                <Image src={partnerAvatar} alt={partner.username} width={28} height={28} className="rounded-full object-cover shrink-0 mb-1" />
               )}
               <div className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 isOwn

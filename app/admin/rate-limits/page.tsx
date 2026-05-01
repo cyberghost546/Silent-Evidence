@@ -1,18 +1,52 @@
 'use client';
 // app/admin/rate-limits/page.tsx
-// Shows the current in-memory rate limit entries — which IPs are hitting which routes
-// and how many requests they've made in the current window.
+//
+// WHY 'use client'?
+//   This page fetches live data from an API on mount and refreshes on button click.
+//   Those interactions require useState and useEffect, which only work in Client Components.
+//
+// PURPOSE:
+//   Shows which IP addresses are hitting which API routes and how many times in the
+//   current rate-limit window. Helps the admin identify:
+//     - Bots making excessive requests
+//     - Users being wrongly throttled
+//     - Which routes are under the most traffic
+//
+// HOW RATE LIMITING WORKS ON THIS SITE:
+//   The API middleware tracks (IP + route) combinations in memory (or Redis).
+//   Each entry has a request count and a window start time. When a threshold is
+//   exceeded, the API returns HTTP 429 Too Many Requests. This page shows those
+//   in-flight entries so the admin can manually clear them if needed.
+//
+// STATE:
+//   entries  — the live rate-limit entries from the API
+//   total    — total count of entries (for the subtitle)
+//   loading  — true during a fetch (shows the skeleton)
+//   clearing — the key of the entry being cleared (null when idle)
+//              Using a key string (not a boolean) lets us disable only the
+//              specific Clear button that was clicked, not all of them.
+//
+// PATTERN: useCallback + useEffect for manual refresh
+//   `load` is wrapped in useCallback so it has a stable reference.
+//   The effect calls it once on mount ([] dep array).
+//   The Refresh button and the post-clear code call it again manually.
+//   This avoids setting up a polling interval that would fire unnecessarily.
 
 import { useEffect, useState, useCallback } from 'react';
 
+// Shape of a single rate-limit entry returned by GET /api/admin/rate-limits
 type Entry = { key: string; ip: string; route: string; count: number; windowStart: string; ageSeconds: number };
 
 export default function AdminRateLimitsPage() {
-  const [entries, setEntries] = useState<Entry[]>([]);
-  const [total, setTotal]     = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [entries, setEntries]   = useState<Entry[]>([]);
+  const [total, setTotal]       = useState(0);
+  const [loading, setLoading]   = useState(true);
+  // null = no clear in progress; 'all' = clearing everything; otherwise = key of the entry being cleared
   const [clearing, setClearing] = useState<string | null>(null);
 
+  // load() fetches the current entries from the API and updates state.
+  // useCallback ensures a stable function reference so it can safely be listed
+  // as a dependency of the useEffect without causing infinite re-renders.
   const load = useCallback(() => {
     setLoading(true);
     fetch('/api/admin/rate-limits')
@@ -21,22 +55,26 @@ export default function AdminRateLimitsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Fetch on mount — empty dep array means this runs once
   useEffect(() => { load(); }, [load]);
 
+  // clearEntry — DELETE a single rate-limit entry by its composite key (IP+route)
   const clearEntry = async (key: string) => {
-    setClearing(key);
+    setClearing(key); // disable just this row's button
     await fetch('/api/admin/rate-limits', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key }),
     });
     setClearing(null);
-    load();
+    load(); // re-fetch to show updated list
   };
 
+  // clearAll — DELETE all entries in the rate-limit store
   const clearAll = async () => {
+    // Confirm dialog prevents accidental mass-clear
     if (!confirm('Clear all rate limit entries?')) return;
-    setClearing('all');
+    setClearing('all'); // disable the "Clear All" button
     await fetch('/api/admin/rate-limits', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     setClearing(null);
     load();

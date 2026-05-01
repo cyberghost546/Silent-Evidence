@@ -3,7 +3,9 @@
 // The detail view for a single book club — shows members, current story, and invite code.
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Member = { id: number; joinedAt: string; user: { id: number; username: string; profile: { avatar: string | null } | null } };
 
@@ -30,6 +32,7 @@ interface Props {
 }
 
 export default function BookClubRoom({ club, userId, isMember, isOwner }: Props) {
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -48,7 +51,7 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ clubId: club.id }),
     });
-    if (res.ok) window.location.reload();
+    if (res.ok) router.refresh();
     else setJoining(false);
   };
 
@@ -60,7 +63,7 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ clubId: club.id }),
     });
-    if (res.ok) window.location.href = '/book-club';
+    if (res.ok) router.push('/book-club');
     else {
       const data = await res.json();
       setLeftMsg(data.error ?? 'Failed to leave.');
@@ -119,8 +122,8 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
               <Link href={`/story/${club.story.slug}`}
                 className="flex gap-4 group hover:opacity-90 transition">
                 {club.story.coverImage ? (
-                  <img src={club.story.coverImage} alt={club.story.title}
-                    className="w-20 h-28 object-cover rounded-xl shrink-0" />
+                  <Image src={club.story.coverImage} alt={club.story.title}
+                    width={80} height={112} className="object-cover rounded-xl shrink-0" />
                 ) : (
                   <div className="w-20 h-28 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center text-3xl">📕</div>
                 )}
@@ -197,8 +200,8 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
                 return (
                   <Link key={m.id} href={`/user/${m.user.username}`}
                     className="flex items-center gap-3 hover:opacity-80 transition">
-                    <img src={avatar} alt={m.user.username}
-                      className="w-8 h-8 rounded-full object-cover shrink-0" />
+                    <Image src={avatar} alt={m.user.username}
+                      width={32} height={32} className="rounded-full object-cover shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white truncate">{m.user.username}</p>
                     </div>

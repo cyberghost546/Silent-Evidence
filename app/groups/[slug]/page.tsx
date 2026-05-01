@@ -1,4 +1,35 @@
-// app/groups/[slug]/page.tsx — group detail page
+// app/groups/[slug]/page.tsx
+//
+// Server Component — group detail page. Fetches all group data in a single query,
+// determines the current user's membership/role, and passes everything to
+// GroupDetailClient which handles the interactive post feed, polls, and join/leave.
+//
+// PURPOSE:
+//   A group is a community space for a specific horror subgenre or theme.
+//   This page is the "inside" view — it shows posts, members, and polls
+//   once you're viewing a group (public or after joining a private one).
+//
+// SINGLE QUERY WITH DEEP INCLUDES:
+//   `findUnique` with nested `include` fetches all related data in one round-trip:
+//   - `members` — all members with their user profile (avatar, username)
+//   - `posts`   — 20 most recent posts with author info (desc order)
+//   - `polls`   — active polls (not yet ended) with options and vote counts
+//   - `_count`  — total member and post counts
+//
+// POLL VOTES CONDITIONAL INCLUDE:
+//   `votes: userId ? { where: { userId }, select: { id: true } } : false`
+//   When logged in, we fetch each option's votes filtered to this user — this
+//   tells GroupDetailClient whether the user has already voted on each poll.
+//   When not logged in, we pass `false` to skip loading votes entirely.
+//
+// MEMBERSHIP CHECK:
+//   `membership` is found by scanning the already-loaded `group.members` array
+//   (no extra DB query). `userRole` drives whether the UI shows admin controls.
+//
+// JSON SERIALIZATION:
+//   `JSON.parse(JSON.stringify(group))` converts Dates to ISO strings for the
+//   Server → Client Component prop boundary.
+
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';

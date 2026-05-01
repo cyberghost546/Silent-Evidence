@@ -1,7 +1,33 @@
 'use client';
 // app/reset-password/page.tsx
-// Form where users set their new password after clicking the reset link.
-// Reads the token from the ?token= query param.
+//
+// WHY 'use client'?
+//   The form tracks controlled input state, shows/hides the password with a toggle,
+//   and submits asynchronously — all of which need useState and browser events.
+//
+// PURPOSE:
+//   Step 2 of the password-reset flow. The user arrives here after clicking a
+//   "Reset Password" link in their email. The link contains a one-time `?token=`
+//   query param that the API uses to verify the request and identify the user.
+//
+// FLOW:
+//   1. User clicks the reset link in their email → lands on /reset-password?token=abc123
+//   2. This page reads the token from the URL with `useSearchParams().get('token')`
+//   3. On submit, POST /api/auth/reset-password with { token, newPassword }
+//   4. API verifies the token (checks it exists, is not expired, is not already used)
+//   5. API updates the user's password hash, invalidates the token, returns 200
+//   6. `done` state flips to true → success screen with "Sign In" button
+//
+// SUSPENSE WRAPPER:
+//   Next.js 14 requires `useSearchParams()` to be wrapped in a <Suspense> boundary.
+//   Without it, the entire page would suspend during server-side rendering.
+//   The outer `ResetPasswordPage` component provides the Suspense shell;
+//   the inner `ResetPasswordForm` component does the actual work.
+//   This is the recommended pattern for any component that reads query params.
+//
+// REAL-TIME MISMATCH INDICATOR:
+//   The confirm-password field turns red-bordered while `form.confirm !== form.password`
+//   (and the confirm field is non-empty). This gives instant feedback before submit.
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';

@@ -3,20 +3,24 @@
 // Stories with at least 1 like are shown automatically (no admin action needed).
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
+import { cache, TTL } from '@/lib/cache';
 
 export default async function PopularStories() {
-  // Fetch published stories ordered by like count descending
-  const stories = await prisma.story.findMany({
-    where: { status: 'PUBLISHED', likes: { some: {} } }, // must have at least 1 like
-    orderBy: { likes: { _count: 'desc' } },
-    take: 6,
-    include: {
-      author: { select: { username: true } },
-      category: { select: { name: true, slug: true } },
-      _count: { select: { likes: true, comments: true } },
-    },
-  });
+  // Cached 5 minutes — like-ranked list doesn't need real-time accuracy.
+  const stories = await cache('homepage:popular', TTL.MEDIUM, () =>
+    prisma.story.findMany({
+      where: { status: 'PUBLISHED', likes: { some: {} } },
+      orderBy: { likes: { _count: 'desc' } },
+      take: 6,
+      include: {
+        author: { select: { username: true } },
+        category: { select: { name: true, slug: true } },
+        _count: { select: { likes: true, comments: true } },
+      },
+    })
+  );
 
   if (stories.length === 0) return null;
 
@@ -44,10 +48,12 @@ export default async function PopularStories() {
             {/* Cover image */}
             <div className="h-44 overflow-hidden relative">
               {story.coverImage ? (
-                <img
+                <Image
                   src={story.coverImage}
                   alt={story.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />

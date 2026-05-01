@@ -9,6 +9,7 @@ import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import ReadingGoalWidget from '@/app/components/ui/ReadingGoalWidget';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = { title: 'Reading Challenge | Silent Evidence' };
 
@@ -139,8 +140,8 @@ export default async function ReadingChallengePage() {
                 <Link key={h.id} href={`/story/${h.story.slug}`}
                   className="flex items-center gap-4 bg-gray-900 border border-gray-800 hover:border-red-600/30 rounded-2xl p-4 transition group">
                   {h.story.coverImage ? (
-                    <img src={h.story.coverImage} alt={h.story.title}
-                      className="w-14 h-14 object-cover rounded-xl shrink-0" />
+                    <Image src={h.story.coverImage} alt={h.story.title}
+                      width={56} height={56} className="object-cover rounded-xl shrink-0" />
                   ) : (
                     <div className="w-14 h-14 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center text-2xl">📕</div>
                   )}

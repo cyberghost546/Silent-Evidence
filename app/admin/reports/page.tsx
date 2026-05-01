@@ -1,6 +1,26 @@
 // app/admin/reports/page.tsx
-// Admin page that lists all user-submitted content reports.
-// Admins can mark reports as REVIEWED or DISMISSED directly from this page.
+//
+// Server Component — fetches all content reports and passes them to AdminReportsClient.
+//
+// PURPOSE:
+//   Content moderation queue. When a user clicks "Report" on a story or comment,
+//   a Report record is created. This page surfaces all pending reports so the admin
+//   can review them and take action (mark REVIEWED or DISMISS).
+//
+// PRISMA GUARD:
+//   `if (!(prisma as any).report)` — defensive check for when the Report model was
+//   added to the schema but `prisma generate` hasn't been run yet. Without regenerating,
+//   `prisma.report` would be undefined and calling `.findMany()` would throw.
+//   This guard shows a friendly error with instructions instead of crashing.
+//   In production this situation should never happen; it's a development-time safeguard.
+//
+// SERIALIZATION:
+//   `r.createdAt.toISOString()` converts the Prisma Date to an ISO string manually
+//   (instead of the usual JSON.parse/stringify round-trip). Both approaches work;
+//   `.toISOString()` is explicit and slightly more readable for a single field.
+//
+// The actual approve/reject buttons live in AdminReportsClient — see that file
+// for the interaction pattern (optimistic status updates, per-row loading state).
 
 import { prisma } from '@/lib/prisma';
 import AdminReportsClient from './AdminReportsClient';

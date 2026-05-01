@@ -17,19 +17,36 @@
  * 4. The rendered <Pagination> component is passed as a React node ("paginationNode")
  *    so it appears below the story grid/list without needing extra prop drilling.
  *
+ * WHY A WRAPPER COMPONENT?
+ * Next.js App Router enforces a strict boundary: Server Components cannot import
+ * 'use client' components directly *without* going through a client boundary file.
+ * By creating this tiny wrapper with 'use client', we satisfy that boundary while
+ * keeping all the data-fetching logic in the parent server page.
+ *
  * HOW TO REUSE:
  * Any time you have a Server Component that needs to render an interactive
  * child, create a tiny 'use client' wrapper like this one. Pass the server-fetched
  * data as props and let the client component do all the interactivity.
+ *
+ * PROPS:
+ *   stories        — array of StoryCard objects fetched on the server
+ *   paginationNode — a pre-rendered <Pagination> React node passed through as
+ *                    a slot; avoids re-fetching page count on the client
  */
 
 import StoryViewToggle, { type StoryCard } from '@/app/components/ui/StoryViewToggle';
 
+// Props mirror exactly what the parent server page provides
 type Props = {
   stories: StoryCard[];
+  // React.ReactNode lets the server page pass any JSX (e.g. <Pagination />)
+  // without this component needing to know its shape
   paginationNode: React.ReactNode;
 };
 
 export default function CategoryStories({ stories, paginationNode }: Props) {
+  // Forward all props to StoryViewToggle:
+  //   - `stories`  → the list that StoryViewToggle renders in list or grid layout
+  //   - `footer`   → StoryViewToggle renders this below its story list (pagination)
   return <StoryViewToggle stories={stories} footer={paginationNode} />;
 }

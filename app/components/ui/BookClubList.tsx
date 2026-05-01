@@ -3,7 +3,9 @@
 // Lists clubs + create / join forms. Supports premium-only clubs.
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Club = {
   id: number;
@@ -18,6 +20,7 @@ type Club = {
 };
 
 export default function BookClubList({ userId, isPremium }: { userId: number | null; isPremium?: boolean }) {
+  const router = useRouter();
   const [clubs, setClubs]               = useState<Club[]>([]);
   const [loading, setLoading]           = useState(true);
   const [showCreate, setShowCreate]     = useState(false);
@@ -68,7 +71,7 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
     setSaving(false);
     if (res.ok) {
       const { clubId } = await res.json();
-      window.location.href = `/book-club/${clubId}`;
+      router.push(`/book-club/${clubId}`);
     } else {
       const data = await res.json().catch(() => ({}));
       setMsg(data.error ?? 'Invalid invite code.');
@@ -243,7 +246,7 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               {club.story ? (
                 <div className="flex items-center gap-2 bg-gray-800/60 rounded-xl p-2.5">
                   {club.story.coverImage && (
-                    <img src={club.story.coverImage} alt={club.story.title} className="w-8 h-8 rounded object-cover shrink-0" />
+                    <Image src={club.story.coverImage} alt={club.story.title} width={32} height={32} className="rounded object-cover shrink-0" />
                   )}
                   <div className="min-w-0">
                     <p className="text-[10px] text-red-400 font-semibold uppercase tracking-wide">Currently Reading</p>

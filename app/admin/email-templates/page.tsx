@@ -1,7 +1,43 @@
 'use client';
 // app/admin/email-templates/page.tsx
-// Live editor for the site's transactional email HTML templates.
-// Templates are stored in the SiteSetting table under email_* keys.
+//
+// WHY 'use client'?
+//   This is a live HTML editor — the admin types in a textarea and sees a real-time
+//   preview rendered below it. That requires useState for the draft content and
+//   useEffect for the initial data fetch, so this must be a Client Component.
+//
+// PURPOSE:
+//   Lets the admin edit the HTML sent in transactional emails without touching code.
+//   Templates are stored in the SiteSetting table so changes take effect on the next
+//   email send without a deployment.
+//
+// TEMPLATES array:
+//   The source of truth for which templates exist. Each entry has:
+//   - `key`   — the SiteSetting key (e.g. 'email_welcome') where the HTML is stored
+//   - `label` — human-readable name shown in the sidebar
+//   - `desc`  — explains when this email is sent (shown under the label)
+//
+// STATE:
+//   templates  — a Record<key, html> of all template bodies fetched from the API
+//   activeKey  — which template is currently open in the editor
+//   draft      — the editor content (may differ from the saved version until Save is clicked)
+//   saving     — true while the POST is in-flight (disables the Save button)
+//   saved      — true for 2s after a successful save (shows "✓ Saved" confirmation)
+//   loading    — true during the initial fetch (shows skeleton placeholder)
+//
+// SWITCHING TEMPLATES:
+//   `switchTemplate(key)` first saves the current draft back into the `templates` map
+//   (so it isn't lost if the admin switches tabs), then sets `activeKey` and loads
+//   the draft for the new template from the local map.
+//
+// LIVE PREVIEW:
+//   `dangerouslySetInnerHTML={{ __html: draft }}` renders the raw HTML in a white
+//   iframe-style div. This is intentional — these are trusted admin-edited HTML
+//   templates, not user-submitted content, so XSS isn't a concern here.
+//
+// API:
+//   GET  /api/admin/email-templates       → { templates: Record<string, string> }
+//   POST /api/admin/email-templates       → { key, value } → saves one template
 
 import { useEffect, useState } from 'react';
 
@@ -28,10 +64,12 @@ export default function EmailTemplatesPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // switchTemplate — save the current draft into local state, then swap to the new tab
+  // This preserves unsaved edits when the admin flips between templates without saving
   const switchTemplate = (key: string) => {
-    setTemplates(prev => ({ ...prev, [activeKey]: draft }));
+    setTemplates(prev => ({ ...prev, [activeKey]: draft })); // cache current draft
     setActiveKey(key);
-    setDraft(templates[key] ?? '');
+    setDraft(templates[key] ?? ''); // load new template's content into the editor
   };
 
   const save = async () => {

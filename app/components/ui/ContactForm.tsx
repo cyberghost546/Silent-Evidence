@@ -55,7 +55,7 @@ export default function ContactForm() {
   if (status === 'sent') {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-4">
-        <div className="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center text-green-400">
+        <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -75,7 +75,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5" suppressHydrationWarning>
       <h2 className="text-lg font-semibold text-white mb-1">Send us a message</h2>
 
       <div className="grid sm:grid-cols-2 gap-4">

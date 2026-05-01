@@ -1,27 +1,70 @@
 'use client';
+// app/login/page.tsx
+//
+// WHY 'use client'?
+//   This page manages form state (controlled inputs), shows loading spinners,
+//   and handles button clicks — all of which require React hooks (useState).
+//   Server Components can't do any of that, so 'use client' is required.
+//
+// HOW LOGIN WORKS — two-step flow:
+//   Step 1: Normal login
+//     - User submits email + password.
+//     - POST /api/auth/login validates credentials.
+//     - If the account has 2FA enabled, the API returns HTTP 202 + { requires2fa: true }.
+//       We then show the 2FA code input (step 2) without navigating away.
+//     - If no 2FA, the API returns 200 and sets a `userId` cookie. router.push('/') navigates home.
+//
+//   Step 2: Two-factor authentication (when requires2fa === true)
+//     - The API emailed a 6-digit code to the user.
+//     - User types the code; POST /api/auth/2fa/verify checks it.
+//     - On success the API sets the `userId` cookie and we navigate home.
+//
+// STATE EXPLAINED:
+//   form        — controlled object holding email + password values
+//   error       — any error message returned by the API (shown in red box)
+//   loading     — true while step-1 fetch is in flight (disables submit button)
+//   showPassword — toggles input type between 'password' and 'text'
+//   needs2fa    — switches the UI from the login form to the 2FA code entry
+//   tempUserId  — temporary user ID returned by the API while 2FA is pending
+//                 (not a full session — the cookie isn't set until the code is verified)
+//   twoFaCode   — controlled value for the 6-digit code input
+//   verifying   — true while step-2 fetch is in flight
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  // useRouter lets us navigate programmatically after login succeeds
   const router = useRouter();
 
+  // One state object for the form fields — spread-update pattern keeps handleChange simple
   const [form, setForm]               = useState({ email: '', password: '' });
   const [error, setError]             = useState('');
   const [loading, setLoading]         = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  // When the API signals 2FA is needed, we flip this to show the code step
   const [needs2fa, setNeeds2fa]       = useState(false);
+  // Temporary identifier sent back from the API after step 1 succeeds but before
+  // the 2FA code is confirmed. We pass it back in the step-2 request so the server
+  // knows which user is completing verification.
   const [tempUserId, setTempUserId]   = useState<number | null>(null);
   const [twoFaCode, setTwoFaCode]     = useState('');
   const [verifying, setVerifying]     = useState(false);
 
+  // Generic change handler for all controlled inputs.
+  // Spreading `[e.target.name]` lets one handler work for both email and password.
+  // Clearing the error on each keystroke prevents a stale error message from showing
+  // while the user is actively correcting their input.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
   };
 
+  // ── Step 1: Submit email + password ──────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
+    // e.preventDefault() stops the browser's default form submit (which would reload the page)
+    // so we can handle the POST ourselves with fetch()
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -34,20 +77,26 @@ export default function LoginPage() {
     const data = await res.json();
     setLoading(false);
 
+    // HTTP 202 Accepted = "credentials valid, but we need 2FA before completing login"
+    // The API emailed a code and returned a tempUserId to use in the verification step.
     if (res.status === 202 && data.requires2fa) {
       setTempUserId(data.tempUserId);
-      setNeeds2fa(true);
+      setNeeds2fa(true); // swap the form UI for the code entry UI
       return;
     }
     if (!res.ok) { setError(data.error); return; }
+    // Success: API set the `userId` cookie, navigate to homepage
     router.push('/');
   };
 
+  // ── Step 2: Verify the 2FA code ──────────────────────────────────────────
   const handleVerify2fa = async (e: React.FormEvent) => {
     e.preventDefault();
     setVerifying(true);
     setError('');
 
+    // Pass both the temp ID (so the server knows which user) and the 6-digit code.
+    // On success the server validates the code, sets the real `userId` cookie, and returns 200.
     const res  = await fetch('/api/auth/2fa/verify', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,6 +106,7 @@ export default function LoginPage() {
     setVerifying(false);
 
     if (!res.ok) { setError(data.error); return; }
+    // Verification passed — navigate to homepage (cookie is now set)
     router.push('/');
   };
 
@@ -264,6 +314,10 @@ export default function LoginPage() {
   );
 }
 
+// ErrorBox — inline alert shown when login or 2FA verification fails.
+// Extracted as its own component so it can be reused in both the login step
+// and the 2FA step without duplicating the Tailwind styling.
+// The warning triangle SVG gives a clear visual cue without a third-party icon library.
 function ErrorBox({ message }: { message: string }) {
   return (
     <div className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">

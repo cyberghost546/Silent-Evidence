@@ -27,6 +27,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 // Shape of a single slideshow slide from the database
 type Slide = {
@@ -189,7 +190,9 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
 
           {/* Image preview */}
           {form.image && (
-            <img src={form.image} alt="preview" className="w-full h-40 object-cover rounded-lg border border-gray-700" />
+            <div className="relative w-full h-40 overflow-hidden rounded-lg border border-gray-700">
+              <Image src={form.image} alt="preview" fill sizes="100vw" className="object-cover" />
+            </div>
           )}
 
           <button type="submit" disabled={adding} className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
@@ -208,10 +211,12 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
             }`}
           >
             {/* Thumbnail */}
-            <img
+            <Image
               src={slide.image}
               alt={slide.title}
-              className="w-24 h-14 object-cover rounded-lg flex-shrink-0 border border-gray-700"
+              width={96}
+              height={56}
+              className="object-cover rounded-lg shrink-0 border border-gray-700"
             />
 
             {/* Info */}

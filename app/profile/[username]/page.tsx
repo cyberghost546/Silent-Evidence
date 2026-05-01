@@ -1,7 +1,29 @@
 // app/profile/[username]/page.tsx
+//
+// Server Component — public author profile page at /profile/:username.
+//
+// WHAT THIS PAGE SHOWS:
+//   • Hero banner with the user's chosen theme colour
+//   • Avatar, username, join date, follow/dashboard button
+//   • Sidebar: bio, website, stats grid (stories/followers/following/views/likes),
+//     fear-mood profile tags, reading stats
+//   • Main area: pinned story card + grid of all other published stories
+//
+// KEY DATA PATTERNS:
+//   1. The main user query uses nested `include` to fetch the profile, stories,
+//      and their social counts all in one DB round-trip. This avoids N+1 queries.
+//   2. Reading stats (history count, streak, top moods) are fetched in parallel via
+//      Promise.all — total wait = max(query1, query2, query3) not their sum.
+//   3. `isOwnProfile` compares cookie userId with the profile's userId — controls
+//      which buttons appear (Edit/Dashboard vs Follow).
+//   4. `isFollowing` is only queried when the viewer is logged in AND viewing
+//      someone else. We short-circuit with `false` otherwise to save a DB round-trip.
+//   5. `favMood` is derived by counting mood occurrences in the last 100 reading
+//      history records — a simple frequency map, no DB GROUP BY needed.
 import { notFound }  from 'next/navigation';
 import { cookies }   from 'next/headers';
 import Link          from 'next/link';
+import Image         from 'next/image';
 import { prisma }    from '@/lib/prisma';
 import Header        from '@/app/components/ui/Header';
 import Footer        from '@/app/components/ui/Footer';
@@ -11,10 +33,15 @@ import { getTheme } from '@/app/lib/themes';
 
 type Props = { params: Promise<{ username: string }> };
 
+// fmt() formats large numbers compactly: 1234 → "1.2k", 999 → "999".
+// Used in the stats grid so big follower/view counts don't overflow their cells.
 function fmt(n: number) {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
 
+// MOOD_COLORS maps each horror-genre mood value to a Tailwind colour set.
+// The `/10` and `/20` opacity modifiers give translucent coloured backgrounds
+// that sit nicely on the dark gray card backgrounds.
 const MOOD_COLORS: Record<string, string> = {
   GOTHIC:      'bg-purple-500/10 text-purple-400 border-purple-500/20',
   PARANORMAL:  'bg-blue-500/10   text-blue-400   border-blue-500/20',
@@ -25,15 +52,20 @@ const MOOD_COLORS: Record<string, string> = {
 };
 
 export default async function ProfilePage({ params }: Props) {
+  // In Next.js 14 App Router, `params` is a Promise — must be awaited
   const { username } = await params;
 
+  // ── Main user query ──────────────────────────────────────────────────────
+  // One Prisma query fetches the user + profile + stories + social counts.
+  // `include: { _count }` counts related records without loading them all —
+  // the same as SELECT COUNT(*) in SQL but written declaratively.
   const user = await prisma.user.findUnique({
     where:   { username },
     include: {
-      profile: true,
+      profile: true,                       // bio, avatar, website, theme, etc.
       stories: {
-        where:   { status: 'PUBLISHED' },
-        orderBy: { createdAt: 'desc' },
+        where:   { status: 'PUBLISHED' },  // only show public stories
+        orderBy: { createdAt: 'desc' },    // newest first
         include: {
           category: { select: { name: true, slug: true } },
           _count:   { select: { likes: true, comments: true } },
@@ -41,7 +73,7 @@ export default async function ProfilePage({ params }: Props) {
       },
       _count: {
         select: {
-          stories:   { where: { status: 'PUBLISHED' } },
+          stories:   { where: { status: 'PUBLISHED' } }, // for the story-count badge
           followers: true,
           following:  true,
         },
@@ -49,12 +81,15 @@ export default async function ProfilePage({ params }: Props) {
     },
   });
 
+  // `notFound()` renders Next.js' built-in 404 page
   if (!user) return notFound();
 
-  // Reading stats — only shown on own profile to respect privacy
+  // ── Reading stats (parallel) ──────────────────────────────────────────────
+  // Three independent DB queries run simultaneously via Promise.all.
   const [readCount, streak, topMoods] = await Promise.all([
     prisma.readingHistory.count({ where: { userId: user.id } }),
     prisma.readingStreak.findUnique({ where: { userId: user.id } }),
+    // Last 100 reads — enough to calculate a representative mood preference
     prisma.readingHistory.findMany({
       where: { userId: user.id },
       select: { story: { select: { mood: true } } },
@@ -63,21 +98,27 @@ export default async function ProfilePage({ params }: Props) {
     }),
   ]);
 
-  // Count mood frequency from last 100 reads
+  // ── Derive favourite mood ─────────────────────────────────────────────────
+  // Build a frequency map: { GOTHIC: 12, SLASHER: 8, … }, then find the top entry.
   const moodFreqMap = new Map<string, number>();
   for (const h of topMoods) {
     if (h.story?.mood) moodFreqMap.set(h.story.mood, (moodFreqMap.get(h.story.mood) ?? 0) + 1);
   }
   const favMood = [...moodFreqMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
+  // ── Viewer identity ───────────────────────────────────────────────────────
   const cookieStore  = await cookies();
   const loggedInId   = Number(cookieStore.get('userId')?.value ?? 0);
+  // isOwnProfile determines whether to show the Edit/Dashboard button vs Follow
   const isOwnProfile = loggedInId === user.id;
 
+  // Only check the Follow table when needed — short-circuit saves a DB round-trip
   const isFollowing = loggedInId && !isOwnProfile
     ? !!(await prisma.follow.findFirst({ where: { followerId: loggedInId, followingId: user.id } }))
     : false;
 
+  // ── Derived display values ────────────────────────────────────────────────
+  // Fall back to ui-avatars.com for users without an uploaded avatar
   const avatar = user.profile?.avatar ??
     `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=256`;
 
@@ -86,11 +127,16 @@ export default async function ProfilePage({ params }: Props) {
     month: 'long', year: 'numeric',
   });
 
+  // getTheme() returns Tailwind class strings for the hero gradient
   const theme           = getTheme(user.profile?.profileTheme ?? 'default');
+  // Find the pinned story in the already-fetched array — no extra DB query
   const pinnedStory     = user.pinnedStoryId ? (user.stories.find(s => s.id === user.pinnedStoryId) ?? null) : null;
+  // Exclude the pinned story from the main grid so it doesn't appear twice
   const unpinnedStories = pinnedStory ? user.stories.filter(s => s.id !== pinnedStory.id) : user.stories;
+  // Totals computed from the already-fetched stories array — no extra DB query
   const totalLikes      = user.stories.reduce((s, st) => s + st._count.likes, 0);
   const totalViews      = user.stories.reduce((s, st) => s + st.views, 0);
+  // fearMoods is stored as a comma-separated string: "GOTHIC,SLASHER" → ["GOTHIC", "SLASHER"]
   const fearMoods       = user.profile?.fearMoods?.split(',').filter(Boolean) ?? [];
 
   return (
@@ -328,8 +374,8 @@ export default async function ProfilePage({ params }: Props) {
                 <Link href={`/story/${pinnedStory.slug}`}
                   className="group flex gap-4 bg-gray-900 border border-red-600/20 hover:border-red-600/50 rounded-2xl p-4 transition-all duration-200 hover:shadow-lg hover:shadow-red-950/30">
                   {pinnedStory.coverImage ? (
-                    <img src={pinnedStory.coverImage} alt={pinnedStory.title}
-                      className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                    <Image src={pinnedStory.coverImage} alt={pinnedStory.title}
+                      width={80} height={80} className="rounded-xl object-cover shrink-0" />
                   ) : (
                     <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-red-950 to-gray-800 shrink-0 flex items-center justify-center">
                       <svg className="w-7 h-7 text-red-600/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -392,8 +438,8 @@ export default async function ProfilePage({ params }: Props) {
 
                     {story.coverImage ? (
                       <div className="relative h-44 overflow-hidden">
-                        <img src={story.coverImage} alt={story.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image src={story.coverImage} alt={story.title}
+                          fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent" />
                         <span className="absolute top-3 left-3 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest bg-black/50 text-red-400 backdrop-blur-sm border border-red-500/20">
                           {story.category.name}

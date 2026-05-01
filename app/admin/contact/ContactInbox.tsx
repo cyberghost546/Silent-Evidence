@@ -122,8 +122,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
   };
 
   return (
-    // h-full fills the flex-1 wrapper in page.tsx — no fragile calc needed
-    <div className="flex gap-6 h-full">
+    <div className="flex gap-6 h-[calc(100vh-11rem)]">
 
       {/* ── Left panel: message list ── */}
       <div className="w-full max-w-sm flex flex-col flex-shrink-0">
@@ -207,8 +206,8 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
           <>
             {/* Header */}
             <div className="px-6 py-5 border-b border-gray-800 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-bold text-white">{selected.subject}</h2>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg font-bold text-white truncate">{selected.subject}</h2>
                 <p className="text-sm text-gray-400 mt-0.5">
                   From <span className="text-white font-medium">{selected.name}</span>
                   {' '}·{' '}
@@ -224,7 +223,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
               </div>
 
               {/* Action buttons */}
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                 {/* Reply by email */}
                 <a
                   href={`mailto:${selected.email}?subject=Re: ${encodeURIComponent(selected.subject)}`}

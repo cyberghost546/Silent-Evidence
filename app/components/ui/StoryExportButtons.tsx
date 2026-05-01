@@ -1,4 +1,15 @@
 'use client';
+// app/components/ui/StoryExportButtons.tsx
+//
+// WHY 'use client'?
+//   Uses anchor `download` attributes — technically renderable server-side, but
+//   colocated with other edit-page client components and needs no server data.
+//
+// PURPOSE:
+//   Gives story authors two export options — plain text and Markdown — rendered
+//   as simple download links that hit /api/stories/[storyId]/export?format=txt
+//   and ?format=md. The API returns the story content with the correct headers
+//   so the browser triggers a file download with no extra client-side logic needed.
 
 // Download .txt or .md via a regular anchor download
 export default function StoryExportButtons({ storyId }: { storyId: number }) {

@@ -29,6 +29,7 @@
  * single-page split-panel layout.
  */
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Conversation = {
   partner: { id: number; username: string; profile: { avatar: string | null } | null };
@@ -66,8 +67,8 @@ export default function MessagesClient({
               className="flex items-center gap-4 bg-gray-900 border border-gray-800 hover:border-red-600/50 rounded-xl px-4 py-3.5 transition group"
             >
               <div className="relative flex-shrink-0">
-                <img src={avatarUrl(c.partner)} alt={c.partner.username}
-                  className="w-11 h-11 rounded-full object-cover" />
+                <Image src={avatarUrl(c.partner)} alt={c.partner.username}
+                  width={44} height={44} className="rounded-full object-cover" />
                 {c.unread > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full text-white text-[10px] flex items-center justify-center font-bold">
                     {c.unread > 9 ? '9+' : c.unread}

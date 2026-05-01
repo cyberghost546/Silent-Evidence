@@ -5,6 +5,7 @@
 // Uses the existing /api/collaborators endpoints.
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type Collaborator = {
   id: number;
@@ -108,7 +109,7 @@ export default function CollaboratorPanel({ storyId }: Props) {
               <div className="flex items-center gap-2">
                 {/* Avatar or initial fallback */}
                 {c.user.profile?.avatar ? (
-                  <img src={c.user.profile.avatar} alt={c.user.username} className="w-7 h-7 rounded-full object-cover" />
+                  <Image src={c.user.profile.avatar} alt={c.user.username} width={28} height={28} className="rounded-full object-cover" />
                 ) : (
                   <span className="w-7 h-7 rounded-full bg-red-600/20 border border-red-600/30 flex items-center justify-center text-xs font-bold text-red-400 uppercase">
                     {c.user.username[0]}

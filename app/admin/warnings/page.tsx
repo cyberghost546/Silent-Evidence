@@ -1,4 +1,31 @@
-// app/admin/warnings/page.tsx — User warnings, suspensions, and bans
+// app/admin/warnings/page.tsx
+//
+// Server Component — fetches all warnings, bans, and suspensions in parallel,
+// then passes the data to WarningsClient which handles the interactive controls.
+//
+// PURPOSE:
+//   Central moderation hub for disciplinary actions against users:
+//     - Warnings: a logged message sent to the user (soft action, kept for history)
+//     - Suspensions: temporary ban (suspendedUntil > now() = user is locked out)
+//     - Bans: permanent removal (isBanned = true)
+//
+//   All actions are logged to the audit trail so there's a permanent record of
+//   who did what and when.
+//
+// THREE PARALLEL QUERIES:
+//   1. `userWarning.findMany` — the 50 most recent warning records with the warned
+//      user's name and the admin who issued the warning (double join via `include`)
+//   2. `user.findMany({ where: { isBanned: true } })` — all permanently banned users
+//   3. `user.findMany({ where: { suspendedUntil: { gt: new Date() } } })` — only
+//      ACTIVE suspensions (gt: greater than now). Expired suspensions are excluded.
+//
+// JSON SERIALIZATION:
+//   `JSON.parse(JSON.stringify(warnings))` strips Prisma's Date objects (which don't
+//   survive the Server → Client Component boundary) into plain ISO strings.
+//   Only `warnings` and `suspendedUsers` need this treatment because they contain
+//   Date fields (issuedAt, suspendedUntil). `bannedUsers` only has `createdAt`
+//   but is included for consistency.
+
 import { prisma } from '@/lib/prisma';
 import WarningsClient from './WarningsClient';
 

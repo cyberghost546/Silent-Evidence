@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   const KEY = 'verification_requests';
   const setting = await prisma.siteSetting.findUnique({ where: { key: KEY } });
-  const requests: { userId: number; status: string }[] = setting ? JSON.parse(setting.value) : [];
+  const requests: { userId: number; status: string }[] = setting?.value ? JSON.parse(setting.value) : [];
 
   const updated = requests.map(r => r.userId === userId ? { ...r, status: action === 'approve' ? 'approved' : 'rejected' } : r);
   await prisma.siteSetting.upsert({

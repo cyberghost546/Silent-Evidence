@@ -1,4 +1,29 @@
 'use client';
+// app/components/ui/HorrorBingo.tsx
+//
+// WHY 'use client'?
+//   Manages checked-cell state, fetches the current template and user progress
+//   on mount, and toggles cells on click — all requiring React hooks.
+//
+// PURPOSE:
+//   Interactive 5×5 bingo card where readers check off horror tropes as they
+//   read stories. Progress is saved server-side per user via /api/bingo/check.
+//
+// TEMPLATE:
+//   The bingo template (25 cell labels) is set by an admin and served by
+//   /api/bingo. Different templates can be created for different themes or
+//   events. The free square is always index 12 (the centre cell).
+//
+// WIN DETECTION:
+//   `checkBingo(checks)` tests all rows, columns, and both diagonals for a
+//   complete line. Called after every toggle so the BINGO banner appears
+//   instantly (optimistic) without waiting for the server round-trip.
+//
+// OPTIMISTIC UPDATES:
+//   Cell state updates immediately on click for instant visual feedback.
+//   The POST to /api/bingo/check persists it server-side in the background.
+//   If the server call fails the user sees a slight inconsistency on next load
+//   but no error UI is shown — bingo is low-stakes enough to tolerate this.
 
 import { useState, useEffect, useCallback } from 'react';
 

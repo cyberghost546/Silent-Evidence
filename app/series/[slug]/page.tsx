@@ -1,9 +1,32 @@
 // app/series/[slug]/page.tsx
-// Series detail page — shows a named series with all its published stories
-// listed in reading order (seriesOrder asc). Each story card shows the
-// estimated reading time. Returns notFound() if the slug doesn't match a series.
+//
+// Server Component — series detail page.
+//
+// PURPOSE:
+//   Shows all stories in a series in the order the author intended them to be
+//   read. Readers can see the whole arc at a glance and jump straight to any part.
+//
+// DATA:
+//   Single `findUnique` with nested includes — one DB round-trip fetches:
+//   - The series itself (name, description, slug)
+//   - The author's username and avatar (for the "By ..." credit line)
+//   - All PUBLISHED stories in this series, sorted by `seriesOrder` (asc)
+//   - Per-story like and comment counts via `_count` (avoids loading all rows)
+//
+//   `where: { status: 'PUBLISHED' }` — draft or scheduled stories in the series
+//   are hidden from readers; only the author sees them on the edit page.
+//
+//   `seriesOrder` is an integer set by the author to control reading order.
+//   It defaults to the part index (i + 1) when null, as a fallback.
+//
+// `readingTime(story.content)` — a utility that counts words and returns a
+//   human-readable estimate like "4 min read". Shown on each story card.
+//
+// `notFound()` — Next.js built-in that renders the 404 page when the slug
+//   doesn't exist in the DB. Cleaner than a manual redirect.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -61,8 +84,8 @@ export default async function SeriesPage({ params }: Props) {
 
               {/* Cover */}
               {story.coverImage && (
-                <div className="w-24 flex-shrink-0 overflow-hidden">
-                  <img src={story.coverImage} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="relative w-24 flex-shrink-0 overflow-hidden">
+                  <Image src={story.coverImage} alt={story.title} fill sizes="96px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
               )}
 

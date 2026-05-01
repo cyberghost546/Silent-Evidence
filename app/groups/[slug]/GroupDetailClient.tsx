@@ -35,6 +35,7 @@
  */
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import PollCard from '@/app/components/ui/PollCard';
 import CreatePollModal from '@/app/components/ui/CreatePollModal';
 
@@ -143,8 +144,8 @@ export default function GroupDetailClient({
       {/* Group header */}
       <div className="flex flex-col sm:flex-row gap-5 mb-8">
         {group.coverImage && (
-          <img src={group.coverImage} alt={group.name}
-            className="w-full sm:w-40 h-32 sm:h-28 object-cover rounded-xl flex-shrink-0" />
+          <Image src={group.coverImage} alt={group.name}
+            width={160} height={112} className="w-full sm:w-40 h-32 sm:h-28 object-cover rounded-xl shrink-0" />
         )}
         <div className="flex-1">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -203,8 +204,8 @@ export default function GroupDetailClient({
             group.posts.map(post => (
               <div key={post.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <img src={avatarUrl(post.author)} alt={post.author.username}
-                    className="w-8 h-8 rounded-full object-cover" />
+                  <Image src={avatarUrl(post.author)} alt={post.author.username}
+                    width={32} height={32} className="rounded-full object-cover" />
                   <div>
                     <Link href={`/user/${post.author.username}`}
                       className="text-sm font-semibold text-white hover:text-red-400 transition">
@@ -232,7 +233,7 @@ export default function GroupDetailClient({
           {group.members.map(m => (
             <Link key={m.id} href={`/user/${m.user.username}`}
               className="flex items-center gap-3 bg-gray-900 border border-gray-800 hover:border-red-600/50 rounded-xl px-4 py-3 transition">
-              <img src={avatarUrl(m.user)} alt={m.user.username} className="w-10 h-10 rounded-full object-cover" />
+              <Image src={avatarUrl(m.user)} alt={m.user.username} width={40} height={40} className="rounded-full object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-white truncate">{m.user.username}</p>
                 <p className="text-xs text-gray-600 capitalize">{m.role.toLowerCase()}</p>

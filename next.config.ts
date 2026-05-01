@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+// Run `ANALYZE=true npm run build` to open the interactive bundle treemap.
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
 
 const securityHeaders = [
   // Prevent embedding in iframes (clickjacking protection)
@@ -56,6 +60,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'source.unsplash.com' },
       // Localhost uploads in development
       { protocol: 'http', hostname: 'localhost' },
+      // YouTube thumbnail CDN — used by VideoCard and AddVideoButton
+      { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
   async headers() {
@@ -68,4 +74,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

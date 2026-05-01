@@ -1,5 +1,46 @@
 'use client';
+// app/videos/AddVideoButton.tsx
+//
+// WHY 'use client'?
+//   The modal open/close toggle and multi-step form state all require useState —
+//   these can only run in Client Components.
+//
+// PURPOSE:
+//   A 2-step modal for community members to add a video story to the site.
+//   Step 1 — URL validation and thumbnail preview.
+//   Step 2 — Story metadata (title, description, category) and submit.
+//
+// 2-STEP FLOW:
+//   The URL step comes first so the user can see a thumbnail preview and
+//   confirm the video is correct before filling in metadata. `handleNext()`
+//   validates the URL and advances; the Back button returns to Step 1.
+//
+// isValidVideoUrl():
+//   Accepts YouTube (youtu.be, youtube.com, www.youtube.com) or direct video
+//   file URLs ending in .mp4, .webm, or .ogg. Invalid URLs return false and
+//   show an inline error rather than advancing to Step 2.
+//
+// getYouTubeThumbnail():
+//   Extracts the video ID from YouTube URLs to build an img.youtube.com
+//   thumbnail URL (hqdefault.jpg). Shows a live preview in Step 1 so the
+//   user can verify the right video was pasted. Returns null for non-YouTube
+//   URLs (direct video files get no preview).
+//
+// SUBMIT STRATEGY:
+//   `handleSubmit()` POSTs to `/api/stories` — the same endpoint used for
+//   text stories — with `videoUrl` set and `status: 'PUBLISHED'`. This reuses
+//   the existing story creation API rather than needing a separate video route.
+//   The `content` field is required by the API schema, so it falls back to the
+//   title when no description is provided.
+//
+// window.location.reload() vs router.refresh():
+//   A full page reload is used after a successful submit to guarantee the new
+//   video appears in the grid. This is simpler than router.refresh() + modal
+//   close sequencing and avoids any stale-data edge cases.
+
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type Category = { id: number; name: string; slug: string };
 
@@ -27,6 +68,7 @@ function isValidVideoUrl(url: string) {
 }
 
 export default function AddVideoButton({ categories }: { categories: Category[] }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -91,8 +133,9 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
         return;
       }
 
-      // Refresh the page to show the new video
-      window.location.reload();
+      // Refresh server data and close the modal
+      reset();
+      router.refresh();
     } catch {
       setError('Network error. Please try again.');
       setSubmitting(false);
@@ -152,7 +195,9 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                   {/* Thumbnail preview */}
                   {videoUrl && isValidVideoUrl(videoUrl) && thumb && (
                     <div className="rounded-xl overflow-hidden border border-gray-800">
-                      <img src={thumb} alt="Preview" className="w-full object-cover max-h-48" />
+                      <div className="relative w-full" style={{ maxHeight: '192px', aspectRatio: '16/9' }}>
+                        <Image src={thumb} alt="Preview" fill sizes="(max-width: 640px) 100vw, 512px" className="object-cover" />
+                      </div>
                       <p className="text-xs text-gray-500 px-3 py-2">Preview looks good? Continue to add details.</p>
                     </div>
                   )}
@@ -173,7 +218,7 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                   {/* Thumbnail small preview */}
                   {thumb && (
                     <div className="flex gap-3 items-center bg-gray-800 rounded-xl p-3">
-                      <img src={thumb} alt="thumb" className="w-20 h-12 object-cover rounded-lg shrink-0" />
+                      <Image src={thumb} alt="thumb" width={80} height={48} className="object-cover rounded-lg shrink-0" />
                       <p className="text-xs text-gray-400 truncate">{videoUrl}</p>
                     </div>
                   )}

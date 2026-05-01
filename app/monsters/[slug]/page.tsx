@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -43,8 +44,9 @@ export default async function MonsterDetailPage({ params }: Props) {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           {/* Hero image */}
           {monster.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={monster.image} alt={monster.name} className="w-full h-64 object-cover" />
+            <div className="relative w-full h-64 overflow-hidden">
+              <Image src={monster.image} alt={monster.name} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" />
+            </div>
           )}
           {!monster.image && (
             <div className="w-full h-40 bg-gray-800 flex items-center justify-center text-7xl text-gray-700">👹</div>
@@ -87,8 +89,7 @@ export default async function MonsterDetailPage({ params }: Props) {
                       className="flex items-center gap-3 p-3 bg-gray-800 rounded-xl hover:bg-gray-750 border border-gray-700 hover:border-gray-600 transition-colors"
                     >
                       {s.coverImage && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={s.coverImage} alt={s.title} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                        <Image src={s.coverImage} alt={s.title} width={48} height={48} className="rounded-lg object-cover shrink-0" />
                       )}
                       <div>
                         <p className="text-white text-sm font-medium line-clamp-1">{s.title}</p>

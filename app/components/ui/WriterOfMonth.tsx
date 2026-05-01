@@ -3,29 +3,33 @@
 // a cinematic spotlight banner on the homepage/leaderboard.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
+import { cache, TTL } from '@/lib/cache';
 import { PenLine, Crown, Heart } from 'lucide-react';
 
 export default async function WriterOfMonth() {
-  // Find the user flagged as Writer of the Month
-  const writer = await prisma.user.findFirst({
-    where: { writerOfMonth: true },
-    select: {
-      id: true,
-      username: true,
-      profile: { select: { avatar: true, bio: true } },
-      _count: { select: { stories: true } },
-      stories: {
-        where: { status: 'PUBLISHED' },
-        orderBy: { likes: { _count: 'desc' } },
-        take: 3,
-        select: {
-          id: true, title: true, slug: true, coverImage: true,
-          _count: { select: { likes: true } },
+  // Cached 1 hour — writer of the month changes at most once a month.
+  const writer = await cache('homepage:writer-of-month', TTL.LONG, () =>
+    prisma.user.findFirst({
+      where: { writerOfMonth: true },
+      select: {
+        id: true,
+        username: true,
+        profile: { select: { avatar: true, bio: true } },
+        _count: { select: { stories: true } },
+        stories: {
+          where: { status: 'PUBLISHED' },
+          orderBy: { likes: { _count: 'desc' } },
+          take: 3,
+          select: {
+            id: true, title: true, slug: true, coverImage: true,
+            _count: { select: { likes: true } },
+          },
         },
       },
-    },
-  });
+    })
+  );
 
   if (!writer) return null;
 
@@ -60,10 +64,12 @@ export default async function WriterOfMonth() {
             {/* Glowing avatar ring */}
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-yellow-500/30 blur-lg scale-110" />
-              <img
+              <Image
                 src={avatar}
                 alt={writer.username}
-                className="relative w-24 h-24 rounded-full object-cover border-4 border-yellow-500/50"
+                width={96}
+                height={96}
+                className="relative rounded-full object-cover border-4 border-yellow-500/50"
               />
             </div>
             <div className="text-center">
@@ -97,7 +103,7 @@ export default async function WriterOfMonth() {
                       <span className="text-yellow-500 font-extrabold text-sm w-5 flex-shrink-0">#{i + 1}</span>
                       {/* Tiny thumbnail */}
                       {story.coverImage && (
-                        <img src={story.coverImage} alt={story.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                        <Image src={story.coverImage} alt={story.title} width={40} height={40} className="rounded-lg object-cover flex-shrink-0" />
                       )}
                       <span className="text-sm text-gray-300 group-hover:text-yellow-300 transition line-clamp-1">{story.title}</span>
                       <span className="ml-auto text-xs text-gray-500 flex-shrink-0 inline-flex items-center gap-0.5"><Heart className="w-3 h-3" /> {story._count.likes}</span>

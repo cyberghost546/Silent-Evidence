@@ -5,6 +5,7 @@
 // On success, reloads so the full chapter content becomes visible.
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
@@ -80,6 +81,7 @@ function CheckoutForm({ chapterId, priceInCents, onSuccess }: {
 
 // ── Main gate component ────────────────────────────────────────────────────────
 export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCents }: Props) {
+  const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading]           = useState(false);
   const [purchased, setPurchased]       = useState(false);
@@ -100,8 +102,8 @@ export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCe
     setLoading(false);
   };
 
-  // After successful payment, reload to show the full chapter
-  const handleSuccess = () => window.location.reload();
+  // After successful payment, refresh server data to show the full chapter
+  const handleSuccess = () => router.refresh();
 
   if (purchased) return null; // Already purchased — parent should show content
 

@@ -5,7 +5,7 @@
 // autosave to localStorage every 30 seconds, AI writing assistant, template picker,
 // and final POST to /api/stories to publish or save as draft.
 // Props: categories — list of {id, name} fetched server-side; initialExcerpt — pre-filled excerpt.
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { LANGUAGES } from '@/lib/languages';
 import dynamic from 'next/dynamic';
@@ -44,6 +44,12 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
   const [longitude, setLongitude]   = useState('');
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState('');
+
+  // Cover image — tab: 'url' or 'upload'
+  const [coverTab, setCoverTab]         = useState<'url' | 'upload'>('url');
+  const [uploading, setUploading]       = useState(false);
+  const [uploadError, setUploadError]   = useState('');
+  const coverFileRef                    = useRef<HTMLInputElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   // Template picker visibility
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
@@ -149,6 +155,24 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
     setWordCount(wc);
     latestContent.current = html;
     scheduleAutosave();
+  };
+
+  const handleCoverUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError('');
+    setUploading(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    setUploading(false);
+    if (!res.ok) {
+      const data = await res.json();
+      setUploadError(data.error ?? 'Upload failed');
+      return;
+    }
+    const { url } = await res.json();
+    setCoverImage(url);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -295,22 +319,79 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       {/* Cover image */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          Cover Image URL <span className="text-gray-500 font-normal">(optional)</span>
+          Cover Image <span className="text-gray-500 font-normal">(optional)</span>
         </label>
-        <input
-          type="url"
-          value={coverImage}
-          onChange={(e) => setCoverImage(e.target.value)}
-          placeholder="https://example.com/image.jpg"
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
-        />
-        {coverImage && (
-          <img
-            src={coverImage}
-            alt="Cover preview"
-            className="mt-3 w-full h-48 object-cover rounded-lg border border-gray-700"
-            onError={(e) => (e.currentTarget.style.display = 'none')}
+
+        {/* Tab switcher */}
+        <div className="flex gap-1 bg-gray-800 border border-gray-700 rounded-lg p-1 mb-3 w-fit">
+          {(['upload', 'url'] as const).map(tab => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => { setCoverTab(tab); setUploadError(''); }}
+              className={`px-4 py-1.5 text-xs font-semibold rounded-md transition ${
+                coverTab === tab ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              {tab === 'upload' ? '📁 Upload from device' : '🔗 Paste URL'}
+            </button>
+          ))}
+        </div>
+
+        {coverTab === 'upload' ? (
+          <div
+            onClick={() => coverFileRef.current?.click()}
+            className="relative flex flex-col items-center justify-center gap-2 w-full h-36 border-2 border-dashed border-gray-700 hover:border-red-600/60 rounded-lg cursor-pointer transition group bg-gray-900"
+          >
+            <input
+              ref={coverFileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+              onChange={handleCoverUpload}
+            />
+            {uploading ? (
+              <p className="text-sm text-gray-400 animate-pulse">Uploading…</p>
+            ) : (
+              <>
+                <span className="text-3xl">🖼️</span>
+                <p className="text-sm text-gray-400 group-hover:text-white transition">
+                  Click to choose an image
+                </p>
+                <p className="text-xs text-gray-600">JPEG, PNG, WebP or GIF · max 5 MB</p>
+              </>
+            )}
+            {uploadError && (
+              <p className="absolute bottom-2 text-xs text-red-400">{uploadError}</p>
+            )}
+          </div>
+        ) : (
+          <input
+            type="url"
+            value={coverImage}
+            onChange={(e) => setCoverImage(e.target.value)}
+            placeholder="https://example.com/image.jpg"
+            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
           />
+        )}
+
+        {/* Preview — shown regardless of which tab set the URL */}
+        {coverImage && (
+          <div className="relative mt-3">
+            <img
+              src={coverImage}
+              alt="Cover preview"
+              className="w-full h-48 object-cover rounded-lg border border-gray-700"
+              onError={(e) => (e.currentTarget.style.display = 'none')}
+            />
+            <button
+              type="button"
+              onClick={() => { setCoverImage(''); if (coverFileRef.current) coverFileRef.current.value = ''; }}
+              className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white text-xs px-2 py-1 rounded-md transition"
+            >
+              ✕ Remove
+            </button>
+          </div>
         )}
       </div>
 

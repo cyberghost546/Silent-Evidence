@@ -27,6 +27,15 @@ import { cookies } from 'next/headers';
 // Import the Prisma database client for all DB queries
 import { prisma } from '@/lib/prisma';
 
+import { z } from 'zod';
+
+const CreatePollSchema = z.object({
+  question: z.string().min(1, 'Question is required.').max(500),
+  options:  z.array(z.string().min(1)).min(2, 'Provide between 2 and 10 options.').max(10, 'Provide between 2 and 10 options.'),
+  endsAt:   z.string().nullable().optional(),
+  groupId:  z.number().int().positive().nullable().optional(),
+});
+
 // ── Helper: builds the Prisma select object for poll queries ─────────────────
 // This helper is used in both GET and POST responses so we define it once here
 // to keep the two handlers in sync — they return the exact same shape.
@@ -131,26 +140,19 @@ export async function POST(req: Request) {
   // Guests cannot create polls
   if (!userId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });
 
-  // Parse the JSON request body
-  const body = await req.json();
-
-  // Destructure the expected fields from the body
-  const { question, options, endsAt, groupId } = body;
-
-  // The question is required and must not be blank
-  if (!question?.trim()) return NextResponse.json({ error: 'Question is required.' }, { status: 400 });
-
-  // options must be an array of 2–10 items before cleaning.
-  // We check the raw array first to give a clear error about the count.
-  if (!Array.isArray(options) || options.length < 2 || options.length > 10) {
-    return NextResponse.json({ error: 'Provide between 2 and 10 options.' }, { status: 400 });
+  // Parse and validate the JSON request body
+  const rawBody = await req.json();
+  const parsed = CreatePollSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
+  const { question: rawQuestion, options, endsAt, groupId } = parsed.data;
 
   // Strip leading/trailing whitespace from each option and remove any empty strings.
   // .filter(Boolean) removes empty strings left after trimming (e.g. "  " → "" → removed).
   const cleanOptions: string[] = options.map((o: string) => o.trim()).filter(Boolean);
 
-  // Re-check the count after cleaning in case empty strings reduced the valid count below 2
+  // Re-check the count after cleaning in case whitespace-only strings reduced the valid count below 2
   if (cleanOptions.length < 2) return NextResponse.json({ error: 'At least 2 non-empty options required.' }, { status: 400 });
 
   // Create the poll AND all its options in a single database operation.
@@ -159,7 +161,7 @@ export async function POST(req: Request) {
   const poll = await prisma.poll.create({
     data: {
       // The trimmed poll question
-      question: question.trim(),
+      question: rawQuestion.trim(),
       // Convert the ISO date string to a JS Date object, or null if no end date was given.
       // null means the poll stays open indefinitely until manually closed.
       endsAt: endsAt ? new Date(endsAt) : null,

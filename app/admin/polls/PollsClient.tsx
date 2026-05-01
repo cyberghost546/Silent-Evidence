@@ -1,23 +1,63 @@
 'use client';
+// app/admin/polls/PollsClient.tsx
+//
+// WHY 'use client'?
+//   The poll creation form (dynamic option inputs), the close/delete actions, and
+//   the live results all require useState — these only work in Client Components.
+//
+// PURPOSE:
+//   Manage site-wide polls visible on the homepage or category pages.
+//   The admin can create a poll with a question, 2+ options, and an optional
+//   end date. Running polls show live vote counts. Closing a poll sets `endsAt`
+//   to now (immediately stops accepting votes). Deleting removes it entirely.
+//
+// STATE:
+//   polls    — the local list of polls, mutated optimistically after each action
+//   question — the question text for the new poll being created
+//   options  — array of option strings; starts with two empty strings, more can be added
+//   endsAt   — optional ISO date string for when the poll closes automatically
+//   creating — disables the Create button while the POST is in-flight
+//   msg      — 3-second flash message after each action
+//
+// DYNAMIC OPTIONS:
+//   `options` is an array where each element is one option text input.
+//   `addOption()` appends an empty string (adds a new input row).
+//   `setOption(i, v)` updates the value at index i (controlled input pattern).
+//   `validOpts` filters out empty strings before submitting — blank options are ignored.
+//
+// CLOSE vs DELETE:
+//   `close()` — sets endsAt to now via PATCH (poll stays visible with final results)
+//   `del()`   — deletes the poll entirely via DELETE (native confirm() guard)
+//
+// OPTIMISTIC UPDATES:
+//   After create: prepend the new poll to local state immediately.
+//   After close:  update the closed poll's endsAt in-place via .map().
+//   After delete: remove the poll from the array via .filter().
+
 import { useState } from 'react';
 
+// Option shape — each poll option with its vote count from Prisma's _count
 type Option = { id: number; text: string; _count: { votes: number } };
+// Poll shape — includes the options array and total vote count
 type Poll = { id: number; question: string; endsAt: string | null; createdAt: string; _count: { votes: number }; options: Option[] };
 
 export default function PollsClient({ polls: initial }: { polls: Poll[] }) {
   const [polls, setPolls] = useState(initial);
   const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState(['', '']);
+  const [options, setOptions] = useState(['', '']); // start with 2 empty option inputs
   const [endsAt, setEndsAt] = useState('');
   const [creating, setCreating] = useState(false);
   const [msg, setMsg] = useState('');
 
   const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
 
+  // addOption appends a new empty text input to the options array
   const addOption = () => setOptions(o => [...o, '']);
+  // setOption updates the value of the i-th option input
   const setOption = (i: number, v: string) => setOptions(o => o.map((x, idx) => idx === i ? v : x));
 
   const create = async () => {
+    // Filter out blank option inputs before submitting
     const validOpts = options.filter(o => o.trim());
     if (!question.trim() || validOpts.length < 2) { flash('Need a question and at least 2 options.'); return; }
     setCreating(true);

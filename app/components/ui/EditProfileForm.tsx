@@ -68,8 +68,10 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
       body: formData,
     });
 
-    const data = await res.json();
     setUploading(false);
+
+    let data: { url?: string; error?: string } = {};
+    try { data = await res.json(); } catch { /* empty body */ }
 
     if (!res.ok) {
       setError(data.error ?? 'Upload failed.');
@@ -77,7 +79,7 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
     }
 
     // Update the avatar field with the returned URL so the preview refreshes
-    setAvatar(data.url);
+    setAvatar(data.url ?? '');
   };
 
   // ── Submit profile info ────────────────────────────────────────────────────

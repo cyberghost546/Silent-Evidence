@@ -1,9 +1,46 @@
 // app/search/page.tsx
-// Full-text story search page with filters for category, mood, reading time band,
-// content rating, and sort order. All filtering is done via DB query on the server
-// using URL search params (?q=, ?category=, ?mood=, etc.).
-// Pagination is handled with ?page= — PAGE_SIZE stories per page.
+//
+// Server Component — full-text story search with multi-dimensional filtering.
+// All filtering happens DB-side using URL search params read from `searchParams`.
 // SearchStories is the client component that handles the filter UI interactions.
+//
+// FILTERS (each maps to a URL param):
+//   ?q=         — full-text search across title, excerpt, content, category, author, tags
+//   ?category=  — filter by category slug
+//   ?mood=      — filter by the story's mood enum value (GOTHIC, PARANORMAL, etc.)
+//   ?readTime=  — short/medium/long band (applied in-memory after query — see below)
+//   ?sort=      — newest/popular/comments
+//   ?page=      — pagination offset
+//
+// READING TIME BAND APPROACH:
+//   Prisma can't filter by a computed value (word count from content string),
+//   so we fetch up to 200 results from the DB and then filter in JS:
+//     mins = content.length / 5 / 200  (rough: 5 chars/word, 200 words/min)
+//   This over-fetches but avoids storing a precomputed `wordCount` column.
+//   Pagination is then applied manually to the in-memory filtered array.
+//   For no readTime filter, standard DB-side skip/take pagination is used.
+//
+// WHERE CLAUSE BUILDER:
+//   `whereBase` uses spread syntax to conditionally add fields. If `catSlug` is
+//   empty, `{ category: { slug: catSlug } }` is NOT spread in — the object is falsy.
+//   The `OR` block does multi-field text search: Prisma generates a SQL WHERE with
+//   multiple LIKE clauses joined by OR.
+//
+// `filterHref()` builds a URL for filter links by merging the current params with
+//   overrides. This lets each pill link preserve other active filters while changing
+//   only the one it controls — e.g. clicking a category pill keeps ?q= and ?mood=.
+//
+// PEOPLE RESULTS:
+//   When a query is present, we also search for users by username (up to 6 results)
+//   and show them in a "People" section above the story results.
+
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import Header from '@/app/components/ui/Header';
+import Footer from '@/app/components/ui/Footer';
+import Pagination from '@/app/components/ui/Pagination';
+import { cookies } from 'next/headers';
+import SearchStories from './SearchStories';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';

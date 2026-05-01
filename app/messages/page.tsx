@@ -1,6 +1,40 @@
 // app/messages/page.tsx
-// Instagram-style full-screen DM page.
-// Server component — preloads conversation list, then hands off to InboxClient.
+//
+// Server Component — auth-gated inbox page.
+//
+// PURPOSE:
+//   Instagram-style full-screen DM inbox. Shows one row per unique conversation
+//   partner, with the most recent message preview and an unread count badge.
+//   Clicking a conversation navigates to /messages/[username] for the full thread.
+//
+// DATA PATTERN:
+//   One query loads ALL direct messages involving this user (sent or received),
+//   ordered newest first. We then deduplicate them client-side into one conversation
+//   entry per partner.
+//
+//   WHY LOAD ALL MESSAGES INSTEAD OF QUERYING CONVERSATIONS DIRECTLY?
+//   There is no separate "Conversation" table — each DM row is independent.
+//   To build the inbox, we need the most recent message per partner. The most
+//   efficient approach at this scale is to load all messages and do the grouping
+//   in JS (see the `seen` Set below). For very high-volume apps you'd use a SQL
+//   subquery or a separate conversations table.
+//
+// DEDUPLICATION ALGORITHM:
+//   `seen` is a Set<number> of partner IDs we've already processed.
+//   We iterate messages newest-first (already sorted by Prisma).
+//   For each message, the "partner" is whoever is NOT the current user.
+//   The first time we see a partner ID, we add their conversation entry.
+//   Subsequent messages from the same partner are skipped (`continue`).
+//   Result: one entry per partner, with the newest message as the preview.
+//
+// UNREAD COUNT:
+//   Computed by scanning the loaded messages array — no extra DB query.
+//   `m.senderId === partner.id && m.receiverId === userId && !m.read`
+//   This counts messages the partner sent to us that we haven't read yet.
+//
+// LAYOUT:
+//   `h-screen overflow-hidden` — the inbox takes the full viewport height.
+//   InboxClient manages its own internal scroll regions (conversation list + chat pane).
 
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';

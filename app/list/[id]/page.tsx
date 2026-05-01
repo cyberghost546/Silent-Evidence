@@ -24,6 +24,7 @@
  */
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -89,8 +90,8 @@ export default async function ListPage({ params }: Props) {
                   <span className="text-lg font-bold text-gray-700 group-hover:text-red-500 transition">{i + 1}</span>
                 </div>
                 {story.coverImage && (
-                  <div className="w-20 flex-shrink-0 overflow-hidden">
-                    <img src={story.coverImage} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="relative w-20 flex-shrink-0 overflow-hidden">
+                    <Image src={story.coverImage} alt={story.title} fill sizes="80px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 )}
                 <div className="flex-1 py-3 pr-4 flex flex-col justify-center gap-1 min-w-0">

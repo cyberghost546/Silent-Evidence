@@ -1,6 +1,34 @@
 'use client';
+// app/admin/featured-authors/FeaturedAuthorsClient.tsx
+//
+// WHY 'use client'?
+//   The search-as-you-type author lookup, the add/remove buttons, and the flash
+//   messages all require useState and async fetch calls — Client Component only.
+//
+// PURPOSE:
+//   Interactive UI for managing the "Featured Authors" list. The admin searches
+//   for a user by username, clicks "Add", and they appear in the featured slot.
+//   The featured list is capped at 6 entries (enforced client-side with an early
+//   return + flash message, and also validated server-side).
+//
+// WRITE-THROUGH PATTERN:
+//   Both `add()` and `remove()` update local state FIRST (optimistic), then POST
+//   the full updated ID array to the API. This means:
+//     1. The UI feels instant — no waiting for the server.
+//     2. The API receives the complete new array (not a delta), so the server can
+//        simply overwrite the stored JSON without needing to merge anything.
+//   If the API call fails silently, local state and DB may drift — acceptable for
+//   this admin-only low-stakes feature.
+//
+// SEARCH FLOW:
+//   `lookup()` fires on button click or Enter key press.
+//   Results are cleared when an author is added (the dropdown disappears cleanly).
+//
+// `flash()` — shared helper that sets a message for 3 seconds then auto-clears.
+
 import { useState } from 'react';
 
+// Author shape — flattened from the server component's _count.stories/_count.followers
 type Author = { id: number; username: string; isVerified: boolean; stories: number; followers: number };
 
 export default function FeaturedAuthorsClient({ featured: initial }: { featured: Author[] }) {

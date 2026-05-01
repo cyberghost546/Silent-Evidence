@@ -1,38 +1,84 @@
-// app/admin/revenue/page.tsx — Financial overview: tips, subscriptions, purchases
+// app/admin/revenue/page.tsx
+//
+// Server Component — financial overview dashboard for the admin.
+//
+// WHAT IT SHOWS:
+//   • All-time revenue (sum of tips + story/bundle/chapter purchases)
+//   • Tips this month vs last month (month-over-month comparison)
+//   • Active subscriber count
+//   • Revenue breakdown by source with a proportional progress bar
+//   • Top 5 most-tipped authors
+//   • 10 most recent tip transactions
+//
+// DATA NOTES:
+//   All monetary amounts are stored as integers in cents (e.g. 500 = $5.00).
+//   The `cents()` helper converts them to dollar strings for display.
+//
+//   `prisma.tip.aggregate({ _sum: { amount: true } })` is the Prisma equivalent
+//   of SELECT SUM(amount) FROM Tip — it returns a single number, not rows.
+//
+//   `prisma.tip.groupBy({ by: ['toUserId'], _sum: { amount: true }, ... })` is
+//   equivalent to SELECT toUserId, SUM(amount) FROM Tip GROUP BY toUserId.
+//   This is how we find the top-tipped authors without loading every tip row.
+//
+//   The `topTippedUsers` step resolves usernames AFTER the groupBy because
+//   Prisma's groupBy doesn't support nested relations. We run one lookup per
+//   top-5 user — acceptable because it's at most 5 extra queries.
+//
+// All 10 main queries are parallelised via Promise.all so they run simultaneously.
+
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
+// cents() converts a cent integer to a formatted dollar string: 500 → "$5.00"
 function cents(n: number) { return `$${(n / 100).toFixed(2)}`; }
 
 export default async function AdminRevenuePage() {
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  // Date boundaries for month-over-month comparison
+  const startOfMonth     = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
+  // ── Parallel DB queries ───────────────────────────────────────────────────
+  // All 10 queries run at the same time — wait time = slowest single query.
   const [
-    totalTips, monthTips, lastMonthTips,
-    subCount, activeSubs,
-    storyPurchases, bundlePurchases, chapterPurchases,
-    recentTips, topTipped,
+    totalTips, monthTips, lastMonthTips,   // tip aggregates
+    subCount, activeSubs,                   // subscription counts
+    storyPurchases, bundlePurchases, chapterPurchases, // purchase aggregates
+    recentTips, topTipped,                  // recent tips + top-tipped leaderboard
   ] = await Promise.all([
+    // All-time tip total
     prisma.tip.aggregate({ _sum: { amount: true } }),
+    // Tips since the 1st of this calendar month
     prisma.tip.aggregate({ where: { createdAt: { gte: startOfMonth } }, _sum: { amount: true } }),
+    // Tips during last month (for comparison)
     prisma.tip.aggregate({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } }, _sum: { amount: true } }),
+    // All subscriptions ever created
     prisma.subscription.count(),
+    // Subscriptions with status = 'active' (currently paying)
     prisma.subscription.count({ where: { status: 'active' } }),
+    // Story purchase totals
     prisma.storyPurchase.aggregate({ _sum: { amount: true }, _count: true }),
+    // Bundle purchase totals (note: field is paidCents, not amount)
     prisma.bundlePurchase.aggregate({ _sum: { paidCents: true }, _count: true }),
+    // Chapter purchase totals
     prisma.chapterPurchase.aggregate({ _sum: { amount: true }, _count: true }),
+    // 10 most recent tips with sender and recipient names for the table
     prisma.tip.findMany({ orderBy: { createdAt: 'desc' }, take: 10, include: { from: { select: { username: true } }, to: { select: { username: true } } } }),
+    // Top 5 recipients by total tips received — GROUP BY toUserId
     prisma.tip.groupBy({ by: ['toUserId'], _sum: { amount: true }, orderBy: { _sum: { amount: 'desc' } }, take: 5 }),
   ]);
 
+  // All-time revenue across all monetisation channels (in cents)
   const allTimeRevenue =
     (totalTips._sum.amount ?? 0) +
     (storyPurchases._sum.amount ?? 0) +
     (bundlePurchases._sum.paidCents ?? 0) +
     (chapterPurchases._sum.amount ?? 0);
 
+  // Resolve usernames for the top-tipped authors.
+  // groupBy returns user IDs, not usernames — we look up each one separately.
+  // Promise.all parallelises these 5 lookups.
   const topTippedUsers = await Promise.all(
     topTipped.map(async t => {
       const u = await prisma.user.findUnique({ where: { id: t.toUserId }, select: { username: true } });
@@ -128,11 +174,15 @@ export default async function AdminRevenuePage() {
   );
 }
 
+// StatCard — a summary tile with a large coloured value, a label, and an optional
+// sub-label (used for secondary context like "Last month: $12.00").
+// `color` is a Tailwind text-colour class e.g. 'text-green-400'.
 function StatCard({ label, value, color, sub }: { label: string; value: string; color: string; sub?: string }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">{label}</p>
+      {/* Optional secondary label — only rendered when provided */}
       {sub && <p className="text-xs text-gray-600 mt-1">{sub}</p>}
     </div>
   );

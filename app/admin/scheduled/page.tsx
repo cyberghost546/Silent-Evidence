@@ -1,8 +1,28 @@
-// app/admin/scheduled/page.tsx — All stories queued for future publication
+// app/admin/scheduled/page.tsx
+//
+// Server Component — shows all stories that are queued for automatic future publication.
+//
+// HOW SCHEDULED PUBLISHING WORKS:
+//   When an author sets a publish date on a story, its status is set to 'SCHEDULED'
+//   and `scheduledAt` is set to the target timestamp. A background job (cron) checks
+//   this table periodically and changes the status to 'PUBLISHED' when `scheduledAt`
+//   is in the past. This page lets the admin see what's in the queue.
+//
+// DATA:
+//   `where: { status: 'SCHEDULED' }` — only queued stories, not drafts or published.
+//   `orderBy: { scheduledAt: 'asc' }` — soonest to publish at the top.
+//   `include: { author, category }` — needed for the table columns.
+//
+// DERIVED `timeLeft`:
+//   Computed per-row in the render loop — converts the scheduled timestamp to
+//   "in Xh" or "overdue" relative to now. Done at request time so the numbers
+//   are accurate when the admin loads the page.
+
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
 export default async function AdminScheduledPage() {
+  // Fetch all scheduled stories, soonest first
   const stories = await prisma.story.findMany({
     where: { status: 'SCHEDULED' },
     orderBy: { scheduledAt: 'asc' },

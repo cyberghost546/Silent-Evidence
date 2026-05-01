@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Recipe {
   id: number;
@@ -99,8 +100,9 @@ export default function RecipesFeed() {
           <div key={r.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition-colors">
             {/* Cover */}
             {r.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.image} alt={r.title} className="w-full h-44 object-cover" />
+              <div className="relative h-44 overflow-hidden">
+                <Image src={r.image} alt={r.title} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
+              </div>
             ) : (
               <div className="w-full h-32 bg-gray-800 flex items-center justify-center text-5xl text-gray-700">
                 {r.type === 'drink' ? '🍷' : r.type === 'ritual' ? '🕯️' : '🍖'}

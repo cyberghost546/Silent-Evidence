@@ -4,45 +4,42 @@
 // from the past 7 days so the section is never empty.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
+import { cache, TTL } from '@/lib/cache';
 import { readingTime } from '@/lib/readingTime';
 
+const STORY_SELECT = {
+  id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true,
+  author: { select: { username: true, profile: { select: { avatar: true } } } },
+  category: { select: { name: true, slug: true } },
+  _count: { select: { likes: true, comments: true } },
+} as const;
+
 export default async function StoryOfTheWeek() {
-  // 1. Check if an admin has manually pinned a story
-  const setting = await prisma.siteSetting.findUnique({ where: { key: 'story_of_week_id' } });
-  const pinnedId = setting?.value ? Number(setting.value) : null;
+  // Cached 30 minutes — admin can update via admin panel; cache provides relief during traffic spikes.
+  const story = await cache('homepage:story-of-week', TTL.MEDIUM, async () => {
+    const setting = await prisma.siteSetting.findUnique({ where: { key: 'story_of_week_id' } });
+    const pinnedId = setting?.value ? Number(setting.value) : null;
 
-  // 2. Fetch either the pinned story or the top-liked story of the past 7 days
-  let story = null;
+    if (pinnedId) {
+      const pinned = await prisma.story.findUnique({
+        where: { id: pinnedId, status: 'PUBLISHED' },
+        select: STORY_SELECT,
+      });
+      if (pinned) return pinned;
+    }
 
-  if (pinnedId) {
-    story = await prisma.story.findUnique({
-      where: { id: pinnedId, status: 'PUBLISHED' },
-      select: {
-        id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true,
-        author: { select: { username: true, profile: { select: { avatar: true } } } },
-        category: { select: { name: true, slug: true } },
-        _count: { select: { likes: true, comments: true } },
-      },
-    });
-  }
-
-  if (!story) {
     // Fallback: highest-liked published story from the past 7 days
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const candidates = await prisma.story.findMany({
       where: { status: 'PUBLISHED', createdAt: { gte: oneWeekAgo } },
-      select: {
-        id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true,
-        author: { select: { username: true, profile: { select: { avatar: true } } } },
-        category: { select: { name: true, slug: true } },
-        _count: { select: { likes: true, comments: true } },
-      },
+      select: STORY_SELECT,
       orderBy: { likes: { _count: 'desc' } },
       take: 1,
     });
-    story = candidates[0] ?? null;
-  }
+    return candidates[0] ?? null;
+  });
 
   if (!story) return null;
 
@@ -66,10 +63,13 @@ export default async function StoryOfTheWeek() {
         {/* Cover image */}
         <Link href={`/story/${story.slug}`} className="md:w-96 h-56 md:h-auto flex-shrink-0 overflow-hidden relative block">
           {story.coverImage ? (
-            <img
+            <Image
               src={story.coverImage}
               alt={story.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              fill
+              sizes="(max-width: 768px) 100vw, 384px"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              priority
             />
           ) : (
             // Gradient placeholder when no cover image is set
@@ -105,10 +105,12 @@ export default async function StoryOfTheWeek() {
 
           {/* Author + meta row */}
           <div className="flex items-center gap-3 mt-2">
-            <img
+            <Image
               src={authorAvatar}
               alt={story.author.username}
-              className="w-7 h-7 rounded-full object-cover border border-gray-600"
+              width={28}
+              height={28}
+              className="rounded-full object-cover border border-gray-600"
             />
             <Link
               href={`/user/${story.author.username}`}

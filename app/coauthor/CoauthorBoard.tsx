@@ -23,6 +23,26 @@
  *   submitting  — true while the POST request is in flight (disables the button)
  *   error       — inline validation or API error message
  *
+ * OPTIMISTIC-STYLE UPDATE — POST:
+ * After a successful POST, the returned CoauthorRequest object is prepended:
+ *   setRequests(prev => [created, ...prev])
+ * This means the new post appears at the top of the list immediately, without
+ * a page reload or a refetch of the entire list.
+ *
+ * OPTIMISTIC-STYLE UPDATE — PATCH (toggle):
+ * handleToggle() sends PATCH to the API, then flips isOpen locally:
+ *   prev.map(r => r.id === id ? { ...r, isOpen: !r.isOpen } : r)
+ * The spread preserves all other fields; only isOpen changes.
+ *
+ * INLINE FORM PATTERN:
+ * showForm toggles between the "+" button and the form. On cancel, we also
+ * clear the error so stale messages don't reappear next time the form opens.
+ *
+ * GENRE PILL RENDERING:
+ * genres is stored as "Cosmic, Action, Gothic" — a single comma-separated string.
+ * We split it with .split(',') and .trim() each part, then render each as a
+ * <span> pill. This avoids a separate genres[] array on the data model.
+ *
  * HOW TO REUSE:
  * This pattern — a list page with an inline "create" form that prepends the new
  * item to the list without a page reload — is very reusable. Key ideas:
@@ -35,37 +55,57 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// ── TypeScript Interfaces ──────────────────────────────────────────────────────
+
+// Shape of a co-author request record as returned by the API/Prisma
 interface CoauthorRequest {
   id:          number;
   title:       string;
   description: string;
+  // genres may be null when the author left it blank
   genres:      string | null;
+  // true = still accepting partners; false = slot filled
   isOpen:      boolean;
+  // Prisma returns Date objects; JSON serialisation turns them to strings
   createdAt:   string | Date;
   authorId:    number;
   author: {
     username: string;
+    // profile is null when the user hasn't set up their profile yet
     profile:  { avatar: string | null } | null;
   };
 }
 
+// Props passed from the server page
 interface Props {
   initialRequests: CoauthorRequest[];
+  // null when the visitor is not logged in
   currentUserId:   number | null;
 }
 
 export default function CoauthorBoard({ initialRequests, currentUserId }: Props) {
+  // ── State ────────────────────────────────────────────────────────────────────
+
+  // Full list of requests — initialised from server data, updated optimistically
   const [requests,    setRequests]    = useState<CoauthorRequest[]>(initialRequests);
+  // Controls whether the inline "Post Request" form is visible
   const [showForm,    setShowForm]    = useState(false);
+  // Controlled form fields
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
   const [genres,      setGenres]      = useState('');
+  // Prevents double-submits while the POST is in-flight
   const [submitting,  setSubmitting]  = useState(false);
+  // Validation or API error shown inside the form
   const [error,       setError]       = useState<string | null>(null);
 
-  // Post a new co-author request
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+
+  // Post a new co-author request to the API
   const handlePost = async () => {
     setError(null);
+
+    // Client-side validation before hitting the network
     if (title.trim().length < 5) { setError('Title must be at least 5 characters.'); return; }
     if (description.trim().length < 20) { setError('Description must be at least 20 characters.'); return; }
 
@@ -75,29 +115,40 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ title, description, genres }),
     });
+
     if (res.ok) {
       const created: CoauthorRequest = await res.json();
-      setRequests(prev => [created, ...prev]);  // prepend new request
+      // Prepend so the newest request appears at the top of the board immediately
+      setRequests(prev => [created, ...prev]);
+      // Close the form and reset all fields for next time
       setShowForm(false);
       setTitle(''); setDescription(''); setGenres('');
     } else {
+      // Parse the API error message; fall back if the body isn't valid JSON
       const data = await res.json().catch(() => ({}));
       setError(data.error ?? 'Failed to post. Please try again.');
     }
     setSubmitting(false);
   };
 
-  // Toggle a request open/closed (author only)
+  // Toggle a request between "Open" and "Filled" — only the author sees this button
   const handleToggle = async (id: number) => {
     const res = await fetch(`/api/coauthor-requests/${id}`, { method: 'PATCH' });
     if (res.ok) {
+      // Flip isOpen for the matching request; leave all other requests unchanged
       setRequests(prev => prev.map(r => r.id === id ? { ...r, isOpen: !r.isOpen } : r));
     }
   };
 
+  // ── Render ────────────────────────────────────────────────────────────────────
+
   return (
     <div className="space-y-6">
-      {/* Post button — only for logged-in users */}
+
+      {/*
+        "Post a request" button — only shown to logged-in users who haven't
+        already opened the form. currentUserId is null for guests.
+      */}
       {currentUserId && !showForm && (
         <button
           onClick={() => setShowForm(true)}
@@ -107,15 +158,21 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
         </button>
       )}
 
-      {/* Post form */}
+      {/* ── Inline create form ────────────────────────────────────────── */}
       {showForm && (
         <div className="border border-gray-800 rounded-xl p-5 bg-gray-900 space-y-3">
           <h3 className="text-sm font-bold text-white">New Co-author Request</h3>
 
+          {/* Inline validation/API error — only visible when error is non-null */}
           {error && (
             <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
           )}
 
+          {/*
+            suppressHydrationWarning on inputs: Next.js SSR can produce a
+            mismatch if the server and client render different default values
+            (e.g. autofill). This attribute silences that warning for form fields.
+          */}
           <input
             suppressHydrationWarning
             value={title}
@@ -139,15 +196,18 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
           />
 
+          {/* Action buttons: Post (primary) + Cancel (secondary) */}
           <div className="flex gap-2">
             <button
               onClick={handlePost}
               disabled={submitting}
               className="flex-1 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition"
             >
+              {/* Label changes during the in-flight POST */}
               {submitting ? 'Posting…' : 'Post Request'}
             </button>
             <button
+              // Also clear the error so it doesn't reappear when the form opens again
               onClick={() => { setShowForm(false); setError(null); }}
               className="px-4 py-2 border border-gray-700 text-gray-400 hover:text-white text-sm rounded-lg transition"
             >
@@ -157,8 +217,9 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
         </div>
       )}
 
-      {/* Listings */}
+      {/* ── Request listings ──────────────────────────────────────────── */}
       {requests.length === 0 ? (
+        // Empty state — shown when no requests exist yet
         <div className="text-center py-16 text-gray-500">
           <p className="text-4xl mb-4">✍️</p>
           <p className="text-lg font-semibold text-gray-400 mb-1">No open requests yet</p>
@@ -168,20 +229,24 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
         requests.map(request => (
           <div
             key={request.id}
+            // Closed requests are muted with opacity-60 so open ones stand out
             className={`border rounded-xl p-5 ${request.isOpen ? 'border-gray-800 bg-gray-900' : 'border-gray-800/50 bg-gray-900/50 opacity-60'}`}
           >
-            {/* Header row */}
+            {/* ── Header row: avatar + title + status badge ─────────── */}
             <div className="flex items-start gap-3 mb-3">
-              {/* Author avatar */}
+
+              {/* Author avatar — falls back to a letter-initial placeholder */}
               {request.author.profile?.avatar ? (
                 <Image
                   src={request.author.profile.avatar}
                   alt={request.author.username}
                   width={36}
                   height={36}
+                  // Next.js Image handles srcset and lazy loading automatically
                   className="rounded-full flex-shrink-0 object-cover"
                 />
               ) : (
+                // Fallback: grey circle with the first letter of the username
                 <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                   <span className="text-sm font-bold text-gray-400">
                     {request.author.username[0].toUpperCase()}
@@ -189,19 +254,22 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
                 </div>
               )}
 
+              {/* Title + byline */}
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-bold text-white truncate">{request.title}</h3>
                 <p className="text-xs text-gray-500">
                   by{' '}
+                  {/* Link to the author's public profile page */}
                   <Link href={`/user/${request.author.username}`} className="text-gray-400 hover:text-white transition">
                     {request.author.username}
                   </Link>
                   {' · '}
+                  {/* Format the ISO date string to "Jan 1" style */}
                   {new Date(request.createdAt).toLocaleDateString()}
                 </p>
               </div>
 
-              {/* Status badge */}
+              {/* Status badge — green for open, grey for closed */}
               <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
                 request.isOpen ? 'bg-green-500/15 text-green-400' : 'bg-gray-700 text-gray-500'
               }`}>
@@ -209,12 +277,17 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
               </span>
             </div>
 
-            {/* Description */}
+            {/* Description — whitespace-pre-wrap preserves intentional line breaks */}
             <p className="text-sm text-gray-400 leading-relaxed mb-3 whitespace-pre-wrap">{request.description}</p>
 
-            {/* Genre tags */}
+            {/* ── Genre pills ───────────────────────────────────────── */}
             {request.genres && (
+              // Only render if the genres field is non-null and non-empty
               <div className="flex flex-wrap gap-1.5 mb-3">
+                {/*
+                  Split the comma-separated string into individual tokens.
+                  .trim() removes any whitespace around commas ("Cosmic , Action").
+                */}
                 {request.genres.split(',').map(g => (
                   <span key={g} className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full">
                     {g.trim()}
@@ -223,7 +296,11 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
               </div>
             )}
 
-            {/* Author actions */}
+            {/* ── Author action: toggle open/closed ─────────────────── */}
+            {/*
+              Only visible to the request's original author (currentUserId === request.authorId).
+              Other users see no action here — they would DM the author via their profile.
+            */}
             {currentUserId === request.authorId && (
               <button
                 onClick={() => handleToggle(request.id)}
@@ -236,7 +313,7 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
         ))
       )}
 
-      {/* Login prompt */}
+      {/* ── Login prompt for guests ────────────────────────────────── */}
       {!currentUserId && (
         <p className="text-center text-sm text-gray-500 py-4">
           <Link href="/login" className="text-red-400 hover:text-red-300 transition">Sign in</Link> to post a co-author request.

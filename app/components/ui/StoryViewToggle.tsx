@@ -7,6 +7,7 @@
 
 import { useState } from 'react'; // useState — tracks which layout ('grid' | 'list') is active
 import Link from 'next/link';      // Link — wraps each story card for client-side navigation
+import Image from 'next/image';
 import { readingTime } from '@/lib/readingTime'; // readingTime — converts raw content string to "X min read" label
 
 // ── Exported type ─────────────────────────────────────────────────────────────
@@ -140,10 +141,12 @@ export default function StoryViewToggle({ stories, footer }: Props) {
 
                   {/* Show the actual cover image if one exists */}
                   {story.coverImage ? (
-                    <img
+                    <Image
                       src={story.coverImage}    // external or uploaded image URL
                       alt={story.title}         // alt text for screen readers
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   ) : (
                     // Fallback placeholder gradient with a faint skull emoji
@@ -182,10 +185,12 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                   <div className="flex items-center gap-2 mt-auto pt-3 border-t border-gray-700/60">
 
                     {/* Tiny author avatar */}
-                    <img
+                    <Image
                       src={authorAvatar}                // resolved avatar URL (real or generated)
                       alt={story.author.username}       // alt text for screen readers
-                      className="w-6 h-6 rounded-full object-cover border border-gray-600 flex-shrink-0"
+                      width={24}
+                      height={24}
+                      className="rounded-full object-cover border border-gray-600 flex-shrink-0"
                     />
 
                     {/* Author username — truncated so it doesn't overflow */}
@@ -230,13 +235,15 @@ export default function StoryViewToggle({ stories, footer }: Props) {
               >
                 {/* ── Thumbnail strip ─────────────────────────────────────── */}
                 {/* Fixed width on the left; scales on sm breakpoint */}
-                <div className="w-32 sm:w-40 flex-shrink-0 h-28 overflow-hidden">
+                <div className="relative w-32 sm:w-40 flex-shrink-0 h-28 overflow-hidden">
                   {story.coverImage ? (
                     // Actual cover image — zooms slightly on hover for depth
-                    <img
+                    <Image
                       src={story.coverImage}
                       alt={story.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="160px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     // Gradient placeholder when no cover image exists
@@ -270,7 +277,7 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                   <div className="flex items-center gap-3 text-xs text-gray-600 mt-auto flex-wrap">
 
                     {/* Tiny author avatar */}
-                    <img src={authorAvatar} alt={story.author.username} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                    <Image src={authorAvatar} alt={story.author.username} width={16} height={16} className="rounded-full object-cover shrink-0" />
 
                     {/* Author username */}
                     <span>{story.author.username}</span>

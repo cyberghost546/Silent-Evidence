@@ -23,7 +23,14 @@ function getRedis(): Redis | null {
   const g = globalThis as typeof globalThis & { __redis?: Redis };
 
   if (!g.__redis) {
-    g.__redis = new Redis(process.env.REDIS_URL, {
+    // Parse the URL with the WHATWG URL API (avoids the deprecated url.parse()
+    // that ioredis calls internally when given a URL string directly).
+    const u = new URL(process.env.REDIS_URL);
+    g.__redis = new Redis({
+      host: u.hostname,
+      port: u.port ? parseInt(u.port, 10) : 6379,
+      ...(u.password && { password: decodeURIComponent(u.password) }),
+      ...(u.pathname.length > 1 && { db: parseInt(u.pathname.slice(1), 10) }),
       maxRetriesPerRequest: 0,   // fail fast — don't queue commands while reconnecting
       retryStrategy: (times) => (times >= 3 ? null : 500),  // 3 attempts, 500 ms apart
       enableOfflineQueue: false,

@@ -1,7 +1,39 @@
 'use client';
+// app/components/ui/StoryEditForm.tsx
+//
+// WHY 'use client'?
+//   Manages a large controlled form with autosave, image upload, AI suggestions,
+//   and the RichEditor — all requiring browser-side hooks and event handlers.
+//
+// PURPOSE:
+//   The full story editor shown on /story/[slug]/edit. Handles:
+//     • Title, content (via RichEditor), excerpt, cover image, category, status
+//     • Content warnings (preset chips + custom input) serialised as JSON
+//     • Content rating (ALL / TEEN / MATURE)
+//     • Scheduled publish date (datetime-local input)
+//     • Video URL attachment
+//
+// AUTOSAVE:
+//   `doAutosave` debounces field changes with a 2-second timer. It reads from
+//   `latestFields` ref (not React state) to always capture the current values
+//   without needing the effect to re-register on every keystroke. PATCH
+//   /api/stories/[id] is called silently in the background; the "Saved" badge
+//   confirms success.
+//
+// RICH EDITOR (dynamic import):
+//   `RichEditor` is loaded with `dynamic(..., { ssr: false })` because it uses
+//   browser APIs (contentEditable, execCommand) that don't exist on the server.
+//   This avoids a hydration mismatch without needing a Suspense boundary.
+//
+// WARNINGS:
+//   Stored in the DB as a JSON-encoded string array. On mount, we parse the
+//   stored string back to string[]. On save, we JSON.stringify it back. Preset
+//   chips toggle on/off; the custom input appends arbitrary strings.
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 const RichEditor = dynamic(() => import('./RichEditor'), { ssr: false });
 
@@ -224,7 +256,7 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
         {/* Preview current cover image */}
         {coverImage && (
           <div className="relative w-full h-48 rounded-xl overflow-hidden border border-gray-700 mb-3">
-            <img src={coverImage} alt="Cover preview" className="w-full h-full object-cover" />
+            <Image src={coverImage} alt="Cover preview" fill sizes="100vw" className="object-cover" />
             {/* Remove image button */}
             <button
               type="button"

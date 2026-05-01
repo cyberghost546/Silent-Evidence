@@ -1,8 +1,23 @@
 // app/admin/generate/page.tsx
-// Admin page — AI story generator tool.
-// Fetches all categories from the DB so the GenerateTabs client component
-// can let the admin pick a category when generating a story via the AI API.
-// Only reachable through the admin layout, which enforces the ADMIN role.
+//
+// Server Component — fetches the category list from the DB, then renders the
+// AI story generation UI via the GenerateTabs client component.
+//
+// PURPOSE:
+//   Lets the admin generate AI-written horror stories using the Claude API.
+//   The admin picks a category, optionally provides a prompt or tone, and
+//   the AI returns a full draft that can be reviewed and published.
+//
+// WHY CATEGORIES ARE FETCHED HERE:
+//   GenerateTabs needs the full list of categories to populate the dropdown.
+//   We fetch it server-side (in this Server Component) rather than client-side
+//   so the page renders immediately with the category data — no loading flash.
+//   The `orderBy: { name: 'asc' }` keeps the dropdown alphabetically sorted.
+//
+// ACCESS:
+//   Only reachable through the /admin layout, which enforces the ADMIN role check
+//   before this component ever runs. No auth check needed here.
+
 import { prisma } from '@/lib/prisma';
 import GenerateTabs from './GenerateTabs';
 

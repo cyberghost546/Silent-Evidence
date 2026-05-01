@@ -1,4 +1,32 @@
 // app/videos/page.tsx
+//
+// Server Component — community horror video gallery.
+//
+// PURPOSE:
+//   Shows all stories that have a `videoUrl` attached. Stories without a
+//   videoUrl are silently excluded by the client-side `.filter()` after the
+//   DB fetch — this avoids a Prisma `NOT NULL` filter and lets us reuse the
+//   same query shape as other story list pages.
+//
+// PARALLEL QUERIES:
+//   Promise.all([stories, categories]) fires both Prisma queries at the same
+//   time instead of sequentially, halving the DB round-trip time.
+//
+// DEDUPLICATION:
+//   `videoCategories` is built with `new Map(…).values()` to deduplicate
+//   categories — multiple videos in the same category should only show one
+//   filter pill. Map keyed by slug ensures uniqueness.
+//
+// CATEGORY FILTER:
+//   The `?category=slug` query param (from `searchParams`) narrows the grid.
+//   Category filter pills are plain <a> links (full page navigations) because
+//   this is a server component — no client state needed for simple URL filters.
+//
+// FEATURED SLOT:
+//   `const [featured, ...rest] = filtered` — the first video in the filtered
+//   list becomes the hero card; the rest go into the 3-column grid.
+//   If a category filter is applied, the newest video in that category is featured.
+
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';

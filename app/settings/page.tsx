@@ -1,4 +1,37 @@
 // app/settings/page.tsx
+//
+// Server Component — the logged-in user's account settings page.
+//
+// WHAT THIS PAGE COVERS:
+//   • Profile editing (avatar, bio, website, username)
+//   • Age & Content settings (Kids Mode, Teen, Full Access)
+//   • Fear Profile (horror mood preferences for personalised recommendations)
+//   • Reading Speed setting
+//   • Notifications (newsletter toggle, push notifications, digest frequency)
+//   • Appearance (premium profile themes and avatar borders)
+//   • Discord integration
+//   • Account actions (password change, delete account)
+//   • Blocked users list
+//
+// WHY A SERVER COMPONENT?
+//   The page reads the logged-in user's full profile from the database to pre-fill
+//   every settings section. Doing this on the server means each form section gets
+//   its initial values immediately — no loading spinners on first paint.
+//   The individual form sections (EditProfileForm, AccountSettings, etc.) are
+//   Client Components that handle their own mutations via fetch().
+//
+// AUTH:
+//   Cookie → userId → user lookup. If either is missing → redirect('/login').
+//
+// isPremium:
+//   Admins get all premium perks without paying. Regular users need an active
+//   Stripe subscription (status === 'active'). This flag is passed to
+//   PremiumAppearancePicker to decide which options to show/lock.
+//
+// Section COMPONENT:
+//   A small reusable wrapper that gives each settings section a consistent layout:
+//   id anchor for scroll navigation, title/description header, and a dark card container.
+
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';

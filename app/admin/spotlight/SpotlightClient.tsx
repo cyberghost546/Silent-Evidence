@@ -1,11 +1,32 @@
 'use client';
+// app/admin/spotlight/SpotlightClient.tsx
+//
+// WHY 'use client'?
+//   The story search input, set/clear actions, and flash messages all need
+//   useState and fetch calls — these only work in Client Components.
+//
+// PURPOSE:
+//   Interactive UI to set or clear the homepage Story Spotlight.
+//   Only one story can be in the spotlight at a time. The admin searches for a
+//   story, selects it, and the `spotlight_story_id` setting is updated.
+//
+// PATTERN:
+//   `current` starts from the `initial` prop (server-fetched) and is updated
+//   in local state after each set/clear — no page reload needed.
+//   `set()` POSTs the story ID; `clear()` sends a DELETE request.
+//
+// SEARCH FLOW:
+//   `lookup()` fires on button click or Enter key press.
+//   Selecting a result from the dropdown sets it immediately and clears the search.
+
 import { useState } from 'react';
 import Link from 'next/link';
 
+// Story shape — only the fields needed for the spotlight preview and search results
 type Story = { id: number; title: string; slug: string; author: { username: string } };
 
 export default function SpotlightClient({ current: initial }: { current: Story | null }) {
-  const [current, setCurrent] = useState(initial);
+  const [current, setCurrent] = useState(initial); // currently spotlighted story (null = none)
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Story[]>([]);
   const [msg, setMsg] = useState('');

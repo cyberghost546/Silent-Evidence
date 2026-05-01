@@ -2,65 +2,99 @@
  * app/mood/[mood]/page.tsx
  *
  * WHAT THIS FILE DOES:
- * A filtered story listing page for a specific horror mood — e.g. /mood/creepy,
- * /mood/paranoid, /mood/gore. Each mood has its own label, emoji, description,
- * and colour scheme defined in the MOOD_META lookup table.
+ * A dynamic route that renders a filtered story listing for a specific horror
+ * "mood" — e.g. /mood/epic, /mood/dark, /mood/romantic. Each mood has its own
+ * label, emoji, description, and Tailwind colour class defined in MOOD_META.
  *
- * MOOD_META PATTERN:
- * Instead of a long if/else chain, we use a Record<string, ...> object as a
- * lookup table. `MOOD_META[moodKey]` gives us all the display data for that mood
- * in one line. If the key doesn't exist in the table we call notFound().
+ * DYNAMIC ROUTE:
+ * The folder name `[mood]` tells Next.js this segment is dynamic. At request
+ * time, Next.js resolves the actual slug (e.g. "dark") and passes it via the
+ * `params` prop as a Promise (Next.js 14 async params pattern).
  *
- * URL → DB value:
- * The URL uses lowercase (e.g. "creepy") but the DB stores uppercase ("CREEPY").
- * `mood.toUpperCase()` converts the URL segment before querying.
+ * MOOD_META LOOKUP TABLE PATTERN:
+ * Instead of a long if/else or switch chain, we use a `Record<string, {...}>`
+ * object as a constant lookup table. `MOOD_META[moodKey]` returns the display
+ * data in a single expression. If the key doesn't exist → `undefined` → 404.
+ * This is easy to extend: just add a new entry to MOOD_META and the navigation
+ * pills, empty states, and colour classes all update automatically.
  *
- * ALL MOODS NAV:
- * Object.entries(MOOD_META) iterates over every mood so we can render the
- * navigation pills. The currently active mood gets its own colour class from
- * MOOD_META; the others get a neutral grey style.
+ * URL → DB ENUM NORMALISATION:
+ * URLs are lowercase ("dark") but the Prisma enum and DB store uppercase ("DARK").
+ * `mood.toUpperCase()` handles the conversion before querying, avoiding a mismatch.
  *
- * HOW TO REUSE:
- * This "lookup table + dynamic route" pattern is great for any taxonomy page
- * (genres, tags, ratings). Define your metadata object, validate the param
- * against it, and query the DB with the validated key.
+ * DATA FETCHING:
+ * This is an async Server Component — it queries Prisma directly on the server.
+ * No API route is needed; the DB call happens during the server render.
+ *
+ * ALL-MOODS NAVIGATION:
+ * `Object.entries(MOOD_META)` iterates every key/value pair so we can render
+ * pill links for every mood without manually listing them twice.
+ *
+ * HOW TO ADD A NEW MOOD:
+ * 1. Add a new entry to MOOD_META below.
+ * 2. Add the matching value to the Mood enum in schema.prisma.
+ * 3. Run `prisma migrate dev`.
+ * That's it — the nav pills, story grid, and hero all update automatically.
  */
+
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
-import Header from '@/app/components/ui/Header';
-import Footer from '@/app/components/ui/Footer';
+import Link         from 'next/link';
+import { prisma }   from '@/lib/prisma';
+import Header       from '@/app/components/ui/Header';
+import Footer       from '@/app/components/ui/Footer';
 import { readingTime } from '@/lib/readingTime';
 
+// ── TypeScript: dynamic route params ──────────────────────────────────────────
+// In Next.js 14, params are a Promise — we must `await` them inside the component.
 type Props = { params: Promise<{ mood: string }> };
 
-// Lookup table: mood key → display metadata
-// Using a Record<string, ...> means we can do MOOD_META[key] instead of a big if/else chain
+// ── Mood metadata lookup table ─────────────────────────────────────────────────
+// Keys match the Prisma enum values exactly (uppercase).
+// The `color` string bundles three Tailwind classes:
+//   1. text-*      → pill label colour
+//   2. border-*    → pill border colour
+//   3. bg-*        → pill background tint
+// All three are applied together to the active pill.
 const MOOD_META: Record<string, { label: string; emoji: string; description: string; color: string }> = {
-  EPIC:          { label: 'Epic',          emoji: '⚔️',  description: 'Grand battles and heroic moments.',                    color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-  HEARTWARMING:  { label: 'Heartwarming',  emoji: '💖',  description: 'Stories that touch the soul.',                         color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
-  MYSTERIOUS:    { label: 'Mysterious',    emoji: '🔮',  description: 'Puzzles, secrets, and intrigue.',                      color: 'text-green-400 border-green-500/30 bg-green-500/10' },
-  ACTION:        { label: 'Action',        emoji: '💥',  description: 'Non-stop fights and adrenaline.',                      color: 'text-red-400 border-red-500/30 bg-red-500/10' },
-  ROMANTIC:      { label: 'Romantic',      emoji: '🌸',  description: 'Love stories and tender moments.',                     color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
-  COMEDIC:       { label: 'Comedic',       emoji: '😂',  description: 'Laughs, gags, and fun chaos.',                         color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
-  DRAMATIC:      { label: 'Dramatic',      emoji: '🎭',  description: 'Intense emotions and plot twists.',                    color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
-  DARK:          { label: 'Dark',          emoji: '🌑',  description: 'Grim themes and moral ambiguity.',                     color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
+  EPIC:         { label: 'Epic',         emoji: '⚔️',  description: 'Grand battles and heroic moments.',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
+  HEARTWARMING: { label: 'Heartwarming', emoji: '💖',  description: 'Stories that touch the soul.',        color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
+  MYSTERIOUS:   { label: 'Mysterious',   emoji: '🔮',  description: 'Puzzles, secrets, and intrigue.',     color: 'text-green-400 border-green-500/30 bg-green-500/10' },
+  ACTION:       { label: 'Action',       emoji: '💥',  description: 'Non-stop fights and adrenaline.',     color: 'text-red-400 border-red-500/30 bg-red-500/10' },
+  ROMANTIC:     { label: 'Romantic',     emoji: '🌸',  description: 'Love stories and tender moments.',    color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
+  COMEDIC:      { label: 'Comedic',      emoji: '😂',  description: 'Laughs, gags, and fun chaos.',        color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
+  DRAMATIC:     { label: 'Dramatic',     emoji: '🎭',  description: 'Intense emotions and plot twists.',   color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
+  DARK:         { label: 'Dark',         emoji: '🌑',  description: 'Grim themes and moral ambiguity.',    color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
 };
 
+// ── Page component ─────────────────────────────────────────────────────────────
+// `async` because we need to await params and run DB queries server-side.
 export default async function MoodPage({ params }: Props) {
+  // Await the params Promise — Next.js 14 requirement for dynamic routes
   const { mood } = await params;
-  // URL uses lowercase ("creepy") but the DB enum is uppercase ("CREEPY")
+
+  // Normalise the URL segment to uppercase to match the Prisma Mood enum.
+  // e.g. "dark" → "DARK"
   const moodKey = mood.toUpperCase();
-  // Validate: if this mood doesn't exist in our table, show a 404
+
+  // Validate against our lookup table.
+  // If moodKey isn't defined (e.g. /mood/nonexistent), meta is undefined
+  // and we trigger a 404 rather than crashing or showing an empty page.
   const meta = MOOD_META[moodKey];
   if (!meta) return notFound();
 
-  // Fetch all published stories with this mood, newest first
-  // `moodKey as any` is needed because Prisma's generated enum type doesn't
-  // automatically accept a plain string — the cast tells TypeScript to trust us
+  // ── Prisma query ──────────────────────────────────────────────────────────
+  // Fetch all PUBLISHED stories with this mood, newest-first.
+  // `moodKey as any` is a pragmatic cast: Prisma's generated Mood enum type
+  // doesn't accept a plain string even though the runtime value is valid.
+  // The alternatives (importing the Prisma Mood enum) add more complexity
+  // than the cast is worth.
+  // `include` joins related tables in a single query rather than N+1 selects:
+  //   - author.username for the "by @username" line
+  //   - category.name/slug for the category badge
+  //   - _count.likes/_count.comments for the engagement numbers
   const stories = await prisma.story.findMany({
-    where: { mood: moodKey as any, status: 'PUBLISHED' },
-    orderBy: { createdAt: 'desc' },
+    where:    { mood: moodKey as any, status: 'PUBLISHED' },
+    orderBy:  { createdAt: 'desc' },
     include: {
       author:   { select: { username: true } },
       category: { select: { name: true, slug: true } },
@@ -72,36 +106,59 @@ export default async function MoodPage({ params }: Props) {
     <main className="min-h-screen bg-gray-900 text-white">
       <Header />
 
-      {/* Hero */}
+      {/* ── Hero / breadcrumb section ──────────────────────────────────────── */}
+      {/* bg-gray-800 + border-b creates a subtle raised panel effect */}
       <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-6xl mx-auto px-4 py-12">
+
+          {/* Breadcrumb trail: Home → Mood → {label} */}
           <div className="flex items-center gap-3 mb-2">
             <Link href="/" className="text-xs text-gray-500 hover:text-gray-400">Home</Link>
             <span className="text-gray-600">/</span>
             <span className="text-xs text-gray-400">Mood</span>
             <span className="text-gray-600">/</span>
+            {/* Current mood label — no link, it's where we are */}
             <span className="text-xs text-gray-300">{meta.label}</span>
           </div>
+
+          {/* Emoji + heading + description */}
           <div className="flex items-center gap-4 mt-4">
+            {/* Large emoji acts as the page icon for this mood */}
             <span className="text-5xl">{meta.emoji}</span>
             <div>
               <h1 className="text-3xl font-bold text-white">{meta.label}</h1>
               <p className="text-gray-400 mt-1">{meta.description}</p>
             </div>
           </div>
-          <div className="mt-4 text-sm text-gray-500">{stories.length} {stories.length === 1 ? 'story' : 'stories'}</div>
+
+          {/* Story count — plural-aware (singular "story" vs "stories") */}
+          <div className="mt-4 text-sm text-gray-500">
+            {stories.length} {stories.length === 1 ? 'story' : 'stories'}
+          </div>
         </div>
       </div>
 
-      {/* All moods nav */}
+      {/* ── All moods navigation + story grid ──────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 py-6">
+
+        {/* ── All-moods pill navigation ────────────────────────────────────── */}
+        {/*
+          Object.entries(MOOD_META) gives [[key, meta], ...] pairs.
+          We map over them to render a pill link for every defined mood.
+          The active mood (key === moodKey) gets its own colour from meta.color;
+          inactive moods get a neutral gray style with hover states.
+          The href lowercases the key again to match the URL convention.
+        */}
         <div className="flex flex-wrap gap-2 mb-8">
           {Object.entries(MOOD_META).map(([key, m]) => (
             <Link
               key={key}
               href={`/mood/${key.toLowerCase()}`}
+              // Conditional class: active pill uses theme colour, others use neutral gray
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition ${
-                key === moodKey ? m.color : 'text-gray-500 border-gray-700 hover:border-gray-500 hover:text-gray-300'
+                key === moodKey
+                  ? m.color  // active: coloured pill from lookup table
+                  : 'text-gray-500 border-gray-700 hover:border-gray-500 hover:text-gray-300'
               }`}
             >
               {m.emoji} {m.label}
@@ -109,32 +166,75 @@ export default async function MoodPage({ params }: Props) {
           ))}
         </div>
 
+        {/* ── Conditional render: empty state OR story grid ────────────────── */}
         {stories.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">No {meta.label.toLowerCase()} stories yet.</div>
+          // Empty state — no stories match this mood yet
+          <div className="text-center py-20 text-gray-500">
+            No {meta.label.toLowerCase()} stories yet.
+          </div>
         ) : (
+          // Responsive grid:
+          //   mobile (default): 1 column
+          //   sm (≥640px):      2 columns
+          //   lg (≥1024px):     3 columns
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {stories.map(story => (
+              // Each card is a Link — the whole card is clickable
+              // group class enables child hover effects (scale, colour) keyed off the parent hover
               <Link
                 key={story.id}
                 href={`/story/${story.slug}`}
                 className="group bg-gray-800 border border-gray-700 hover:border-green-600/60 rounded-xl overflow-hidden transition-all duration-200 flex flex-col"
               >
+                {/* ── Cover image area (fixed height) ───────────────────────── */}
                 <div className="h-44 overflow-hidden relative">
                   {story.coverImage ? (
-                    <img src={story.coverImage} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    // group-hover:scale-105 creates a subtle zoom on the image when the card is hovered.
+                    // transition-transform duration-500 makes it smooth.
+                    <img
+                      src={story.coverImage}
+                      alt={story.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-4xl">{meta.emoji}</div>
+                    // Fallback: gradient placeholder with the mood's emoji centred
+                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-4xl">
+                      {meta.emoji}
+                    </div>
                   )}
+
+                  {/* Dark gradient overlay so the category badge text is legible */}
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-800/80 to-transparent" />
-                  <span className="absolute bottom-3 left-4 text-xs font-bold uppercase tracking-wider text-green-400">{story.category.name}</span>
+
+                  {/* Category badge — absolute positioned at the bottom-left of the image */}
+                  <span className="absolute bottom-3 left-4 text-xs font-bold uppercase tracking-wider text-green-400">
+                    {story.category.name}
+                  </span>
                 </div>
+
+                {/* ── Card body ─────────────────────────────────────────────── */}
+                {/* flex flex-col gap-2 flex-1 stretches the body to fill the card height */}
                 <div className="p-4 flex flex-col gap-2 flex-1">
-                  <h3 className="text-sm font-semibold text-white group-hover:text-green-300 transition-colors line-clamp-2">{story.title}</h3>
-                  {story.excerpt && <p className="text-xs text-gray-500 line-clamp-2">{story.excerpt}</p>}
+
+                  {/* Story title — group-hover:text-green-300 uses parent hover state */}
+                  {/* line-clamp-2 caps the title at 2 lines, preventing layout variation */}
+                  <h3 className="text-sm font-semibold text-white group-hover:text-green-300 transition-colors line-clamp-2">
+                    {story.title}
+                  </h3>
+
+                  {/* Optional excerpt — only rendered when present */}
+                  {story.excerpt && (
+                    <p className="text-xs text-gray-500 line-clamp-2">{story.excerpt}</p>
+                  )}
+
+                  {/* ── Meta row (author, reading time, likes) ─────────────── */}
+                  {/* mt-auto pushes this to the bottom of the card for alignment */}
                   <div className="flex items-center gap-3 mt-auto pt-2 text-xs text-gray-600">
                     <span>{story.author.username}</span>
                     <span>·</span>
+                    {/* readingTime() calculates estimated reading time from raw content string */}
                     <span>{readingTime(story.content)}</span>
+                    {/* ml-auto pushes the like count to the far right */}
                     <span className="ml-auto flex items-center gap-1">♥ {story._count.likes}</span>
                   </div>
                 </div>

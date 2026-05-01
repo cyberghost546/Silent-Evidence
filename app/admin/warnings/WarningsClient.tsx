@@ -1,22 +1,58 @@
 'use client';
+// app/admin/warnings/WarningsClient.tsx
+//
+// WHY 'use client'?
+//   The action form (warn/suspend/ban), unban buttons, and flash messages all
+//   require useState and async API calls — these only work in Client Components.
+//
+// PURPOSE:
+//   The interactive moderation panel for taking disciplinary action against users.
+//   Three levels of escalation:
+//     - Warn:    records a warning and sends the user a notification
+//     - Suspend: sets suspendedUntil to N days from now (user is locked out until then)
+//     - Ban:     sets isBanned = true (permanent; can only be undone via "Unblock" here)
+//
+// STATE:
+//   warnings       — the warning history (read-only; no mutations in this UI)
+//   bannedUsers    — mutated when an admin unbans someone (user removed from list)
+//   suspendedUsers — mutated when an admin unbans someone
+//   username       — controlled input for "which user to act on"
+//   action         — which of the three escalation levels to apply
+//   reason         — optional note explaining the action (logged to audit trail)
+//   days           — suspension length in days (only relevant for 'suspend')
+//   loading        — disables the submit button while the POST is in-flight
+//   msg            — flash message shown after any action, auto-cleared after 4s
+//
+// `flash()` helper — shows a message for 4 seconds then auto-clears it.
+//   This is a common UX pattern; using setTimeout + setState instead of a toast
+//   library keeps the component dependency-free.
+//
+// The action form targets by username (not userId) because admins typically know
+//   a user's name, not their DB ID. The API resolves the username to a userId internally.
+//
+// `unban()` removes the user from BOTH bannedUsers and suspendedUsers locally
+//   (a single unban call clears both states), then flashes a confirmation.
+
 import { useState } from 'react';
 
+// Type shapes matching the data passed from the server component
 type Warning = { id: number; reason: string; issuedAt: string; user: { id: number; username: string }; admin: { username: string } };
 type BannedUser = { id: number; username: string };
 type SuspendedUser = { id: number; username: string; suspendedUntil: string };
 
 export default function WarningsClient({ warnings: initial, bannedUsers: initialBanned, suspendedUsers: initialSuspended }:
   { warnings: Warning[]; bannedUsers: BannedUser[]; suspendedUsers: SuspendedUser[] }) {
-  const [warnings] = useState(initial);
+  const [warnings] = useState(initial); // read-only — no mutations in this UI
   const [bannedUsers, setBannedUsers] = useState(initialBanned);
   const [suspendedUsers, setSuspendedUsers] = useState(initialSuspended);
   const [username, setUsername] = useState('');
   const [action, setAction] = useState<'warn' | 'suspend' | 'ban'>('warn');
   const [reason, setReason] = useState('');
-  const [days, setDays] = useState('7');
+  const [days, setDays] = useState('7'); // default suspension length
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
 
+  // flash() — show a message for 4 seconds then clear it automatically
   const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
 
   const submit = async () => {

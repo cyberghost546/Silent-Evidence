@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type ResumeStory = {
   id: number;
@@ -73,9 +74,9 @@ export default function ContinueReading() {
             className="group relative bg-gray-800 border border-gray-700 hover:border-red-600/60 rounded-xl overflow-hidden transition-all duration-300 flex items-center gap-3 p-3"
           >
             {/* Thumbnail */}
-            <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-700">
+            <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-700">
               {story.coverImage ? (
-                <img src={story.coverImage} alt={story.title} loading="lazy" className="w-full h-full object-cover" />
+                <Image src={story.coverImage} alt={story.title} width={64} height={64} className="rounded-lg object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

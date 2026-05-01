@@ -6,22 +6,29 @@ import { checkAndAwardBadges } from '@/lib/badges';
 import { notifyNewComment, notifyCommentReply } from '@/lib/notifyEmail';
 import { checkToxicity } from '@/lib/toxicityCheck';
 import { sendPushToUser } from '@/lib/webpush';
+import { z } from 'zod';
+
+const CreateCommentSchema = z.object({
+  storyId:  z.number().int().positive('A valid story ID is required.'),
+  content:  z.string().min(1, 'Comment cannot be empty.').max(2000, 'Comment is too long (max 2000 characters).'),
+  parentId: z.number().int().positive().nullable().optional(),
+});
 
 export async function POST(req: Request) {
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
   if (!userId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });
 
-  const { storyId, content, parentId } = await req.json();
-  if (!storyId || !content?.trim()) {
-    return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+  const rawBody = await req.json();
+  const parsed = CreateCommentSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-  if (content.trim().length > 2000) {
-    return NextResponse.json({ error: 'Comment is too long (max 2000 characters).' }, { status: 400 });
-  }
+  const { storyId, content: rawContent, parentId } = parsed.data;
+  const content = rawContent.trim();
 
   // AI toxicity check — reject hate speech and harassment before saving
-  const toxicity = await checkToxicity(content.trim());
+  const toxicity = await checkToxicity(content);
   if (toxicity.flagged) {
     return NextResponse.json(
       { error: 'Your comment was flagged for potentially harmful content and could not be posted.' },
@@ -33,7 +40,7 @@ export async function POST(req: Request) {
     data: {
       storyId,
       userId,
-      content: content.trim(),
+      content: content,
       parentId: parentId ?? null,
     },
     include: {
@@ -73,7 +80,7 @@ export async function POST(req: Request) {
               replierUsername: commenter.username,
               storyTitle: parent.story.title,
               storySlug: parent.story.slug,
-              replyExcerpt: content.trim(),
+              replyExcerpt: content,
             }).catch(() => {});
           }
         }).catch(() => {});
@@ -104,12 +111,12 @@ export async function POST(req: Request) {
               commenterUsername: commenter.username,
               storyTitle: story.title,
               storySlug: story.slug,
-              commentExcerpt: content.trim(),
+              commentExcerpt: content,
             }).catch(() => {});
 
             sendPushToUser(story.authorId, {
               title: `New comment on "${story.title}"`,
-              body: `${commenter.username}: ${content.trim().slice(0, 80)}`,
+              body: `${commenter.username}: ${content.slice(0, 80)}`,
               url: `/story/${story.slug}#comments`,
             }).catch(() => {});
           }

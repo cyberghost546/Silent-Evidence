@@ -1,23 +1,62 @@
-// app/admin/email-log/page.tsx — History of all system emails
+// app/admin/email-log/page.tsx
+//
+// Server Component — paginated history of every email the system has sent.
+//
+// PURPOSE:
+//   The email log table records every outbound email (welcome, password reset,
+//   digest, notifications, etc.) along with whether it was delivered ('sent')
+//   or failed. This page is the primary debugging tool for email issues:
+//   if a user says they didn't receive an email, check here first.
+//
+// DATA PATTERNS:
+//   `groupBy: ['type']` builds the filter pill list — tells us which email
+//   types exist and how many of each. This is the Prisma equivalent of
+//   SELECT type, COUNT(*) FROM EmailLog GROUP BY type ORDER BY count DESC.
+//
+//   Three queries run in parallel via Promise.all:
+//     1. The current page of log rows (skip/take for pagination)
+//     2. Total count (for page math)
+//     3. Type groups (for the filter pills)
+//   Two more sequential queries fetch the sent/failed counts for the stat cards
+//   (they depend on the resolved `where` clause, so they run after Promise.all).
+//
+// FILTER:
+//   `?type=welcome`  — shows only welcome emails
+//   `?type=all`      — resets the filter (same as no filter)
+//   `where` is built before the queries so both the data query and the count
+//   query use the same filter condition.
+//
+// PAGINATION:
+//   50 rows per page (PAGE_SIZE). `skip` and `take` implement OFFSET/LIMIT in SQL.
+//   The `page` query param is clamped to at least 1 to prevent negative offsets.
+
 import { prisma } from '@/lib/prisma';
 
 const PAGE_SIZE = 50;
 
 export default async function AdminEmailLogPage({ searchParams }: { searchParams: Promise<{ page?: string; type?: string }> }) {
   const { page: pageParam, type: typeParam } = await searchParams;
+  // Clamp to at least 1 — prevents ?page=0 causing a negative skip value
   const page = Math.max(1, Number(pageParam ?? 1));
+  // 'all' is the UI sentinel for "no filter" — map it to undefined so Prisma ignores it
   const typeFilter = typeParam && typeParam !== 'all' ? typeParam : undefined;
 
+  // Build the where clause once so both the data query and count use the same filter
   const where = typeFilter ? { type: typeFilter } : {};
 
+  // ── Parallel DB queries ──────────────────────────────────────────────────
   const [logs, total, types] = await Promise.all([
+    // The current page of log rows — newest first, offset by previous pages
     prisma.emailLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }),
+    // Total matching rows for page math
     prisma.emailLog.count({ where }),
+    // All distinct email types with counts — used to build the filter pill list
     prisma.emailLog.groupBy({ by: ['type'], _count: { type: true }, orderBy: { _count: { type: 'desc' } } }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const sentCount = await prisma.emailLog.count({ where: { ...where, status: 'sent' } });
+  // Sent/failed counts for the summary stat cards at the top
+  const sentCount   = await prisma.emailLog.count({ where: { ...where, status: 'sent' } });
   const failedCount = await prisma.emailLog.count({ where: { ...where, status: 'failed' } });
 
   return (

@@ -4,22 +4,24 @@
 // Because this is a server component, the DB query runs on the server — no API call needed.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
+import { cache, TTL } from '@/lib/cache';
 
 export default async function FeaturedStories() {
-  // Only show published stories that an admin has specifically marked as featured.
-  // Ordered newest-first so freshly featured stories appear in the hero slot.
-  const stories = await prisma.story.findMany({
-    where: { featured: true, status: 'PUBLISHED' },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    // include fetches relations in optimised extra queries rather than N+1 queries
-    include: {
-      author: { select: { username: true } },
-      category: { select: { name: true, slug: true } },
-      _count: { select: { likes: true, comments: true } },
-    },
-  });
+  // Cached 5 minutes — featured stories change rarely (admin-curated).
+  const stories = await cache('homepage:featured', TTL.MEDIUM, () =>
+    prisma.story.findMany({
+      where: { featured: true, status: 'PUBLISHED' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: {
+        author: { select: { username: true } },
+        category: { select: { name: true, slug: true } },
+        _count: { select: { likes: true, comments: true } },
+      },
+    })
+  );
 
   // If no stories are marked featured yet, don't render the section at all
   if (stories.length === 0) return null;
@@ -45,10 +47,13 @@ export default async function FeaturedStories() {
           {/* Cover image */}
           <div className="relative h-72 lg:h-full min-h-[320px] overflow-hidden">
             {hero.coverImage ? (
-              <img
+              <Image
                 src={hero.coverImage}
                 alt={hero.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                fill
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                priority
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900" />
@@ -99,15 +104,17 @@ export default async function FeaturedStories() {
                 className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600 rounded-xl overflow-hidden transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]"
               >
                 {/* Thumbnail */}
-                <div className="w-28 flex-shrink-0 overflow-hidden">
+                <div className="w-28 flex-shrink-0 overflow-hidden relative min-h-[100px]">
                   {story.coverImage ? (
-                    <img
+                    <Image
                       src={story.coverImage}
                       alt={story.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="112px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 min-h-[100px]" />
+                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800" />
                   )}
                 </div>
 

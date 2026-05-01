@@ -6,6 +6,22 @@ import { checkAndAwardBadges } from '@/lib/badges';
 import { sendMail } from '@/lib/email';
 import { updateWritingStreak } from '@/lib/streaks';
 import { sanitizeContent } from '@/lib/sanitize';
+import { z } from 'zod';
+
+const PatchStorySchema = z.object({
+  title:            z.string().min(1).max(200).optional(),
+  content:          z.string().min(1).max(100_000).optional(),
+  excerpt:          z.string().max(500).optional(),
+  coverImage:       z.string().optional(),
+  videoUrl:         z.string().nullable().optional(),
+  audioUrl:         z.string().nullable().optional(),
+  isPremiumOnly:    z.boolean().optional(),
+  earlyAccessUntil: z.string().nullable().optional(),
+  status:           z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED']).optional(),
+  categoryId:       z.number().int().positive().optional(),
+  scheduledAt:      z.string().nullable().optional(),
+  warnings:         z.string().optional(),
+});
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -106,36 +122,41 @@ export async function PATCH(req: Request, { params }: Params) {
   }).then(r => r?.accepted === true));
   if (!isAuthor && !isCollaborator) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
-  const body = await req.json();
-  const title      = typeof body.title      === 'string' ? body.title.trim()      : undefined;
-  const content    = typeof body.content    === 'string' ? sanitizeContent(body.content.trim()) : undefined;
-  const excerpt    = typeof body.excerpt    === 'string' ? body.excerpt.trim()    : undefined;
-  const coverImage = typeof body.coverImage === 'string' ? body.coverImage.trim() : undefined;
-  const videoUrl        = typeof body.videoUrl  === 'string' ? body.videoUrl.trim()  : undefined;
-  const audioUrl        = typeof body.audioUrl  === 'string' ? body.audioUrl.trim()  : undefined;
-  const isPremiumOnly   = typeof body.isPremiumOnly === 'boolean' ? body.isPremiumOnly : undefined;
-  const earlyAccessUntil = body.earlyAccessUntil !== undefined
-    ? (body.earlyAccessUntil ? new Date(body.earlyAccessUntil) : null)
-    : undefined;
-  const status     = body.status;
-  const categoryId = body.categoryId ? Number(body.categoryId) : undefined;
+  const rawBody = await req.json();
+  const parsed = PatchStorySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+  }
 
-  if (title !== undefined && (title.length === 0 || title.length > 200)) {
-    return NextResponse.json({ error: 'Title must be between 1 and 200 characters.' }, { status: 400 });
-  }
-  if (content !== undefined && (content.length === 0 || content.length > 100_000)) {
-    return NextResponse.json({ error: 'Content is required and must be under 100,000 characters.' }, { status: 400 });
-  }
-  const scheduledAt = body.scheduledAt !== undefined
-    ? (body.scheduledAt ? new Date(body.scheduledAt) : null)
-    : undefined;
-  // warnings: JSON-encoded string[] sent from StoryEditForm
-  const warnings = typeof body.warnings === 'string' ? body.warnings : undefined;
+  const {
+    title:            rawTitle,
+    content:          rawContent,
+    excerpt:          rawExcerpt,
+    coverImage:       rawCoverImage,
+    videoUrl:         rawVideoUrl,
+    audioUrl:         rawAudioUrl,
+    isPremiumOnly,
+    earlyAccessUntil: earlyAccessUntilRaw,
+    status,
+    categoryId,
+    scheduledAt:      scheduledAtRaw,
+    warnings,
+  } = parsed.data;
 
-  const VALID_STATUSES = ['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED'];
-  if (status !== undefined && !VALID_STATUSES.includes(status)) {
-    return NextResponse.json({ error: 'Invalid status.' }, { status: 400 });
-  }
+  const title      = rawTitle      !== undefined ? rawTitle.trim()                           : undefined;
+  const content    = rawContent    !== undefined ? sanitizeContent(rawContent.trim())         : undefined;
+  const excerpt    = rawExcerpt    !== undefined ? rawExcerpt.trim()                          : undefined;
+  const coverImage = rawCoverImage !== undefined ? rawCoverImage.trim()                       : undefined;
+  const videoUrl   = rawVideoUrl   !== undefined ? (rawVideoUrl?.trim() ?? null)              : undefined;
+  const audioUrl   = rawAudioUrl   !== undefined ? (rawAudioUrl?.trim() ?? null)              : undefined;
+  const earlyAccessUntil = earlyAccessUntilRaw !== undefined
+    ? (earlyAccessUntilRaw ? new Date(earlyAccessUntilRaw) : null)
+    : undefined;
+  // warnings: JSON-encoded string[] sent from StoryEditForm — already validated as string
+  const scheduledAt = scheduledAtRaw !== undefined
+    ? (scheduledAtRaw ? new Date(scheduledAtRaw) : null)
+    : undefined;
+
   // SCHEDULED requires a future scheduledAt date
   if (status === 'SCHEDULED' && (!scheduledAt || scheduledAt <= new Date())) {
     return NextResponse.json({ error: 'Scheduled date must be in the future.' }, { status: 400 });

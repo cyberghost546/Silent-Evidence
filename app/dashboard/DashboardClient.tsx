@@ -1,5 +1,41 @@
 'use client';
 // app/dashboard/DashboardClient.tsx
+//
+// WHY 'use client'?
+//   Fetches data on mount via /api/dashboard, uses Recharts for interactive charts,
+//   and manages period toggle state — all of which require browser-side hooks.
+//
+// PURPOSE:
+//   The interactive analytics shell for the author dashboard. Fetches the full
+//   DashboardData object from /api/dashboard once on mount and renders:
+//     • Animated stat cards (views, likes, followers, tips)
+//     • Sparklines (14-day trend miniature charts per stat)
+//     • "This month" summary row + writing streak
+//     • Line charts (reads, followers) with 7d / 30d period toggle
+//     • Daily reads bar chart with best-day star highlight
+//     • Top stories horizontal bar chart with Recharts BarChart
+//     • Recent comments and tips feed
+//     • Quick action links
+//
+// ANIMATED COUNTERS:
+//   `useCountUp(target, duration)` animates numbers from 0 → target using
+//   requestAnimationFrame with an ease-out cubic curve. This gives stat cards
+//   a satisfying "rolling up" effect on first load.
+//
+// SPARKLINES:
+//   `<Sparkline data={numbers} color="…" />` renders a tiny SVG polyline from
+//   the last 14 days. The polyline normalises values to a 24px-tall view box
+//   so it always fills vertically regardless of the data range.
+//
+// PERIOD TOGGLE:
+//   `period` ('7d' | '30d') slices the readsPerDay / followersPerDay arrays
+//   before passing to Recharts. The toggle button updates local state only —
+//   no refetch needed because the full 30-day arrays come down in the initial
+//   API response.
+//
+// WRITING STREAK:
+//   Calculated client-side by walking readsPerDay in reverse and counting
+//   consecutive days with value > 0. Streak resets on the first zero day.
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';

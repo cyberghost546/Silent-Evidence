@@ -21,48 +21,26 @@ import { cookies } from 'next/headers';
 
 // Import the Prisma database client to save and retrieve contact messages
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+const ContactSchema = z.object({
+  name:    z.string().min(1, 'Name is required.').max(100),
+  email:   z.string().min(1, 'Email is required.').email('Invalid email address.').max(254),
+  subject: z.string().min(1, 'Subject is required.').max(200),
+  message: z.string().min(1, 'Message is required.').max(5000, 'Message is too long.'),
+});
 
 // ── POST — public: anyone can submit a contact message ───────────────────────
 // This function runs whenever a POST request is made to /api/contact.
 // "req" contains the name, email, subject, and message in its JSON body.
 export async function POST(req: NextRequest) {
-  // ── Parse the request body ────────────────────────────────────────────────
-  // Read the JSON body submitted by the contact form
-  const body = await req.json();
-
-  // Safely extract each field as a string and trim whitespace.
-  // If a field is missing or not a string, we default to an empty string.
-  // This prevents TypeErrors when calling .trim() on undefined values.
-  const name    = typeof body.name    === 'string' ? body.name.trim()    : '';
-  const email   = typeof body.email   === 'string' ? body.email.trim()   : '';
-  const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
-  const message = typeof body.message === 'string' ? body.message.trim() : '';
-
-  // ── Field presence validation ─────────────────────────────────────────────
-  // All four fields are required — the form should not allow submission without them,
-  // but we validate server-side too in case someone submits a raw API request.
-  if (!name || !email || !subject || !message) {
-    return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
+  // ── Parse and validate the request body ─────────────────────────────────
+  const rawBody = await req.json();
+  const parsed = ContactSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-
-  // ── Email format validation ───────────────────────────────────────────────
-  // A minimal regex to validate email format:
-  // [^\s@]+ — one or more characters that are NOT whitespace or @  (the local part)
-  // @        — the literal @ separator
-  // [^\s@]+ — the domain name part
-  // \.       — a literal dot
-  // [^\s@]+  — the top-level domain (e.g. "com", "org")
-  // This is intentionally lenient — we just want to catch obviously wrong values.
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 });
-  }
-
-  // ── Message length validation ─────────────────────────────────────────────
-  // Cap the message at 5,000 characters to prevent database storage abuse
-  // and excessively long messages that would waste admin time to read.
-  if (message.length > 5000) {
-    return NextResponse.json({ error: 'Message is too long.' }, { status: 400 });
-  }
+  const { name, email, subject, message } = parsed.data;
 
   // ── Save the message to the database ─────────────────────────────────────
   // Insert a new contactMessage row with all four validated fields.

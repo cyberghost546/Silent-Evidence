@@ -1,8 +1,32 @@
 // app/tag/[slug]/page.tsx
-// Tag browsing page — shows all published stories that have been tagged with
-// a specific tag. The TagFollowButton lets logged-in users follow the tag
-// so its stories appear in their personalised feed. TagStories handles
-// client-side pagination of the story list.
+//
+// Server Component — tag detail / browsing page.
+//
+// PURPOSE:
+//   Shows all published stories that carry a specific tag.
+//   Tags are reader-discoverable labels (e.g. #werewolf, #haunted-house) that
+//   authors add to their stories. Following a tag adds its stories to the reader's
+//   personalised "For You" feed.
+//
+// DATA:
+//   Three sequential queries (order matters — we need the tag ID first):
+//   1. `tag.findUnique` — get the tag + follower/story counts via `_count`
+//   2. `tagFollow.findUnique` — check if this user already follows the tag
+//      (compound key `userId_tagId` = Prisma's name for the composite unique index)
+//      Skipped entirely when `userId` is null (guest visitors can't follow)
+//   3. `story.findMany` — all published stories tagged with this slug, newest first
+//
+//   `tags: { some: { slug } }` is Prisma's M:N filter syntax — it matches stories
+//   where at least ONE of the story's tags has the given slug. Equivalent SQL:
+//   WHERE EXISTS (SELECT 1 FROM _StoryToTag WHERE tagSlug = ?)
+//
+// `userFollows` is a boolean gate: if the TagFollow record exists, the user follows
+//   the tag. `!!userFollows` converts the record/null to a true/false prop.
+//
+// TagStories is a Client Component that paginates the full story list client-side
+// (no extra API calls needed since we load all stories in one query).
+//
+// `notFound()` returns a 404 response if the slug doesn't match any tag.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';

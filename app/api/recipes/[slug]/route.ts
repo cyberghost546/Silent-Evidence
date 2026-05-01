@@ -20,8 +20,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
 
     return NextResponse.json({
       ...recipe,
-      ingredients: JSON.parse(recipe.ingredients),
-      steps: JSON.parse(recipe.steps),
+      ingredients: recipe.ingredients ? JSON.parse(recipe.ingredients) : [],
+      steps: recipe.steps ? JSON.parse(recipe.steps) : [],
       reactionCounts: recipe.reactions.reduce<Record<string, number>>((acc, r) => {
         acc[r.emoji] = (acc[r.emoji] ?? 0) + 1;
         return acc;

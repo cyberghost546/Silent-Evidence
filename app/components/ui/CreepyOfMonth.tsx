@@ -7,6 +7,7 @@
 // returns null and nothing is rendered.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { readingTime } from '@/lib/readingTime';
 import { Trophy, Crown, Heart } from 'lucide-react';
@@ -46,7 +47,7 @@ export default async function PickOfMonth() {
         {/* Cover image rendered at low opacity as a background layer */}
         {story.coverImage && (
           <div className="absolute inset-0">
-            <img src={story.coverImage} alt="" className="w-full h-full object-cover opacity-20" />
+            <Image src={story.coverImage} alt="" fill sizes="100vw" className="object-cover opacity-20" />
             {/* Gradient overlay fades image toward the left so text remains readable */}
             <div className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-800/90 to-transparent" />
           </div>
@@ -78,7 +79,7 @@ export default async function PickOfMonth() {
 
           {/* Author info row: avatar, username, reading time, and like count */}
           <div className="flex items-center gap-3 mt-1">
-            <img src={avatar} alt={story.author.username} className="w-8 h-8 rounded-full border-2 border-green-500/40 object-cover" />
+            <Image src={avatar} alt={story.author.username} width={32} height={32} className="rounded-full border-2 border-green-500/40 object-cover" />
             <span className="text-sm text-gray-300">{story.author.username}</span>
             <span className="text-gray-600">·</span>
             <span className="text-xs text-gray-500">{readingTime(story.content)}</span>

@@ -26,6 +26,7 @@
  */
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
@@ -108,12 +109,12 @@ export default async function FeedPage() {
                   className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]"
                 >
                   {story.coverImage && (
-                    <img src={story.coverImage} alt={story.title} className="w-28 h-20 object-cover rounded-lg flex-shrink-0" />
+                    <Image src={story.coverImage} alt={story.title} width={112} height={80} className="object-cover rounded-lg shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
                     {/* Author row — tiny avatar + username + category */}
                     <div className="flex items-center gap-2 mb-1">
-                      <img src={avatar} alt={story.author.username} className="w-5 h-5 rounded-full object-cover" />
+                      <Image src={avatar} alt={story.author.username} width={20} height={20} className="rounded-full object-cover" />
                       <span className="text-xs text-gray-400">{story.author.username}</span>
                       <span className="text-xs text-gray-600">in</span>
                       <span className="text-xs text-red-400">{story.category.name}</span>

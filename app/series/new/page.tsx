@@ -1,7 +1,25 @@
 // app/series/new/page.tsx
-// Page for creating a new story series.
-// Only logged-in users can access this — redirects to /login if not authenticated.
-// A series groups related stories together (e.g. a multi-part horror saga).
+//
+// Server Component — auth-gated shell for the "Create a Series" form.
+//
+// PURPOSE:
+//   A series is an ordered collection of related stories (e.g. "The Haunting of
+//   Blackmoor — Parts 1–5"). Authors create a series here, then attach individual
+//   stories to it from the story edit page or the series detail page.
+//
+// AUTH:
+//   Only logged-in users can create series. We read the `userId` cookie and
+//   redirect to /login immediately if it's missing (no DB lookup needed — the
+//   presence of the cookie is enough to determine that the user is authenticated).
+//   The actual form submission will validate the session server-side via the API.
+//
+// SERVER/CLIENT SPLIT:
+//   This Server Component renders the page shell (Header, Footer, title/description).
+//   NewSeriesForm is a Client Component because form submission and the subsequent
+//   redirect after creation require browser-side logic (fetch + router.push).
+//
+// `metadata` is the Next.js way to set <title> and <meta description> in the
+//   <head> from a Server Component — it's picked up by the RSC renderer automatically.
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';

@@ -1,4 +1,19 @@
 'use client';
+// app/components/ui/StorySoundtrack.tsx
+//
+// WHY 'use client'?
+//   No hooks are used, but the Spotify iframe embed is a client-side resource.
+//   Marking 'use client' keeps it out of the server component bundle.
+//
+// PURPOSE:
+//   Embeds a Spotify playlist or album the author recommends listeners play while
+//   reading the story. Accepts both full URLs (https://open.spotify.com/playlist/…)
+//   and the compact URI format (spotify:playlist:…).
+//
+// toEmbedUrl():
+//   Converts either URL format to a Spotify embed URL by replacing the path prefix
+//   with /embed/ — the only format that allows iframe embedding without CORS issues.
+//   Returns null for invalid or non-Spotify URLs so the component silently hides.
 
 interface Props {
   spotifyPlaylistUrl: string;

@@ -1,12 +1,42 @@
 'use client';
 // app/admin/login-map/page.tsx
-// World map showing where users are logging in from based on IP geolocation.
+//
+// WHY 'use client'?
+//   The Leaflet map library requires `window` to be defined, which only exists in
+//   the browser. The map component must be loaded dynamically with ssr:false.
+//   The filter state (all/success/failed) also requires useState.
+//
+// PURPOSE:
+//   Security oversight tool — shows a world map pinpointing where login attempts
+//   originated, colour-coded by success (red) or failure (orange). Useful for
+//   spotting unusual geographic patterns, e.g. a spike of failed logins from a
+//   country where no users live (potential credential-stuffing attack).
+//
+// DATA:
+//   `markers`        — array of geo-located login events (lat/lng + metadata)
+//   `countrySummary` — aggregated count per country (for the bar chart section)
+//   `total`          — total number of geo-mapped logins
+//   All data is fetched from GET /api/admin/login-map on mount.
+//
+// DYNAMIC IMPORT (ssr: false):
+//   Leaflet reads `window.L` and attaches DOM listeners on import. Running it on
+//   the server would crash because `window` doesn't exist in Node.js. The `dynamic()`
+//   call with `ssr: false` defers the import to the browser after hydration.
+//
+// FILTERING:
+//   The `filter` state is applied client-side — no extra API calls needed.
+//   `filtered` is derived from `data.markers` on every render based on the active pill.
+//   This is fine because the total marker count is small (capped by the API).
+//
+// PROGRESS BAR (Top Countries):
+//   Each country's bar width is calculated as (count / total) * 100, giving a
+//   proportional fill that makes the most-active country span the full width.
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { LoginMarker } from '@/app/components/ui/LoginMap';
 
-// Load the map without SSR — Leaflet requires window to be defined
+// Load the Leaflet map component without SSR — window must exist before Leaflet initialises
 const LoginMap = dynamic(() => import('@/app/components/ui/LoginMap'), { ssr: false });
 
 interface CountryRow { country: string; count: number }

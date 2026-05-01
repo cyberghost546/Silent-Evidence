@@ -1,4 +1,35 @@
 'use client';
+// app/components/ui/AdminCategoriesClient.tsx
+//
+// WHY 'use client'?
+//   The add/delete actions and the inline form toggle all require useState and
+//   fetch calls — these can only run in Client Components.
+//
+// PURPOSE:
+//   Admin UI for managing site-wide story categories. Shows a grid of all
+//   categories with their story counts. Admins can add new categories via an
+//   inline form and delete existing ones (with a confirm dialog).
+//
+// AUTO-SLUG:
+//   `handleNameChange()` auto-generates a URL slug whenever the admin types
+//   in the Name field. Steps: lowercase → trim → strip special chars → spaces → dashes.
+//   Example: "My New Category!" → "my-new-category"
+//   The admin can still manually override the slug field afterwards.
+//
+// PER-ROW LOADING STATE:
+//   `loading` holds the ID of the category being deleted (not a boolean).
+//   This disables only the clicked delete button, not the entire UI —
+//   the same per-row loading pattern used throughout the admin.
+//
+// ROUTER REFRESH:
+//   After add or delete, `router.refresh()` re-fetches the server component's
+//   data without a full page navigation, so the grid reflects the change.
+//   This is the Next.js App Router alternative to calling the API and mutating
+//   local state manually.
+//
+// CATEGORY_ICONS:
+//   A slug → emoji lookup table used to render a matching icon on each card.
+//   Falls back to 🏷️ for any slug not in the map.
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';

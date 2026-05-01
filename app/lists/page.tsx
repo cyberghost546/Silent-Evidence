@@ -26,6 +26,7 @@
  */
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
@@ -87,7 +88,7 @@ export default async function ListsPage() {
                 <div className="h-32 flex overflow-hidden">
                   {list.items.length > 0 ? list.items.map(item => (
                     item.story.coverImage
-                      ? <img key={item.id} src={item.story.coverImage} alt="" className="flex-1 object-cover min-w-0" />
+                      ? <div key={item.id} className="relative flex-1 min-w-0 overflow-hidden"><Image src={item.story.coverImage} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-cover" /></div>
                       : <div key={item.id} className="flex-1 bg-gradient-to-br from-gray-700 to-gray-900" />
                   )) : (
                     <div className="w-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-4xl">📋</div>

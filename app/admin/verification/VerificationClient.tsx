@@ -1,6 +1,39 @@
 'use client';
+// app/admin/verification/VerificationClient.tsx
+//
+// WHY 'use client'?
+//   Approve/reject buttons trigger async API calls and optimistically update the
+//   request's status badge in the list — that requires useState.
+//
+// PURPOSE:
+//   Review panel for author verification applications. Pending applications are
+//   shown with the author's reason and any links they provided. The admin can
+//   approve (grants the blue checkmark badge) or reject (dismisses without action).
+//
+// STATE:
+//   requests — local copy of the initial requests prop; mutated on each decision
+//   loading  — the userId of the request currently being acted on (null = idle)
+//              Using the userId (not a boolean) lets us disable only the specific
+//              row's buttons, not all rows simultaneously.
+//   msg      — brief success message shown after an action, auto-cleared after 3s
+//
+// OPTIMISTIC UPDATE PATTERN:
+//   After the API call succeeds, we update `requests` locally with the new status
+//   (`r.map(x => x.userId === userId ? { ...x, status: 'approved' } : x)`).
+//   This avoids a page reload — the UI reflects the decision immediately.
+//   The data in the database is the source of truth, but the local state keeps
+//   the UI responsive without a refetch.
+//
+// `act()` is a single function for both approve and reject — the `action` parameter
+//   controls which path the API takes. This avoids duplicating the fetch logic.
+//
+// LAYOUT:
+//   `pending` — shown as full cards with approve/reject buttons
+//   `decided` — collapsed in a <details> accordion (past decisions, low priority)
+
 import { useState } from 'react';
 
+// Request shape passed as a prop from the server component
 type Request = {
   userId: number; username: string; reason: string; links: string;
   submittedAt: string; status: string;
@@ -8,24 +41,27 @@ type Request = {
 
 export default function VerificationClient({ requests: initial }: { requests: Request[] }) {
   const [requests, setRequests] = useState(initial);
+  // loading: userId of the row being acted on (null = no action in-flight)
   const [loading, setLoading] = useState<number | null>(null);
   const [msg, setMsg] = useState('');
 
   const act = async (userId: number, action: 'approve' | 'reject') => {
-    setLoading(userId);
+    setLoading(userId); // disable this row's buttons while the API call is in-flight
     const res = await fetch('/api/admin/verification', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, action }),
     });
     if (res.ok) {
+      // Optimistic update: mutate the status in local state (no page reload)
       setRequests(r => r.map(x => x.userId === userId ? { ...x, status: action === 'approve' ? 'approved' : 'rejected' } : x));
       setMsg(action === 'approve' ? 'User verified!' : 'Application rejected.');
-      setTimeout(() => setMsg(''), 3000);
+      setTimeout(() => setMsg(''), 3000); // auto-clear the success message
     }
     setLoading(null);
   };
 
+  // Split into two arrays to render pending first, decided in a collapsed section
   const pending = requests.filter(r => r.status === 'pending');
   const decided = requests.filter(r => r.status !== 'pending');
 

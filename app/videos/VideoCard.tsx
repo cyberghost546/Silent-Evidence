@@ -1,6 +1,31 @@
 'use client';
+// app/videos/VideoCard.tsx
+//
+// Renders a single video story in two layouts:
+//   FeaturedCard — full-width landscape split (video left, info right) for the hero slot
+//   GridCard     — compact portrait card for the 3-column grid
+//
+// VIDEO RENDERING STRATEGY:
+//   Three possible video sources are handled:
+//     1. YouTube (youtu.be / youtube.com /watch or /shorts)
+//        → converts to a privacy-enhanced youtube-nocookie.com embed iframe
+//        → thumbnail is fetched from img.youtube.com/vi/<id>/maxresdefault.jpg
+//     2. Direct video file (.mp4, .webm, .ogg)
+//        → rendered with a native <video autoPlay controls> element
+//     3. Neither → no thumbnail, plain grey background fallback
+//
+// PLAY-ON-CLICK PATTERN:
+//   `playing` state starts false (show thumbnail + play button overlay).
+//   Clicking the button sets playing=true, which swaps the thumbnail out for
+//   the iframe/video. This avoids embedding iframes on page load (faster, no
+//   autoplay blocked errors) and lets YouTube preload only when needed.
+//
+// EXPORTED DEFAULT:
+//   `VideoCard` is a thin router — `featured` prop picks FeaturedCard vs GridCard.
+
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 function getYouTubeEmbedUrl(url: string): string | null {
   try {
@@ -91,7 +116,7 @@ function FeaturedCard({ story }: { story: StoryData }) {
             ) : (
               <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full flex items-center justify-center group/play">
                 {thumbUrl
-                  ? <img src={thumbUrl} alt={story.title} className="absolute inset-0 w-full h-full object-cover" />
+                  ? <Image src={thumbUrl} alt={story.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                   : <div className="absolute inset-0 bg-gray-800" />
                 }
                 <div className="absolute inset-0 bg-black/50 group-hover/play:bg-black/40 transition" />
@@ -161,7 +186,7 @@ function GridCard({ story }: { story: StoryData }) {
         ) : (
           <button onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full flex items-center justify-center group/play">
             {thumbUrl
-              ? <img src={thumbUrl} alt={story.title} className="absolute inset-0 w-full h-full object-cover" />
+              ? <Image src={thumbUrl} alt={story.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
               : <div className="absolute inset-0 bg-gray-800" />
             }
             {/* Bottom gradient for readability */}

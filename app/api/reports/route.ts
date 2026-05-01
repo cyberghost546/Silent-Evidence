@@ -5,6 +5,18 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+const CreateReportSchema = z.object({
+  type:     z.enum(['COMMENT', 'STORY', 'FORUM_POST', 'FORUM_REPLY'], {
+              errorMap: () => ({ message: 'Invalid report type' }),
+            }),
+  targetId: z.number().int().positive('A valid target ID is required.'),
+  reason:   z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'OTHER'], {
+              errorMap: () => ({ message: 'Invalid reason' }),
+            }),
+  note:     z.string().max(1000).optional(),
+});
 
 export async function POST(req: Request) {
   // Read the session cookie to identify the reporter
@@ -16,31 +28,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Login required' }, { status: 401 });
   }
 
-  // Parse the incoming JSON body
-  const { type, targetId, reason, note } = await req.json();
-
-  // Basic validation — all required fields must be present
-  if (!type || !targetId || !reason) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  // Parse and validate the incoming JSON body
+  const rawBody = await req.json();
+  const parsed = CreateReportSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-
-  // Validate that type is one of the allowed enum values
-  const allowedTypes = ['COMMENT', 'STORY', 'FORUM_POST', 'FORUM_REPLY'];
-  if (!allowedTypes.includes(type)) {
-    return NextResponse.json({ error: 'Invalid report type' }, { status: 400 });
-  }
-
-  // Validate that reason is one of the allowed enum values
-  const allowedReasons = ['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'OTHER'];
-  if (!allowedReasons.includes(reason)) {
-    return NextResponse.json({ error: 'Invalid reason' }, { status: 400 });
-  }
+  const { type, targetId, reason, note } = parsed.data;
 
   // Create the report record in the database
   const report = await prisma.report.create({
     data: {
       type,
-      targetId: Number(targetId),
+      targetId,
       reason,
       // Optional extra note — trim whitespace, store null if empty
       note: note?.trim() || null,

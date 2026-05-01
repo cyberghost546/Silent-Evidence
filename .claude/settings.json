@@ -54,7 +54,11 @@
       "Bash(npx ts-node *)",
       "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {PrismaClient} = require\\('\\\\''@prisma/client'\\\\''\\); const p = new PrismaClient\\(\\); p.category.findMany\\(\\).then\\(r => console.log\\(JSON.stringify\\(r\\)\\)\\).catch\\(e => console.error\\(e.message\\)\\).finally\\(\\(\\) => p.$disconnect\\(\\)\\);')",
       "Read(//tmp/**)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(xargs cat *)",
+      "Bash(xargs wc *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('scripts',{}\\)\\); print\\(list\\(d.get\\('devDependencies',{}\\).keys\\(\\)\\)[-5:]\\)\")",
+      "Bash(npx vitest *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",

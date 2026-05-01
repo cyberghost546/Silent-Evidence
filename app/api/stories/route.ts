@@ -11,6 +11,27 @@ import { serverError } from '@/lib/apiError';
 import type { Mood } from '@prisma/client';
 import { checkStoryToxicity } from '@/lib/toxicityCheck';
 import { sanitizeContent } from '@/lib/sanitize';
+import { z } from 'zod';
+
+const CreateStorySchema = z.object({
+  title:            z.string().min(1, 'Title is required.').max(200, 'Title must be 200 characters or fewer.'),
+  content:          z.string().min(1, 'Content is required.').max(100_000, 'Story content is too long.'),
+  categoryId:       z.number().int().positive('A valid category is required.'),
+  excerpt:          z.string().max(500, 'Excerpt must be 500 characters or fewer.').optional().default(''),
+  coverImage:       z.string().optional().default(''),
+  status:           z.enum(['DRAFT', 'PUBLISHED']).optional().default('DRAFT'),
+  language:         z.string().optional(),
+  mood:             z.string().nullable().optional(),
+  warnings:         z.string().nullable().optional(),
+  scheduledAt:      z.string().nullable().optional(),
+  locationName:     z.string().nullable().optional(),
+  latitude:         z.number().nullable().optional(),
+  longitude:        z.number().nullable().optional(),
+  videoUrl:         z.string().nullable().optional(),
+  audioUrl:         z.string().nullable().optional(),
+  isPremiumOnly:    z.boolean().optional().default(false),
+  earlyAccessUntil: z.string().nullable().optional(),
+});
 
 // GET /api/stories?mood=GORE&take=6
 // Returns published stories, optionally filtered by mood, ordered newest first.
@@ -90,37 +111,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'You must be logged in.' }, { status: 401 });
   }
 
-  const body = await req.json();
-  const title       = typeof body.title      === 'string' ? body.title.trim()      : '';
-  const content     = typeof body.content    === 'string' ? sanitizeContent(body.content.trim()) : '';
-  const excerpt     = typeof body.excerpt    === 'string' ? body.excerpt.trim()    : '';
-  const coverImage  = typeof body.coverImage === 'string' ? body.coverImage.trim() : '';
-  const categoryId  = body.categoryId;
-  const status      = body.status;
-  const language    = body.language;
-  const mood         = body.mood ?? null;
-  const warnings     = body.warnings ?? null;
-  const scheduledAt  = body.scheduledAt ? new Date(body.scheduledAt) : null;
-  const locationName = body.locationName ?? null;
-  const latitude     = body.latitude ?? null;
-  const longitude    = body.longitude ?? null;
-  const videoUrl        = typeof body.videoUrl  === 'string' ? body.videoUrl.trim()  : null;
-  const audioUrl        = typeof body.audioUrl  === 'string' ? body.audioUrl.trim()  : null;
-  const isPremiumOnly   = body.isPremiumOnly === true;
-  const earlyAccessUntil = body.earlyAccessUntil ? new Date(body.earlyAccessUntil) : null;
+  const rawBody = await req.json();
+  const parsed = CreateStorySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+  }
 
-  if (!title || !content || !categoryId) {
-    return NextResponse.json({ error: 'Title, category, and content are required.' }, { status: 400 });
-  }
-  if (title.length > 200) {
-    return NextResponse.json({ error: 'Title must be 200 characters or fewer.' }, { status: 400 });
-  }
-  if (content.length > 100_000) {
-    return NextResponse.json({ error: 'Story content is too long.' }, { status: 400 });
-  }
-  if (excerpt.length > 500) {
-    return NextResponse.json({ error: 'Excerpt must be 500 characters or fewer.' }, { status: 400 });
-  }
+  const {
+    title: rawTitle,
+    content: rawContent,
+    categoryId,
+    excerpt:          rawExcerpt,
+    coverImage:       rawCoverImage,
+    status,
+    language,
+    mood,
+    warnings,
+    scheduledAt:      scheduledAtRaw,
+    locationName,
+    latitude,
+    longitude,
+    videoUrl:         rawVideoUrl,
+    audioUrl:         rawAudioUrl,
+    isPremiumOnly,
+    earlyAccessUntil: earlyAccessUntilRaw,
+  } = parsed.data;
+
+  const title            = rawTitle.trim();
+  const content          = sanitizeContent(rawContent.trim());
+  const excerpt          = rawExcerpt?.trim() ?? '';
+  const coverImage       = rawCoverImage?.trim() ?? '';
+  const scheduledAt      = scheduledAtRaw ? new Date(scheduledAtRaw) : null;
+  const earlyAccessUntil = earlyAccessUntilRaw ? new Date(earlyAccessUntilRaw) : null;
+  const videoUrl         = rawVideoUrl?.trim() ?? null;
+  const audioUrl         = rawAudioUrl?.trim() ?? null;
 
   // Run AI toxicity check on the title and excerpt before publishing
   // Only check published stories — drafts can be edited before they go live

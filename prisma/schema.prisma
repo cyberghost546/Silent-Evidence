@@ -1252,7 +1252,9 @@ model StoryPurchase {
   storyId               Int
   story                 Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, storyId]) // Can only purchase once
+  @@unique([userId, storyId])
+  @@index([userId])
+  @@index([storyId])
 }
 
 // ============================================================
@@ -1435,6 +1437,10 @@ model Poll {
 
   options   PollOption[]
   votes     PollVote[]
+
+  @@index([authorId])
+  @@index([groupId, createdAt])
+  @@index([createdAt])
 }
 
 // One selectable answer choice within a poll
@@ -1445,6 +1451,8 @@ model PollOption {
   pollId Int
   poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
   votes  PollVote[]
+
+  @@index([pollId])
 }
 
 // Records which option a user chose — one vote per user per poll
@@ -1745,6 +1753,8 @@ model BundlePurchase {
 
   // A user can only purchase the same bundle once
   @@unique([userId, bundleId])
+  @@index([userId])
+  @@index([bundleId])
 }
 
 // ============================================================
@@ -1769,6 +1779,8 @@ model ChapterPurchase {
 
   // A user can only purchase the same chapter once
   @@unique([userId, chapterId])
+  @@index([userId])
+  @@index([chapterId])
 }
 
 // ============================================================
@@ -1806,6 +1818,8 @@ model SprintParticipant {
 
   // A user can only join the same sprint once
   @@unique([sprintId, userId])
+  @@index([sprintId])
+  @@index([userId])
 }
 
 // ============================================================
@@ -1825,6 +1839,9 @@ model CoauthorRequest {
 
   authorId    Int
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([isOpen, createdAt])
 }
 
 // ============================================================
@@ -1858,6 +1875,8 @@ model TagFollow {
   tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tagId])
+  @@index([tagId])
+  @@index([userId])
 }
 
 // ============================================================
@@ -1883,6 +1902,9 @@ model BookClub {
   ownerId     Int
   owner       User             @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members     BookClubMember[]
+
+  @@index([ownerId])
+  @@index([isPrivate, createdAt])
 }
 
 // Junction table: tracks who belongs to which book club
@@ -1898,6 +1920,8 @@ model BookClubMember {
 
   // A user can only be a member of the same club once
   @@unique([clubId, userId])
+  @@index([userId])
+  @@index([clubId])
 }
 
 // ============================================================

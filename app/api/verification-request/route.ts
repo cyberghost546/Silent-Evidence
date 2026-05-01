@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   // Store applications as a JSON array in the site_settings table
   const KEY = 'verification_requests';
   const existing = await prisma.siteSetting.findUnique({ where: { key: KEY } });
-  const requests: unknown[] = existing ? JSON.parse(existing.value) : [];
+  const requests: unknown[] = existing?.value ? JSON.parse(existing.value) : [];
 
   // Prevent duplicate applications
   if (requests.some((r: unknown) => (r as { userId: number }).userId === userId)) {

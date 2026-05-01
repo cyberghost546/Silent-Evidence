@@ -1,7 +1,36 @@
 // app/admin/cookies/page.tsx
-// Admin dashboard page showing cookie consent statistics.
-// Displays total consents, a breakdown by choice (all / essential / rejected),
-// acceptance rate, and a paginated log of the 100 most recent consent records.
+//
+// Server Component — no useState/useEffect needed because all data comes from
+// Prisma at request time and the page has no interactive controls.
+//
+// PURPOSE:
+//   GDPR compliance overview. Shows how visitors responded to the cookie consent
+//   banner: did they accept all cookies, essential-only, or reject everything?
+//   This data helps the team understand whether consent rates are healthy and
+//   lets legal confirm that consent is being properly recorded.
+//
+// THREE CONSENT CHOICES (stored as the `choice` string field):
+//   'all'       — user accepted analytics + marketing cookies
+//   'essential' — user allowed only strictly necessary cookies
+//   'rejected'  — user rejected all optional cookies
+//
+// DATA PATTERN:
+//   Three parallel queries via Promise.all:
+//     1. `count()` — total consent records ever recorded
+//     2. `groupBy(['choice'])` — count per choice type (SQL: GROUP BY choice)
+//     3. `findMany({ take: 100 })` — the 100 most recent raw records for the log
+//
+//   `counts` is built from the groupBy result using Object.fromEntries, turning
+//   `[{ choice: 'all', _count: { choice: 42 } }]` into `{ all: 42 }`.
+//   This makes lookups like `counts['all']` clean in the JSX below.
+//
+// ACCEPTANCE RATE:
+//   `acceptanceRate` = (accepted all / total) * 100
+//   Reflects the percentage of users who gave full consent — a key GDPR KPI.
+//
+// CHOICE_STYLES:
+//   A lookup map from choice string → display label + Tailwind badge classes.
+//   Centralised here so the breakdown section and the log table share the same styling.
 
 import { prisma } from '@/lib/prisma';
 import ProgressBar from '@/app/components/ui/ProgressBar';

@@ -25,6 +25,11 @@ export async function POST(req: Request) {
   const buffer   = Buffer.from(await file.arrayBuffer());
   const publicId = `avatar-${userId}-${Date.now()}`;
 
-  const url = await uploadToCloudinary(buffer, 'silent-evidence/avatars', publicId);
-  return NextResponse.json({ url });
+  try {
+    const url = await uploadToCloudinary(buffer, 'silent-evidence/avatars', publicId);
+    return NextResponse.json({ url });
+  } catch (err) {
+    console.error('Cloudinary upload error:', err);
+    return NextResponse.json({ error: 'Image upload failed. Please try again.' }, { status: 500 });
+  }
 }

@@ -1,24 +1,59 @@
 'use client';
 // app/admin/merge/page.tsx
-// Search for two stories and merge one into the other.
-// The source story is deleted; its likes, comments, bookmarks, reactions, and views
-// are transferred to the target story.
+//
+// WHY 'use client'?
+//   The merge tool is fully interactive: both pickers use live search with debounced
+//   API calls, and the merge itself fires an async POST. All of that requires useState,
+//   so this must be a Client Component.
+//
+// PURPOSE:
+//   Lets the admin combine two duplicate stories into one. All engagement data
+//   (likes, comments, bookmarks, reactions, views) is moved from the source to
+//   the target by the API. The source story is then permanently deleted.
+//
+//   Common use case: an author accidentally posted the same story twice, and
+//   each copy has some comments/likes that should be preserved on the surviving version.
+//
+// ARCHITECTURE:
+//   StoryPicker — a reusable search-as-you-type sub-component used twice (source + target).
+//     It manages its own local search state (query, results, loading) and calls
+//     `onSelect` when the user picks a story, lifting the chosen story up to the parent.
+//
+//   AdminMergePage — the outer page component that holds the source/target state
+//     and fires the actual merge API call when the button is clicked.
+//
+// API:
+//   GET  /api/admin/search?q=...&type=stories  — live story search (used by StoryPicker)
+//   POST /api/admin/merge-stories              — { sourceId, targetId } → merges stories
+//
+// SAFETY:
+//   A browser `confirm()` dialog forces the admin to acknowledge that the source
+//   will be permanently deleted before the API call fires. The button is also
+//   disabled unless both source and target are selected.
 
 import { useState } from 'react';
 
+// Story shape returned by the search API — only the fields the picker needs
 type Story = { id: number; title: string; slug: string; author: { username: string }; _count: { likes: number; comments: number } };
 
+// StoryPicker — search-as-you-type component for selecting one story.
+// `label` is the heading (e.g. "Source" or "Target").
+// `selected` is the currently chosen story (null = nothing chosen yet).
+// `onSelect` is called with the chosen Story when the user clicks a result.
 function StoryPicker({ label, selected, onSelect }: { label: string; selected: Story | null; onSelect: (s: Story) => void }) {
   const [q, setQ]         = useState('');
   const [results, setResults] = useState<Story[]>([]);
   const [searching, setSearching] = useState(false);
 
+  // search() fires on every keystroke — waits for at least 2 characters to avoid
+  // hammering the API with single-letter queries.
   const search = async (val: string) => {
     setQ(val);
     if (val.length < 2) { setResults([]); return; }
     setSearching(true);
     const res = await fetch(`/api/admin/search?q=${encodeURIComponent(val)}&type=stories`);
     const data = await res.json();
+    // Cap at 8 results — enough for the picker dropdown, avoids a massive list
     setResults((data.stories ?? []).slice(0, 8));
     setSearching(false);
   };
@@ -62,14 +97,15 @@ function StoryPicker({ label, selected, onSelect }: { label: string; selected: S
 }
 
 export default function AdminMergePage() {
-  const [source, setSource] = useState<Story | null>(null);
-  const [target, setTarget] = useState<Story | null>(null);
+  const [source, setSource] = useState<Story | null>(null); // story to be deleted
+  const [target, setTarget] = useState<Story | null>(null); // story to receive the data
   const [merging, setMerging] = useState(false);
-  const [result, setResult]   = useState<string | null>(null);
-  const [error, setError]     = useState<string | null>(null);
+  const [result, setResult]   = useState<string | null>(null); // success message
+  const [error, setError]     = useState<string | null>(null); // API error message
 
   const merge = async () => {
     if (!source || !target) return;
+    // browser confirm acts as a last-chance warning before a destructive, irreversible action
     if (!confirm(`Merge "${source.title}" INTO "${target.title}"?\n\nThe source story will be permanently deleted. This cannot be undone.`)) return;
     setMerging(true);
     setError(null);

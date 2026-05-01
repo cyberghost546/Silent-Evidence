@@ -33,6 +33,7 @@
 
 import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 // ── Type definitions ──────────────────────────────────────────────────────────
 
@@ -195,7 +196,7 @@ export default function StoryOfWeekAdmin({
             >
               {/* Thumbnail */}
               {s.coverImage ? (
-                <img src={s.coverImage} alt={s.title} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />
+                <Image src={s.coverImage} alt={s.title} width={64} height={48} className="object-cover rounded-lg shrink-0" />
               ) : (
                 <div className="w-16 h-12 bg-gray-700 rounded-lg flex-shrink-0" />
               )}

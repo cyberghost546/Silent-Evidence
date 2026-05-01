@@ -1,6 +1,37 @@
 'use client';
+// app/admin/tags/TagManagerClient.tsx
+//
+// WHY 'use client'?
+//   The search input, filter tabs, and delete buttons all need useState for
+//   interactive client-side filtering and optimistic deletion.
+//
+// PURPOSE:
+//   Tag management table. Shows all tags on the site with their story counts,
+//   lets admins search/filter, and lets them delete tags (with confirmation).
+//
+//   Common use cases:
+//   - Delete typo tags (e.g. "haunting" and "hauntings" are duplicates)
+//   - Clean up unused tags (storyCount === 0) that clutter the tag cloud
+//   - Find tags by name to check how many stories they're attached to
+//
+// FILTERING:
+//   Two layers of client-side filtering applied in sequence:
+//   1. Filter tab: 'all' shows everything; 'unused' hides tags with storyCount > 0
+//   2. Search text: case-insensitive substring match on the tag name
+//   Both are composed with `.filter().filter()` — no API call, purely in memory.
+//   This is practical because the total tag count is typically small (hundreds, not millions).
+//
+// DELETE PATTERN:
+//   `del()` shows a native browser `confirm()` dialog (acceptable in admin tools),
+//   then fires a DELETE request. On success, the tag is optimistically removed from
+//   local state — no refetch needed.
+//
+// `storyCount` is the flattened `_count.stories` value computed by the parent server
+//   component so this client component doesn't need to know about Prisma's _count shape.
+
 import { useState } from 'react';
 
+// Tag shape — storyCount is pre-flattened from Prisma's _count.stories
 type Tag = { id: number; name: string; slug: string; storyCount: number };
 
 export default function TagManagerClient({ tags: initial }: { tags: Tag[] }) {
@@ -17,6 +48,7 @@ export default function TagManagerClient({ tags: initial }: { tags: Tag[] }) {
     if (res.ok) { setTags(t => t.filter(x => x.id !== id)); flash(`Tag "${name}" deleted.`); }
   };
 
+  // Two-stage client-side filter: tab filter → search text filter
   const visible = tags
     .filter(t => filter === 'unused' ? t.storyCount === 0 : true)
     .filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()));

@@ -1,8 +1,35 @@
 'use client';
-// app/admin/search/page.tsx — Unified admin search across users, stories, comments
+// app/admin/search/page.tsx
+//
+// WHY 'use client'?
+//   Search is fully interactive — the query fires on button click (or Enter key),
+//   results update asynchronously, and the loading state must be reflected in the UI.
+//   All of that requires useState, so this must be a Client Component.
+//
+// PURPOSE:
+//   A unified search bar for admins to find users, stories, or comments without
+//   having to navigate to each section separately. Useful for quickly locating a
+//   specific user to ban, or a comment to delete, from a single search field.
+//
+// API:
+//   GET /api/admin/search?q=<query>
+//   Returns `{ results: Result[] }` — each result has a type, label, sub-label,
+//   and an `href` link so the admin can click through to the full record.
+//
+// UX PATTERN:
+//   - `searched` flag distinguishes "haven't searched yet" (no message) from
+//     "searched and got zero results" (shows "No results" empty state).
+//   - Enter key triggers the same `search()` function as the button click via
+//     `onKeyDown={e => e.key === 'Enter' && search()}`.
+//
+// ICONS / COLORS:
+//   Two Record<string, string> lookup tables map the result type to an icon emoji
+//   and a Tailwind colour class. Avoids a chain of if/else in the JSX.
+
 import { useState } from 'react';
 import Link from 'next/link';
 
+// Result shape from the admin search API — includes a precomputed `href` for linking
 type Result = { type: 'user' | 'story' | 'comment'; id: number; label: string; sub: string; href: string };
 
 export default function AdminSearchPage() {

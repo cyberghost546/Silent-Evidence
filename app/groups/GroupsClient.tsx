@@ -31,6 +31,7 @@
  */
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import CreateGroupModal from '@/app/components/ui/CreateGroupModal';
 
 type Group = {
@@ -117,8 +118,8 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
               >
                 {/* Cover image or gradient placeholder */}
                 {group.coverImage ? (
-                  <div className="h-28 overflow-hidden">
-                    <img src={group.coverImage} alt={group.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="relative h-28 overflow-hidden">
+                    <Image src={group.coverImage} alt={group.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                 ) : (
                   <div className="h-28 bg-gradient-to-br from-red-950/40 to-gray-800 flex items-center justify-center">

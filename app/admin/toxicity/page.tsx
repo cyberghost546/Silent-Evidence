@@ -1,7 +1,42 @@
 'use client';
 // app/admin/toxicity/page.tsx
-// AI-powered content moderation queue — scans recent comments/stories with Claude
-// and surfaces borderline content for a human admin to review.
+//
+// WHY 'use client'?
+//   The scan is triggered by a button click and results stream back from an API call.
+//   Dismiss/delete actions mutate local state. All of that needs useState, so this
+//   must be a Client Component.
+//
+// PURPOSE:
+//   AI-powered content moderation queue. When the admin clicks "Run AI Scan", this
+//   page POSTs to /api/admin/toxicity, which sends recent comments/stories to Claude
+//   for analysis and returns a list of items that may violate the site's policies.
+//
+//   Horror context: gore, dark themes, and disturbing fiction are ALLOWED on this site.
+//   Claude is instructed to only flag real harassment, hate speech, or credible threats —
+//   not fictional horror content.
+//
+// SCAN MODES:
+//   'comments' — scan recent comments only
+//   'stories'  — scan recent story excerpts only
+//   'both'     — scan both (default for a thorough sweep)
+//
+// ITEM LIFECYCLE:
+//   1. Claude flags an item with a severity (low/medium/high) and a reason string.
+//   2. The admin sees the item in a card with the AI's reason shown in yellow.
+//   3. Admin can:
+//      a. Delete — fires a DELETE to the comment/story API endpoint, then hides the card.
+//      b. Dismiss — hides the card locally (no API call, just marks the ID in `dismissed`).
+//
+// STATE:
+//   flagged    — all items returned by the scan
+//   dismissed  — Set<number> of IDs the admin has dismissed or deleted (client-side only)
+//   visible    — flagged items minus dismissed ones (derived, not stored)
+//   scanned    — total number of items the AI checked (shown in the subtitle)
+//   scanning   — true while the POST is in-flight (shows a spinner on the button)
+//
+// SEV_STYLE:
+//   A lookup map for severity → Tailwind badge classes.
+//   Using a Record type avoids a chain of if/else for three cases.
 
 import { useState } from 'react';
 
@@ -45,15 +80,19 @@ export default function AdminToxicityPage() {
   };
 
   const deleteItem = async (item: FlaggedItem) => {
+    // Route to the correct API based on whether this is a comment or a story
     const url = item.type === 'comment'
       ? `/api/admin/comments/${item.id}`
       : `/api/admin/stories/${item.id}`;
     await fetch(url, { method: 'DELETE' });
+    // Hide from UI immediately after deletion — no need to re-scan
     setDismissed(prev => new Set([...prev, item.id]));
   };
 
+  // dismiss() hides a card locally without deleting content (false positive handling)
   const dismiss = (id: number) => setDismissed(prev => new Set([...prev, id]));
 
+  // visible is derived — compute it on every render from the two source-of-truth states
   const visible = flagged.filter(f => !dismissed.has(f.id));
 
   return (
