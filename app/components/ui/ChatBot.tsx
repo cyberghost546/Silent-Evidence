@@ -102,10 +102,14 @@ function parseMessage(content: string): { text: string; showForm: boolean } {
 // The main chatbot component. Manages:
 // - Open/closed state of the floating panel
 // - The full conversation history (messages array)
-// - Sending messages to /api/chat and reading the streamed response
+// - AI provider toggle: Claude (/api/chat) or Ollama (/api/ollama/chat)
+// - Sending messages to the selected provider and reading the streamed response
 export default function ChatBot() {
   // Controls whether the chat panel is visible
   const [open, setOpen] = useState(false);
+
+  // Which AI backend to use — 'claude' or 'ollama'
+  const [provider, setProvider] = useState<'claude' | 'ollama'>('claude');
 
   // Whether the floating button has been permanently dismissed (persisted in localStorage)
   const [dismissed, setDismissed] = useState(false);
@@ -178,10 +182,11 @@ export default function ChatBot() {
     setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
     try {
-      const res = await fetch('/api/chat', {
+      const endpoint = provider === 'ollama' ? '/api/ollama/chat' : '/api/chat';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Send only role + content — the showForgotPassword flag is UI-only, not sent to Claude
+        // Send only role + content — the showForgotPassword flag is UI-only, not sent to AI
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
         }),
@@ -266,16 +271,45 @@ export default function ChatBot() {
                 <p className="text-xs text-gray-500">Silent Evidence AI Guide</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                setDismissed(true);
-                localStorage.setItem('se_watcher_dismissed', '1');
-              }}
-              className="text-gray-600 hover:text-gray-400 transition text-xl leading-none"
-              aria-label="Close chat"
-            >×</button>
+            <div className="flex items-center gap-2">
+              {/* AI provider toggle */}
+              <div className="flex items-center bg-gray-900 rounded-lg border border-gray-700 text-xs overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setProvider('claude')}
+                  className={`px-2 py-1 transition-colors ${
+                    provider === 'claude'
+                      ? 'bg-red-700 text-white'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                  title="Use Claude (Anthropic)"
+                >
+                  Claude
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProvider('ollama')}
+                  className={`px-2 py-1 transition-colors ${
+                    provider === 'ollama'
+                      ? 'bg-red-700 text-white'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                  title="Use Llama 3.2 (Ollama)"
+                >
+                  Llama
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setDismissed(true);
+                  localStorage.setItem('se_watcher_dismissed', '1');
+                }}
+                className="text-gray-600 hover:text-gray-400 transition text-xl leading-none"
+                aria-label="Close chat"
+              >×</button>
+            </div>
           </div>
 
           {/* Messages list — scrollable, max 320px tall */}
