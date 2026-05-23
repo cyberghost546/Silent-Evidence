@@ -16,13 +16,13 @@ async function getDraft(token: string) {
   if (!res.ok) return null;
   return res.json() as Promise<{
     story: {
-      id:          number;
-      title:       string;
-      content:     string;
-      coverImage:  string | null;
-      mood:        string | null;
-      tags:        { name: string }[];
-      createdAt:   string;
+      id: number;
+      title: string;
+      content: string;
+      coverImage: string | null;
+      mood: string | null;
+      tags: { name: string }[];
+      createdAt: string;
       author: { username: string; avatar: string | null };
     };
     expiresAt: string | null;

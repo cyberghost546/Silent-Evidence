@@ -4,6 +4,7 @@
 // Set OLLAMA_BASE_URL in your .env to point to your Ollama server.
 
 import { NextRequest } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
@@ -26,6 +27,12 @@ Site features include: story reading & writing, bookmarks, likes, comments, chal
 Keep your answers concise and atmospheric. If you don't know something specific about the site, suggest they explore or contact support. Never break character — you are The Watcher.`;
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rl = checkRateLimit(ip, 'ollama-chat', { limit: 20, windowMs: 60 * 1000 });
+  if (rl.blocked) {
+    return new Response('Too many requests — slow down.', { status: 429 });
+  }
+
   const { messages } = await req.json();
 
   if (!Array.isArray(messages) || messages.length === 0) {

@@ -26,10 +26,33 @@ import { prisma } from '@/lib/prisma';
 // Import the Anthropic SDK — the official library for calling the Claude AI API
 import Anthropic from '@anthropic-ai/sdk';
 
-// Create one shared Anthropic client instance at module level.
-// Sharing a single instance avoids the overhead of creating a new HTTP connection per request.
-// process.env.ANTHROPIC_API_KEY reads the secret API key from your .env file — never hard-code it.
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// When OLLAMA_GENERATION=true, story generation uses the local Ollama model instead of Claude.
+// This is free and keeps Claude credits for higher-priority features like the chatbot.
+const USE_OLLAMA = process.env.OLLAMA_GENERATION === 'true';
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
+
+async function generateStoryText(prompt: string): Promise<string> {
+  if (USE_OLLAMA) {
+    const res = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: OLLAMA_MODEL, prompt, stream: false }),
+    });
+    if (!res.ok) throw new Error(`Ollama returned ${res.status}`);
+    const data = await res.json();
+    return data.response ?? '';
+  }
+
+  const message = await client.messages.create({
+    model: 'claude-opus-4-6',
+    max_tokens: 4096,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  return message.content[0].type === 'text' ? message.content[0].text : '';
+}
 
 // ── POST /api/admin/generate-story ───────────────────────────────────────────
 
@@ -107,24 +130,8 @@ Respond ONLY with a valid JSON object in this exact format (no markdown, no extr
 Make the story original, immersive, and genuinely unsettling. End with a memorable twist or haunting final line.`;
 
   try {
-    // ── Call Claude ───────────────────────────────────────────────────────────
-
-    // client.messages.create() sends our prompt to the Claude API and waits for a response.
-    // model: 'claude-opus-4-6' — the most capable model, used here because story quality
-    //   matters more than speed or cost for this single-story admin feature.
-    // max_tokens: 4096 — the maximum number of tokens Claude can generate in its response.
-    //   A token is roughly 4 characters; 4096 tokens ≈ 3000-4000 words.
-    // messages: — the conversation history. A single user message with our prompt.
-    const message = await client.messages.create({
-      model: 'claude-opus-4-6',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    // message.content is an array of content blocks (Claude can return text AND images).
-    // We only care about the first block, and only if it's a text block.
-    // If it's not text (unlikely but safe to guard), rawText falls back to an empty string.
-    const rawText = message.content[0].type === 'text' ? message.content[0].text : '';
+    // Call either Ollama (free, local) or Claude depending on OLLAMA_GENERATION env var
+    const rawText = await generateStoryText(prompt);
 
     // ── Parse JSON from Claude's response ────────────────────────────────────
 

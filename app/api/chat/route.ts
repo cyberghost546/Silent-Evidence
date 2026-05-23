@@ -6,6 +6,7 @@
 
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
 // Create one Anthropic client instance — reused for every request.
 // The API key is stored in .env as ANTHROPIC_API_KEY (never hardcoded).
@@ -36,6 +37,12 @@ Keep your answers concise and atmospheric. If you don't know something specific 
 export async function POST(req: NextRequest) {
   // The client sends the full conversation history (all messages so far) on every request.
   // Claude needs the whole history to understand the context of the conversation.
+  const ip = getClientIp(req);
+  const rl = checkRateLimit(ip, 'chat', { limit: 20, windowMs: 60 * 1000 });
+  if (rl.blocked) {
+    return new Response('Too many requests — slow down.', { status: 429 });
+  }
+
   const { messages } = await req.json();
 
   if (!Array.isArray(messages) || messages.length === 0) {

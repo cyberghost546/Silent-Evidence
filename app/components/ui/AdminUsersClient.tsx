@@ -23,7 +23,7 @@
 //     searchable, filterable, sortable table.
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 

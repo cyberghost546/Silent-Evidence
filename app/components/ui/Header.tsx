@@ -82,6 +82,10 @@ export default async function Header() {
           <li>
             <Link href="/about" className="hover:text-gray-300">About</Link>
           </li>
+
+          <li>
+            <Link href="/contact" className="hover:text-gray-300">Contact</Link>
+          </li>
         </ul>
 
         {/* Spacer — pushes search + user controls to the right */}

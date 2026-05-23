@@ -11,6 +11,7 @@ import { serverError } from '@/lib/apiError';
 import type { Mood } from '@prisma/client';
 import { checkStoryToxicity } from '@/lib/toxicityCheck';
 import { sanitizeContent } from '@/lib/sanitize';
+import { detectMood } from '@/lib/moodDetect';
 import { z } from 'zod';
 
 const CreateStorySchema = z.object({
@@ -158,6 +159,12 @@ export async function POST(req: Request) {
     }
   }
 
+  // Auto-detect mood via Ollama when publishing without one set
+  let resolvedMood = mood || null;
+  if (!resolvedMood && status === 'PUBLISHED') {
+    resolvedMood = await detectMood(title, excerpt || content.slice(0, 500)) ?? null;
+  }
+
   // Generate a unique URL slug from the title
   const slug = slugify(title);
 
@@ -170,7 +177,7 @@ export async function POST(req: Request) {
       coverImage: coverImage || null,
       status:      scheduledAt ? 'DRAFT' : (status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT'),
       language:    language || 'en',
-      mood:         mood || null,
+      mood:         resolvedMood,
       warnings:     warnings || null,
       scheduledAt:  scheduledAt || null,
       locationName: locationName || null,
