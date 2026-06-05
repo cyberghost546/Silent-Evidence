@@ -6,6 +6,8 @@ import { checkAndAwardBadges } from '@/lib/badges';
 import { notifyNewComment, notifyCommentReply } from '@/lib/notifyEmail';
 import { checkToxicity } from '@/lib/toxicityCheck';
 import { sendPushToUser } from '@/lib/webpush';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyCsrfToken } from '@/lib/csrf';
 import { z } from 'zod';
 
 const CreateCommentSchema = z.object({
@@ -15,6 +17,14 @@ const CreateCommentSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const rl = checkRateLimit(ip, 'comments', { limit: 10, windowMs: 60 * 1000 });
+  if (rl.blocked) return NextResponse.json({ error: 'Too many comments — slow down.' }, { status: 429 });
+
+  if (!(await verifyCsrfToken(req))) {
+    return NextResponse.json({ error: 'Invalid CSRF token.' }, { status: 403 });
+  }
+
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
   if (!userId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });

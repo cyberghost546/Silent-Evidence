@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { cache, TTL } from '@/lib/cache';
+import ReadingBadge from './ReadingBadge';
 
 export default async function PopularStories() {
   // Cached 5 minutes — like-ranked list doesn't need real-time accuracy.
@@ -59,6 +60,7 @@ export default async function PopularStories() {
                 <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-gray-800/80 to-transparent" />
+              <ReadingBadge storyId={story.id} />
             </div>
 
             {/* Info */}

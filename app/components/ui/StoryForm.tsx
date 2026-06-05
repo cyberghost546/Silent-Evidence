@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { LANGUAGES } from '@/lib/languages';
 import dynamic from 'next/dynamic';
 import StoryTemplatePicker from './StoryTemplatePicker';
+import { getCsrfToken } from '@/lib/getCsrfToken';
 
 const RichEditor = dynamic(() => import('./RichEditor'), { ssr: false });
 const AIWritingAssistant = dynamic(() => import('./AIWritingAssistant'), { ssr: false });
@@ -185,9 +186,10 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
 
     if (autosaveId.current !== null) {
       // Patch the existing autosaved draft with final values
+      const csrfToken = await getCsrfToken();
       const res = await fetch(`/api/stories/${autosaveId.current}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ title, content, excerpt, coverImage: coverImage || null, categoryId: Number(categoryId), status, language }),
       });
       const data = await res.json();
@@ -195,9 +197,10 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       if (!res.ok) { setError(data.error ?? 'Something went wrong.'); return; }
       router.push(status === 'PUBLISHED' ? `/story/${data.slug}` : '/my-stories');
     } else {
+      const csrfToken = await getCsrfToken();
       const res = await fetch('/api/stories', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ title, categoryId: Number(categoryId), excerpt, content, coverImage: coverImage || null, videoUrl: videoUrl || null, audioUrl: audioUrl || null, status, language, mood: mood || null, contentRating, warnings: warnings.length ? JSON.stringify(warnings) : null, scheduledAt: scheduledAt || null, seriesId: seriesId ? Number(seriesId) : null, seriesOrder: seriesOrder ? Number(seriesOrder) : null, locationName: locationName || null, latitude: latitude ? Number(latitude) : null, longitude: longitude ? Number(longitude) : null, isPremiumOnly, earlyAccessUntil: earlyAccessUntil || null }),
       });
       const data = await res.json();

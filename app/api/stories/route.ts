@@ -12,6 +12,8 @@ import type { Mood } from '@prisma/client';
 import { checkStoryToxicity } from '@/lib/toxicityCheck';
 import { sanitizeContent } from '@/lib/sanitize';
 import { detectMood } from '@/lib/moodDetect';
+import { verifyCsrfToken } from '@/lib/csrf';
+import { sendPushToUser } from '@/lib/webpush';
 import { z } from 'zod';
 
 const CreateStorySchema = z.object({
@@ -105,6 +107,10 @@ function slugify(title: string): string {
 }
 
 export async function POST(req: Request) {
+  if (!(await verifyCsrfToken(req))) {
+    return NextResponse.json({ error: 'Invalid CSRF token.' }, { status: 403 });
+  }
+
   // Only logged-in users can create stories
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
@@ -197,6 +203,31 @@ export async function POST(req: Request) {
     checkAndAwardBadges(userId).catch(() => {});
     // Bust the stories listing cache so the new story appears immediately
     invalidatePattern('stories:list:*').catch(() => {});
+
+    // Notify all followers — fire-and-forget so publish isn't delayed
+    prisma.follow.findMany({
+      where: { followingId: userId },
+      select: { followerId: true },
+    }).then(async (follows) => {
+      if (follows.length === 0) return;
+      const author = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+      const authorName = author?.username ?? 'Someone you follow';
+      for (const { followerId } of follows) {
+        prisma.notification.create({
+          data: {
+            userId: followerId,
+            type: 'FOLLOW',
+            message: `${authorName} published a new story: "${story.title}"`,
+            storyId: story.id,
+          },
+        }).catch(() => {});
+        sendPushToUser(followerId, {
+          title: `New story by ${authorName}`,
+          body: story.title,
+          url: `/story/${story.slug}`,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
   }
 
   // Return slug + id so the client can redirect and autosave subsequent edits

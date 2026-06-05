@@ -23,6 +23,7 @@ import BackToTop from '@/app/components/ui/BackToTop';
 import ReadingTracker from '@/app/components/ui/ReadingTracker';
 import StoryActionsDropdown from '@/app/components/ui/StoryActionsDropdown';
 import RelatedStories from '@/app/components/ui/RelatedStories';
+import RelatedTagsSidebar from '@/app/components/ui/RelatedTagsSidebar';
 import ReactionBar from '@/app/components/ui/ReactionBar';
 import ScareOMeter from '@/app/components/ui/ScareOMeter';
 import GhostModeToggle from '@/app/components/ui/GhostMode';
@@ -545,6 +546,9 @@ export default async function StoryPage({ params }: Props) {
 
         {/* More like this */}
         <MoreLikeThis storyId={story.id} categoryId={story.categoryId} mood={story.mood} />
+
+        {/* Tags — browse more stories with the same tags */}
+        <RelatedTagsSidebar tags={story.tags} currentStoryId={story.id} />
 
         {/* Related stories */}
         <RelatedStories categoryId={story.categoryId} currentStoryId={story.id} />

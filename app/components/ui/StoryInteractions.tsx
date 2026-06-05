@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import CommentReactions from './CommentReactions';
 import SpoilerText from './SpoilerText';
+import { getCsrfToken } from '@/lib/getCsrfToken';
 
 type CommentUser = { username: string; profile: { avatar: string | null } | null };
 
@@ -242,9 +243,10 @@ function CommentCard({
   const submitReply = async () => {
     if (!replyText.trim()) return;
     setSubmitting(true);
+    const csrfToken = await getCsrfToken();
     const res = await fetch('/api/comments', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
       body: JSON.stringify({ storyId, content: replyText, parentId: comment.id }),
     });
     if (res.ok) {
@@ -450,9 +452,10 @@ export default function StoryInteractions({
   const submitComment = async () => {
     if (!commentText.trim()) return;
     setSubmitting(true);
+    const csrfToken = await getCsrfToken();
     const res = await fetch('/api/comments', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
       body: JSON.stringify({ storyId, content: commentText }),
     });
     if (res.ok) {
