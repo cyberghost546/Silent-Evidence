@@ -86,11 +86,6 @@ a, button {
   color: #ffffff;
 }
 
-/* Light mode — blue selection to match the light mode accent */
-html.light ::selection {
-  background-color: rgba(37, 99, 235, 0.25);
-  color: #111111;
-}
 
 /* Notification toast slide-in animation */
 @keyframes slide-in {
@@ -265,289 +260,41 @@ html.light ::selection {
   }
 }
 
-/* Global dark-theme red override for legacy green utility classes
-   This keeps the horror accent consistent without needing to rewrite
-   every green Tailwind class in the app immediately. */
-html:not(.light) [class*="bg-green-600"] { background-color: #dc2626 !important; }
-html:not(.light) [class*="hover:bg-green-700"]:hover { background-color: #b91c1c !important; }
-html:not(.light) [class*="bg-green-700"] { background-color: #b91c1c !important; }
-html:not(.light) [class*="bg-green-500"]:not(.status-ok) { background-color: #ef4444 !important; }
-html:not(.light) [class*="bg-green-400"] { background-color: #f87171 !important; }
-html:not(.light) [class*="bg-green-900"] { background-color: #7f1d1d !important; }
-html:not(.light) [class*="bg-green-800"] { background-color: #991b1b !important; }
-html:not(.light) [class*="bg-green-950"] { background-color: #581c1c !important; }
+/* Global dark-theme red override for legacy green utility classes */
+[class*="bg-green-600"] { background-color: #dc2626 !important; }
+[class*="hover:bg-green-700"]:hover { background-color: #b91c1c !important; }
+[class*="bg-green-700"] { background-color: #b91c1c !important; }
+[class*="bg-green-500"]:not(.status-ok) { background-color: #ef4444 !important; }
+[class*="bg-green-400"] { background-color: #f87171 !important; }
+[class*="bg-green-900"] { background-color: #7f1d1d !important; }
+[class*="bg-green-800"] { background-color: #991b1b !important; }
+[class*="bg-green-950"] { background-color: #581c1c !important; }
 
-html:not(.light) [class*="text-green-400"] { color: #f87171 !important; }
-html:not(.light) [class*="text-green-300"] { color: #fca5a5 !important; }
-html:not(.light) [class*="text-green-500"] { color: #ef4444 !important; }
-html:not(.light) [class*="text-green-600"] { color: #dc2626 !important; }
+[class*="text-green-400"] { color: #f87171 !important; }
+[class*="text-green-300"] { color: #fca5a5 !important; }
+[class*="text-green-500"] { color: #ef4444 !important; }
+[class*="text-green-600"] { color: #dc2626 !important; }
 
-html:not(.light) [class*="border-green-500"] { border-color: #ef4444 !important; }
-html:not(.light) [class*="border-green-600"] { border-color: #dc2626 !important; }
-html:not(.light) [class*="border-green-700"] { border-color: #b91c1c !important; }
-html:not(.light) [class*="border-green-900"] { border-color: #7f1d1d !important; }
+[class*="border-green-500"] { border-color: #ef4444 !important; }
+[class*="border-green-600"] { border-color: #dc2626 !important; }
+[class*="border-green-700"] { border-color: #b91c1c !important; }
+[class*="border-green-900"] { border-color: #7f1d1d !important; }
 
-html:not(.light) [class*="hover:border-green-600"]:hover { border-color: #dc2626 !important; }
-html:not(.light) [class*="hover:text-green-400"]:hover { color: #f87171 !important; }
-html:not(.light) [class*="hover:text-green-300"]:hover { color: #fca5a5 !important; }
+[class*="hover:border-green-600"]:hover { border-color: #dc2626 !important; }
+[class*="hover:text-green-400"]:hover { color: #f87171 !important; }
+[class*="hover:text-green-300"]:hover { color: #fca5a5 !important; }
 
-/* ── Custom scrollbar — light mode ──
-   Light gray track, blue thumb to match light mode accent color */
-html.light ::-webkit-scrollbar-track {
-  background: #e2e8f0; /* light gray rail */
-}
-
-html.light ::-webkit-scrollbar-thumb {
-  background: #2563eb; /* blue thumb matches light mode accent */
-  border-radius: 4px;
-}
-
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #1d4ed8; /* darker blue on hover */
-}
-
-/* Firefox — light mode */
-@supports (scrollbar-color: auto) {
-  html.light * {
-    scrollbar-color: #2563eb #e2e8f0;
-    scrollbar-width: thin;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LIGHT MODE
-   - Backgrounds: white / light gray
-   - Text: black / dark gray
-   - Accents: BLUE instead of red
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── Blue accent palette used in light mode ──
-   Replaces all red (#dc2626 family) with blue (#2563eb family) */
-html.light {
-  /* Backgrounds */
-  --color-gray-950: #f0f2f5;
-  --color-gray-900: #ffffff;
-  --color-gray-800: #f4f6f8;
-  --color-gray-700: #e2e6ea;
-
-  /* Text — darkened so secondary/muted text is readable on white backgrounds */
-  --color-gray-600: #374151;  /* was #6b7280 — now dark enough for contrast */
-  --color-gray-500: #1f2937;  /* was #4b5563 */
-  --color-gray-400: #111827;  /* was #374151 — near-black for meta text */
-  --color-gray-300: #030712;  /* was #1f2937 */
-
-  /* "text-white" headings → true black */
-  --color-white: #111111;
-
-  /* Remap ALL red variables → blue */
-  --color-red-50:  #eff6ff;
-  --color-red-100: #dbeafe;
-  --color-red-200: #bfdbfe;
-  --color-red-300: #93c5fd;
-  --color-red-400: #3b82f6;
-  --color-red-500: #2563eb;
-  --color-red-600: #1d4ed8;
-  --color-red-700: #1e40af;
-  --color-red-800: #1e3a8a;
-  --color-red-900: #1e3269;
-  --color-red-950: #e8f0ff;
-
-  color-scheme: light;
-}
-
-/* ── Images ── */
-html.light img {
-  filter: brightness(0.96);
-}
-
-/* ── Borders ── */
-html.light .border-gray-700,
-html.light .border-gray-800 {
-  border-color: #dde1e7;
-}
-
-/* Red borders → blue borders */
-html.light [class*="border-red-"] {
-  border-color: #93c5fd !important;
-}
-html.light .border-red-600 { border-color: #2563eb !important; }
-html.light .border-red-800 { border-color: #1e40af !important; }
-html.light .border-red-900 { border-color: #1e3a8a !important; }
-
-/* ── Header ── */
-html.light header {
-  background-color: #ffffff !important;
-  border-bottom-color: #e5e7eb !important;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-}
-html.light header a,
-html.light header button {
-  color: #374151 !important;
-}
-html.light header a:hover,
-html.light header button:hover {
-  color: #1d4ed8 !important;  /* blue hover */
-}
-
-/* ── Inputs / textareas ── */
-html.light input[type="text"],
-html.light input[type="search"],
-html.light input[type="email"],
-html.light input[type="password"],
-html.light textarea,
-html.light select {
-  background-color: #f4f6f8 !important;
-  border-color: #d1d5db !important;
-  color: #111111 !important;
-}
-html.light input::placeholder,
-html.light textarea::placeholder {
-  color: #9ca3af !important;
-}
-/* Focus ring → blue */
-html.light input:focus,
-html.light textarea:focus {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.2) !important;
-}
-
-/* ── Backgrounds ── */
-html.light .bg-gray-900  { background-color: #ffffff !important; }
-html.light .bg-gray-800  { background-color: #f4f6f8 !important; }
-html.light .bg-gray-950  { background-color: #f0f2f5 !important; }
-
-/* Red backgrounds → blue */
-html.light .bg-red-600   { background-color: #2563eb !important; }
-html.light .bg-red-700   { background-color: #1d4ed8 !important; }
-html.light .bg-red-500   { background-color: #3b82f6 !important; }
-html.light [class*="bg-red-950"] { background-color: #eff6ff !important; }
-html.light [class*="bg-red-900"] { background-color: #dbeafe !important; }
-
-/* ── Dividers ── */
-html.light .divide-gray-800 > * + * { border-color: #e5e7eb !important; }
-
-/* ── Card shadows — subtle black base, strong blue glow on hover ── */
-html.light [class*="shadow-"] {
-  box-shadow: 0 4px 20px rgba(37,99,235,0.12) !important;
-}
-html.light [class*="shadow-"]:hover {
-  box-shadow: 0 12px 40px rgba(37,99,235,0.45) !important;
-}
-
-/* ── Footer ── */
-html.light footer {
-  background-color: #f0f2f5 !important;
-  border-top-color: #e5e7eb !important;
-}
-
-/* ── Headings → black (except over images) ── */
-html.light h1:not(.over-image),
-html.light h2:not(.over-image),
-html.light h3:not(.over-image),
-html.light h4:not(.over-image) {
-  color: #111111;
-}
-
-/* ── Text on top of dark images stays white ── */
-html.light .text-on-image,
-html.light .text-on-image * {
-  color: #ffffff !important;
-}
-html.light .absolute.bottom-0 .text-white,
-html.light .absolute .text-white {
-  color: #ffffff !important;
-}
-
-/* ── All red text → blue ── */
-html.light .text-red-300 { color: #3b82f6 !important; }
-html.light .text-red-400 { color: #2563eb !important; }
-html.light .text-red-500 { color: #1d4ed8 !important; }
-html.light .text-red-600 { color: #1d4ed8 !important; }
-
-/* ── Buttons: red bg → blue bg ── */
-html.light .hover\:bg-red-700:hover { background-color: #1d4ed8 !important; }
-html.light .hover\:bg-red-600:hover { background-color: #2563eb !important; }
-html.light .hover\:text-red-400:hover { color: #2563eb !important; }
-html.light .hover\:text-red-300:hover { color: #3b82f6 !important; }
-html.light .hover\:border-red-600:hover { border-color: #2563eb !important; }
-
-/* ── The "Silent Evidence" logo text → blue in light mode ── */
-html.light .text-red-500.font-bold,
-html.light a .text-red-500 {
-  color: #1d4ed8 !important;
-}
-
-/* ── Accent bar (the | before section titles) → blue ── */
-html.light .bg-red-600 { background-color: #2563eb !important; }
-
-/* ── Category & Explore dropdowns in light mode ── */
-html.light .light-dropdown {
-  background-color: #ffffff !important;
-  border-color: #2563eb !important;          /* blue border */
-  box-shadow: 0 8px 30px rgba(37,99,235,0.18) !important;  /* blue shadow */
-}
-html.light .light-dropdown-item {
-  color: #111111 !important;                 /* black letters */
-}
-html.light .light-dropdown-item:hover {
-  background-color: #eff6ff !important;      /* light blue hover bg */
-  color: #1d4ed8 !important;                 /* blue text on hover */
-}
-
-/* ── Secondary / muted text — explicit overrides for readability on white ──
-   These classes are used for timestamps, metadata, captions etc.
-   Without overrides they render as light gray (#6b7280) which is barely
-   readable against a white background. */
-html.light .text-gray-600 { color: #374151 !important; }
-html.light .text-gray-500 { color: #1f2937 !important; }
-html.light .text-gray-400 { color: #111827 !important; }
-html.light .text-gray-300 { color: #030712 !important; }
-
-/* ── Additional background shades ── */
-html.light .bg-gray-700  { background-color: #e9ecef !important; }
-html.light .bg-gray-600  { background-color: #dee2e6 !important; }
-
-/* ── Body / main text ── */
-html.light .text-gray-200 { color: #1f2937 !important; }
-html.light .text-gray-100 { color: #111827 !important; }
-
-/* ── Hover background states ── */
-html.light .hover\:bg-gray-800:hover { background-color: #e9ecef !important; }
-html.light .hover\:bg-gray-700:hover { background-color: #dee2e6 !important; }
-
-/* ── Semi-transparent card backgrounds (e.g. bg-gray-800\/50) ── */
-html.light [class*="bg-gray-800/"]  { background-color: rgba(244,246,248,0.8) !important; }
-html.light [class*="bg-gray-900/"]  { background-color: rgba(255,255,255,0.8) !important; }
-
-/* ── Story cards & panels ── */
-html.light article,
-html.light [class*="rounded-xl"],
-html.light [class*="rounded-2xl"] {
-  border-color: #e2e6ea;
-}
-
-/* ── Code / mono text ── */
-html.light .font-mono { color: #374151 !important; }
-
-/* ── Badges / pills with dark backgrounds ── */
-html.light [class*="bg-gray-800"][class*="rounded-full"] {
-  background-color: #e9ecef !important;
-  color: #374151 !important;
-}
 
 /* ── Shimmer loading animation (Facebook-style sweep) ── */
-/* Uses transform: translateX so the browser only triggers Composite — no Paint cost. */
 @keyframes shimmer {
   to { transform: translateX(200%); }
 }
-
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
   background: #1f2937;
   border-radius: 0.375rem;
 }
-
 .skeleton-shimmer::after {
   content: '';
   position: absolute;
@@ -562,50 +309,6 @@ html.light [class*="bg-gray-800"][class*="rounded-full"] {
   transform: translateX(-100%);
   animation: shimmer 1.6s infinite linear;
 }
-
-html.light .skeleton-shimmer {
-  background: #e5e7eb;
-}
-
-html.light .skeleton-shimmer::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.7) 50%,
-    transparent 100%
-  );
-}
-
-/* ── Skeleton / pulse placeholders ── */
-html.light .animate-pulse [class*="bg-gray-700"],
-html.light .animate-pulse [class*="bg-gray-800"] {
-  background-color: #dde1e7 !important;
-}
-
-/* ── Focus rings ── */
-html.light [class*="focus:ring-red"] {
-  --tw-ring-color: rgba(37,99,235,0.4) !important;
-}
-
-/* ── Green accent → keep green in light mode (not red) ── */
-html.light [class*="text-green-500"],
-html.light [class*="text-green-400"] {
-  color: #16a34a !important;
-}
-html.light [class*="bg-green-600"],
-html.light [class*="bg-green-700"] {
-  background-color: #a31616 !important;
-}
-html.light [class*="border-green-"] {
-  border-color: #16a34a !important;
-}
-
-/* ── Scrollbar ── */
-html.light ::-webkit-scrollbar { width: 6px; }
-html.light ::-webkit-scrollbar-track { background: #f0f2f5; }
-html.light ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 3px; }
-html.light ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
-
 
 /* ── Reader settings — font size and line spacing controlled via JS ── */
 :root {

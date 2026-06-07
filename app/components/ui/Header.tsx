@@ -15,7 +15,6 @@ import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
 import DMIcon from './DMIcon';
-import ThemeToggle from './ThemeToggle';
 import MobileNav from './MobileNav';
 
 export default async function Header() {
@@ -96,7 +95,6 @@ export default async function Header() {
         {/* Logged-in state: show theme toggle, DMs, notifications, and avatar menu */}
         {user && avatar ? (
           <div className="flex items-center gap-2 md:gap-3">
-            <ThemeToggle />
             <DMIcon />
             <NotificationBell />
             <UserMenu username={user.username} avatar={avatar} role={user.role} />

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
+import { awardBadge, hasBingoLine } from '@/lib/badges';
 
 interface SessionData { userId?: number }
 const SESSION_OPTIONS = {
@@ -42,7 +43,17 @@ export async function POST(req: NextRequest) {
     }
 
     await prisma.bingoCellCheck.create({ data: { cardId: card.id, cellIndex } });
-    return NextResponse.json({ checked: true });
+
+    // Check if this new cell completes a bingo line — award badge if so
+    const allChecks = await prisma.bingoCellCheck.findMany({
+      where: { cardId: card.id },
+      select: { cellIndex: true },
+    });
+    const checkedIndexes = allChecks.map((c) => c.cellIndex);
+    const bingo = hasBingoLine(checkedIndexes);
+    if (bingo) awardBadge(session.userId, 'BINGO_COMPLETE').catch(() => {});
+
+    return NextResponse.json({ checked: true, bingo });
   } catch {
     return NextResponse.json({ error: 'Failed to toggle cell' }, { status: 500 });
   }

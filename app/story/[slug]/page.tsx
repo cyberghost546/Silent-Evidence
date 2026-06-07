@@ -55,6 +55,7 @@ import { hasRecentView } from '@/lib/cache';
 import { headers } from 'next/headers';
 import ReadingPaywall from '@/app/components/ui/ReadingPaywall';
 import PremiumAudioPlayer from '@/app/components/ui/PremiumAudioPlayer';
+import ScrollDepthTracker from '@/app/components/ui/ScrollDepthTracker';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://silentevidence.com';
 
@@ -224,6 +225,7 @@ export default async function StoryPage({ params }: Props) {
       <ReadingProgress storyId={story.id} />
       <BackToTop />
       {userId && <ReadingTracker storyId={story.id} />}
+      {userId && <ScrollDepthTracker storyId={story.id} />}
       <Header />
 
       {/* Free tier paywall — shown when user has exceeded monthly reading limit */}

@@ -3,6 +3,21 @@
     {
       "path": "/api/cron/newsletter",
       "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/publish-scheduled",
+      "schedule": "*/15 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/cron/newsletter/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/ollama/chat/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

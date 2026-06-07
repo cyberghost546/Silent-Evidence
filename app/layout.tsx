@@ -77,7 +77,6 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      // Default to dark — ThemeToggle reads localStorage on mount and switches if needed
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >

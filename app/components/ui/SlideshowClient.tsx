@@ -96,7 +96,7 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
           1. Dark gradient fades the image to black at the bottom (makes text readable)
           2. Subtle red radial glow at the top for a horror atmosphere */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(34,197,94,0.08)_0%,_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(220,38,38,0.08)_0%,_transparent_60%)]" />
 
       {/* Thin red accent line along the very top edge — purely decorative */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-600/30 to-transparent" />
@@ -188,38 +188,33 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
 
 // ── HeroFallback ──────────────────────────────────────────────────────────────
 // Shown when there are no slides in the database yet (e.g. a fresh install).
-// It renders a branded static hero with two CTA buttons instead.
+// hero-fallback class lets globals.css swap in a clean light-mode design.
 function HeroFallback() {
   return (
-    <div className="relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden bg-gray-950">
-      {/* Layered radial glows create depth without needing an actual image */}
+    <div className="hero-fallback relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden bg-gray-950">
+      {/* Dark mode: layered red radial glows. In light mode CSS removes these. */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(220,38,38,0.12)_0%,_transparent_70%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(220,38,38,0.08)_0%,_transparent_50%)]" />
       {/* Top accent line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-600/30 to-transparent" />
 
-      {/* Centred text content over the dark gradient */}
-      {/* text-on-image keeps all text white in light mode — this sits over a dark background */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8 text-on-image">
-        {/* Decorative label with flanking lines */}
+      {/* Content — NOT using text-on-image so theme CSS controls text colour */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
         <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-red-400 mb-6">
           <span className="w-4 h-px bg-red-500" />
           True Accounts · Unexplained Events
           <span className="w-4 h-px bg-red-500" />
         </span>
 
-        {/* Site name */}
         <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
           Silent Evidence
         </h1>
 
-        {/* Tagline */}
         <p className="text-gray-400 text-lg max-w-xl leading-relaxed mb-8">
           Stories that can&apos;t be explained. Accounts that were never meant to be found.
           This is where the truth hides.
         </p>
 
-        {/* Two CTA buttons */}
         <div className="flex gap-4">
           <a href="/search" className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm">
             Browse Stories

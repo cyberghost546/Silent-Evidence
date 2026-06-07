@@ -30,29 +30,27 @@ const ACCENTS = [
 ];
 
 // A mapping of category slug → emoji icon.
-// Each horror category gets a thematic emoji that renders at any size,
-// requires no external assets, and looks great on dark backgrounds.
 const ICONS: Record<string, string> = {
-  'ghost-stories':    '👻',
-  'psychological':    '🧠',
-  'supernatural':     '⚡',
-  'paranormal':       '👁️',
-  'slasher-horror':   '🔪',
-  'cosmic-horror':    '🌌',
-  'body-horror':      '🩸',
-  'urban-legends':    '🏙️',
-  'true-crime':       '🔍',
-  'tech-horror':      '💻',
-  'survival-horror':  '🪓',
-  'occult-witchcraft':'🕯️',
-  'monsters-creatures':'🐉',
-  'dark-fantasy':     '⚔️',
-  'folk-horror':      '🌾',
-  'found-footage':    '📹',
-  'dark-romance':     '🥀',
-  'post-apocalyptic': '☢️',
-  'haunted-places':   '🏚️',
-  'sci-fi-horror':    '🛸',
+  'ghost-stories':      '👻',
+  'psychological':      '🧠',
+  'supernatural':       '✨',
+  'paranormal':         '👁️',
+  'slasher-horror':     '🔪',
+  'cosmic-horror':      '🌌',
+  'body-horror':        '🩸',
+  'urban-legends':      '🏙️',
+  'true-crime':         '🔍',
+  'tech-horror':        '💻',
+  'survival-horror':    '🪓',
+  'occult-witchcraft':  '🔮',
+  'monsters-creatures': '🦇',
+  'dark-fantasy':       '🐉',
+  'found-footage':      '📹',
+  'folk-horror':        '🌾',
+  'dark-romance':       '🥀',
+  'post-apocalyptic':   '☢️',
+  'haunted-places':     '🏚️',
+  'sci-fi-horror':      '🛸',
 };
 
 export default async function CategoriesShowcase() {
@@ -61,7 +59,7 @@ export default async function CategoriesShowcase() {
   // so we can display it on the tile without a separate query.
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
-    include: { _count: { select: { stories: true } } },
+    include: { _count: { select: { stories: { where: { status: 'PUBLISHED' } } } } },
   });
 
   return (

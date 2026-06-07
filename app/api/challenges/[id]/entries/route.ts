@@ -21,6 +21,7 @@ import { cookies } from 'next/headers';
 
 // Import the Prisma database client to validate challenges, stories, and create entries
 import { prisma } from '@/lib/prisma';
+import { awardBadge } from '@/lib/badges';
 
 // Next.js App Router passes dynamic URL segment values through a params Promise.
 // { id } in the type refers to the [id] segment in the file path.
@@ -52,7 +53,11 @@ export async function POST(req: NextRequest, { params }: Props) {
   const challengeId = Number(id);
 
   // Parse the JSON body — expects { storyId: number }
-  const { storyId } = await req.json();
+  const body = await req.json();
+  const { storyId } = body;
+  if (typeof storyId !== 'number' || storyId <= 0) {
+    return NextResponse.json({ error: 'Invalid storyId' }, { status: 400 });
+  }
 
   // ── Validate the challenge ─────────────────────────────────────────────────
   // Look up the challenge record to ensure it exists and is still accepting submissions
@@ -79,6 +84,9 @@ export async function POST(req: NextRequest, { params }: Props) {
     // The database has a unique constraint on (challengeId, userId), meaning if this
     // user already has an entry for this challenge, Prisma will throw an error.
     const entry = await prisma.challengeEntry.create({ data: { challengeId, storyId, userId } });
+
+    // Award CHALLENGE_ENTERED badge on first-ever challenge submission (fire-and-forget)
+    awardBadge(userId, 'CHALLENGE_ENTERED').catch(() => {});
 
     // Return 201 Created with the newly created entry record
     return NextResponse.json(entry, { status: 201 });

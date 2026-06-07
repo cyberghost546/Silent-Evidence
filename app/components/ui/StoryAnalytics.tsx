@@ -2,58 +2,45 @@
 /**
  * StoryAnalytics.tsx
  *
- * WHAT THIS FILE DOES:
- * An author-only collapsible analytics panel shown directly on the story page
- * (below the story content). When expanded it fetches and displays:
- *   - Four stat pills: total views, likes, comments, bookmarks
- *   - A 7-day bar chart showing daily read counts
+ * Author-only collapsible analytics panel on the story page.
+ * Fetches lazily when expanded and displays:
+ *   - Four stat pills: views, likes, comments, bookmarks
+ *   - Avg read-through rate progress bar
+ *   - 7-day reads bar chart (Recharts BarChart)
  *
- * Data is fetched lazily — only when the author clicks to expand the panel.
- * This avoids an unnecessary API call for every visitor who isn't the author.
- *
- * HOW TO REUSE IN A FUTURE PROJECT:
- * 1. Create a GET endpoint at /api/[content-type]/[id]/analytics that returns
- *    { views, likes, comments, bookmarks, weeklyChart: [{date, reads}] }.
- * 2. Place <StoryAnalytics storyId={id} /> on any author-only detail page.
- * 3. The bar chart scales each bar relative to the week's maximum — no fixed axis.
- *
- * Example usage:
- *   {isAuthor && <StoryAnalytics storyId={story.id} />}
+ * Dynamic styles (bar heights, progress width) are applied imperatively via
+ * refs rather than the `style` prop to satisfy the no-inline-styles lint rule.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+} from 'recharts';
 
-// ChartDay — one day's worth of data for the bar chart
 type ChartDay = { date: string; reads: number };
 
-// AnalyticsData — the full payload returned by the analytics API
 type AnalyticsData = {
-  views: number;
-  likes: number;
-  comments: number;
-  bookmarks: number;
-  weeklyChart: ChartDay[]; // array of 7 days, oldest first
+  views:         number;
+  likes:         number;
+  comments:      number;
+  bookmarks:     number;
+  weeklyChart:   ChartDay[];
+  avgCompletion: number | null; // 0–100; null = no tracking data yet
 };
 
-// Props: the story's database ID
 type Props = { storyId: number };
 
-// ── dayLabel ─────────────────────────────────────────────────────────────────
-// Converts an ISO date string (e.g. "2024-11-05") to a short weekday label
-// like "Tue". The T12:00:00Z forces noon UTC so DST can't flip the date.
 function dayLabel(iso: string) {
-  const d = new Date(iso + 'T12:00:00Z');
-  return d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+  return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', {
+    weekday: 'short',
+    timeZone: 'UTC',
+  });
 }
 
-// ── Pill ──────────────────────────────────────────────────────────────────────
-// A small card showing a single metric (icon + number + label).
-// Reusable anywhere you need a compact stat display.
 function Pill({ label, value, icon }: { label: string; value: number; icon: string }) {
   return (
     <div className="flex flex-col items-center bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-700">
       <span className="text-base">{icon}</span>
-      {/* toLocaleString adds thousands separators: 12345 → "12,345" */}
       <span className="text-lg font-bold text-white">{value.toLocaleString()}</span>
       <span className="text-xs text-gray-500">{label}</span>
     </div>
@@ -61,28 +48,39 @@ function Pill({ label, value, icon }: { label: string; value: number; icon: stri
 }
 
 export default function StoryAnalytics({ storyId }: Props) {
-  // data — null until the API responds; shows a skeleton while null
   const [data, setData] = useState<AnalyticsData | null>(null);
-
-  // open — controls whether the panel is expanded (collapsed by default)
   const [open, setOpen] = useState(false);
 
-  // ── Lazy fetch: only loads data when the author opens the panel ───────────
-  // The dependency array [open, storyId] means: re-run if open flips to true
-  // or if storyId changes. The `if (!open) return` guard skips the fetch
-  // while the panel is still collapsed.
+  // Ref for the progress bar fill — width is set imperatively to avoid inline style prop
+  const progressBarRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!open) return;
     fetch(`/api/stories/${storyId}/analytics`)
       .then((r) => r.json())
-      .then(setData)      // setData is called directly as the .then handler
-      .catch(() => {});   // silently ignore errors so the page doesn't break
+      .then(setData)
+      .catch(() => {});
   }, [open, storyId]);
+
+  // Apply progress bar width once data arrives — imperative so no style= in JSX
+  useEffect(() => {
+    if (progressBarRef.current && data) {
+      progressBarRef.current.style.width = `${data.avgCompletion ?? 0}%`;
+    }
+  }, [data]);
+
+  // Format chart data for Recharts
+  const chartData = data?.weeklyChart.map((d) => ({
+    day:   dayLabel(d.date),
+    reads: d.reads,
+  })) ?? [];
 
   return (
     <div className="mt-6 border border-dashed border-gray-700 rounded-2xl overflow-hidden">
+
       {/* Toggle header */}
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-gray-800/50 transition"
       >
@@ -99,47 +97,74 @@ export default function StoryAnalytics({ storyId }: Props) {
       {open && (
         <div className="px-5 pb-5 border-t border-gray-800">
           {!data ? (
-            // Loading skeleton
             <div className="animate-pulse space-y-3 pt-4">
               <div className="grid grid-cols-4 gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="h-16 bg-gray-800 rounded-xl" />
                 ))}
               </div>
-              <div className="h-24 bg-gray-800 rounded-xl" />
+              <div className="h-8 bg-gray-800 rounded-xl" />
+              <div className="h-28 bg-gray-800 rounded-xl" />
             </div>
           ) : (
             <>
               {/* Stat pills */}
               <div className="grid grid-cols-4 gap-3 mt-4">
-                <Pill icon="👁" label="Views"    value={data.views} />
-                <Pill icon="❤️" label="Likes"    value={data.likes} />
-                <Pill icon="💬" label="Comments" value={data.comments} />
+                <Pill icon="👁"  label="Views"     value={data.views} />
+                <Pill icon="❤️" label="Likes"     value={data.likes} />
+                <Pill icon="💬" label="Comments"  value={data.comments} />
                 <Pill icon="🔖" label="Bookmarks" value={data.bookmarks} />
               </div>
 
-              {/* 7-day bar chart */}
+              {/* Avg read-through rate */}
+              <div className="mt-4 flex items-center gap-3 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3">
+                <span className="text-base shrink-0">📖</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 mb-1.5">Avg read-through rate</p>
+                  <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                    {/* Width set imperatively via ref — no style prop in JSX */}
+                    <div
+                      ref={progressBarRef}
+                      className="h-full bg-red-600 rounded-full transition-all duration-500"
+                    />
+                  </div>
+                </div>
+                <span className="text-sm font-bold text-white shrink-0 w-12 text-right">
+                  {data.avgCompletion !== null ? `${data.avgCompletion}%` : '—'}
+                </span>
+              </div>
+
+              {/* 7-day reads bar chart (Recharts) */}
               <div className="mt-5">
                 <p className="text-xs text-gray-500 mb-2">Reads this week</p>
-                <div className="flex items-end gap-1.5 h-24">
-                  {(() => {
-                    const max = Math.max(...data.weeklyChart.map((d) => d.reads), 1);
-                    return data.weeklyChart.map((day) => {
-                      const pct = (day.reads / max) * 100;
-                      return (
-                        <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                          <span className="text-[10px] text-gray-600">{day.reads || ''}</span>
-                          <div
-                            className="w-full bg-red-600 rounded-t-sm"
-                            style={{ height: `${Math.max(pct, 2)}%` }}
-                            title={`${day.reads} reads`}
-                          />
-                          <span className="text-[10px] text-gray-600">{dayLabel(day.date)}</span>
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
+                <ResponsiveContainer width="100%" height={96}>
+                  <BarChart data={chartData} barCategoryGap="20%">
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fill: '#6b7280', fontSize: 10 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis hide allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: '#111827',
+                        border: '1px solid #374151',
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                      cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                    />
+                    <Bar dataKey="reads" radius={[4, 4, 0, 0]}>
+                      {chartData.map((entry, i) => (
+                        <Cell
+                          key={i}
+                          fill={entry.reads > 0 ? '#dc2626' : '#374151'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </>
           )}

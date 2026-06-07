@@ -27,7 +27,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
   const [wordCount, setWordCount]   = useState(0);
   const [coverImage, setCoverImage] = useState('');
   const [videoUrl, setVideoUrl]     = useState('');
-  const [status, setStatus]         = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
+  const [status, setStatus]         = useState<'DRAFT' | 'PUBLISHED' | 'SCHEDULED'>('DRAFT');
   const [language, setLanguage]     = useState('en');
   const [mood, setMood]             = useState('');
   const [contentRating, setContentRating] = useState<'ALL' | 'TEEN' | 'MATURE'>('ALL');
@@ -495,14 +495,14 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <select value={mood} onChange={e => setMood(e.target.value)}
           className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition appearance-none">
           <option value="">— No mood selected —</option>
-          <option value="CREEPY">🕷️ Creepy</option>
-          <option value="PARANOID">👁️ Paranoid</option>
-          <option value="DISTURBING">😱 Disturbing</option>
-          <option value="ATMOSPHERIC">🌫️ Atmospheric</option>
-          <option value="PSYCHOLOGICAL">🧠 Psychological</option>
-          <option value="SUPERNATURAL">👻 Supernatural</option>
-          <option value="GORE">🩸 Gore</option>
-          <option value="JUMPSCARE">⚡ Jump Scare</option>
+          <option value="DARK">🌑 Dark</option>
+          <option value="MYSTERIOUS">🌫️ Mysterious</option>
+          <option value="DRAMATIC">🎭 Dramatic</option>
+          <option value="EPIC">⚔️ Epic</option>
+          <option value="ACTION">💥 Action</option>
+          <option value="HEARTWARMING">❤️ Heartwarming</option>
+          <option value="ROMANTIC">🌹 Romantic</option>
+          <option value="COMEDIC">😂 Comedic</option>
         </select>
       </div>
 
@@ -554,12 +554,22 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
           Schedule Publishing <span className="text-gray-500 font-normal">(optional — leave blank to publish now)</span>
         </label>
-        <input type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)}
-          min={new Date().toISOString().slice(0, 16)} suppressHydrationWarning
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition" />
+        <input
+          type="datetime-local"
+          value={scheduledAt}
+          onChange={e => {
+            const val = e.target.value;
+            setScheduledAt(val);
+            // Auto-select SCHEDULED status when a date is picked; revert to DRAFT when cleared
+            setStatus(val ? 'SCHEDULED' : 'DRAFT');
+          }}
+          min={new Date().toISOString().slice(0, 16)}
+          suppressHydrationWarning
+          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
+        />
         {scheduledAt && (
-          <p className="text-xs text-gray-500 mt-1.5">
-            Will publish on {new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          <p className="text-xs text-amber-400/80 mt-1.5">
+            🕐 Will auto-publish on {new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </p>
         )}
       </div>
@@ -627,18 +637,28 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <div className="flex rounded-lg overflow-hidden border border-gray-700 text-sm shrink-0">
           <button
             type="button"
-            onClick={() => setStatus('DRAFT')}
+            onClick={() => { setStatus('DRAFT'); setScheduledAt(''); }}
             className={`px-4 py-2 transition ${status === 'DRAFT' ? 'bg-gray-700 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
           >
-            💾 Save as Draft
+            💾 Draft
           </button>
           <button
             type="button"
-            onClick={() => setStatus('PUBLISHED')}
+            onClick={() => { setStatus('PUBLISHED'); setScheduledAt(''); }}
             className={`px-4 py-2 transition ${status === 'PUBLISHED' ? 'bg-red-600 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
           >
             🚀 Publish
           </button>
+          {/* SCHEDULED button — only shown once a publish date is set above */}
+          {scheduledAt && (
+            <button
+              type="button"
+              onClick={() => setStatus('SCHEDULED')}
+              className={`px-4 py-2 transition ${status === 'SCHEDULED' ? 'bg-amber-600 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
+            >
+              🕐 Scheduled
+            </button>
+          )}
         </div>
 
         <button
@@ -646,7 +666,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
           disabled={loading}
           className="flex-1 sm:flex-none px-8 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition text-sm"
         >
-          {loading ? 'Saving...' : status === 'PUBLISHED' ? 'Publish Story' : 'Save Draft'}
+          {loading ? 'Saving...' : status === 'PUBLISHED' ? 'Publish Story' : status === 'SCHEDULED' ? 'Schedule Story' : 'Save Draft'}
         </button>
       </div>
 

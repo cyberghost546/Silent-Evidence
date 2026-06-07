@@ -91,28 +91,36 @@ export async function POST(req: NextRequest) {
   // Guests cannot have reading history saved
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Parse the JSON body to get the story that was read
-  const { storyId } = await req.json();
+  // Parse the JSON body — storyId required, progress optional (0–100)
+  const body = await req.json();
+  const { storyId } = body;
+  const progress = typeof body.progress === 'number'
+    ? Math.max(0, Math.min(100, Math.round(body.progress)))
+    : undefined;
 
   // Validate: storyId must be provided AND must be a number (not a string or null)
   if (!storyId || typeof storyId !== 'number') {
     return NextResponse.json({ error: 'Invalid storyId' }, { status: 400 });
   }
 
-  // Upsert the reading history entry.
-  // "Upsert" means:
-  //   - If this user has already read this story → UPDATE the readAt timestamp
-  //   - If this is the first time → CREATE a new row
-  // The composite unique key userId_storyId ensures at most one row per (user, story) pair.
+  // Fetch existing record so we can enforce "progress only ever increases"
+  const existing = progress !== undefined
+    ? await prisma.readingHistory.findUnique({
+        where: { userId_storyId: { userId, storyId } },
+        select: { progress: true },
+      })
+    : null;
+
+  const shouldUpdateProgress =
+    progress !== undefined && progress > (existing?.progress ?? 0);
+
   await prisma.readingHistory.upsert({
-    where: {
-      // Composite unique key: match on both userId AND storyId
-      userId_storyId: { userId, storyId },
+    where: { userId_storyId: { userId, storyId } },
+    update: {
+      readAt: new Date(),
+      ...(shouldUpdateProgress ? { progress } : {}),
     },
-    // Already exists — refresh the timestamp to "now" so it floats to the top of history
-    update: { readAt: new Date() },
-    // First time reading — create a new entry (readAt defaults to now via schema)
-    create: { userId, storyId },
+    create: { userId, storyId, ...(progress !== undefined ? { progress } : {}) },
   });
 
   // Update the user's reading streak after recording this read

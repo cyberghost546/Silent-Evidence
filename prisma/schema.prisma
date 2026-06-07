@@ -730,8 +730,9 @@ model ScareRating {
 // ============================================================
 
 model ReadingHistory {
-  id      Int      @id @default(autoincrement())
-  readAt  DateTime @default(now())  // timestamp of the most recent visit
+  id       Int      @id @default(autoincrement())
+  readAt   DateTime @default(now())  // timestamp of the most recent visit
+  progress Int      @default(0)      // 0–100 scroll % through the story content
 
   userId  Int
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -744,6 +745,8 @@ model ReadingHistory {
   // Index for "user's reading history" sorted by most recent
   @@index([userId, readAt])
   @@index([storyId])
+  // Index for analytics queries filtering by progress (avg completion rate)
+  @@index([storyId, progress])
 }
 
 // ============================================================

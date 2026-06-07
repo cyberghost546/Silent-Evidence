@@ -4,6 +4,8 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 // Run `ANALYZE=true npm run build` to open the interactive bundle treemap.
 const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const securityHeaders = [
   // Prevent embedding in iframes (clickjacking protection)
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
@@ -13,34 +15,31 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   // Disable browser features not needed by the site
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  // Prevent this page from sharing a browsing context group with cross-origin openers
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+  // Disable DNS prefetching to avoid leaking visited URLs
+  { key: 'X-DNS-Prefetch-Control', value: 'off' },
   // Force HTTPS for 1 year in production (with preload eligibility)
-  ...(process.env.NODE_ENV === 'production'
+  ...(isProd
     ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]
     : []),
-  // Content Security Policy — restricts which sources scripts, styles, and other
-  // resources may be loaded from, dramatically reducing XSS attack surface.
+  // Content Security Policy
   {
     key: 'Content-Security-Policy',
     value: [
-      // Only allow scripts from this origin and Next.js inline scripts (nonces not used here)
       "default-src 'self'",
-      // Scripts: self + unsafe-inline required by Next.js App Router hydration
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com",
-      // Styles: self + unsafe-inline required by Tailwind and TipTap
+      // unsafe-eval is only needed by Next.js dev mode — strip it from production
+      isProd
+        ? "script-src 'self' 'unsafe-inline' https://js.pusher.com https://js.stripe.com"
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      // Images: self + data URIs + Unsplash CDN + UI Avatars + Picsum
-      "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos",
-      // Fonts: self only (no Google Fonts used)
+      "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos https://i.ytimg.com",
       "font-src 'self'",
-      // API / WebSocket connections: self + Pusher + Stripe
+      // api.anthropic.com is called server-side only — kept here for browser fetch fallback
       "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
-      // Frames: only Stripe (for payment elements)
       "frame-src https://js.stripe.com https://hooks.stripe.com",
-      // Disallow all plugins (Flash, etc.)
       "object-src 'none'",
-      // Disallow <base> tag hijacking
       "base-uri 'self'",
-      // Only allow forms to submit to this origin
       "form-action 'self'",
     ].join('; '),
   },
