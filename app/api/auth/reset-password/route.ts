@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   // Allow at most 5 password reset submissions from the same IP per 15 minutes.
   // This prevents systematic token guessing.
-  const rateLimit = checkRateLimit(ip, 'reset-password', {
+  const rateLimit = await checkRateLimit(ip, 'reset-password', {
     limit: 5,                  // max 5 attempts before blocking
     windowMs: 15 * 60 * 1000, // 15-minute window in milliseconds
   });

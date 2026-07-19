@@ -18,7 +18,7 @@ const CreateCommentSchema = z.object({
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
-  const rl = checkRateLimit(ip, 'comments', { limit: 10, windowMs: 60 * 1000 });
+  const rl = await checkRateLimit(ip, 'comments', { limit: 10, windowMs: 60 * 1000 });
   if (rl.blocked) return NextResponse.json({ error: 'Too many comments — slow down.' }, { status: 429 });
 
   if (!(await verifyCsrfToken(req))) {

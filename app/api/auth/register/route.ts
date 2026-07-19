@@ -38,6 +38,7 @@ import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 // zodError        — 400 response with field-level validation errors from Zod
 // serverError     — 500 response for unexpected failures
 import { conflict, tooManyRequests, zodError, serverError } from '@/lib/apiError';
+import { signUserId, SESSION_COOKIE, SESSION_SIG_COOKIE } from '@/lib/sessionCookie';
 
 // ── Zod schema — declares validation rules for all registration fields ─────────
 // Each field has its own chain of validators that run left-to-right.
@@ -86,7 +87,7 @@ export async function POST(req: Request) {
 
   // Allow at most 3 new accounts from the same IP in any 1-hour window.
   // 'register' namespaces this counter separately from the login or other limiters.
-  const rateLimit = checkRateLimit(ip, 'register', {
+  const rateLimit = await checkRateLimit(ip, 'register', {
     limit: 3,                  // max 3 registrations per window
     windowMs: 60 * 60 * 1000, // 1-hour window in milliseconds
   });
@@ -151,13 +152,16 @@ export async function POST(req: Request) {
     // maxAge: 30 days — cookie persists across browser sessions for a month.
     // sameSite: 'lax' — blocks CSRF while allowing normal link navigation.
     // secure in production — only sent over HTTPS to prevent interception.
-    c.set('userId', String(user.id), {
+    const cookieOpts = {
       httpOnly: true,
       path: '/',
       maxAge: 60 * 60 * 24 * 30, // 30 days in seconds
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       secure: process.env.NODE_ENV === 'production',
-    });
+    };
+    // Set the signed `userId` + `userId_sig` cookies so the session can't be forged.
+    c.set(SESSION_COOKIE, String(user.id), cookieOpts);
+    c.set(SESSION_SIG_COOKIE, await signUserId(user.id), cookieOpts);
 
     // Return 201 Created — the registration and auto-login succeeded
     return NextResponse.json({ ok: true }, { status: 201 });

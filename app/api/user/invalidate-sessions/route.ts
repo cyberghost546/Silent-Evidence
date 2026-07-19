@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { unauthorized, serverError } from '@/lib/apiError';
+import { clearSessionCookies } from '@/lib/sessionCookie';
 
 export async function POST() {
   try {
@@ -18,8 +19,8 @@ export async function POST() {
     });
 
     const res = NextResponse.json({ ok: true });
-    // Clear the current session cookie so this device is also logged out
-    res.cookies.set('userId', '', { maxAge: 0, path: '/' });
+    // Clear the current session cookies so this device is also logged out
+    clearSessionCookies(res);
     return res;
   } catch (err) {
     console.error('[POST /api/user/invalidate-sessions]', err);

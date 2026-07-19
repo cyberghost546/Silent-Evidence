@@ -172,7 +172,7 @@ export default function BannedWordsClient({ words: initial }: { words: Word[] })
         </div>
 
         {words.length === 0 ? (
-          {/* Empty state — shown before any words have been added */}
+          /* Empty state — shown before any words have been added */
           <p className="text-gray-600 text-sm">No banned words yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">

@@ -56,6 +56,15 @@ function getRedis(): Redis | null {
   return g.__redis;
 }
 
+/**
+ * getRedisClient — exposes the shared Redis singleton for callers outside this
+ * module (e.g. the rate limiter). Returns null when Redis is unavailable so the
+ * caller can fall back to an in-memory path.
+ */
+export function getRedisClient(): Redis | null {
+  return getRedis();
+}
+
 // ── Cache prefix — namespaces all keys to avoid collisions ───────────────────
 const PREFIX = 'se:'; // "se" = Silent Evidence
 

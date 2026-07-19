@@ -9,6 +9,9 @@
 const REQUIRED_VARS = [
   'DATABASE_URL',
   'NEXT_PUBLIC_BASE_URL',
+  // Signs the session cookie so `userId` cannot be forged. Must be a long random
+  // string (>= 32 chars). Generate with: openssl rand -hex 32
+  'SESSION_SECRET',
 ] as const;
 
 // ── Optional but warned variables ─────────────────────────────────────────────

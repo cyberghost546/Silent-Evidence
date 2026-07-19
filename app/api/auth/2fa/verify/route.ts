@@ -22,6 +22,7 @@ import { prisma } from '@/lib/prisma';
 // attacker who has the tempUserId can enumerate all codes in seconds.
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { tooManyRequests } from '@/lib/apiError';
+import { setSessionCookies } from '@/lib/sessionCookie';
 
 // ── POST handler ──────────────────────────────────────────────────────────────
 // This function runs whenever a POST request is made to /api/auth/2fa/verify.
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
   // We key on IP alone first so that an attacker cannot bypass this by rotating
   // tempUserIds — all guesses from a single IP are counted together.
   const ip = getClientIp(req);
-  const ipLimit = checkRateLimit(ip, '2fa-verify', {
+  const ipLimit = await checkRateLimit(ip, '2fa-verify', {
     limit: 5,
     windowMs: 15 * 60 * 1000, // 15 minutes
   });
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
 
   // Also rate-limit per user ID so that distributed IPs cannot share the attempt
   // budget against a single victim account (5 attempts per userId per 15 minutes).
-  const userLimit = checkRateLimit(String(userId), '2fa-verify-user', {
+  const userLimit = await checkRateLimit(String(userId), '2fa-verify-user', {
     limit: 5,
     windowMs: 15 * 60 * 1000,
   });
@@ -100,13 +101,7 @@ export async function POST(req: Request) {
   // sameSite: 'lax'  — CSRF protection while still allowing normal link navigation.
   // secure in production — only transmitted over HTTPS, not plain HTTP.
   // maxAge: 7 days   — the session lasts for one week.
-  res.cookies.set('userId', String(userId), {
-    httpOnly: true,
-    path: '/',
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
-  });
+  await setSessionCookies(res, userId);
 
   // Return the response — the browser stores the cookie, and the user is now logged in
   return res;

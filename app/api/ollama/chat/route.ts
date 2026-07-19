@@ -28,7 +28,7 @@ Keep your answers concise and atmospheric. If you don't know something specific 
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const rl = checkRateLimit(ip, 'ollama-chat', { limit: 20, windowMs: 60 * 1000 });
+  const rl = await checkRateLimit(ip, 'ollama-chat', { limit: 20, windowMs: 60 * 1000 });
   if (rl.blocked) {
     return new Response('Too many requests — slow down.', { status: 429 });
   }

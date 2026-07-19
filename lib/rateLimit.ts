@@ -1,7 +1,10 @@
 // lib/rateLimit.ts
-// In-memory rate limiter for API routes — prevents brute-force attacks on auth endpoints.
-// Uses a Map keyed by IP address + route label to track request counts and windows.
-// NOTE: This is per-process only. For multi-server deployments, swap to Redis-backed rate limiting.
+// Rate limiter for API routes — prevents brute-force and request-flood abuse.
+// Uses Redis (shared across all server instances) when REDIS_URL is configured,
+// and transparently falls back to a per-process in-memory Map when it isn't.
+// Keyed by IP address + route label.
+
+import { getRedisClient } from '@/lib/cache';
 
 // Stores the count of requests and the time the window started for each key
 export const store = new Map<string, { count: number; windowStart: number }>();
@@ -44,14 +47,44 @@ interface RateLimitResult {
  *   const result = checkRateLimit(ip, 'login', { limit: 5, windowMs: 15 * 60 * 1000 });
  *   if (result.blocked) return NextResponse.json({ error: 'Too many attempts' }, { status: 429 });
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   ip: string,
   key: string,
   opts: RateLimitOptions
-): RateLimitResult {
-  const now = Date.now();
+): Promise<RateLimitResult> {
   // Combine IP + key so different endpoints have independent counters per IP
   const storeKey = `${ip}:${key}`;
+
+  // ── Redis path — shared across all instances ────────────────────────────────
+  const redis = getRedisClient();
+  if (redis) {
+    try {
+      const redisKey = `rl:${storeKey}`;
+      // Atomically increment the counter for this window.
+      const count = await redis.incr(redisKey);
+      // On the first request of a window, set the expiry so the window slides.
+      if (count === 1) {
+        await redis.pexpire(redisKey, opts.windowMs);
+      }
+      // Read remaining TTL to report an accurate reset time; repair a missing
+      // expiry (e.g. if the process died between INCR and PEXPIRE).
+      let ttl = await redis.pttl(redisKey);
+      if (ttl < 0) {
+        await redis.pexpire(redisKey, opts.windowMs);
+        ttl = opts.windowMs;
+      }
+      return {
+        blocked: count > opts.limit,
+        remaining: Math.max(0, opts.limit - count),
+        resetAt: Date.now() + ttl,
+      };
+    } catch {
+      // Redis error — fall through to the in-memory limiter below.
+    }
+  }
+
+  // ── In-memory fallback — per-process only ───────────────────────────────────
+  const now = Date.now();
   const entry = store.get(storeKey);
 
   // If no entry exists OR the window has expired, start a fresh window

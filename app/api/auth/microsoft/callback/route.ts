@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Import the Prisma database client to find or create user records
 import { prisma } from '@/lib/prisma';
+import { setSessionCookies } from '@/lib/sessionCookie';
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // This function runs when Microsoft redirects the browser back to our callback URL.
@@ -127,13 +128,7 @@ export async function GET(req: NextRequest) {
   // path: '/'      — cookie is sent on every request to the site.
   // maxAge: 7 days — session lasts for one week.
   // sameSite: 'lax' — prevents cross-site request forgery while allowing navigation.
-  res.cookies.set('userId', String(user.id), {
-    httpOnly: true,
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-  });
+  await setSessionCookies(res, user.id);
 
   // Return the redirect response — the browser stores the cookie and navigates to '/'
   return res;

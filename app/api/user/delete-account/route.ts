@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { clearSessionCookies } from '@/lib/sessionCookie';
 
 export async function DELETE() {
   const cookieStore = await cookies();
@@ -16,7 +17,7 @@ export async function DELETE() {
 
   // Clear the auth cookie so the browser session ends immediately
   const response = NextResponse.json({ ok: true });
-  response.cookies.set('userId', '', { maxAge: 0, path: '/' });
+  clearSessionCookies(response);
 
   return response;
 }

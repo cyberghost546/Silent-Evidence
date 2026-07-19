@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   // The client sends the full conversation history (all messages so far) on every request.
   // Claude needs the whole history to understand the context of the conversation.
   const ip = getClientIp(req);
-  const rl = checkRateLimit(ip, 'chat', { limit: 20, windowMs: 60 * 1000 });
+  const rl = await checkRateLimit(ip, 'chat', { limit: 20, windowMs: 60 * 1000 });
   if (rl.blocked) {
     return new Response('Too many requests — slow down.', { status: 429 });
   }

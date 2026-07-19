@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   // Allow at most 3 reset email requests from the same IP per hour.
   // Without this, an attacker could spam someone's inbox with reset emails.
-  const rateLimit = checkRateLimit(ip, 'forgot-password', {
+  const rateLimit = await checkRateLimit(ip, 'forgot-password', {
     limit: 3,                  // max 3 requests before blocking
     windowMs: 60 * 60 * 1000, // 1-hour window in milliseconds
   });

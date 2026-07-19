@@ -8,6 +8,7 @@
 
 // Import NextResponse to build redirect responses in Next.js API routes
 import { NextResponse } from 'next/server';
+import { clearSessionCookies } from '@/lib/sessionCookie';
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // This function runs whenever a GET request is made to /api/auth/logout.
@@ -23,7 +24,7 @@ export async function GET() {
   // maxAge: 0 tells the browser to delete this cookie immediately.
   // path: '/' must match the path the cookie was set on, otherwise the browser
   // won't delete it (a common gotcha with cookie deletion).
-  res.cookies.set('userId', '', { maxAge: 0, path: '/' });
+  clearSessionCookies(res);
 
   // Return the redirect response — the browser clears the cookie and navigates home
   return res;

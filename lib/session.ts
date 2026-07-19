@@ -5,6 +5,7 @@
 
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { SESSION_COOKIE, SESSION_SIG_COOKIE, verifyUserId } from '@/lib/sessionCookie';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,8 +27,14 @@ export interface SessionUser {
  */
 export async function getSessionUserId(): Promise<number | null> {
   const c = await cookies();
-  const raw = c.get('userId')?.value;
+  const raw = c.get(SESSION_COOKIE)?.value;
   if (!raw) return null;
+
+  // Verify the HMAC signature — a `userId` cookie without a matching `userId_sig`
+  // has been forged or tampered with, so reject it. (Middleware normally strips
+  // these before we get here; this is defense in depth.)
+  const sig = c.get(SESSION_SIG_COOKIE)?.value;
+  if (!(await verifyUserId(raw, sig))) return null;
 
   // Parse and validate — the cookie value must be a positive integer
   const id = parseInt(raw, 10);

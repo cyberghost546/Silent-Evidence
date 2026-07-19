@@ -35,6 +35,7 @@ import { checkRateLimit, getClientIp, anonymizeIp } from '@/lib/rateLimit';
 // serverError     — 500 response for unexpected failures
 import { badRequest, unauthorized, tooManyRequests, zodError, serverError } from '@/lib/apiError';
 import { lookupGeoIp } from '@/lib/geoip';
+import { setSessionCookies } from '@/lib/sessionCookie';
 
 // ── Zod schema — validates and sanitizes the request body ─────────────────────
 // z.object() defines an object shape with typed fields; safeParse() will check
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
 
   // Check whether this IP has exceeded 5 login attempts in the last 15 minutes.
   // The second argument 'login' namespaces this counter separately from other endpoints.
-  const rateLimit = checkRateLimit(ip, 'login', {
+  const rateLimit = await checkRateLimit(ip, 'login', {
     limit: 5,            // maximum allowed attempts before blocking
     windowMs: 15 * 60 * 1000, // 15-minute sliding window (in milliseconds)
   });
@@ -168,13 +169,8 @@ export async function POST(req: Request) {
     //                     still allowing normal navigation links to work.
     // secure: true in production — cookie is only sent over HTTPS, not plain HTTP.
     // maxAge           — how long the cookie lives, in seconds (7 days here).
-    res.cookies.set('userId', String(user.id), {
-      httpOnly: true,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 days expressed in seconds
-    });
+    // Sets the signed `userId` + `userId_sig` cookies so the session can't be forged.
+    await setSessionCookies(res, user.id);
 
     // Record the successful login — geo-lookup runs in parallel, never blocks response
     lookupGeoIp(ip).then(geo => prisma.loginLog.create({
