@@ -54,7 +54,6 @@ export default class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="min-h-[300px] flex flex-col items-center justify-center p-8 text-center">
           {/* Spooky ghost icon */}
-          <div className="text-6xl mb-4">👻</div>
 
           <h2 className="text-xl font-bold text-red-500 mb-2">
             Something went wrong

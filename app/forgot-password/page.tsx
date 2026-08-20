@@ -119,7 +119,6 @@ export default function ForgotPasswordPage() {
           // Shown after the email is dispatched. The user sees a mailbox icon,
           // a reassuring message, and a link back to sign-in.
           <div className="text-center py-6">
-            <div className="text-5xl mb-4">📬</div>
             <p className="text-white font-semibold">Check your inbox</p>
             <p className="text-gray-400 text-sm mt-2">
               {/* Display the email they submitted so they know which inbox to check.

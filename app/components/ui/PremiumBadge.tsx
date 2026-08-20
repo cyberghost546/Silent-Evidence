@@ -29,7 +29,6 @@ export default function PremiumBadge({ size = 'md' }: Props) {
       `}
     >
       {/* Lightning bolt icon — represents elite energy and speed */}
-      <span aria-hidden="true">⚡</span>
       ANIME ELITE
     </span>
   );

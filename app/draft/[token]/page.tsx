@@ -45,7 +45,6 @@ export default async function DraftPreviewPage({
     <main className="max-w-3xl mx-auto px-4 py-10">
       {/* Draft banner */}
       <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 mb-8">
-        <span className="text-yellow-400 text-lg">📝</span>
         <div>
           <p className="text-sm font-semibold text-yellow-300">Draft Preview</p>
           <p className="text-xs text-yellow-500/80">

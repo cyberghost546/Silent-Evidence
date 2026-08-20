@@ -119,7 +119,7 @@ export default function GoldenHour() {
         box-shadow: 0 2px 24px rgba(100, 0, 180, 0.5);
         pointer-events: none;
       `;
-      banner.textContent = "✨  Golden Hour — 3AM  ✨"; // Sparkle emoji for horror flair
+      banner.textContent = "Golden Hour — 3AM"; // Sparkle emoji for horror flair
       document.body.appendChild(banner);
     }
 

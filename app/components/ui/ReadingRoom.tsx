@@ -154,7 +154,6 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-400 transition"
       >
-        <span className="text-lg">👥</span>
         {roomCode ? `Reading Room · ${members.length} member${members.length !== 1 ? 's' : ''}` : 'Reading Room'}
         <span className="text-xs">{open ? '▲' : '▼'}</span>
       </button>

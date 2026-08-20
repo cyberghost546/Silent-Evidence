@@ -38,7 +38,6 @@ export default function MyInvitesClient({ invites: initial }: { invites: Invite[
   if (invites.length === 0) {
     return (
       <div className="text-center py-20 text-gray-600">
-        <p className="text-4xl mb-3">📭</p>
         <p>No co-author invitations yet.</p>
       </div>
     );

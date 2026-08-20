@@ -10,6 +10,7 @@
 //   6. Assembles the full page layout including the reading toolbar, interactions, and recommendations
 
 import { notFound } from 'next/navigation';
+import { moodIcon } from '@/lib/moodIcons';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -357,7 +358,7 @@ export default async function StoryPage({ params }: Props) {
             const w: string[] = JSON.parse(story.warnings);
             if (w.length > 0) return (
               <div className="flex flex-wrap gap-2 mt-4">
-                <span className="text-xs text-gray-500 font-medium self-center">⚠️ Warnings:</span>
+                <span className="text-xs text-gray-500 font-medium self-center">Warnings:</span>
                 {w.map(warning => (
                   <span key={warning} className="text-xs px-2.5 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full">{warning}</span>
                 ))}
@@ -370,8 +371,11 @@ export default async function StoryPage({ params }: Props) {
         {story.mood && (
           <div className="mt-3">
             <a href={`/mood/${story.mood.toLowerCase()}`} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-gray-500 text-gray-400 rounded-full transition">
-              {({EPIC:'⚡',HEARTWARMING:'❤️',MYSTERIOUS:'🌫️',ACTION:'⚔️',ROMANTIC:'🌹',COMEDIC:'😂',DRAMATIC:'🎭',DARK:'🌑'} as Record<string,string>)[story.mood] ?? ''}
-              {' '}{story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
+              {(() => {
+                const MoodIcon = moodIcon(story.mood);
+                return <MoodIcon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />;
+              })()}
+              {story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
             </a>
           </div>
         )}
@@ -394,7 +398,6 @@ export default async function StoryPage({ params }: Props) {
         {/* Early access gate — free users see a countdown until the embargo lifts */}
         {!hasPremium && userId !== story.author.id && story.earlyAccessUntil && new Date(story.earlyAccessUntil) > new Date() && (
           <div className="mt-10 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8 text-center">
-            <p className="text-3xl mb-3">📖</p>
             <h3 className="text-lg font-bold text-white mb-2">Premium Early Access</h3>
             <p className="text-sm text-gray-400 mb-1">This story is available to premium members now.</p>
             <p className="text-sm text-gray-500 mb-6">
@@ -407,7 +410,7 @@ export default async function StoryPage({ params }: Props) {
               href="/premium"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition text-sm"
             >
-              ⚡ Read Now with Premium
+ Read Now with Premium
             </a>
           </div>
         )}
@@ -415,14 +418,13 @@ export default async function StoryPage({ params }: Props) {
         {/* Premium paywall — shown when story is premium-only and the viewer is not subscribed */}
         {story.isPremiumOnly && !hasPremium && userId !== story.author.id ? (
           <div className="mt-10 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
-            <p className="text-3xl mb-3">🔒</p>
             <h3 className="text-lg font-bold text-white mb-2">Premium Members Only</h3>
             <p className="text-sm text-gray-400 mb-6">This story is exclusive to premium subscribers. Upgrade to read it and unlock all premium content.</p>
             <a
               href="/subscribe"
               className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-sm"
             >
-              ✨ Become a Member
+ Become a Member
             </a>
           </div>
         ) : story.isChaptered && chapters.length > 0 ? (

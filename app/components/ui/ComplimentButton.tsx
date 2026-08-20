@@ -14,11 +14,11 @@ type Props = {
 
 // The 5 preset compliment options shown in the dropdown
 const COMPLIMENTS = [
-  "Your writing genuinely scared me — great work! 🖤",
+  "Your writing genuinely scared me — great work!",
   "I couldn't stop reading. Incredible story!",
-  "The atmosphere you created was perfect 🕯️",
+  "The atmosphere you created was perfect",
   "This gave me chills. Please write more!",
-  "You have a real talent for horror writing. Keep going 🙌",
+  "You have a real talent for horror writing. Keep going",
 ] as const;
 
 export default function ComplimentButton({ toUserId, toUsername, fromUserId }: Props) {
@@ -72,7 +72,7 @@ export default function ComplimentButton({ toUserId, toUsername, fromUserId }: P
       });
 
       if (res.ok) {
-        setFeedback('Sent! 💌');
+        setFeedback('Sent!');
       } else {
         const data = await res.json().catch(() => ({}));
         // Show the server-returned error message or a generic fallback
@@ -96,7 +96,6 @@ export default function ComplimentButton({ toUserId, toUsername, fromUserId }: P
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span>💌</span>
         <span>Send Compliment</span>
       </button>
 

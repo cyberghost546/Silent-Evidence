@@ -27,12 +27,13 @@
 //   This is the Next.js App Router alternative to calling the API and mutating
 //   local state manually.
 //
-// CATEGORY_ICONS:
-//   A slug → emoji lookup table used to render a matching icon on each card.
-//   Falls back to 🏷️ for any slug not in the map.
+// Category icons:
+//   Resolved through the shared lib/categoryIcons map, which falls back to a
+//   neutral icon for any slug it does not know.
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { categoryIcon } from '@/lib/categoryIcons';
 
 type Category = {
   id: number;
@@ -42,29 +43,7 @@ type Category = {
   _count: { stories: number };
 };
 
-// Emoji map — keyed by slug so each category gets a matching icon
-const CATEGORY_ICONS: Record<string, string> = {
-  'ghost-stories':     '👻',
-  'psychological':     '🧠',
-  'supernatural':      '🌀',
-  'paranormal':        '🔮',
-  'slasher-horror':    '🔪',
-  'cosmic-horror':     '🌌',
-  'body-horror':       '🧬',
-  'urban-legends':     '🌆',
-  'true-crime':        '🔍',
-  'tech-horror':       '💻',
-  'survival-horror':   '🪓',
-  'occult-witchcraft': '🕯️',
-  'monsters-creatures':'🐉',
-  'dark-fantasy':      '⚔️',
-  'folk-horror':       '🌾',
-  'found-footage':     '📹',
-  'dark-romance':      '🥀',
-  'post-apocalyptic':  '☢️',
-  'haunted-places':    '🏚️',
-  'sci-fi-horror':     '🚀',
-};
+// Icons come from the shared lib/categoryIcons map (see note there).
 
 export default function AdminCategoriesClient({ categories }: { categories: Category[] }) {
   // router.refresh() re-fetches server data without a full navigation
@@ -153,7 +132,7 @@ export default function AdminCategoriesClient({ categories }: { categories: Cate
       {/* Category grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((cat) => {
-          const icon = CATEGORY_ICONS[cat.slug] ?? '🏷️';
+          const Icon = categoryIcon(cat.slug);
           return (
             <div
               key={cat.id}
@@ -163,7 +142,7 @@ export default function AdminCategoriesClient({ categories }: { categories: Cate
               {/* Icon + name + delete */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-xl shrink-0">{icon}</span>
+                  <Icon className="w-5 h-5 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
                   <div className="min-w-0">
                     <p className="font-semibold text-white truncate">{cat.name}</p>
                     <p className="text-xs text-gray-600 truncate font-mono">/category/{cat.slug}</p>
@@ -191,7 +170,7 @@ export default function AdminCategoriesClient({ categories }: { categories: Cate
               <div className="mt-auto">
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full
                                  bg-gray-800 border border-gray-700 text-gray-400">
-                  📖 {cat._count.stories} {cat._count.stories === 1 ? 'story' : 'stories'}
+ {cat._count.stories} {cat._count.stories === 1 ? 'story' : 'stories'}
                 </span>
               </div>
             </div>

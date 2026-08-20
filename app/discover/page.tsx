@@ -22,14 +22,14 @@ export const metadata: Metadata = {
 
 // Mood options — must match the Mood enum values in Prisma schema
 const MOODS = [
-  { value: 'DARK',         label: '🌑 Dark' },
-  { value: 'MYSTERIOUS',   label: '🌫 Mysterious' },
-  { value: 'DRAMATIC',     label: '🎭 Dramatic' },
-  { value: 'EPIC',         label: '⚔️ Epic' },
-  { value: 'ACTION',       label: '💥 Action' },
-  { value: 'HEARTWARMING', label: '❤️ Heartwarming' },
-  { value: 'ROMANTIC',     label: '🌹 Romantic' },
-  { value: 'COMEDIC',      label: '😂 Comedic' },
+  { value: 'DARK',         label: 'Dark' },
+  { value: 'MYSTERIOUS',   label: 'Mysterious' },
+  { value: 'DRAMATIC',     label: 'Dramatic' },
+  { value: 'EPIC',         label: 'Epic' },
+  { value: 'ACTION',       label: 'Action' },
+  { value: 'HEARTWARMING', label: 'Heartwarming' },
+  { value: 'ROMANTIC',     label: 'Romantic' },
+  { value: 'COMEDIC',      label: 'Comedic' },
 ];
 
 type Props = {
@@ -100,7 +100,7 @@ export default async function DiscoverPage({ searchParams }: Props) {
       <main className="min-h-screen bg-gray-950 text-white">
         <div className="max-w-lg mx-auto px-4 pt-12 pb-2 text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-            Discover Stories 👻
+            Discover Stories
           </h1>
           <p className="mt-2 text-gray-400 text-sm sm:text-base">
             Swipe right to save, left to skip
@@ -163,7 +163,6 @@ export default async function DiscoverPage({ searchParams }: Props) {
         <div className="max-w-lg mx-auto px-4 mt-4">
           {serialised.length === 0 ? (
             <div className="flex flex-col items-center gap-4 py-24 text-center">
-              <p className="text-5xl">😶</p>
               <p className="text-white font-semibold">No stories found</p>
               <p className="text-gray-400 text-sm">Try a different mood or category.</p>
               <Link

@@ -5,6 +5,7 @@
 // This page is purely celebratory UI.
 
 import Link from 'next/link';
+import { Zap, Unlock, Crown, Palette } from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import PremiumBadge from '@/app/components/ui/PremiumBadge';
@@ -34,7 +35,6 @@ export default function PremiumSuccessPage() {
           {/* ── Animated badge ──────────────────────────────────────────────
               Wrapped in a scale + pulse animation via Tailwind animate classes */}
           <div className="flex justify-center mb-6 animate-bounce">
-            <span className="text-7xl leading-none drop-shadow-[0_0_30px_rgba(251,191,36,0.8)]">⚡</span>
           </div>
 
           {/* Main heading */}
@@ -58,22 +58,20 @@ export default function PremiumSuccessPage() {
 
           {/* Divider with skulls */}
           <div className="flex items-center gap-3 justify-center mb-8 text-gray-700 text-lg select-none" aria-hidden="true">
-            <span>💀</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
-            <span>💀</span>
           </div>
 
           {/* ── Perks reminder ─────────────────────────────────────────────── */}
           <ul className="text-left space-y-3 mb-10 max-w-xs mx-auto">
             {[
-              { icon: '⚡', text: 'Horror Elite badge is now showing on your profile' },
-              { icon: '🔓', text: 'All premium stories are unlocked' },
-              { icon: '👑', text: 'You have priority in leaderboards' },
-              { icon: '🩸', text: 'Exclusive blood theme available in settings' },
+              { icon: Zap,     text: 'Horror Elite badge is now showing on your profile' },
+              { icon: Unlock,  text: 'All premium stories are unlocked' },
+              { icon: Crown,   text: 'You have priority in leaderboards' },
+              { icon: Palette, text: 'Exclusive blood theme available in settings' },
             ].map((perk) => (
               <li key={perk.text} className="flex items-start gap-3 text-sm text-gray-300">
                 <span className="shrink-0 w-6 h-6 flex items-center justify-center bg-gray-800 rounded-full text-sm leading-none">
-                  {perk.icon}
+                  <perk.icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
                 </span>
                 {perk.text}
               </li>
@@ -92,12 +90,11 @@ export default function PremiumSuccessPage() {
               transition
             "
           >
-            Go to Homepage 💀
+            Go to Homepage
           </Link>
 
           {/* Bottom decorative skulls */}
           <p className="mt-12 text-3xl opacity-10 select-none" aria-hidden="true">
-            💀 ⚡ 💀
           </p>
         </div>
       </section>

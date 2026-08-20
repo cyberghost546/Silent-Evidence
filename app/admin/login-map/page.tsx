@@ -121,7 +121,6 @@ export default function LoginMapPage() {
           </div>
         ) : data?.total === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-            <p className="text-4xl">🌍</p>
             <p className="text-gray-400 text-sm">No geo data yet. It will appear after new logins.</p>
           </div>
         ) : (

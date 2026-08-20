@@ -74,7 +74,7 @@ export default function DareAFriend({ storyId, storyTitle, userId }: Props) {
 
       if (res.ok) {
         // Dare created — show success toast, close modal, reset fields
-        showToast('Dare sent! 💀', 'success');
+        showToast('Dare sent!', 'success');
         closeModal();
         setReceiverUsername('');
         setMessage('');
@@ -105,7 +105,6 @@ export default function DareAFriend({ storyId, storyTitle, userId }: Props) {
         }`}
       >
         {/* Ghost emoji + label */}
-        <span>👻</span>
         <span>Dare a Friend</span>
       </button>
 
@@ -145,7 +144,7 @@ export default function DareAFriend({ storyId, storyTitle, userId }: Props) {
             </button>
 
             {/* ── Modal heading ────────────────────────────── */}
-            <h2 className="text-xl font-bold text-white mb-1">👻 Dare a Friend</h2>
+            <h2 className="text-xl font-bold text-white mb-1">Dare a Friend</h2>
             <p className="text-sm text-gray-500 mb-6">
               Challenge someone to read{' '}
               <span className="text-red-400 font-medium">"{storyTitle}"</span>

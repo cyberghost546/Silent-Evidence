@@ -31,7 +31,6 @@ export default function PremiumAppearancePicker({ initialTheme, initialBorder, i
   if (!isPremium) {
     return (
       <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5 text-center">
-        <p className="text-2xl mb-2">🎭</p>
         <p className="text-sm font-semibold text-white mb-1">Premium Cosmetics</p>
         <p className="text-xs text-gray-500 mb-4">Unlock custom profile themes and animated avatar borders with a premium subscription.</p>
         <a href="/premium" className="inline-block px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold rounded-xl transition">
@@ -58,7 +57,7 @@ export default function PremiumAppearancePicker({ initialTheme, initialBorder, i
                   : 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-500'
               }`}
             >
-              <span className="text-xl">{t.emoji}</span>
+              <t.icon className="w-5 h-5" strokeWidth={1.5} aria-hidden="true" />
               <span className="font-medium leading-tight text-center">{t.name}</span>
             </button>
           ))}
@@ -80,7 +79,7 @@ export default function PremiumAppearancePicker({ initialTheme, initialBorder, i
                   : 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-500'
               }`}
             >
-              <span>{b.emoji}</span>
+              <b.icon className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
               <span className="font-medium">{b.name}</span>
             </button>
           ))}
@@ -92,7 +91,6 @@ export default function PremiumAppearancePicker({ initialTheme, initialBorder, i
         <div className="relative w-16 h-16 shrink-0">
           <div className={`absolute -inset-1 rounded-full bg-linear-to-br ${THEMES[theme].glow} blur-md ${BORDERS[border].cssClass}`} />
           <div className="relative w-16 h-16 rounded-full bg-gray-700 border-4 border-gray-950 flex items-center justify-center text-2xl">
-            👤
           </div>
         </div>
         <div>

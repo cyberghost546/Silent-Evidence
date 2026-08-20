@@ -57,7 +57,6 @@ export default function WritingPromptBanner() {
     <div className="relative bg-gradient-to-r from-red-950/60 to-gray-900 border-b border-red-900/40">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-start gap-4">
         {/* Quill icon */}
-        <span className="text-2xl flex-shrink-0 mt-0.5">✍️</span>
 
         <div className="flex-1 min-w-0">
           {/* Label row */}

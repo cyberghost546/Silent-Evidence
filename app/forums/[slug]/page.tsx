@@ -92,7 +92,7 @@ export default async function ForumPage({ params }: Props) {
                 alt={post.author.username} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  {post.pinned && <span className="text-xs font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full">📌 Pinned</span>}
+                  {post.pinned && <span className="text-xs font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full">Pinned</span>}
                   <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-1">{post.title}</h3>
                 </div>
                 <p className="text-xs text-gray-500 mt-1 line-clamp-2">{post.content}</p>
@@ -101,7 +101,7 @@ export default async function ForumPage({ params }: Props) {
                   <span>·</span>
                   <span>{new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   <span>·</span>
-                  <span>💬 {post._count.replies} replies</span>
+                  <span>{post._count.replies} replies</span>
                 </div>
               </div>
             </Link>

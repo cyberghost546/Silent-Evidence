@@ -35,7 +35,6 @@ export default function AdBanner({ slot = 'leaderboard', className = '' }: Props
         {/* Placeholder creative — swap this out for your ad network script */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900" />
         <div className="relative flex flex-col items-center gap-2 text-center px-4">
-          <span className="text-2xl opacity-30">📢</span>
           <p className="text-xs text-gray-600 font-medium">Your ad here</p>
           <p className="text-[10px] text-gray-700">
             {isLeaderboard ? '728 × 90' : '300 × 250'}

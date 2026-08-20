@@ -112,7 +112,7 @@ export default function AdminSettingsPage() {
                   <p className="font-semibold text-white text-sm">{flag.label}</p>
                   {/* Warning pill — only shown for danger flags when they're active */}
                   {flag.danger && on && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-600/20 border border-red-600/40 text-red-400">⚠ Active</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-600/20 border border-red-600/40 text-red-400">Active</span>
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">{flag.desc}</p>

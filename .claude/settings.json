@@ -63,7 +63,13 @@
       "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\(JSON.stringify\\(p.scripts,null,1\\)\\);console.log\\(Object.keys\\(p.dependencies||{}\\).join\\(' '\\)\\);console.log\\('DEV:',Object.keys\\(p.devDependencies||{}\\).join\\(' '\\)\\)\")",
       "Bash(DATABASE_URL= npx prisma generate)",
       "Bash(npm test *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(node \"C:/Users/chris/AppData/Local/Temp/claude/c--Users-chris-Documents-GitHub-Horror-Blog-Website/b1129544-7b3e-4063-b4fa-9940fe00f19f/scratchpad/scan-emoji.js\")",
+      "Bash(node \"C:/Users/chris/AppData/Local/Temp/claude/c--Users-chris-Documents-GitHub-Horror-Blog-Website/b1129544-7b3e-4063-b4fa-9940fe00f19f/scratchpad/strip-emoji.js\")",
+      "Bash(node \"C:/Users/chris/AppData/Local/Temp/claude/c--Users-chris-Documents-GitHub-Horror-Blog-Website/b1129544-7b3e-4063-b4fa-9940fe00f19f/scratchpad/strip-emoji.js\" --write)",
+      "Bash(python3 -)",
+      "Bash(node \"C:/Users/chris/AppData/Local/Temp/claude/c--Users-chris-Documents-GitHub-Horror-Blog-Website/b1129544-7b3e-4063-b4fa-9940fe00f19f/scratchpad/fix-mood-page.js\")",
+      "Bash(git stash *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\chris\\Documents\\GitHub\\Horror_Blog_Website\\app\\story\\[slug]",

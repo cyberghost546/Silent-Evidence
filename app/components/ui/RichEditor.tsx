@@ -34,6 +34,7 @@
  */
 
 import { useEditor, EditorContent } from '@tiptap/react';
+import { Undo2, Redo2 } from 'lucide-react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -188,8 +189,12 @@ export default function RichEditor({ value, onChange, placeholder, onSave }: Pro
         <span className="w-px h-5 bg-gray-700 mx-1" />
 
         {/* History buttons */}
-        <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Undo">↩</ToolbarBtn>
-        <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">↪</ToolbarBtn>
+        <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Undo">
+          <Undo2 className="w-3.5 h-3.5" strokeWidth={2} aria-hidden="true" />
+        </ToolbarBtn>
+        <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">
+          <Redo2 className="w-3.5 h-3.5" strokeWidth={2} aria-hidden="true" />
+        </ToolbarBtn>
 
         {/* Live word count — pushed to the right with ml-auto */}
         <span className="ml-auto text-xs text-gray-500">{wordCount} words</span>

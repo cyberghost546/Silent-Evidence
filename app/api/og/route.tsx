@@ -13,16 +13,7 @@ import { prisma } from '@/lib/prisma';
 export const runtime = 'nodejs';
 
 // Mood emoji mapping — matches the Mood enum values for visual flair on OG cards
-const MOOD_EMOJI: Record<string, string> = {
-  EPIC: '⚔️',
-  HEARTWARMING: '💖',
-  MYSTERIOUS: '🔮',
-  ACTION: '💥',
-  ROMANTIC: '🌸',
-  COMEDIC: '😂',
-  DRAMATIC: '🎭',
-  DARK: '🌑',
-};
+
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -54,8 +45,8 @@ export async function GET(req: Request) {
   const excerpt = story.excerpt
     ? story.excerpt.length > 120 ? story.excerpt.slice(0, 117) + '...' : story.excerpt
     : 'A horror story on Silent Evidence';
-  // Look up the mood emoji for the badge — fall back to empty string if mood not set
-  const moodEmoji = story.mood ? MOOD_EMOJI[story.mood] ?? '' : '';
+  // The badge shows the mood name only — this renders to a PNG via Satori,
+  // where a text label reproduces far more reliably than any glyph.
   // Capitalize the mood label for display (e.g. "EPIC" → "Epic")
   const moodLabel = story.mood ? story.mood.charAt(0) + story.mood.slice(1).toLowerCase() : '';
 
@@ -101,7 +92,7 @@ export async function GET(req: Request) {
                 color: '#888',
               }}
             >
-              {moodEmoji} {moodLabel}
+              {moodLabel}
             </div>
           )}
         </div>

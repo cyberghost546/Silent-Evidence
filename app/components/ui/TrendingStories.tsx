@@ -74,7 +74,6 @@ export default async function TrendingStories() {
           <h2 className="text-2xl font-bold text-white">Trending</h2>
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 text-center">
-          <p className="text-3xl mb-3">🔥</p>
           <p className="text-gray-400 text-sm">No trending stories yet this week.</p>
           <p className="text-gray-600 text-xs mt-1">Check back soon — or be the first to write one.</p>
         </div>
@@ -113,8 +112,8 @@ export default async function TrendingStories() {
               <p className="text-xs text-gray-500 mt-0.5">{story.author.username}</p>
             </div>
             <div className="flex flex-col items-end gap-1 flex-shrink-0 text-xs text-gray-500">
-              <span>👁 {story.views.toLocaleString()}</span>
-              <span>♥ {story._count.likes}</span>
+              <span>{story.views.toLocaleString()}</span>
+              <span>{story._count.likes}</span>
             </div>
           </Link>
         ))}

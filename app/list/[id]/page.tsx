@@ -101,7 +101,7 @@ export default async function ListPage({ params }: Props) {
                     <span>{story.author.username}</span>
                     <span>·</span>
                     <span>{readingTime(story.content)}</span>
-                    <span className="ml-auto">♥ {story._count.likes}</span>
+                    <span className="ml-auto">{story._count.likes}</span>
                   </div>
                 </div>
               </Link>

@@ -20,59 +20,67 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import {
+  LayoutDashboard, Users, BookOpen, Bot, Flag, AlertTriangle, ShieldCheck, Map,
+  TrendingUp, Swords, Images, Tags, Megaphone, Trophy, Mail, LifeBuoy, Newspaper,
+  MessageSquare, Package, PenLine, Cookie, BadgeCheck, DollarSign, Crown, Ban,
+  ShieldAlert, Search, Tag, Clock, Send, HeartPulse, Moon, Star, Flashlight,
+  BarChart3, ClipboardList, Calendar, MailOpen, Globe, Flame, Gauge, Settings,
+  GitMerge, ShieldX,
+} from 'lucide-react';
 
 // links — the full list of admin navigation items.
 // Each object has:
 //   href  — the URL this link points to
 //   label — human-readable name shown in the sidebar
-//   icon  — emoji icon displayed to the left of the label
+//   icon  — a lucide-react icon component rendered to the left of the label
 const links = [
-  { href: '/admin',              label: 'Overview',    icon: '📊' },
-  { href: '/admin/users',        label: 'Users',       icon: '👥' },
-  { href: '/admin/stories',      label: 'Stories',     icon: '📖' },
-  { href: '/admin/generate',     label: 'AI Generator', icon: '🤖' },
-  { href: '/admin/comments',     label: 'Moderation',  icon: '🚩' },
-  { href: '/admin/reports',      label: 'Reports',     icon: '⚠️'  },
-  { href: '/admin/login-logs',   label: 'Login Logs',  icon: '🔐' },
-  { href: '/admin/login-map',    label: 'Login Map',   icon: '🗺️' },
-  { href: '/admin/analytics',    label: 'Analytics',   icon: '📈' },
-  { href: '/admin/challenges',   label: 'Challenges',  icon: '⚔️'  },
-  { href: '/admin/slides',       label: 'Slideshow',   icon: '🖼️'  },
-  { href: '/admin/categories',   label: 'Categories',  icon: '🏷️' },
-  { href: '/admin/announcement',   label: 'Announcement',   icon: '📢' },
-  { href: '/admin/story-of-week', label: 'Story of Week',  icon: '🏆' },
-  { href: '/admin/contact',       label: 'Contact Inbox',  icon: '✉️'  },
-  { href: '/admin/user-support',  label: 'User Support',   icon: '🆘'  },
-  { href: '/admin/newsletter',    label: 'Newsletter',      icon: '📰' },
-  { href: '/admin/digest',        label: 'Comment Digest',  icon: '💬' },
-  { href: '/admin/bundles',       label: 'Bundles',         icon: '📦' },
-  { href: '/admin/prompts',         label: 'Writing Prompts',     icon: '✍️' },
-  { href: '/admin/cookies',         label: 'Cookie Consent',      icon: '🍪' },
+  { href: '/admin',                 label: 'Overview',            icon: LayoutDashboard },
+  { href: '/admin/users',           label: 'Users',               icon: Users },
+  { href: '/admin/stories',         label: 'Stories',             icon: BookOpen },
+  { href: '/admin/generate',        label: 'AI Generator',        icon: Bot },
+  { href: '/admin/comments',        label: 'Moderation',          icon: Flag },
+  { href: '/admin/reports',         label: 'Reports',             icon: AlertTriangle },
+  { href: '/admin/login-logs',      label: 'Login Logs',          icon: ShieldCheck },
+  { href: '/admin/login-map',       label: 'Login Map',           icon: Map },
+  { href: '/admin/analytics',       label: 'Analytics',           icon: TrendingUp },
+  { href: '/admin/challenges',      label: 'Challenges',          icon: Swords },
+  { href: '/admin/slides',          label: 'Slideshow',           icon: Images },
+  { href: '/admin/categories',      label: 'Categories',          icon: Tags },
+  { href: '/admin/announcement',    label: 'Announcement',        icon: Megaphone },
+  { href: '/admin/story-of-week',   label: 'Story of Week',       icon: Trophy },
+  { href: '/admin/contact',         label: 'Contact Inbox',       icon: Mail },
+  { href: '/admin/user-support',    label: 'User Support',        icon: LifeBuoy },
+  { href: '/admin/newsletter',      label: 'Newsletter',          icon: Newspaper },
+  { href: '/admin/digest',          label: 'Comment Digest',      icon: MessageSquare },
+  { href: '/admin/bundles',         label: 'Bundles',             icon: Package },
+  { href: '/admin/prompts',         label: 'Writing Prompts',     icon: PenLine },
+  { href: '/admin/cookies',         label: 'Cookie Consent',      icon: Cookie },
   // ── New pages ──
-  { href: '/admin/verification',    label: 'Verification',         icon: '✅' },
-  { href: '/admin/revenue',         label: 'Revenue',              icon: '💰' },
-  { href: '/admin/premium',         label: 'Premium Members',      icon: '👑' },
-  { href: '/admin/banned-words',    label: 'Content Filter',       icon: '🚫' },
-  { href: '/admin/warnings',        label: 'Warnings & Bans',      icon: '⛔' },
-  { href: '/admin/search',          label: 'Admin Search',         icon: '🔎' },
-  { href: '/admin/tags',            label: 'Tag Manager',          icon: '🏷️' },
-  { href: '/admin/scheduled',       label: 'Scheduled Stories',    icon: '🕐' },
-  { href: '/admin/email-log',       label: 'Email Log',            icon: '📧' },
-  { href: '/admin/health',          label: 'Site Health',          icon: '❤️' },
-  { href: '/admin/mood',            label: 'Mood of Day',          icon: '🌑' },
-  { href: '/admin/featured-authors',label: 'Featured Authors',     icon: '⭐' },
-  { href: '/admin/spotlight',       label: 'Story Spotlight',      icon: '🔦' },
-  { href: '/admin/polls',           label: 'Poll Manager',         icon: '📊' },
-  { href: '/admin/audit-log',       label: 'Audit Log',            icon: '📋' },
-  { href: '/admin/calendar',        label: 'Content Calendar',     icon: '📅' },
-  { href: '/admin/email-templates', label: 'Email Templates',      icon: '✉️'  },
-  { href: '/admin/seo',             label: 'SEO Dashboard',        icon: '🔍' },
-  { href: '/admin/heatmap',         label: 'Activity Heatmap',     icon: '🔥' },
-  { href: '/admin/rate-limits',     label: 'Rate Limits',          icon: '🚦' },
-  { href: '/admin/settings',        label: 'Site Settings',        icon: '⚙️'  },
-  { href: '/admin/merge',           label: 'Merge Stories',        icon: '🔀' },
-  { href: '/admin/toxicity',        label: 'AI Toxicity Queue',    icon: '🤖' },
-  { href: '/admin/ip-blocklist',    label: 'IP Blocklist',         icon: '🛡️' },
+  { href: '/admin/verification',    label: 'Verification',        icon: BadgeCheck },
+  { href: '/admin/revenue',         label: 'Revenue',             icon: DollarSign },
+  { href: '/admin/premium',         label: 'Premium Members',     icon: Crown },
+  { href: '/admin/banned-words',    label: 'Content Filter',      icon: Ban },
+  { href: '/admin/warnings',        label: 'Warnings & Bans',     icon: ShieldAlert },
+  { href: '/admin/search',          label: 'Admin Search',        icon: Search },
+  { href: '/admin/tags',            label: 'Tag Manager',         icon: Tag },
+  { href: '/admin/scheduled',       label: 'Scheduled Stories',   icon: Clock },
+  { href: '/admin/email-log',       label: 'Email Log',           icon: Send },
+  { href: '/admin/health',          label: 'Site Health',         icon: HeartPulse },
+  { href: '/admin/mood',            label: 'Mood of Day',         icon: Moon },
+  { href: '/admin/featured-authors',label: 'Featured Authors',    icon: Star },
+  { href: '/admin/spotlight',       label: 'Story Spotlight',     icon: Flashlight },
+  { href: '/admin/polls',           label: 'Poll Manager',        icon: BarChart3 },
+  { href: '/admin/audit-log',       label: 'Audit Log',           icon: ClipboardList },
+  { href: '/admin/calendar',        label: 'Content Calendar',    icon: Calendar },
+  { href: '/admin/email-templates', label: 'Email Templates',     icon: MailOpen },
+  { href: '/admin/seo',             label: 'SEO Dashboard',       icon: Globe },
+  { href: '/admin/heatmap',         label: 'Activity Heatmap',    icon: Flame },
+  { href: '/admin/rate-limits',     label: 'Rate Limits',         icon: Gauge },
+  { href: '/admin/settings',        label: 'Site Settings',       icon: Settings },
+  { href: '/admin/merge',           label: 'Merge Stories',       icon: GitMerge },
+  { href: '/admin/toxicity',        label: 'AI Toxicity Queue',   icon: Bot },
+  { href: '/admin/ip-blocklist',    label: 'IP Blocklist',        icon: ShieldX },
 ];
 
 export default function AdminSidebar({ username }: { username: string }) {
@@ -104,7 +112,7 @@ export default function AdminSidebar({ username }: { username: string }) {
 
       {/* Navigation links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {links.map(({ href, label, icon }) => {
+        {links.map(({ href, label, icon: Icon }) => {
           const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
           return (
             <Link
@@ -117,7 +125,7 @@ export default function AdminSidebar({ username }: { username: string }) {
                   : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
             >
-              <span className="text-base">{icon}</span>
+              <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
               {label}
             </Link>
           );

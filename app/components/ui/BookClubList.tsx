@@ -3,6 +3,7 @@
 // Lists clubs + create / join forms. Supports premium-only clubs.
 
 import { useEffect, useState } from 'react';
+import { Crown, Lock, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -139,13 +140,12 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
                 className="mt-0.5 rounded"
               />
               <div>
-                <p className="text-sm font-semibold text-yellow-300 flex items-center gap-1">👑 Premium-Only Club</p>
+                <p className="text-sm font-semibold text-yellow-300 flex items-center gap-1">Premium-Only Club</p>
                 <p className="text-xs text-gray-500 mt-0.5">Only Horror Elite subscribers can join this club.</p>
               </div>
             </label>
           ) : (
             <div className="flex items-start gap-3 p-3 rounded-xl border border-gray-700/40 bg-gray-800/30">
-              <span className="text-base mt-0.5">👑</span>
               <div>
                 <p className="text-sm text-gray-500">Premium-Only Club</p>
                 <p className="text-xs text-gray-600 mt-0.5">
@@ -202,7 +202,6 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
       {/* Club grid */}
       {clubs.length === 0 ? (
         <div className="text-center py-20 text-gray-500">
-          <p className="text-5xl mb-4">📚</p>
           <p className="font-medium text-gray-400">No clubs yet.</p>
           {userId
             ? <p className="text-sm mt-1">Create one and invite your friends.</p>
@@ -223,7 +222,11 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-lg">{club.isPremium ? '👑' : club.isPrivate ? '🔒' : '🌐'}</span>
+                    {club.isPremium
+              ? <Crown className="w-4 h-4 text-yellow-500" strokeWidth={1.75} aria-hidden="true" />
+              : club.isPrivate
+                ? <Lock className="w-4 h-4 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
+                : <Globe className="w-4 h-4 text-gray-400" strokeWidth={1.75} aria-hidden="true" />}
                     <h3 className={`font-semibold text-sm truncate transition ${club.isPremium ? 'text-yellow-200 group-hover:text-yellow-100' : 'text-white group-hover:text-red-300'}`}>
                       {club.name}
                     </h3>

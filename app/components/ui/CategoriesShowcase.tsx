@@ -12,6 +12,7 @@
 
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { categoryIcon } from '@/lib/categoryIcons';
 
 // A fixed list of Tailwind gradient + border + text colour combinations.
 // Categories are assigned a colour by their position in the list
@@ -29,74 +30,7 @@ const ACCENTS = [
   'from-amber-900/40 border-amber-800/50 text-amber-400',
 ];
 
-// Shown when a category's slug has no entry in ICONS below, so a newly added
-// category always renders an icon instead of an empty gap in the tile.
-const DEFAULT_ICON = '🕯️';
 
-// A mapping of category slug → emoji icon.
-// NOTE: keys are SLUGS (lowercase, hyphenated — as stored in Category.slug),
-// not display names. A key like 'Analog Horror' would never match anything.
-const ICONS: Record<string, string> = {
-  'ghost-stories':      '👻',
-  'psychological':      '🧠',
-  'supernatural':       '✨',
-  'paranormal':         '👁️',
-  'slasher-horror':     '🔪',
-  'cosmic-horror':      '🌌',
-  'body-horror':        '🩸',
-  'urban-legends':      '🏙️',
-  'true-crime':         '🔍',
-  'tech-horror':        '💻',
-  'survival-horror':    '🪓',
-  'occult-witchcraft':  '🔮',
-  'monsters-creatures': '🦇',
-  'dark-fantasy':       '🐉',
-  'found-footage':      '📹',
-  'folk-horror':        '🌾',
-  'dark-romance':       '🥀',
-  'post-apocalyptic':   '☢️',
-  'haunted-places':     '🏚️',
-  'sci-fi-horror':      '🛸',
-
-  // Sub-genres not yet seeded in the database. Harmless until a Category row
-  // with the matching slug exists — at which point the tile picks up its icon
-  // automatically with no code change.
-  'analog-horror':            '📼',
-  'analog-technology-horror': '🔌',
-  'psychological-thriller':   '🌀',
-  'haunted-objects':          '🪆',
-  'demonic-possession':       '😈',
-  'religious-horror':         '✝️',
-  'cult-horror':              '🕯️',
-  'ritual-horror':            '🗿',
-  'sleep-paralysis-horror':   '🛏️',
-  'dream-nightmare-horror':   '💤',
-  'time-loop-horror':         '⏳',
-  'isolation-horror':         '🏝️',
-  'arctic-ocean-horror':      '🧊',
-  'jungle-horror':            '🌴',
-  'pandemic-horror':          '😷',
-  'infection-horror':         '🦠',
-  'mutation-horror':          '🧬',
-  'ai-horror':                '🤖',
-  'cyber-horror':             '🖥️',
-  'internet-horror':          '🌐',
-  'lost-media-horror':        '🎞️',
-  'backrooms-liminal-spaces': '🚪',
-  'vhs-retro-horror':         '📺',
-  'experimental-horror':      '🎭',
-  'gore-extreme-horror':      '🥩',
-  'torture-horror':           '⛓️',
-  'revenge-horror':           '🗡️',
-  'home-invasion-horror':     '🏠',
-  'stalker-horror':           '🕵️',
-  'psychological-breakdown':  '🫥',
-  'doppelganger-horror':      '👥',
-  'possessed-technology':     '📱',
-  'haunted-games':            '🎮',
-  'school-horror':            '🏫',
-  'childhood-trauma-horror':  '🧸',
-};
 
 export default async function CategoriesShowcase() {
   // Fetch all categories alphabetically.
@@ -129,7 +63,7 @@ export default async function CategoriesShowcase() {
             const accent = ACCENTS[i % ACCENTS.length];
             // Look up the icon for this category's slug, falling back to a
             // neutral one so an unmapped category still renders a full tile.
-            const icon = ICONS[cat.slug] ?? DEFAULT_ICON;
+            const Icon = categoryIcon(cat.slug);
             return (
               // Each tile is a Next.js Link so the whole card is clickable.
               // `group` on the Link lets child elements respond to hover state
@@ -139,12 +73,12 @@ export default async function CategoriesShowcase() {
                 href={`/category/${cat.slug}`}
                 className={`group bg-gradient-to-b ${accent} border rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:scale-105 transition-transform duration-200`}
               >
-                {/* Emoji icon — slightly faded at rest, fully visible and scaled up on hover */}
-                {icon && (
-                  <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200 inline-block">
-                    {icon}
-                  </span>
-                )}
+                {/* Category icon — muted at rest, full strength on hover */}
+                <Icon
+                  className="w-6 h-6 opacity-60 group-hover:opacity-100 transition-opacity duration-200"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
                 {/* Category display name */}
                 <p className="text-xs font-semibold text-white leading-tight">{cat.name}</p>
                 {/* Story count — pluralises "story" / "stories" correctly */}

@@ -4,6 +4,7 @@
 // generateMetadata uses the same DB query pattern to set the <title> and
 // description for SEO. Returns notFound() if the slug doesn't exist.
 import { Metadata } from 'next';
+import { Skull } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -49,7 +50,9 @@ export default async function MonsterDetailPage({ params }: Props) {
             </div>
           )}
           {!monster.image && (
-            <div className="w-full h-40 bg-gray-800 flex items-center justify-center text-7xl text-gray-700">👹</div>
+            <div className="w-full h-40 bg-gray-800 flex items-center justify-center">
+              <Skull className="w-16 h-16 text-gray-700" strokeWidth={1.25} aria-hidden="true" />
+            </div>
           )}
 
           <div className="p-8">
@@ -69,7 +72,12 @@ export default async function MonsterDetailPage({ params }: Props) {
               <span className="text-gray-500 text-sm">Scare Factor:</span>
               <div className="flex gap-0.5">
                 {Array.from({ length: 10 }).map((_, i) => (
-                  <span key={i} className={`text-sm ${i < monster.scareFactor ? 'text-red-500' : 'text-gray-700'}`}>💀</span>
+                  <Skull
+                    key={i}
+                    className={`w-3.5 h-3.5 ${i < monster.scareFactor ? 'text-red-500' : 'text-gray-700'}`}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
                 ))}
               </div>
               <span className="text-gray-500 text-sm ml-1">{monster.scareFactor}/10</span>

@@ -40,7 +40,6 @@ export default async function QuizPage() {
 
         {userBest && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-5 py-3 mb-6 flex items-center gap-3">
-            <span className="text-xl">🏆</span>
             <p className="text-sm text-green-400">Your best score: <strong>{userBest.score}/{userBest.total}</strong></p>
           </div>
         )}
@@ -50,12 +49,12 @@ export default async function QuizPage() {
         {/* Leaderboard */}
         {topScores.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-lg font-bold text-white mb-4">🏅 Top Scores</h2>
+            <h2 className="text-lg font-bold text-white mb-4">Top Scores</h2>
             <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
               {topScores.map((attempt, i) => (
                 <div key={attempt.id} className={`flex items-center gap-4 px-5 py-3 ${i < topScores.length - 1 ? 'border-b border-gray-700' : ''}`}>
                   <span className={`text-sm font-bold w-6 text-center ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-600' : 'text-gray-600'}`}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
+                    {`${i + 1}`}
                   </span>
                   <Link href={`/user/${attempt.user.username}`} className="text-sm text-white hover:text-red-400 transition flex-1">{attempt.user.username}</Link>
                   <span className="text-sm font-bold text-white">{attempt.score}<span className="text-gray-500 font-normal">/{attempt.total}</span></span>

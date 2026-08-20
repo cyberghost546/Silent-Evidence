@@ -24,6 +24,7 @@
 // ============================================================
 
 import { useState, useMemo } from 'react';
+import { Crown, PenLine, User, Ghost, Users, Zap, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -52,10 +53,17 @@ const roleBadge: Record<string, string> = {
   GUEST:  'bg-yellow-600/20 text-yellow-400 border-yellow-600/40',
 };
 
-// Role emoji icons shown in the table
-const roleIcon: Record<string, string> = {
-  ADMIN: '👑', AUTHOR: '✍️', USER: '👤', GUEST: '👻',
+// Role icons shown in the table
+const roleIcon: Record<string, LucideIcon> = {
+  ADMIN: Crown, AUTHOR: PenLine, USER: User, GUEST: Ghost,
 };
+
+// RoleIcon — small helper so the icon can be dropped inline next to a role name.
+function RoleIcon({ role, className }: { role: string; className?: string }) {
+  const Icon = roleIcon[role];
+  if (!Icon) return null;
+  return <Icon className={className ?? 'w-3.5 h-3.5 inline-block'} strokeWidth={1.75} aria-hidden="true" />;
+}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -178,13 +186,13 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
       {/* ── Summary stat cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Users',  value: stats.total,   color: 'text-white',         icon: '👥' },
-          { label: 'Admins',       value: stats.admins,  color: 'text-red-400',     icon: '👑' },
-          { label: 'Authors',      value: stats.authors, color: 'text-blue-400',    icon: '✍️' },
-          { label: 'Premium',      value: stats.premium, color: 'text-yellow-400',  icon: '⚡' },
-        ].map(({ label, value, color, icon }) => (
+          { label: 'Total Users',  value: stats.total,   color: 'text-white',       icon: Users },
+          { label: 'Admins',       value: stats.admins,  color: 'text-red-400',     icon: Crown },
+          { label: 'Authors',      value: stats.authors, color: 'text-blue-400',    icon: PenLine },
+          { label: 'Premium',      value: stats.premium, color: 'text-yellow-400',  icon: Zap },
+        ].map(({ label, value, color, icon: Icon }) => (
           <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 shadow-[0_4px_20px_rgba(34,197,94,0.1)]">
-            <span className="text-2xl">{icon}</span>
+            <Icon className={`w-6 h-6 shrink-0 ${color}`} strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className={`text-xl font-bold ${color}`}>{value}</p>
               <p className="text-xs text-gray-500">{label}</p>
@@ -228,7 +236,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                   : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
               }`}
             >
-              {r || 'All'} {r && roleIcon[r]}
+              {r || 'All'} {r && <RoleIcon role={r} />}
             </button>
           ))}
           <button
@@ -240,7 +248,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 : 'border-gray-700 text-gray-400 hover:border-yellow-500/60 hover:text-yellow-400'
             }`}
           >
-            ⚡ Premium
+ Premium
           </button>
         </div>
       </div>
@@ -311,7 +319,6 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 // Empty state when no users match the search
                 <tr>
                   <td colSpan={9} className="px-5 py-16 text-center text-gray-500">
-                    <p className="text-3xl mb-2">🔍</p>
                     <p>No users found matching your search.</p>
                   </td>
                 </tr>
@@ -338,7 +345,9 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                         </div>
                         <span className="font-semibold text-white">{user.username}</span>
                         {user.isPremium && (
-                          <span className="text-[10px] font-bold text-black bg-yellow-400 px-1.5 py-0.5 rounded-full leading-none">⚡</span>
+                          <span className="text-[10px] font-bold text-black bg-yellow-400 px-1.5 py-0.5 rounded-full leading-none">
+                            PRO
+                          </span>
                         )}
                       </div>
                     </td>
@@ -356,7 +365,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                           className={`text-xs font-semibold pl-2 pr-6 py-1 rounded-full border bg-transparent cursor-pointer focus:outline-none appearance-none ${roleBadge[user.role]} disabled:opacity-50`}
                         >
                           {ROLES.map(r => (
-                            <option key={r} value={r} className="bg-gray-900 text-white">{roleIcon[r]} {r}</option>
+                            <option key={r} value={r} className="bg-gray-900 text-white">{r}</option>
                           ))}
                         </select>
                         {/* Custom dropdown arrow */}

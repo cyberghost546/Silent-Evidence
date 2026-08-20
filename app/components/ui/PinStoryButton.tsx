@@ -93,7 +93,7 @@ export default function PinStoryButton({ storyId, isPinned }: Props) {
       } disabled:opacity-40`}
     >
       {/* Label: "…" while loading, then "📌 Unpin" or "📌 Pin" based on current state */}
-      {loading ? '…' : isPinned ? '📌 Unpin' : '📌 Pin'}
+      {loading ? '…' : isPinned ? 'Unpin' : 'Pin'}
     </button>
   );
 }

@@ -28,9 +28,11 @@
 // ============================================================
 
 import { useState } from 'react';
+import { COMMENT_REACTIONS } from '@/lib/reactions';
 
-// The available reaction emojis
-const EMOJIS = ['👍', '😱', '💀', '🔥', '❤️'];
+// The available reactions, defined once in lib/reactions. Each has a stored id
+// (what goes in the database) and an icon (what the reader actually sees).
+const EMOJIS = COMMENT_REACTIONS.map(r => r.id);
 
 type Props = {
   commentId: number;
@@ -94,19 +96,25 @@ export default function CommentReactions({ commentId, initialCounts, initialMine
       {toShow.map(emoji => {
         const count = counts[emoji] ?? 0;
         const active = mine.includes(emoji);
+        const def = COMMENT_REACTIONS.find(r => r.id === emoji);
+        // Skip stored reactions that are no longer offered rather than
+        // rendering a button with nothing in it.
+        if (!def) return null;
+        const Icon = def.icon;
         return (
           <button
             key={emoji}
             onClick={() => toggle(emoji)}
             disabled={!isLoggedIn || loading === emoji}
-            title={isLoggedIn ? (active ? `Remove ${emoji}` : `React with ${emoji}`) : 'Log in to react'}
+            title={isLoggedIn ? (active ? `Remove ${def.label}` : `React with ${def.label}`) : 'Log in to react'}
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition ${
               active
                 ? 'bg-red-600/20 border-red-600/40 text-red-300'
                 : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
             } ${!isLoggedIn ? 'cursor-default' : 'cursor-pointer'}`}
           >
-            <span>{emoji}</span>
+            <Icon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />
+            <span className="sr-only">{def.label}</span>
             {count > 0 && <span>{count}</span>}
           </button>
         );

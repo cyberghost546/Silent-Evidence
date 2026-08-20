@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { Eye, Heart, MessageSquare, Bookmark, type LucideIcon } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -37,10 +38,10 @@ function dayLabel(iso: string) {
   });
 }
 
-function Pill({ label, value, icon }: { label: string; value: number; icon: string }) {
+function Pill({ label, value, icon: Icon }: { label: string; value: number; icon: LucideIcon }) {
   return (
     <div className="flex flex-col items-center bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-700">
-      <span className="text-base">{icon}</span>
+      <Icon className="w-4 h-4 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
       <span className="text-lg font-bold text-white">{value.toLocaleString()}</span>
       <span className="text-xs text-gray-500">{label}</span>
     </div>
@@ -84,7 +85,7 @@ export default function StoryAnalytics({ storyId }: Props) {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-gray-800/50 transition"
       >
-        <span className="text-sm font-semibold text-gray-400">📊 Your story analytics</span>
+        <span className="text-sm font-semibold text-gray-400">Your story analytics</span>
         <svg
           className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -110,15 +111,14 @@ export default function StoryAnalytics({ storyId }: Props) {
             <>
               {/* Stat pills */}
               <div className="grid grid-cols-4 gap-3 mt-4">
-                <Pill icon="👁"  label="Views"     value={data.views} />
-                <Pill icon="❤️" label="Likes"     value={data.likes} />
-                <Pill icon="💬" label="Comments"  value={data.comments} />
-                <Pill icon="🔖" label="Bookmarks" value={data.bookmarks} />
+                <Pill icon={Eye}          label="Views"     value={data.views} />
+                <Pill icon={Heart}        label="Likes"     value={data.likes} />
+                <Pill icon={MessageSquare} label="Comments"  value={data.comments} />
+                <Pill icon={Bookmark}     label="Bookmarks" value={data.bookmarks} />
               </div>
 
               {/* Avg read-through rate */}
               <div className="mt-4 flex items-center gap-3 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3">
-                <span className="text-base shrink-0">📖</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500 mb-1.5">Avg read-through rate</p>
                   <div className="h-2 bg-gray-700 rounded-full overflow-hidden">

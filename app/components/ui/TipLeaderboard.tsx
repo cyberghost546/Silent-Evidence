@@ -49,7 +49,6 @@ export default function TipLeaderboard() {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">💰</span>
         <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
           Most Tipped This Month
         </h2>
@@ -65,7 +64,7 @@ export default function TipLeaderboard() {
             <li key={author.username} className="flex items-center gap-3">
               {/* Rank */}
               <span className="text-sm font-bold text-gray-700 w-5 text-center flex-shrink-0">
-                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+                {i + 1}
               </span>
 
               {/* Avatar */}

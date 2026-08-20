@@ -13,6 +13,8 @@
 //   mood       — optional mood tag; if provided, step 1 attempts a mood match first
 
 import Link from 'next/link';
+import { BookOpen } from 'lucide-react';
+import { moodIcon } from '@/lib/moodIcons';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { readingTime } from '@/lib/readingTime';
@@ -59,11 +61,7 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
   // Nothing to show — don't render the section at all
   if (stories.length === 0) return null;
 
-  // Emoji fallbacks for story cards that have no cover image
-  const moodEmoji: Record<string, string> = {
-    CREEPY:'🕷️', PARANOID:'👁️', DISTURBING:'😱', ATMOSPHERIC:'🌫️',
-    PSYCHOLOGICAL:'🧠', SUPERNATURAL:'👻', GORE:'🩸', JUMPSCARE:'⚡',
-  };
+  // Icon fallbacks for story cards with no cover image come from lib/moodIcons.
 
   return (
     <section className="mt-52">
@@ -85,7 +83,10 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
                 <Image src={story.coverImage} alt={story.title} fill sizes="(max-width:640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
                 <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-900 flex items-center justify-center text-3xl">
-                  {story.mood ? moodEmoji[story.mood] : '📖'}
+                  {(() => {
+              const MIcon = story.mood ? moodIcon(story.mood) : BookOpen;
+              return <MIcon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+            })()}
                 </div>
               )}
               {/* Gradient overlay ensures the bottom of the image fades cleanly */}
@@ -99,7 +100,7 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
                 <span>{story.author.username}</span>
                 <span>·</span>
                 <span>{readingTime(story.content)}</span>
-                <span className="ml-auto">♥ {story._count.likes}</span>
+                <span className="ml-auto">{story._count.likes}</span>
               </div>
             </div>
           </Link>

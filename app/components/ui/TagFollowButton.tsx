@@ -44,6 +44,7 @@
 'use client'; // Marks this as a Client Component — it uses useState and fetch
 
 import { useState } from 'react';
+import { Bell, BellOff } from 'lucide-react';
 
 // ── Props interface ────────────────────────────────────────────────────────────
 
@@ -145,12 +146,12 @@ export default function TagFollowButton({
         } ${loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         {/* Bell icon changes state to show follow status:
-            🔕 muted bell = "you ARE following, click to mute/unfollow"
-            🔔 ringing bell = "you are NOT following, click to follow" */}
+            muted bell   = "you ARE following, click to mute/unfollow"
+            ringing bell = "you are NOT following, click to follow" */}
         {following ? (
-          <span className="text-base leading-none">🔕</span>
+          <BellOff className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
         ) : (
-          <span className="text-base leading-none">🔔</span>
+          <Bell className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
         )}
 
         {/* Text label reflects current state, not the action */}

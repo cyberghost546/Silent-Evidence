@@ -200,12 +200,11 @@ export default function StoryBattle({ userId }: Props) {
         <div className="flex items-center gap-3 mb-5">
           <span className="w-1 h-6 bg-red-600 rounded-full" />
           <h2 className="text-2xl font-bold text-white">Story Battle</h2>
-          <span className="text-sm text-red-500 font-mono uppercase tracking-widest">⚔ Showdown</span>
+          <span className="text-sm text-red-500 font-mono uppercase tracking-widest">Showdown</span>
         </div>
 
         {/* Empty state — dark atmospheric card */}
         <div className="rounded-2xl border border-red-900/20 bg-gray-950 flex flex-col items-center justify-center py-16 gap-4 text-center px-6">
-          <span className="text-5xl opacity-40">⚔</span>
           <p className="text-gray-400 text-lg font-semibold">No battle active right now</p>
           <p className="text-gray-600 text-sm">Check back soon — the next showdown is coming.</p>
         </div>
@@ -234,7 +233,7 @@ export default function StoryBattle({ userId }: Props) {
       <div className="flex items-center gap-3 mb-5">
         <span className="w-1 h-6 bg-red-600 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Story Battle</h2>
-        <span className="text-sm text-red-500 font-mono uppercase tracking-widest">⚔ Showdown</span>
+        <span className="text-sm text-red-500 font-mono uppercase tracking-widest">Showdown</span>
       </div>
 
       {/* ── Main battle card ── */}
@@ -254,7 +253,7 @@ export default function StoryBattle({ userId }: Props) {
 
           {/* Countdown timer — monospaced font keeps width stable as digits change */}
           <span className="text-xs font-mono text-gray-400 bg-gray-900 border border-gray-800 px-3 py-1 rounded-full">
-            ⏱ {countdown}
+ {countdown}
           </span>
         </div>
 
@@ -293,7 +292,6 @@ export default function StoryBattle({ userId }: Props) {
             ) : (
               /* Fallback placeholder when no cover image is set */
               <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center">
-                <span className="text-5xl opacity-20">💀</span>
               </div>
             )}
 
@@ -303,7 +301,7 @@ export default function StoryBattle({ userId }: Props) {
             {/* Voted indicator ribbon — shows when this is the user's pick */}
             {votedA && (
               <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full animate-pulse">
-                ✔ Your vote
+ Your vote
               </div>
             )}
 
@@ -377,7 +375,6 @@ export default function StoryBattle({ userId }: Props) {
               />
             ) : (
               <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center">
-                <span className="text-5xl opacity-20">💀</span>
               </div>
             )}
 
@@ -387,7 +384,7 @@ export default function StoryBattle({ userId }: Props) {
             {/* Voted ribbon */}
             {votedB && (
               <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full animate-pulse">
-                ✔ Your vote
+ Your vote
               </div>
             )}
 

@@ -97,7 +97,6 @@ export default async function ChallengesPage() {
           // ── Empty state ──────────────────────────────────────────────────
           // Shown when no challenges have been created yet.
           <div className="text-center py-24">
-            <div className="text-5xl mb-4">✍️</div>
             <h2 className="text-xl font-semibold text-white mb-2">No challenges yet</h2>
             <p className="text-gray-500">Check back soon — challenges are posted monthly.</p>
           </div>
@@ -162,7 +161,7 @@ export default async function ChallengesPage() {
                   <div className="flex items-center gap-4 text-xs text-gray-500">
                     {/* Short date format: "Apr 1 – Apr 30, 2026" */}
                     <span>
-                      📅{' '}
+{' '}
                       {new Date(c.startDate).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -177,7 +176,7 @@ export default async function ChallengesPage() {
                     <span>·</span>
                     {/* Proper singular/plural: "1 entry" vs "5 entries" */}
                     <span>
-                      ✍️ {c._count.entries}{' '}
+ {c._count.entries}{' '}
                       {c._count.entries === 1 ? 'entry' : 'entries'}
                     </span>
                   </div>

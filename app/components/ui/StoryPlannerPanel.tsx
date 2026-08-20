@@ -119,7 +119,6 @@ export default function StoryPlannerPanel({ storyId }: Props) {
         className="w-full flex items-center justify-between px-5 py-4 bg-gray-800 hover:bg-gray-750 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-lg">🗺️</span>
           <span className="font-semibold text-white text-sm">Story Planner</span>
           {nodes.length > 0 && (
             <span className="text-xs text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">

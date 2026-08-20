@@ -300,7 +300,6 @@ export default function AdminSeoPage() {
             // Ternary: show an empty-state message when no 404s have been logged
             nf.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
-                <p className="text-3xl mb-3">✅</p>
                 <p>No 404 errors logged yet.</p>
                 <p className="text-xs mt-2">
                   The not-found page will log hits automatically once the tracker is active.

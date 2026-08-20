@@ -4,6 +4,7 @@
 // After saving, shows the result (access level) and redirects to home.
 
 import { useState } from 'react';
+import { Circle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // Map ageGroup to a human-readable access level description
@@ -70,7 +71,6 @@ export default function AgeVerificationForm() {
           // ── Entry form ───────────────────────────────────────────────────────
           <>
             <div className="text-center mb-7">
-              <div className="text-5xl mb-3">🎂</div>
               <h1 className="text-2xl font-bold text-white mb-2">How old are you?</h1>
               <p className="text-sm text-gray-400 leading-relaxed">
                 We need your date of birth to make sure you only see content
@@ -119,12 +119,12 @@ export default function AgeVerificationForm() {
                 How it works
               </p>
               {[
-                { icon: '🔵', age: 'Under 13', desc: 'General content only — no gore or explicit content' },
-                { icon: '🟡', age: '13 – 17',  desc: 'General + teen content — some violence, no explicit' },
-                { icon: '🟢', age: '18+',       desc: 'Full access — all stories including mature content' },
+                { tone: 'text-blue-400',   age: 'Under 13', desc: 'General content only — no gore or explicit content' },
+                { tone: 'text-yellow-400', age: '13 – 17',  desc: 'General + teen content — some violence, no explicit' },
+                { tone: 'text-green-400',  age: '18+',      desc: 'Full access — all stories including mature content' },
               ].map(row => (
                 <div key={row.age} className="flex items-start gap-2.5 text-xs text-gray-400">
-                  <span className="flex-shrink-0">{row.icon}</span>
+                  <Circle className={`w-3 h-3 shrink-0 mt-1 ${row.tone}`} strokeWidth={3} aria-hidden="true" />
                   <span><span className="text-gray-300 font-medium">{row.age}:</span> {row.desc}</span>
                 </div>
               ))}

@@ -192,12 +192,12 @@ export default function AdminStoriesClient({ stories }: { stories: Story[] }) {
             {/* Archive selected */}
             <button onClick={() => bulkAction('ARCHIVED')} disabled={bulkLoading}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 hover:bg-yellow-600/30 disabled:opacity-50 transition">
-              📦 Archive
+ Archive
             </button>
             {/* Delete selected */}
             <button onClick={() => bulkAction('DELETE')} disabled={bulkLoading}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 hover:bg-red-600/30 disabled:opacity-50 transition">
-              🗑 Delete
+ Delete
             </button>
             <button onClick={() => setSelected(new Set())} className="text-xs text-gray-500 hover:text-white ml-1">Clear</button>
           </div>
@@ -228,9 +228,9 @@ export default function AdminStoriesClient({ stories }: { stories: Story[] }) {
                 <th className="px-4 py-3 text-left">Category</th>
                 <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-center">★</th>
-                <th className="px-4 py-3 text-center">👑</th>
-                <th className="px-4 py-3 text-center">❤️</th>
-                <th className="px-4 py-3 text-center">💬</th>
+                <th className="px-4 py-3 text-center"></th>
+                <th className="px-4 py-3 text-center"></th>
+                <th className="px-4 py-3 text-center"></th>
                 <th className="px-4 py-3 text-left">Date</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -239,7 +239,6 @@ export default function AdminStoriesClient({ stories }: { stories: Story[] }) {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={11} className="px-5 py-16 text-center text-gray-500">
-                    <p className="text-3xl mb-2">🔍</p>
                     <p>No stories match your search.</p>
                   </td>
                 </tr>
@@ -285,7 +284,7 @@ export default function AdminStoriesClient({ stories }: { stories: Story[] }) {
                   {/* Creepy of Month 👑 */}
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => setCreepyOfMonth(story.id)} disabled={loading === story.id}
-                      className={`text-lg transition disabled:opacity-40 ${story.creepyOfMonth ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}>👑</button>
+                      className={`text-lg transition disabled:opacity-40 ${story.creepyOfMonth ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}></button>
                   </td>
 
                   <td className="px-4 py-3 text-center text-gray-400 text-xs">{story._count.likes}</td>

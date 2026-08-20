@@ -61,7 +61,6 @@ export default function MonstersPage() {
         <div className="text-center mb-10">
 
           {/* Large emoji serves as the page's visual icon — no extra image needed */}
-          <div className="text-5xl mb-4">👹</div>
 
           {/* Primary heading — text-4xl is intentionally large for impact */}
           <h1 className="text-4xl font-bold text-white mb-3">Monster Encyclopedia</h1>

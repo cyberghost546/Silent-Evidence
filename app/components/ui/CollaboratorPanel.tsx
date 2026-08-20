@@ -72,7 +72,6 @@ export default function CollaboratorPanel({ storyId }: Props) {
   return (
     <div className="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">🤝</span>
         <h2 className="text-base font-bold text-white">Co-authors</h2>
       </div>
 

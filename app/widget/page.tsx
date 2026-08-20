@@ -7,21 +7,12 @@
 
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { moodIcon } from '@/lib/moodIcons';
 
 // Revalidate once per hour so the widget refreshes automatically
 export const revalidate = 3600;
 
-// Mood-to-emoji map for a quick visual cue on the widget
-const MOOD_EMOJI: Record<string, string> = {
-  CREEPY:        '🕷️',
-  PARANOID:      '👁️',
-  DISTURBING:    '😱',
-  ATMOSPHERIC:   '🌫️',
-  PSYCHOLOGICAL: '🧠',
-  SUPERNATURAL:  '👻',
-  GORE:          '🩸',
-  JUMPSCARE:     '⚡',
-};
+// Mood icons come from the shared lib/moodIcons map.
 
 export default async function WidgetPage() {
   // Pick today's story using a day-of-year offset
@@ -58,17 +49,16 @@ export default async function WidgetPage() {
           {/* Widget header */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-red-500 text-xs font-bold uppercase tracking-widest">
-              ☠ Story of the Day
+ Story of the Day
             </span>
           </div>
 
-          {/* Mood emoji + title */}
+          {/* Mood icon + title */}
           <div className="flex items-start gap-2 mb-2">
-            {story.mood && (
-              <span className="text-2xl flex-shrink-0 mt-0.5">
-                {MOOD_EMOJI[story.mood] ?? '👻'}
-              </span>
-            )}
+            {story.mood && (() => {
+              const MoodIcon = moodIcon(story.mood);
+              return <MoodIcon className="w-6 h-6 shrink-0 mt-0.5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+            })()}
             <h2 className="text-base font-bold leading-snug">{story.title}</h2>
           </div>
 
@@ -88,7 +78,6 @@ export default async function WidgetPage() {
       ) : (
         // Empty state if no stories exist yet
         <div className="text-center text-gray-600">
-          <p className="text-3xl mb-2">👻</p>
           <p className="text-sm">No stories yet.</p>
         </div>
       )}

@@ -126,8 +126,8 @@ export default async function FeedPage() {
                     {/* Stats footer — reading time (computed from word count), likes, comments, date */}
                     <div className="flex items-center gap-4 text-xs text-gray-600 mt-2">
                       <span>{readingTime(story.content)}</span>
-                      <span>♥ {story._count.likes}</span>
-                      <span>💬 {story._count.comments}</span>
+                      <span>{story._count.likes}</span>
+                      <span>{story._count.comments}</span>
                       {/* ml-auto pushes the date to the right edge */}
                       <span className="ml-auto">{new Date(story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>

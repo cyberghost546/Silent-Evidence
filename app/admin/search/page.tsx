@@ -27,6 +27,7 @@
 //   and a Tailwind colour class. Avoids a chain of if/else in the JSX.
 
 import { useState } from 'react';
+import { User, BookOpen, MessageSquare, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 // Result shape from the admin search API — includes a precomputed `href` for linking
@@ -47,7 +48,7 @@ export default function AdminSearchPage() {
     setSearched(true); setLoading(false);
   };
 
-  const ICONS: Record<string, string> = { user: '👤', story: '📖', comment: '💬' };
+  const ICONS: Record<string, LucideIcon> = { user: User, story: BookOpen, comment: MessageSquare };
   const COLORS: Record<string, string> = { user: 'text-blue-400', story: 'text-red-400', comment: 'text-yellow-400' };
 
   return (
@@ -77,7 +78,10 @@ export default function AdminSearchPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl divide-y divide-gray-800">
           {results.map((r, i) => (
             <Link key={i} href={r.href} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-800/50 transition">
-              <span className="text-xl flex-shrink-0">{ICONS[r.type]}</span>
+              {(() => {
+                const RIcon = ICONS[r.type] ?? BookOpen;
+                return <RIcon className="w-5 h-5 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+              })()}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{r.label}</p>
                 <p className="text-xs text-gray-500 truncate">{r.sub}</p>

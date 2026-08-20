@@ -4,6 +4,7 @@
 // Covers Android (Chrome) + iOS (Safari) + Desktop (Chrome/Edge).
 
 import type { Metadata } from 'next';
+import { Smartphone, Apple, Laptop, Zap, Download, CalendarDays } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Install the App | Silent Evidence',
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 const platforms = [
   {
     name: 'Android (Chrome)',
-    icon: '🤖',
+    icon: Smartphone,
     steps: [
       'Open Silent Evidence in Chrome.',
       'Tap the three-dot menu (⋮) in the top-right corner.',
@@ -26,7 +27,7 @@ const platforms = [
   },
   {
     name: 'iPhone / iPad (Safari)',
-    icon: '🍎',
+    icon: Apple,
     steps: [
       'Open Silent Evidence in Safari (not Chrome).',
       'Tap the Share button (the box with an arrow ↑) at the bottom of the screen.',
@@ -38,7 +39,7 @@ const platforms = [
   },
   {
     name: 'Desktop (Chrome / Edge)',
-    icon: '💻',
+    icon: Laptop,
     steps: [
       'Open Silent Evidence in Chrome or Edge.',
       'Click the install icon (⊕) in the address bar on the right side.',
@@ -54,7 +55,6 @@ export default function InstallPage() {
     <main className="max-w-2xl mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-10">
-        <div className="text-5xl mb-4">📱</div>
         <h1 className="text-3xl font-bold text-white mb-2">Install Silent Evidence</h1>
         <p className="text-gray-400 text-sm leading-relaxed max-w-md mx-auto">
           Add the app to your home screen for faster loading, offline reading,
@@ -65,12 +65,12 @@ export default function InstallPage() {
       {/* Benefits row */}
       <div className="grid grid-cols-3 gap-3 mb-10">
         {[
-          { icon: '⚡', label: 'Faster loading' },
-          { icon: '📥', label: 'Offline reads' },
-          { icon: '🗓️', label: 'Daily widget' },
+  { icon: Zap,          label: 'Faster loading' },
+  { icon: Download,     label: 'Offline reads' },
+  { icon: CalendarDays, label: 'Daily widget' },
         ].map(b => (
           <div key={b.label} className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center">
-            <div className="text-2xl mb-1">{b.icon}</div>
+            <div className="flex justify-center mb-1"><b.icon className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" /></div>
             <p className="text-xs text-gray-400">{b.label}</p>
           </div>
         ))}
@@ -82,7 +82,7 @@ export default function InstallPage() {
           <div key={platform.name} className="border border-gray-800 rounded-xl p-5 bg-gray-900">
             {/* Platform header */}
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">{platform.icon}</span>
+              <platform.icon className="w-6 h-6 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
               <h2 className="text-base font-bold text-white">{platform.name}</h2>
             </div>
 
@@ -101,7 +101,7 @@ export default function InstallPage() {
 
             {/* Pro tip */}
             <p className="mt-4 text-xs text-gray-500 bg-gray-800 rounded-lg px-3 py-2 leading-relaxed">
-              💡 {platform.tip}
+ {platform.tip}
             </p>
           </div>
         ))}
@@ -109,7 +109,7 @@ export default function InstallPage() {
 
       {/* Widget instructions */}
       <div className="mt-8 border border-yellow-500/20 bg-yellow-500/5 rounded-xl p-5">
-        <h3 className="text-sm font-bold text-yellow-400 mb-2">🗓️ Daily Story Widget</h3>
+        <h3 className="text-sm font-bold text-yellow-400 mb-2">Daily Story Widget</h3>
         <p className="text-xs text-gray-400 leading-relaxed mb-3">
           Once the app is installed, you can add a web widget to your home screen
           that shows today&apos;s featured horror story.

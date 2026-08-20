@@ -245,13 +245,13 @@ export default function ChallengeCountdown({ challenge }: Props) {
               <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${phase === 'active' ? 'bg-green-400' : 'bg-red-500'}`} />
             </span>
             <span className="text-xs font-bold uppercase tracking-widest text-red-300">
-              {phase === 'upcoming' ? 'Coming Soon' : phase === 'active' ? '🔴 Live Now' : 'Challenge'}
+              {phase === 'upcoming' ? 'Coming Soon' : phase === 'active' ? 'Live Now' : 'Challenge'}
             </span>
           </div>
 
           {/* Title with shimmer animation */}
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 shimmer-text">
-            ⚔️ {challenge.title}
+ {challenge.title}
           </h2>
 
           {/* Description */}

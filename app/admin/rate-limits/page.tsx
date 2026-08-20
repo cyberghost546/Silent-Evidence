@@ -101,7 +101,6 @@ export default function AdminRateLimitsPage() {
         <div className="space-y-2">{Array.from({length:5}).map((_,i)=><div key={i} className="h-12 bg-gray-800 rounded-xl animate-pulse"/>)}</div>
       ) : entries.length === 0 ? (
         <div className="text-center py-20 text-gray-500">
-          <p className="text-3xl mb-3">🟢</p>
           <p>No active rate limit entries.</p>
         </div>
       ) : (

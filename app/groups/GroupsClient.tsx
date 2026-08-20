@@ -103,7 +103,6 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
       {/* Grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-600">
-          <p className="text-4xl mb-3">👥</p>
           <p>No groups yet{filter !== 'All' ? ` in ${filter}` : ''}.{userId ? ' Create the first one!' : ''}</p>
         </div>
       ) : (
@@ -123,7 +122,6 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
                   </div>
                 ) : (
                   <div className="h-28 bg-gradient-to-br from-red-950/40 to-gray-800 flex items-center justify-center">
-                    <span className="text-3xl">👥</span>
                   </div>
                 )}
 

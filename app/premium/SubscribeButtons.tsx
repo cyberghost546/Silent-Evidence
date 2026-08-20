@@ -27,7 +27,7 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
   if (isSubscribed) {
     return (
       <div className="w-full py-2.5 rounded-xl text-center text-sm font-semibold text-yellow-400 border border-yellow-500/30 bg-yellow-500/10">
-        ⚡ Active plan
+ Active plan
       </div>
     );
   }

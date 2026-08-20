@@ -27,6 +27,18 @@
  */
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { MessagesSquare, Clapperboard, BookOpen, Palette, PenLine, Moon, type LucideIcon } from 'lucide-react';
+
+// Forum icons are chosen by slug, so a renamed emoji in the DB seed can never
+// change what the page shows.
+const FORUM_ICONS: Record<string, LucideIcon> = {
+  general:         MessagesSquare,
+  recommendations: Clapperboard,
+  feedback:        BookOpen,
+  'fan-art':       Palette,
+  'writing-tips':  PenLine,
+  'off-topic':     Moon,
+};
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 
@@ -38,12 +50,12 @@ async function ensureForums() {
   if (count === 0) {
     await prisma.forum.createMany({
       data: [
-        { name: 'General Discussion', slug: 'general', description: 'Talk about anything horror related.', icon: '✨', order: 1 },
-        { name: 'Horror & Paranormal Recommendations', slug: 'recommendations', description: 'Recommend horror stories, films, books, and more.', icon: '🎬', order: 2 },
-        { name: 'Story Feedback & Reviews', slug: 'feedback', description: 'Get feedback on your stories or review others.', icon: '📖', order: 3 },
-        { name: 'Fan Art & Creations', slug: 'fan-art', description: 'Share your fan art, illustrations, and creative work.', icon: '🎨', order: 4 },
-        { name: 'Writing Tips', slug: 'writing-tips', description: 'Share tips, techniques, and advice for horror writing.', icon: '✍️', order: 5 },
-        { name: 'Off Topic', slug: 'off-topic', description: 'Anything goes.', icon: '🌙', order: 6 },
+        { name: 'General Discussion', slug: 'general', description: 'Talk about anything horror related.', order: 1 },
+        { name: 'Horror & Paranormal Recommendations', slug: 'recommendations', description: 'Recommend horror stories, films, books, and more.', order: 2 },
+        { name: 'Story Feedback & Reviews', slug: 'feedback', description: 'Get feedback on your stories or review others.', order: 3 },
+        { name: 'Fan Art & Creations', slug: 'fan-art', description: 'Share your fan art, illustrations, and creative work.', order: 4 },
+        { name: 'Writing Tips', slug: 'writing-tips', description: 'Share tips, techniques, and advice for horror writing.', order: 5 },
+        { name: 'Off Topic', slug: 'off-topic', description: 'Anything goes.', order: 6 },
       ],
     });
   }
@@ -88,7 +100,10 @@ export default async function ForumsPage() {
           {forums.map(forum => (
             <Link key={forum.id} href={`/forums/${forum.slug}`}
               className="group flex items-center gap-5 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-5 transition-all duration-200">
-              <div className="text-3xl flex-shrink-0 w-12 text-center">{forum.icon}</div>
+              {(() => {
+                const ForumIcon = FORUM_ICONS[forum.slug] ?? MessagesSquare;
+                return <ForumIcon className="w-7 h-7 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+              })()}
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-white group-hover:text-red-300 transition-colors">{forum.name}</h2>
                 {forum.description && <p className="text-sm text-gray-500 mt-0.5">{forum.description}</p>}

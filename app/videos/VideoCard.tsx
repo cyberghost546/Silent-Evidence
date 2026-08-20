@@ -145,11 +145,11 @@ function FeaturedCard({ story }: { story: StoryData }) {
               @{story.author.username}
             </Link>
             <span>·</span>
-            <span>👁 {story.views.toLocaleString()}</span>
+            <span>{story.views.toLocaleString()}</span>
             <span>·</span>
-            <span>❤️ {story._count.likes}</span>
+            <span>{story._count.likes}</span>
             <span>·</span>
-            <span>💬 {story._count.comments}</span>
+            <span>{story._count.comments}</span>
           </div>
           <Link href={`/story/${story.slug}`}
             className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition w-fit">
@@ -220,9 +220,9 @@ function GridCard({ story }: { story: StoryData }) {
 
         {/* Stats row */}
         <div className="flex items-center gap-3 text-xs text-gray-600 mt-3 pt-3 border-t border-gray-800">
-          <span className="flex items-center gap-1"><span>👁</span>{story.views.toLocaleString()}</span>
-          <span className="flex items-center gap-1"><span>❤️</span>{story._count.likes}</span>
-          <span className="flex items-center gap-1"><span>💬</span>{story._count.comments}</span>
+          <span className="flex items-center gap-1">{story.views.toLocaleString()}</span>
+          <span className="flex items-center gap-1">{story._count.likes}</span>
+          <span className="flex items-center gap-1">{story._count.comments}</span>
           <Link href={`/story/${story.slug}`}
             className="ml-auto text-red-500 hover:text-red-400 font-semibold transition">
             Read →

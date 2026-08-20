@@ -59,7 +59,7 @@ export default async function OfflineReadsPage() {
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div className="mb-2">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-            📥 Your Offline Library
+ Your Offline Library
           </h1>
           <p className="mt-2 text-gray-400 text-sm">
             These stories are cached on your device so you can read them without internet.
@@ -72,10 +72,9 @@ export default async function OfflineReadsPage() {
         {/* ── Empty state ──────────────────────────────────────────────────── */}
         {stories.length === 0 && (
           <div className="text-center py-20 text-gray-500">
-            <p className="text-4xl mb-4">📭</p>
             <p className="text-lg font-medium text-gray-400">No stories saved yet.</p>
             <p className="text-sm mt-2">
-              Tap 📥 on any story to save it for offline reading.
+              Tap on any story to save it for offline reading.
             </p>
           </div>
         )}
@@ -103,7 +102,6 @@ export default async function OfflineReadsPage() {
                   ) : (
                     // Fallback placeholder when no cover is set
                     <div className="flex items-center justify-center h-full text-gray-600 text-5xl">
-                      📖
                     </div>
                   )}
 

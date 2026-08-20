@@ -220,7 +220,7 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
                 disabled={uploading}
                 className="w-full py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-sm rounded-lg transition font-medium"
               >
-                {uploading ? 'Uploading...' : '📷 Upload from device'}
+                {uploading ? 'Uploading...' : 'Upload from device'}
               </button>
 
               <p className="text-xs text-gray-600">JPG, PNG, WebP or GIF · Max 5 MB</p>

@@ -65,7 +65,6 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-2 px-4 py-2 bg-purple-900/40 hover:bg-purple-900/60 border border-purple-700/40 rounded-xl text-sm font-medium text-purple-300 transition"
       >
-        <span>✨</span>
         AI Writing Assistant
         <span className="text-purple-500 text-xs">{open ? '▲' : '▼'}</span>
       </button>
@@ -74,7 +73,7 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
         <div className="mt-3 bg-gray-900 border border-purple-800/30 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-white flex items-center gap-2">
-              <span>🤖</span> AI Writing Assistant
+               AI Writing Assistant
             </p>
             <span className="text-[10px] text-purple-400 bg-purple-900/30 px-2 py-0.5 rounded-full">Powered by Claude</span>
           </div>
@@ -83,8 +82,8 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
           <div className="flex gap-2">
             {([
               ['continue', '➤ Continue'],
-              ['prompt',   '💡 Starter'],
-              ['title',    '🎭 Suggest Title'],
+              ['prompt',   'Starter'],
+              ['title',    'Suggest Title'],
             ] as const).map(([val, label]) => (
               <button key={val} type="button" onClick={() => { setMode(val); setSuggestion(''); setError(''); }}
                 className={`px-3 py-1.5 text-xs rounded-lg border transition ${

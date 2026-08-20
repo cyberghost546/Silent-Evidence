@@ -64,7 +64,6 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
   if (history.length === 0) {
     return (
       <div className="text-center py-24">
-        <div className="text-5xl mb-4">📖</div>
         <h2 className="text-xl font-semibold text-white mb-2">No history yet</h2>
         <p className="text-gray-500 mb-6">Stories you read will appear here after 10 seconds of reading.</p>
         <Link href="/" className="inline-block bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">

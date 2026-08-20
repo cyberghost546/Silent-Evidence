@@ -342,7 +342,7 @@ export default async function ProfilePage({ params }: Props) {
                   {streak && streak.longestStreak > 0 && (
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-500">Best streak</span>
-                      <span className="text-amber-400 font-semibold">🔥 {streak.longestStreak} days</span>
+                      <span className="text-amber-400 font-semibold">{streak.longestStreak} days</span>
                     </div>
                   )}
 

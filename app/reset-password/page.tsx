@@ -72,7 +72,6 @@ function ResetPasswordForm() {
   if (done) {
     return (
       <div className="text-center py-6">
-        <div className="text-5xl mb-4">✅</div>
         <p className="text-white font-semibold">Password updated!</p>
         <p className="text-gray-400 text-sm mt-2">You can now sign in with your new password.</p>
         <Link

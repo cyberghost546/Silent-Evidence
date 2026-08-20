@@ -6,6 +6,7 @@
 // this file as one cohesive unit without extra files.
 
 import { cookies } from 'next/headers';
+import { Zap, Unlock, Ban, Crown, Palette } from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import PremiumBadge from '@/app/components/ui/PremiumBadge';
@@ -38,11 +39,11 @@ const PLANS = [
 
 // Perks shared by both plans — rendered as a checklist inside each card
 const PERKS = [
-  { icon: '⚡', text: 'Horror Elite badge on your profile' },
-  { icon: '🔓', text: 'Access all premium-only stories' },
-  { icon: '💀', text: 'No ads (coming soon)' },
-  { icon: '👑', text: 'Priority placement in leaderboards' },
-  { icon: '🩸', text: 'Exclusive blood theme customization' },
+  { icon: Zap,      text: 'Horror Elite badge on your profile' },
+  { icon: Unlock,   text: 'Access all premium-only stories' },
+  { icon: Ban,      text: 'No ads (coming soon)' },
+  { icon: Crown,    text: 'Priority placement in leaderboards' },
+  { icon: Palette,  text: 'Exclusive blood theme customization' },
 ];
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -77,7 +78,6 @@ export default async function PremiumPage() {
           <div className="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-yellow-600/10 blur-3xl" />
           {/* Large skull watermark — purely decorative */}
           <span className="absolute top-6 left-1/2 -translate-x-1/2 text-[120px] opacity-5 leading-none">
-            💀
           </span>
         </div>
 
@@ -109,7 +109,6 @@ export default async function PremiumPage() {
           ">
             <div className="flex items-center gap-3">
               {/* Gold lightning bolt to mirror the badge */}
-              <span className="text-2xl">⚡</span>
               <div>
                 <p className="font-bold text-yellow-300">You&apos;re a Horror Elite member!</p>
                 <p className="text-xs text-gray-400">All premium perks are unlocked for your account.</p>
@@ -177,7 +176,7 @@ export default async function PremiumPage() {
                         shrink-0 w-6 h-6 flex items-center justify-center
                         bg-gray-800 rounded-full text-base leading-none
                       ">
-                        {perk.icon}
+                        <perk.icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
                       </span>
                       {perk.text}
                     </li>
@@ -205,7 +204,6 @@ export default async function PremiumPage() {
 
         {/* Bottom skull decoration */}
         <div className="text-center mt-10 text-4xl opacity-10 select-none" aria-hidden="true">
-          💀 💀 💀
         </div>
       </section>
 

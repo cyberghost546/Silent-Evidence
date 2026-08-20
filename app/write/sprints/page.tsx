@@ -46,7 +46,6 @@ export default async function SprintsPage() {
       {/* Sprint list */}
       {sprints.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-4xl mb-4">⏳</p>
           <p className="text-lg font-semibold text-gray-400 mb-1">No active sprints right now</p>
           <p className="text-sm">Check back soon — sprints are scheduled regularly.</p>
         </div>

@@ -146,7 +146,7 @@ export default function UserSupportClient() {
               target="_blank"
               className="text-xs text-gray-500 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg transition flex-shrink-0"
             >
-              View profile ↗
+              View profile
             </Link>
           </div>
 

@@ -19,6 +19,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Skull } from 'lucide-react';
 
 // Props: which story to rate, and whether the visitor is logged in.
 type Props = { storyId: number; isLoggedIn: boolean };
@@ -106,7 +107,11 @@ export default function ScareOMeter({ storyId, isLoggedIn }: Props) {
             >
               {/* Skulls at or below the display number are fully opaque;
                   skulls above it are faded to 20% opacity */}
-              <span className={n <= display ? 'opacity-100' : 'opacity-20'}>💀</span>
+              <Skull
+                className={`w-5 h-5 ${n <= display ? 'opacity-100 text-red-500' : 'opacity-20 text-gray-400'}`}
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
             </button>
           ))}
         </div>

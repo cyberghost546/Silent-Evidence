@@ -166,7 +166,7 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
           <textarea
             value={message}
             onChange={e => setMessage(e.target.value)}
-            placeholder="e.g. ⚠️ Site maintenance scheduled for Sunday 2am–4am UTC."
+            placeholder="e.g. Site maintenance scheduled for Sunday 2am–4am UTC."
             rows={3}
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:outline-none focus:ring-2 focus:ring-red-500"
           />

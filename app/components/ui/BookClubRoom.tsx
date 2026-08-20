@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { BookOpen, Lock, Globe } from 'lucide-react';
 
 type Member = { id: number; joinedAt: string; user: { id: number; username: string; profile: { avatar: string | null } | null } };
 
@@ -77,7 +78,9 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">{club.isPrivate ? '🔒' : '🌐'}</span>
+            {club.isPrivate
+              ? <Lock className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+              : <Globe className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />}
             <h1 className="text-3xl font-extrabold text-white">{club.name}</h1>
           </div>
           <p className="text-sm text-gray-500">
@@ -116,7 +119,7 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
           {/* Current story */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h2 className="text-white font-bold mb-4 flex items-center gap-2">
-              <span>📖</span> Currently Reading
+               Currently Reading
             </h2>
             {club.story ? (
               <Link href={`/story/${club.story.slug}`}
@@ -125,7 +128,9 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
                   <Image src={club.story.coverImage} alt={club.story.title}
                     width={80} height={112} className="object-cover rounded-xl shrink-0" />
                 ) : (
-                  <div className="w-20 h-28 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center text-3xl">📕</div>
+                  <div className="w-20 h-28 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center">
+                    <BookOpen className="w-7 h-7 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                  </div>
                 )}
                 <div>
                   <p className="text-white font-semibold group-hover:text-red-300 transition leading-snug">
@@ -136,14 +141,13 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
                     <p className="text-sm text-gray-400 mt-2 line-clamp-3">{club.story.excerpt}</p>
                   )}
                   <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                    <span>♥ {club.story._count.likes}</span>
-                    <span>💬 {club.story._count.comments}</span>
+                    <span>{club.story._count.likes}</span>
+                    <span>{club.story._count.comments}</span>
                   </div>
                 </div>
               </Link>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p className="text-4xl mb-3">📚</p>
                 <p className="text-sm">No story picked yet.</p>
                 {isOwner && (
                   <p className="text-xs mt-1 text-gray-600">
@@ -162,7 +166,7 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
               </p>
               <Link href={`/story/${club.story.slug}#comments`}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition">
-                <span>💬</span> Go to Discussion
+                 Go to Discussion
               </Link>
             </div>
           )}

@@ -97,7 +97,7 @@ export default async function YouMightAlsoFear({ currentStoryId, mood, categoryI
 
               {/* Author + like count */}
               <p className="text-[10px] text-gray-500 mt-1.5 truncate">
-                {s.author.username} · ♥ {s._count.likes}
+                {s.author.username} · {s._count.likes}
               </p>
             </div>
           </Link>

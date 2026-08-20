@@ -85,7 +85,6 @@ export default function ReadingGoalWidget() {
   if (!goal && !editing) {
     return (
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
-        <p className="text-2xl mb-2">📚</p>
         <p className="text-sm font-semibold text-white mb-1">Set a Reading Goal</p>
         <p className="text-xs text-gray-500 mb-3">Challenge yourself to read more stories.</p>
         <button
@@ -145,7 +144,6 @@ export default function ReadingGoalWidget() {
           </button>
           {goal && (
             <button onClick={remove} className="px-3 py-2 bg-red-950/40 hover:bg-red-950/60 text-red-400 text-xs rounded-lg transition" title="Remove goal">
-              🗑
             </button>
           )}
         </div>
@@ -175,7 +173,7 @@ export default function ReadingGoalWidget() {
         {/* Stats */}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white">
-            {done ? '🎉 Goal Complete!' : 'Reading Goal'}
+            {done ? 'Goal Complete!' : 'Reading Goal'}
           </p>
           <p className="text-xs text-gray-400 mt-0.5">
             <span className="text-white font-semibold">{goal.progress}</span>
@@ -193,7 +191,6 @@ export default function ReadingGoalWidget() {
 
         {/* Edit button */}
         <button onClick={() => setEditing(true)} className="text-xs text-gray-600 hover:text-gray-400 transition flex-shrink-0" title="Edit goal">
-          ✏️
         </button>
       </div>
     </div>

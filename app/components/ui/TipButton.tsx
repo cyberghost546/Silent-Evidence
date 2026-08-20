@@ -84,7 +84,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
           shadow-[0_0_10px_rgba(16,185,129,0.3)]
         "
       >
-        <span>💸</span> Send a Tip
+         Send a Tip
       </button>
 
       {/* ── Modal backdrop + panel ───────────────────────────────────────── */}
@@ -114,7 +114,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
               <span className="text-red-400">@{toUsername}</span>&apos;s writing
             </h2>
             <p className="text-xs text-gray-500 mb-5">
-              Tips go directly to the author. 💀
+              Tips go directly to the author.
             </p>
 
             {/* ── Not logged in guard ─────────────────────────────────── */}
@@ -196,7 +196,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
                       Redirecting…
                     </>
                   ) : (
-                    <>Send Tip 💀</>
+                    <>Send Tip</>
                   )}
                 </button>
               </>

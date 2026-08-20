@@ -198,7 +198,6 @@ export default function ChapterManager({ storyId }: Props) {
     <div className="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📚</span>
           <h2 className="text-base font-bold text-white">Chapters</h2>
           {chapters.length > 0 && (
             <span className="text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">{chapters.length}</span>
@@ -228,7 +227,7 @@ export default function ChapterManager({ storyId }: Props) {
 
               {/* Per-chapter view count — shows how many times this chapter has been read */}
               <span className="text-xs text-gray-600 flex items-center gap-1 flex-shrink-0">
-                👁 {c.views.toLocaleString()}
+ {c.views.toLocaleString()}
               </span>
 
               {/* Up/Down reorder buttons */}

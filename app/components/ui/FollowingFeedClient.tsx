@@ -72,7 +72,6 @@ export default function FollowingFeedClient({ isLoggedIn }: { isLoggedIn: boolea
 
       {!isLoggedIn && (
         <div className="text-center py-20">
-          <p className="text-3xl mb-4">👁️</p>
           <p className="text-white font-semibold mb-2">You need to be logged in</p>
           <Link href="/login" className="text-sm text-red-400 hover:text-red-300 transition">Sign in →</Link>
         </div>
@@ -91,7 +90,6 @@ export default function FollowingFeedClient({ isLoggedIn }: { isLoggedIn: boolea
 
       {isLoggedIn && !loading && isEmpty && (
         <div className="text-center py-20">
-          <p className="text-3xl mb-4">🕸️</p>
           <p className="text-white font-semibold mb-2">Nothing here yet</p>
           <p className="text-gray-500 text-sm mb-6">Follow some authors to see their stories here.</p>
           <Link href="/search" className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-sm transition">
@@ -102,7 +100,6 @@ export default function FollowingFeedClient({ isLoggedIn }: { isLoggedIn: boolea
 
       {isLoggedIn && !loading && stories.length === 0 && !isEmpty && (
         <div className="text-center py-20">
-          <p className="text-3xl mb-4">📖</p>
           <p className="text-gray-500 text-sm">The authors you follow haven&apos;t published anything yet.</p>
         </div>
       )}

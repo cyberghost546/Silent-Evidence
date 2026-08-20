@@ -5,6 +5,7 @@
 // on Android opens this page directly.
 
 import { prisma } from '@/lib/prisma';
+import { moodIcon } from '@/lib/moodIcons';
 import Link from 'next/link';
 import Image from 'next/image';
 import Header from '@/app/components/ui/Header';
@@ -16,11 +17,7 @@ export const metadata: Metadata = { title: "Today's Story | Silent Evidence" };
 // Revalidate once per hour — same story shown all day
 export const revalidate = 3600;
 
-const MOOD_EMOJI: Record<string, string> = {
-  CREEPY: '🕷️', PARANOID: '👁️', DISTURBING: '😱',
-  ATMOSPHERIC: '🌫️', PSYCHOLOGICAL: '🧠', SUPERNATURAL: '👻',
-  GORE: '🩸', JUMPSCARE: '⚡',
-};
+// Mood icons come from the shared lib/moodIcons map.
 
 export default async function StoryOfDayPage() {
   // Deterministic daily pick using day-of-year offset
@@ -50,7 +47,7 @@ export default async function StoryOfDayPage() {
       <div className="max-w-2xl mx-auto px-4 py-10">
         {/* Page header */}
         <div className="text-center mb-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-1">📅 Daily Pick</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-1">Daily Pick</p>
           <h1 className="text-3xl font-bold text-white">Story of the Day</h1>
           <p className="text-sm text-gray-500 mt-1">
             {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -70,9 +67,10 @@ export default async function StoryOfDayPage() {
             <div className="p-6">
               {/* Mood + category */}
               <div className="flex items-center gap-2 mb-3">
-                {story.mood && (
-                  <span className="text-lg">{MOOD_EMOJI[story.mood] ?? '👻'}</span>
-                )}
+                {story.mood && (() => {
+                  const MoodIcon = moodIcon(story.mood);
+                  return <MoodIcon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+                })()}
                 <span className="text-xs text-gray-500">{story.category.name}</span>
               </div>
 
@@ -103,9 +101,9 @@ export default async function StoryOfDayPage() {
 
               {/* Stats row */}
               <div className="flex items-center gap-4 text-xs text-gray-500 mb-6">
-                <span>❤️ {story._count.likes} likes</span>
-                <span>💬 {story._count.comments} comments</span>
-                <span>👁️ {story.views} views</span>
+                <span>{story._count.likes} likes</span>
+                <span>{story._count.comments} comments</span>
+                <span>{story.views} views</span>
               </div>
 
               {/* CTA */}
@@ -119,7 +117,6 @@ export default async function StoryOfDayPage() {
           </div>
         ) : (
           <div className="text-center py-20 text-gray-500">
-            <p className="text-4xl mb-3">👻</p>
             <p>No stories yet. Check back soon!</p>
           </div>
         )}

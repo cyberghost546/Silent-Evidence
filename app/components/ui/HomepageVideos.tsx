@@ -37,7 +37,7 @@ export default async function HomepageVideos() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <span className="w-1 h-6 bg-red-600 rounded-full" />
-          <h2 className="text-2xl font-bold text-white">🎬 Videos</h2>
+          <h2 className="text-2xl font-bold text-white">Videos</h2>
         </div>
         <Link
           href="/videos"

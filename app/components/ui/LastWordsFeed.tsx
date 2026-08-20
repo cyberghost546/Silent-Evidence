@@ -354,7 +354,6 @@ export default function LastWordsFeed({ userId }: Props) {
                        px-4 py-2 rounded-md transition-colors duration-200"
           >
             {/* Purely decorative sparkle — aria-hidden so screen readers skip it */}
-            <span aria-hidden>✨</span>
             {/* Label switches to "Posting..." while the network request is in-flight */}
             {submitting ? 'Posting...' : 'Post Quote'}
           </button>
@@ -398,7 +397,6 @@ export default function LastWordsFeed({ userId }: Props) {
           Encourages the first user to break the ice. */}
       {!loading && words.length === 0 && (
         <div className="text-center py-16 text-gray-600">
-          <p className="text-4xl mb-3">📝</p>
           <p className="italic text-sm">No quotes yet. Be the first to post.</p>
         </div>
       )}

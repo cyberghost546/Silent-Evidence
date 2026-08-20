@@ -4,6 +4,7 @@
 // The service worker serves this page from cache when the user is offline.
 
 import { useEffect, useState } from 'react';
+import { Wifi, WifiOff } from 'lucide-react';
 
 export default function OfflinePage() {
   // Track whether the user has come back online so we can auto-redirect
@@ -30,7 +31,9 @@ export default function OfflinePage() {
 
       {/* Animated skull icon */}
       <div className={`text-8xl mb-6 ${isOnline ? 'animate-bounce' : 'animate-pulse'}`}>
-        {isOnline ? '👻' : '💀'}
+        {isOnline
+          ? <Wifi className="w-12 h-12 text-gray-400" strokeWidth={1.25} aria-hidden="true" />
+          : <WifiOff className="w-12 h-12 text-gray-500" strokeWidth={1.25} aria-hidden="true" />}
       </div>
 
       {isOnline ? (

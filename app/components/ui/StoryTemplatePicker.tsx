@@ -57,9 +57,9 @@ export default function StoryTemplatePicker({ onSelect, onClose }: Props) {
                   : 'border-gray-800 bg-gray-900 hover:border-gray-700'
               }`}
             >
-              {/* Emoji + label */}
+              {/* Icon + label */}
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xl">{template.emoji}</span>
+                <template.icon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
                 <span className="text-sm font-semibold text-white">{template.label}</span>
               </div>
 

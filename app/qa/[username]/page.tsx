@@ -45,14 +45,12 @@ export default async function LiveQAPage({ params }: Props) {
     <main className="min-h-screen bg-gray-950 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🎙️</div>
           <h1 className="text-3xl font-bold text-white mb-2">Live Q&amp;A with {author.username}</h1>
           {author.profile?.bio && <p className="text-gray-400 text-sm">{author.profile.bio}</p>}
         </div>
 
         {!session ? (
           <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl">
-            <div className="text-4xl mb-3">📭</div>
             <p className="text-gray-400">No active Q&amp;A session right now.</p>
             <p className="text-gray-600 text-sm mt-2">Follow {author.username} to get notified when they go live.</p>
           </div>

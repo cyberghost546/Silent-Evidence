@@ -7,6 +7,7 @@
 // can appear on the leaderboard.
 
 import { useState } from 'react';
+import { Trophy, Star, Skull, Check, X } from 'lucide-react';
 
 // The full set of quiz questions.
 // Each entry has:
@@ -100,7 +101,6 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
   if (phase === 'intro') return (
     <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
       {/* Horror-themed emoji intro */}
-      <div className="text-6xl mb-4">💀</div>
       <h2 className="text-xl font-bold text-white mb-2">Are You a True Horror Fan?</h2>
       <p className="text-gray-400 mb-6">10 questions covering horror films, books, and lore. No time limit.</p>
       {/* Start button */}
@@ -115,12 +115,18 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
   if (phase === 'result') return (
     <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
       {/* Trophy/emoji based on performance tier */}
-      <div className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '💀'}</div>
+      <div className="flex justify-center mb-4">
+        {pct >= 80
+          ? <Trophy className="w-14 h-14 text-yellow-400" strokeWidth={1.25} aria-hidden="true" />
+          : pct >= 50
+            ? <Star className="w-14 h-14 text-gray-300" strokeWidth={1.25} aria-hidden="true" />
+            : <Skull className="w-14 h-14 text-gray-500" strokeWidth={1.25} aria-hidden="true" />}
+      </div>
       <h2 className="text-2xl font-bold text-white mb-1">{score} / {QUESTIONS.length}</h2>
       <p className="text-gray-400 mb-2">{pct}% correct</p>
       {/* Motivational message based on score percentage */}
       <p className="text-lg text-white mb-6">
-        {pct >= 90 ? 'Horror Master! 🏅' : pct >= 70 ? 'True Fright Fan! ⭐' : pct >= 50 ? 'Getting there... 🕯️' : 'Keep reading! 📖'}
+        {pct >= 90 ? 'Horror Master!' : pct >= 70 ? 'True Fright Fan!' : pct >= 50 ? 'Getting there...' : 'Keep reading!'}
       </p>
       {/* Confirmation that score was saved */}
       {saved && <p className="text-xs text-green-400 mb-4">✓ Score saved to leaderboard</p>}
@@ -130,7 +136,11 @@ export default function HorrorQuiz({ isLoggedIn }: { isLoggedIn: boolean }) {
       <div className="flex flex-col gap-3 mb-6">
         {QUESTIONS.map((q, i) => (
           <div key={i} className={`flex items-start gap-3 text-left p-3 rounded-xl text-sm ${answers[i] === q.answer ? 'bg-green-500/10 border border-green-500/20' : 'bg-green-500/10 border border-green-500/20'}`}>
-            <span className="flex-shrink-0 mt-0.5">{answers[i] === q.answer ? '✅' : '❌'}</span>
+            <span className="shrink-0 mt-0.5">
+              {answers[i] === q.answer
+                ? <Check className="w-4 h-4 text-green-400" strokeWidth={2.5} aria-hidden="true" />
+                : <X className="w-4 h-4 text-red-400" strokeWidth={2.5} aria-hidden="true" />}
+            </span>
             <div>
               <p className="text-gray-300 text-xs mb-1">{q.q}</p>
               {/* Always show the correct answer */}

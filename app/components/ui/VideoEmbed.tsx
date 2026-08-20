@@ -83,7 +83,7 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
           rel="noopener noreferrer"         // security: prevent the new tab accessing window.opener
           className="mt-2 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-400 transition"
         >
-          ▶ Watch on YouTube
+ Watch on YouTube
         </a>
       </div>
     );
@@ -116,7 +116,7 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition underline"
       >
-        ▶ Watch video
+ Watch video
       </a>
     </div>
   );

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
+import { CONFESSION_REACTION_IDS } from '@/lib/reactions';
 
 interface SessionData { userId?: number }
 const SESSION_OPTIONS = {
@@ -15,7 +16,9 @@ const SESSION_OPTIONS = {
   cookieName: 'se_session',
 };
 
-const ALLOWED_EMOJIS = ['😱', '💀', '👻', '🕯️'];
+// Allowlist comes from the shared reaction definitions so the server and the
+// ConfessionBooth UI can never offer different sets.
+const ALLOWED_EMOJIS = CONFESSION_REACTION_IDS;
 
 export async function POST(req: NextRequest) {
   try {

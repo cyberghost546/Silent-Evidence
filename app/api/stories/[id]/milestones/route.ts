@@ -32,28 +32,30 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ milestones: [] });
   }
 
-  const milestones: { icon: string; label: string }[] = [];
+  // `kind` is a semantic key the client maps to an icon; the API stays free of
+  // any presentation concern.
+  const milestones: { kind: 'views' | 'likes' | 'comments'; label: string }[] = [];
 
   // View milestones
   for (const threshold of VIEW_MILESTONES) {
     if (story.views >= threshold) {
       milestones.push({
-        icon: '👁',
+        kind: 'views',
         label: `${threshold.toLocaleString()} views`,
       });
     }
   }
 
   // First like
-  if (story._count.likes >= 1) milestones.push({ icon: '❤️', label: 'First like!' });
-  if (story._count.likes >= 10) milestones.push({ icon: '❤️', label: '10 likes' });
-  if (story._count.likes >= 50) milestones.push({ icon: '❤️', label: '50 likes' });
-  if (story._count.likes >= 100) milestones.push({ icon: '❤️', label: '100 likes' });
+  if (story._count.likes >= 1) milestones.push({ kind: 'likes', label: 'First like!' });
+  if (story._count.likes >= 10) milestones.push({ kind: 'likes', label: '10 likes' });
+  if (story._count.likes >= 50) milestones.push({ kind: 'likes', label: '50 likes' });
+  if (story._count.likes >= 100) milestones.push({ kind: 'likes', label: '100 likes' });
 
   // First comment
-  if (story._count.comments >= 1) milestones.push({ icon: '💬', label: 'First comment!' });
-  if (story._count.comments >= 10) milestones.push({ icon: '💬', label: '10 comments' });
-  if (story._count.comments >= 50) milestones.push({ icon: '💬', label: '50 comments' });
+  if (story._count.comments >= 1) milestones.push({ kind: 'comments', label: 'First comment!' });
+  if (story._count.comments >= 10) milestones.push({ kind: 'comments', label: '10 comments' });
+  if (story._count.comments >= 50) milestones.push({ kind: 'comments', label: '50 comments' });
 
   return NextResponse.json({ milestones });
 }

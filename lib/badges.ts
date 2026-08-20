@@ -10,17 +10,26 @@ export type BadgeType =
   | 'CHALLENGE_ENTERED'
   | 'BINGO_COMPLETE';
 
-export const BADGE_META: Record<BadgeType, { label: string; emoji: string; description: string }> = {
-  FIRST_STORY:      { emoji: '✍️',  label: 'First Story',       description: 'Published your first story' },
-  TEN_LIKES:        { emoji: '❤️',  label: '10 Likes',          description: 'Received 10 total likes' },
-  FIFTY_LIKES:      { emoji: '🔥',  label: '50 Likes',          description: 'Received 50 total likes' },
-  HUNDRED_LIKES:    { emoji: '💯',  label: '100 Likes',         description: 'Received 100 total likes' },
-  HUNDRED_VIEWS:    { emoji: '👁',  label: '100 Views',         description: 'Reached 100 total views' },
-  THOUSAND_VIEWS:   { emoji: '🌟',  label: '1K Views',          description: 'Reached 1,000 total views' },
-  TEN_STORIES:      { emoji: '📚',  label: '10 Stories',        description: 'Published 10 stories' },
-  FIRST_COMMENT:    { emoji: '💬',  label: 'Conversationalist', description: 'Left your first comment' },
-  CHALLENGE_ENTERED:{ emoji: '⚔️',  label: 'Challenger',        description: 'Entered your first writing challenge' },
-  BINGO_COMPLETE:   { emoji: '🎯',  label: 'Bingo!',            description: 'Completed a bingo line on a horror bingo card' },
+import {
+  PenLine, Heart, Flame, Award, Eye, Star, Library, MessageSquare, Swords, Target,
+  type LucideIcon,
+} from 'lucide-react';
+
+// BADGE_META — display metadata for each badge type.
+// `icon` is a lucide-react component, rendered by the consumer at whatever size
+// it needs. Only the badge TYPE is persisted to the database; this map is the
+// single place that decides how a type is presented.
+export const BADGE_META: Record<BadgeType, { label: string; icon: LucideIcon; description: string }> = {
+  FIRST_STORY:      { icon: PenLine,        label: 'First Story',       description: 'Published your first story' },
+  TEN_LIKES:        { icon: Heart,          label: '10 Likes',          description: 'Received 10 total likes' },
+  FIFTY_LIKES:      { icon: Flame,          label: '50 Likes',          description: 'Received 50 total likes' },
+  HUNDRED_LIKES:    { icon: Award,          label: '100 Likes',         description: 'Received 100 total likes' },
+  HUNDRED_VIEWS:    { icon: Eye,            label: '100 Views',         description: 'Reached 100 total views' },
+  THOUSAND_VIEWS:   { icon: Star,           label: '1K Views',          description: 'Reached 1,000 total views' },
+  TEN_STORIES:      { icon: Library,        label: '10 Stories',        description: 'Published 10 stories' },
+  FIRST_COMMENT:    { icon: MessageSquare,  label: 'Conversationalist', description: 'Left your first comment' },
+  CHALLENGE_ENTERED:{ icon: Swords,         label: 'Challenger',        description: 'Entered your first writing challenge' },
+  BINGO_COMPLETE:   { icon: Target,         label: 'Bingo!',            description: 'Completed a bingo line on a horror bingo card' },
 };
 
 import { prisma } from './prisma';

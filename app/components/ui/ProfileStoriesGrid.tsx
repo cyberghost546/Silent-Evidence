@@ -88,7 +88,6 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                 />
               ) : (
                 <div className="w-32 h-24 bg-gray-700/50 rounded-xl flex-shrink-0 flex items-center justify-center border border-gray-700">
-                  <span className="text-2xl opacity-20">📖</span>
                 </div>
               )}
 
@@ -111,9 +110,9 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                   <span className="text-gray-700">·</span>
                   <span>{story.readTime}</span>
                   <span className="text-gray-700">·</span>
-                  <span>👁 {story.views.toLocaleString()}</span>
-                  <span className="text-red-500/70">♥ {story._count.likes}</span>
-                  <span>💬 {story._count.comments}</span>
+                  <span>{story.views.toLocaleString()}</span>
+                  <span className="text-red-500/70">{story._count.likes}</span>
+                  <span>{story._count.comments}</span>
                   {/* Pin button visible only to the profile owner */}
                   {isOwner && (
                     <PinStoryButton storyId={story.id} isPinned={pinnedStoryId === story.id} />
@@ -144,7 +143,6 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-700/60 to-gray-900 flex items-center justify-center">
-                    <span className="text-3xl opacity-20">📖</span>
                   </div>
                 )}
               </div>
@@ -159,9 +157,9 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
 
                 {/* Compact stats */}
                 <div className="flex items-center gap-2.5 text-[11px] text-gray-600 mt-2">
-                  <span>👁 {story.views.toLocaleString()}</span>
-                  <span className="text-red-500/70">♥ {story._count.likes}</span>
-                  <span>💬 {story._count.comments}</span>
+                  <span>{story.views.toLocaleString()}</span>
+                  <span className="text-red-500/70">{story._count.likes}</span>
+                  <span>{story._count.comments}</span>
                   {/* Pin button in grid mode — stop propagation is handled inside PinStoryButton */}
                   {isOwner && (
                     <span className="ml-auto">

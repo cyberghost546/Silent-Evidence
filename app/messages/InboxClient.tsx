@@ -314,7 +314,6 @@ export default function InboxClient({
             <>
               {conversations.length === 0 ? (
                 <div className="text-center py-16 px-6">
-                  <p className="text-4xl mb-3">💬</p>
                   <p className="text-sm text-gray-500">No conversations yet.</p>
                   <p className="text-xs text-gray-600 mt-1">Search for someone above to start chatting.</p>
                 </div>
@@ -432,7 +431,7 @@ export default function InboxClient({
                     className="w-16 h-16 rounded-full object-cover border-2 border-gray-700 mb-4"
                   />
                   <p className="text-sm text-gray-400 font-medium">{activePartner.username}</p>
-                  <p className="text-xs text-gray-600 mt-1">No messages yet. Say hello! 👋</p>
+                  <p className="text-xs text-gray-600 mt-1">No messages yet. Say hello!</p>
                 </div>
               ) : (
                 messages.map(msg => {

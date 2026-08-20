@@ -43,7 +43,6 @@ export default async function DeathCounter() {
           "
           aria-hidden="true"
         >
-          📖
         </span>
 
         {/* Text content */}

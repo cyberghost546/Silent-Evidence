@@ -30,6 +30,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { EVENT_ICON_OPTIONS, DEFAULT_EVENT_ICON_ID } from '@/lib/calendarIcons';
 
 // TypeScript types for the two data shapes returned by the APIs.
 // Keeping types local (not in a shared types file) is fine for page-specific shapes.
@@ -46,7 +47,7 @@ type CalendarEvent = {
   id: number;
   date: string;              // ISO date string (YYYY-MM-DD)
   title: string;
-  icon: string;              // Emoji character chosen from ICON_OPTIONS
+  icon: string;              // Stored icon id chosen from EVENT_ICON_OPTIONS
   note: string | null;       // Optional hover description
   linkUrl: string | null;    // Optional internal link (e.g. /story/slug)
 };
@@ -60,8 +61,8 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-// Curated horror-themed emoji palette for calendar event icons.
-const ICON_OPTIONS = ['📅','🎃','💀','🕯️','👻','🔪','🩸','🦇','🕷️','🌕','⚰️','🎭','📖','🌑','🔮'];
+// Icon choices live in lib/calendarIcons so the admin picker and the public
+// Horror Calendar widget always agree on what each stored id looks like.
 
 // ── Pure helper: buildCalendar ────────────────────────────────────────────────
 // Returns an array of 35 or 42 cells (always a multiple of 7, for full weeks).
@@ -116,7 +117,7 @@ export default function AdminCalendarPage() {
 
   // Controlled form fields inside the modal.
   const [formTitle, setFormTitle] = useState('');
-  const [formIcon, setFormIcon]   = useState('📅');
+  const [formIcon, setFormIcon]   = useState(DEFAULT_EVENT_ICON_ID);
   const [formNote, setFormNote]   = useState('');
   const [formLink, setFormLink]   = useState('');
   const [saving, setSaving]       = useState(false);
@@ -179,7 +180,7 @@ export default function AdminCalendarPage() {
     const existing = eventsByDay.get(dateKey)?.[0] ?? null;
     setSelected({ date: dateKey, existing });
     setFormTitle(existing?.title ?? '');
-    setFormIcon(existing?.icon ?? '📅');
+    setFormIcon(existing?.icon ?? DEFAULT_EVENT_ICON_ID);
     setFormNote(existing?.note ?? '');
     setFormLink(existing?.linkUrl ?? '');
     setMsg('');
@@ -412,15 +413,17 @@ export default function AdminCalendarPage() {
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Icon</label>
                 <div className="flex flex-wrap gap-2">
-                  {ICON_OPTIONS.map(ic => (
+                  {EVENT_ICON_OPTIONS.map(({ id, icon: Icon, label }) => (
                     // Highlight the selected icon with a purple border/background
-                    <button key={ic} type="button" onClick={() => setFormIcon(ic)}
-                      className={`w-9 h-9 text-xl rounded-lg border transition ${
-                        formIcon === ic
-                          ? 'border-purple-500 bg-purple-900/40'
-                          : 'border-gray-700 hover:border-gray-500'
+                    <button key={id} type="button" onClick={() => setFormIcon(id)}
+                      title={label}
+                      className={`w-9 h-9 rounded-lg border transition flex items-center justify-center ${
+                        formIcon === id
+                          ? 'border-purple-500 bg-purple-900/40 text-purple-300'
+                          : 'border-gray-700 hover:border-gray-500 text-gray-400'
                       }`}>
-                      {ic}
+                      <Icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+                      <span className="sr-only">{label}</span>
                     </button>
                   ))}
                 </div>

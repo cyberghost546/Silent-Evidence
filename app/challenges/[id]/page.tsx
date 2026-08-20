@@ -162,7 +162,7 @@ export default async function ChallengePage({ params }: Props) {
           {/* The writing prompt — highlighted in a dark card for emphasis */}
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-5 mb-5">
             <p className="text-xs text-red-400 font-bold uppercase tracking-widest mb-2">
-              ✍️ The Prompt
+ The Prompt
             </p>
             {/* The prompt is quoted and italicised to visually separate it */}
             <p className="text-lg text-white italic leading-relaxed">
@@ -174,7 +174,7 @@ export default async function ChallengePage({ params }: Props) {
           <div className="flex items-center gap-4 text-sm text-gray-500">
             {/* toLocaleDateString formats dates as "April 1 – April 30, 2026" */}
             <span>
-              📅{' '}
+{' '}
               {new Date(challenge.startDate).toLocaleDateString('en-US', {
                 month: 'long',
                 day: 'numeric',
@@ -233,7 +233,7 @@ export default async function ChallengePage({ params }: Props) {
                           : 'text-gray-700'   // 4th+: dark grey
                       }`}
                     >
-                      {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                      {`#${i + 1}`}
                     </span>
                   </div>
 
@@ -271,11 +271,11 @@ export default async function ChallengePage({ params }: Props) {
                       {/* readingTime() estimates minutes to read based on word count */}
                       <span>{readingTime(entry.story.content)}</span>
                       <span>·</span>
-                      <span>♥ {entry.story._count.likes}</span>
+                      <span>{entry.story._count.likes}</span>
                       <span>·</span>
                       {/* Vote count in gold — this is the challenge ranking metric */}
                       <span className="text-yellow-400 font-semibold">
-                        ⭐ {entry.votes} votes
+ {entry.votes} votes
                       </span>
                     </div>
                   </div>

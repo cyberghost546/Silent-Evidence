@@ -1,7 +1,7 @@
 'use client';
 // app/components/ui/ReactionBar.tsx
 // Emoji reaction row that appears below a story.
-// Readers can react with one of four emoji types: LOVE, HYPE, KAWAII, or FIRE.
+// Readers can react with one of four reaction types: LOVE, HYPE, KAWAII, or FIRE.
 //
 // Rules:
 //   • Only one reaction is allowed per user per story.
@@ -11,6 +11,7 @@
 //     updated in real time after each toggle call.
 
 import { useState } from 'react'; // useState — tracks current counts, which reaction the user has selected, and the loading state
+import { Heart, Flame, Smile, Zap } from 'lucide-react';
 
 // REACTIONS — the full list of available reaction types with display info
 // Each object has:
@@ -18,10 +19,10 @@ import { useState } from 'react'; // useState — tracks current counts, which r
 //   emoji — the visual emoji shown on the button
 //   label — accessible tooltip text (title attribute)
 const REACTIONS = [
-  { type: 'LOVE',   emoji: '❤️',  label: 'Love'   },
-  { type: 'HYPE',   emoji: '🔥',  label: 'Hype'   },
-  { type: 'KAWAII',  emoji: '🥰',  label: 'Kawaii'  },
-  { type: 'FIRE',   emoji: '⚡',  label: 'Epic'   },
+  { type: 'LOVE',   icon: Heart, label: 'Love'   },
+  { type: 'HYPE',   icon: Flame, label: 'Hype'   },
+  { type: 'KAWAII', icon: Smile, label: 'Kawaii' },
+  { type: 'FIRE',   icon: Zap,   label: 'Epic'   },
 ];
 
 // Counts — a simple mapping from reaction type string to its integer count
@@ -85,7 +86,7 @@ export default function ReactionBar({ storyId, initialCounts, userReactions }: P
       <span className="text-xs text-gray-500 mr-1">React:</span>
 
       {/* Render one button per reaction type */}
-      {REACTIONS.map(({ type, emoji, label }) => {
+      {REACTIONS.map(({ type, icon: Icon, label }) => {
         // active — true when this button's type matches the user's current reaction
         const active = reacted === type;
 
@@ -105,7 +106,7 @@ export default function ReactionBar({ storyId, initialCounts, userReactions }: P
             }`}
           >
             {/* Emoji icon for this reaction type */}
-            <span>{emoji}</span>
+            <Icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
 
             {/* Count badge — only shown when count is greater than zero to avoid "0" clutter */}
             {count > 0 && <span className="text-xs font-medium">{count}</span>}

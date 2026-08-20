@@ -50,7 +50,6 @@ export default function PollsClient({ polls: initial, userId }: { polls: Poll[];
       {/* Poll list */}
       {polls.length === 0 ? (
         <div className="text-center py-20 text-gray-600">
-          <p className="text-4xl mb-3">🗳️</p>
           <p>No open polls yet.{userId ? ' Be the first to create one!' : ''}</p>
         </div>
       ) : (

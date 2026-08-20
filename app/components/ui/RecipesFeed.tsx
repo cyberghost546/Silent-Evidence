@@ -9,6 +9,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Utensils } from 'lucide-react';
+import { RECIPE_TYPES, RECIPE_REACTIONS } from '@/lib/reactions';
 
 interface Recipe {
   id: number;
@@ -24,12 +26,8 @@ interface Recipe {
   reactionCounts: Record<string, number>;
 }
 
-const TYPES = [
-  { key: '', label: 'All', emoji: '🍽️' },
-  { key: 'food', label: 'Food', emoji: '🍖' },
-  { key: 'drink', label: 'Drinks', emoji: '🍷' },
-  { key: 'ritual', label: 'Rituals', emoji: '🕯️' },
-];
+// Filter tabs and reaction set both come from lib/reactions.
+const TYPES = RECIPE_TYPES;
 
 const DIFFICULTY_COLOR: Record<string, string> = {
   easy:   'text-green-400 bg-green-900/30',
@@ -37,7 +35,7 @@ const DIFFICULTY_COLOR: Record<string, string> = {
   hard:   'text-red-400 bg-red-900/30',
 };
 
-const REACTION_EMOJIS = ['🔥', '💀', '😋', '👻'];
+
 
 export default function RecipesFeed() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -80,7 +78,7 @@ export default function RecipesFeed() {
                 : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
             }`}
           >
-            <span>{t.emoji}</span>
+            <t.icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
             <span>{t.label}</span>
           </button>
         ))}
@@ -90,7 +88,6 @@ export default function RecipesFeed() {
 
       {!loading && recipes.length === 0 && (
         <div className="text-center py-20 text-gray-600">
-          <div className="text-4xl mb-3">🍳</div>
           <p>No recipes yet. Be the first to share a cursed creation.</p>
         </div>
       )}
@@ -105,7 +102,10 @@ export default function RecipesFeed() {
               </div>
             ) : (
               <div className="w-full h-32 bg-gray-800 flex items-center justify-center text-5xl text-gray-700">
-                {r.type === 'drink' ? '🍷' : r.type === 'ritual' ? '🕯️' : '🍖'}
+                {(() => {
+                  const TypeIcon = RECIPE_TYPES.find(t => t.key === r.type)?.icon ?? Utensils;
+                  return <TypeIcon className="w-4 h-4 inline-block" strokeWidth={1.75} aria-hidden="true" />;
+                })()}
               </div>
             )}
 
@@ -113,14 +113,17 @@ export default function RecipesFeed() {
               {/* Badges */}
               <div className="flex gap-2 mb-3 flex-wrap">
                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-gray-400 capitalize">
-                  {r.type === 'drink' ? '🍷' : r.type === 'ritual' ? '🕯️' : '🍖'} {r.type}
+                  {(() => {
+                  const TypeIcon = RECIPE_TYPES.find(t => t.key === r.type)?.icon ?? Utensils;
+                  return <TypeIcon className="w-4 h-4 inline-block" strokeWidth={1.75} aria-hidden="true" />;
+                })()} {r.type}
                 </span>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${DIFFICULTY_COLOR[r.difficulty] ?? ''}`}>
                   {r.difficulty}
                 </span>
                 {r.prepMins && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-gray-500">
-                    ⏱ {r.prepMins} min
+ {r.prepMins} min
                   </span>
                 )}
               </div>
@@ -133,15 +136,17 @@ export default function RecipesFeed() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600 text-xs">by {r.author.username}</span>
                 <div className="flex gap-1">
-                  {REACTION_EMOJIS.map((emoji) => (
+                  {RECIPE_REACTIONS.map(({ id, icon: Icon, label }) => (
                     <button
-                      key={emoji}
-                      onClick={() => react(r.id, emoji)}
+                      key={id}
+                      onClick={() => react(r.id, id)}
+                      title={label}
                       className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs transition-colors"
                     >
-                      <span>{emoji}</span>
-                      {(r.reactionCounts[emoji] ?? 0) > 0 && (
-                        <span className="text-gray-400">{r.reactionCounts[emoji]}</span>
+                      <Icon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />
+                      <span className="sr-only">{label}</span>
+                      {(r.reactionCounts[id] ?? 0) > 0 && (
+                        <span className="text-gray-400">{r.reactionCounts[id]}</span>
                       )}
                     </button>
                   ))}

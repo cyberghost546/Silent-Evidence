@@ -148,7 +148,7 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
           Label changes depending on mode and loading state. */}
       <button onClick={generate} disabled={generating || (mode === 'manual' && (!manualTitle || !manualPrompt))}
         className="mb-8 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition">
-        {generating ? (mode === 'ai' ? '🤖 Generating…' : 'Saving…') : (mode === 'ai' ? '🤖 Generate New Prompt' : 'Save Prompt')}
+        {generating ? (mode === 'ai' ? 'Generating…' : 'Saving…') : (mode === 'ai' ? 'Generate New Prompt' : 'Save Prompt')}
       </button>
 
       {/* ── Prompt history ───────────────────────────────────────────────────

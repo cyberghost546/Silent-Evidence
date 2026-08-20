@@ -61,14 +61,14 @@ const MOOD_GRADIENTS: Record<string, string> = {
 
 // MOOD_LABELS — human-readable mood labels with emoji for the badge in the card footer
 const MOOD_LABELS: Record<string, string> = {
-  CREEPY:        '🕷 Creepy',
-  PARANOID:      '👁 Paranoid',
-  DISTURBING:    '😰 Disturbing',
-  ATMOSPHERIC:   '🌫 Atmospheric',
-  PSYCHOLOGICAL: '🧠 Psychological',
-  SUPERNATURAL:  '👻 Supernatural',
-  GORE:          '🩸 Gore',
-  JUMPSCARE:     '😱 Jumpscare',
+  CREEPY:        'Creepy',
+  PARANOID:      'Paranoid',
+  DISTURBING:    'Disturbing',
+  ATMOSPHERIC:   'Atmospheric',
+  PSYCHOLOGICAL: 'Psychological',
+  SUPERNATURAL:  'Supernatural',
+  GORE:          'Gore',
+  JUMPSCARE:     'Jumpscare',
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -268,7 +268,6 @@ export default function SwipeDiscovery({ initialStories }: Props) {
     return (
       // Centred column with a ghost emoji, message, and a "Start Over" button
       <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
-        <p className="text-5xl">👻</p>
         <h2 className="text-2xl font-bold text-white">You&apos;ve seen everything!</h2>
         <p className="text-gray-400">You&apos;ve swiped through all the stories for now.</p>
         {/* Start Over resets currentIndex to 0 so the user can swipe the deck again */}
@@ -359,7 +358,6 @@ export default function SwipeDiscovery({ initialStories }: Props) {
           // Mood-coloured gradient shown when there is no cover image
           <div className={`aspect-video w-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
             {/* Faint book emoji as a visual placeholder */}
-            <span className="text-6xl opacity-30 pointer-events-none">📖</span>
           </div>
         )}
 
@@ -390,14 +388,14 @@ export default function SwipeDiscovery({ initialStories }: Props) {
             {/* Mood badge — only rendered when the story has a recognised mood */}
             {story.mood && MOOD_LABELS[story.mood] && (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 border border-gray-700">
-                {MOOD_LABELS[story.mood]} {/* e.g. "👻 Supernatural" */}
+                {MOOD_LABELS[story.mood]} {/* e.g. "Supernatural" */}
               </span>
             )}
 
             {/* Like and comment counts — right-aligned with ml-auto */}
             <div className="flex items-center gap-3 text-xs text-gray-500 ml-auto">
-              <span>❤️ {story._count.likes}</span>
-              <span>💬 {story._count.comments}</span>
+              <span>{story._count.likes}</span>
+              <span>{story._count.comments}</span>
             </div>
           </div>
 
@@ -435,7 +433,6 @@ export default function SwipeDiscovery({ initialStories }: Props) {
           aria-label="Save story to bookmarks"
           className="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-gray-800 border border-gray-700 hover:border-green-500 hover:bg-green-950 transition disabled:opacity-40 shadow-lg"
         >
-          ❤️
         </button>
       </div>
 

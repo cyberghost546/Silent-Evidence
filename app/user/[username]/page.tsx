@@ -51,6 +51,7 @@
 // =============================================================================
 
 import { notFound } from 'next/navigation';
+import { Crown } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -269,7 +270,9 @@ export default async function UserProfilePage({ params }: Props) {
                   Positioned in the top-right corner of the avatar using absolute
                   with negative offsets (-top-2 -right-1). */}
               {user.writerOfMonth && (
-                <span className="absolute -top-2 -right-1 text-xl" title="Writer of the Month">👑</span>
+                <span className="absolute -top-2 -right-1 text-yellow-500" title="Writer of the Month">
+                  <Crown className="w-5 h-5" strokeWidth={1.75} aria-hidden="true" />
+                </span>
               )}
             </div>
 
@@ -428,6 +431,7 @@ export default async function UserProfilePage({ params }: Props) {
                 const meta = BADGE_META[b.type as BadgeType];
                 // Skip unknown badge types rather than crashing
                 if (!meta) return null;
+                const BadgeIcon = meta.icon;
                 return (
                   // title attribute shows the full description on hover as a tooltip
                   <span
@@ -435,7 +439,7 @@ export default async function UserProfilePage({ params }: Props) {
                     title={meta.description}
                     className="inline-flex items-center gap-1.5 bg-gray-800/80 border border-gray-700 hover:border-red-600/40 rounded-full px-3 py-1 text-xs text-gray-300 transition cursor-default"
                   >
-                    <span>{meta.emoji}</span>
+                    <BadgeIcon className="w-3.5 h-3.5 text-red-500/80" strokeWidth={1.75} aria-hidden="true" />
                     <span>{meta.label}</span>
                   </span>
                 );
@@ -476,7 +480,7 @@ export default async function UserProfilePage({ params }: Props) {
         {pinnedStory && (
           <div className="mb-5">
             <p className="text-xs font-bold uppercase tracking-widest text-yellow-500 mb-2 flex items-center gap-1.5">
-              <span>📌</span> Pinned
+               Pinned
             </p>
             <Link
               href={`/story/${pinnedStory.slug}`}
@@ -491,7 +495,6 @@ export default async function UserProfilePage({ params }: Props) {
               ) : (
                 // Placeholder thumbnail when no cover image is set
                 <div className="w-32 h-24 bg-gray-800 rounded-xl flex-shrink-0 flex items-center justify-center">
-                  <span className="text-2xl opacity-30">📖</span>
                 </div>
               )}
               <div className="flex flex-col justify-between flex-1 min-w-0">
@@ -506,9 +509,9 @@ export default async function UserProfilePage({ params }: Props) {
                 {/* Metadata row — date, views, likes, comments */}
                 <div className="flex items-center gap-4 text-xs text-gray-600 mt-2">
                   <span>{new Date(pinnedStory.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  <span>👁 {pinnedStory.views.toLocaleString()}</span>
-                  <span>♥ {pinnedStory._count.likes}</span>
-                  <span>💬 {pinnedStory._count.comments}</span>
+                  <span>{pinnedStory.views.toLocaleString()}</span>
+                  <span>{pinnedStory._count.likes}</span>
+                  <span>{pinnedStory._count.comments}</span>
                 </div>
               </div>
             </Link>
@@ -519,7 +522,6 @@ export default async function UserProfilePage({ params }: Props) {
             Shown instead of stories when canSeeStories is false. */}
         {!canSeeStories && (
           <div className="text-center py-20 border border-gray-800 rounded-2xl">
-            <p className="text-5xl mb-4">🔒</p>
             <p className="text-white font-semibold text-lg">This account is private</p>
             <p className="text-gray-500 text-sm mt-1">Follow this user to see their stories.</p>
           </div>

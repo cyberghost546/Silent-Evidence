@@ -4,6 +4,7 @@
 // then renders story cards using the same layout pattern as the Trending page.
 
 import Link from 'next/link';
+import { moodIcon } from '@/lib/moodIcons';
 import { cookies } from 'next/headers';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -34,16 +35,7 @@ type FeedStory = {
 };
 
 // Mood emoji map — adds visual flavour to mood badges
-const MOOD_EMOJI: Record<string, string> = {
-  CREEPY: '👁',
-  PARANOID: '🌀',
-  DISTURBING: '😱',
-  ATMOSPHERIC: '🌫',
-  PSYCHOLOGICAL: '🧠',
-  SUPERNATURAL: '👻',
-  GORE: '🩸',
-  JUMPSCARE: '⚡',
-};
+// Mood icons come from the shared lib/moodIcons map so every page agrees.
 
 // Format large numbers — 12400 → "12.4k"
 function fmtNum(n: number) {
@@ -63,7 +55,6 @@ export default async function ForYouPage() {
 
         {/* Sign-in prompt */}
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-          <p className="text-6xl mb-6">🔮</p>
           <h1 className="text-3xl font-extrabold text-white mb-3">
             Your Personalised Feed Awaits
           </h1>
@@ -127,7 +118,6 @@ export default async function ForYouPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(220,38,38,0.12)_0%,transparent_70%)]" />
         <div className="max-w-5xl mx-auto px-4 relative">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-3xl">🔮</span>
             <h1 className="text-4xl font-extrabold text-white">For You</h1>
           </div>
           <p className="text-gray-400 text-sm">
@@ -142,7 +132,6 @@ export default async function ForYouPage() {
         {stories.length === 0 ? (
           // Empty state — shown when the feed has no results
           <div className="text-center py-24 text-gray-500">
-            <p className="text-5xl mb-4">👻</p>
             <p className="mb-2">Your feed is empty.</p>
             <p className="text-sm">
               Follow some authors or set your{' '}
@@ -171,7 +160,6 @@ export default async function ForYouPage() {
                   ) : (
                     // Gradient placeholder when no cover image is set
                     <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                      <span className="text-3xl">💀</span>
                     </div>
                   )}
                 </div>
@@ -196,8 +184,12 @@ export default async function ForYouPage() {
 
                     {/* Mood badge — only shown if a mood is set */}
                     {story.mood && (
-                      <span className="text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">
-                        {MOOD_EMOJI[story.mood] ?? '🎭'} {story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
+                      <span className="inline-flex items-center gap-1 text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">
+                        {(() => {
+                          const MoodIcon = moodIcon(story.mood);
+                          return <MoodIcon className="w-3 h-3" strokeWidth={1.75} aria-hidden="true" />;
+                        })()}
+                        {story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
                       </span>
                     )}
                   </div>
@@ -243,13 +235,13 @@ export default async function ForYouPage() {
                     <span className="w-1 h-1 rounded-full bg-gray-700 flex-shrink-0" />
 
                     {/* View count */}
-                    <span className="text-xs text-gray-500">👁 {fmtNum(story.views)}</span>
+                    <span className="text-xs text-gray-500">{fmtNum(story.views)}</span>
 
                     {/* Like count */}
-                    <span className="text-xs text-gray-500">❤️ {fmtNum(story._count.likes)}</span>
+                    <span className="text-xs text-gray-500">{fmtNum(story._count.likes)}</span>
 
                     {/* Comment count */}
-                    <span className="text-xs text-gray-500">💬 {story._count.comments}</span>
+                    <span className="text-xs text-gray-500">{story._count.comments}</span>
                   </div>
                 </div>
               </Link>

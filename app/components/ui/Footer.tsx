@@ -116,8 +116,8 @@ export default async function Footer() {
         {/* Bottom bar — copyright and tagline.
             new Date().getFullYear() automatically updates the year each year. */}
         <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
-          <p>© {new Date().getFullYear()} Silent Evidence. All rights reserved.</p>
-          <p>Made with <span className="text-red-600">♥</span> for horror fans everywhere.</p>
+          <p>{new Date().getFullYear()} Silent Evidence. All rights reserved.</p>
+          <p>Made with  for horror fans everywhere.</p>
         </div>
 
       </div>

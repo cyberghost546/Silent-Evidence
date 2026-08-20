@@ -26,7 +26,7 @@ export default async function DaresPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Page heading */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">👻 Your Dare Inbox</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Your Dare Inbox</h1>
           <p className="text-gray-400">
             Someone dared you to read something terrifying. Do you have the courage?
           </p>

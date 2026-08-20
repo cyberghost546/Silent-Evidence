@@ -88,6 +88,8 @@ const MOCK_STORY = {
 
 // Builds a fake Next.js cookie store. `jar` maps cookie name -> value, so a test
 // can drop the userId cookie while keeping the CSRF pair intact.
+type CookieStore = Awaited<ReturnType<typeof import('next/headers').cookies>>;
+
 function mockCookieStore(jar: Record<string, string>) {
   return {
     get: vi.fn((name: string) => (name in jar ? { value: jar[name] } : undefined)),
@@ -104,7 +106,7 @@ describe('POST /api/stories', () => {
     // the implementation the vi.mock factory installed. Reinstate it every test.
     const { cookies } = await import('next/headers');
     vi.mocked(cookies).mockResolvedValue(
-      mockCookieStore({ userId: '1', csrf_token: CSRF_TOKEN }) as any
+      mockCookieStore({ userId: '1', csrf_token: CSRF_TOKEN }) as unknown as CookieStore
     );
   });
 
@@ -113,7 +115,7 @@ describe('POST /api/stories', () => {
     // otherwise the request is rejected as 403 before the auth check is reached.
     const { cookies } = await import('next/headers');
     vi.mocked(cookies).mockResolvedValue(
-      mockCookieStore({ csrf_token: CSRF_TOKEN }) as any
+      mockCookieStore({ csrf_token: CSRF_TOKEN }) as unknown as CookieStore
     );
 
     const res = await storiesPost(makeRequest(VALID_BODY, ''));

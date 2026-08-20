@@ -85,7 +85,7 @@ export default async function RelatedStories({ categoryId, currentStoryId }: Pro
               {/* Story title — turns red on hover via group-hover; line-clamp-2 prevents overflow */}
               <p className="text-sm font-semibold text-white group-hover:text-red-300 transition line-clamp-2 leading-snug">{s.title}</p>
               {/* Author username and like count in a subtle meta line */}
-              <p className="text-xs text-gray-500 mt-1">{s.author.username} · ♥ {s._count.likes}</p>
+              <p className="text-xs text-gray-500 mt-1">{s.author.username} · {s._count.likes}</p>
             </div>
           </Link>
         ))}

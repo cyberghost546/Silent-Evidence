@@ -3,6 +3,7 @@
 // Free users see a locked teaser so they know the audio exists.
 
 import { useEffect, useRef, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
 
 type Props = {
   audioUrl: string;
@@ -60,7 +61,6 @@ export default function PremiumAudioPlayer({ audioUrl, storyTitle, hasPremium }:
     return (
       <div className="mt-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 flex items-center gap-4">
         <div className="w-10 h-10 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-xl shrink-0">
-          🎙️
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white">Audio Narration Available</p>
@@ -82,7 +82,6 @@ export default function PremiumAudioPlayer({ audioUrl, storyTitle, hasPremium }:
 
       <div className="flex items-center gap-3 mb-3">
         <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-base shrink-0">
-          🎙️
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-purple-300 uppercase tracking-wider">Audio Narration</p>
@@ -109,7 +108,9 @@ export default function PremiumAudioPlayer({ audioUrl, storyTitle, hasPremium }:
           onClick={toggle}
           className="w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center text-white text-sm transition"
         >
-          {playing ? '⏸' : '▶'}
+          {playing
+          ? <Pause className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+          : <Play className="w-4 h-4" strokeWidth={2} aria-hidden="true" />}
         </button>
         <p className="text-xs text-gray-500">
           {playing ? 'Now playing…' : 'Click to listen'}

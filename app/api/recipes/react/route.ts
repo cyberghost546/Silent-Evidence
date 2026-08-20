@@ -1,9 +1,10 @@
 // app/api/recipes/react/route.ts
 // POST — toggles an emoji reaction on a horror recipe.
-// Only the four emojis in ALLOWED are accepted. If the user has already reacted
+// Only the reaction ids in ALLOWED are accepted. If the user has already reacted
 // with the same emoji it is removed (un-react); otherwise it is created.
 // Login required via iron-session.
 import { NextRequest, NextResponse } from 'next/server';
+import { RECIPE_REACTION_IDS } from '@/lib/reactions';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
@@ -14,7 +15,8 @@ const SESSION_OPTIONS = {
   cookieName: 'se_session',
 };
 
-const ALLOWED = ['🔥', '💀', '😋', '👻'];
+// Allowlist comes from the shared reaction definitions.
+const ALLOWED = RECIPE_REACTION_IDS;
 
 export async function POST(req: NextRequest) {
   try {

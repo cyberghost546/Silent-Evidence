@@ -54,7 +54,6 @@ export default function CookieBanner() {
 
         {/* Cookie icon + text */}
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden>🍪</span>
           <div>
             <p className="text-sm font-semibold text-white mb-0.5">We use cookies</p>
             <p className="text-xs text-gray-400 leading-relaxed">

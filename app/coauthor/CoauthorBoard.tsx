@@ -221,7 +221,6 @@ export default function CoauthorBoard({ initialRequests, currentUserId }: Props)
       {requests.length === 0 ? (
         // Empty state — shown when no requests exist yet
         <div className="text-center py-16 text-gray-500">
-          <p className="text-4xl mb-4">✍️</p>
           <p className="text-lg font-semibold text-gray-400 mb-1">No open requests yet</p>
           <p className="text-sm">Be the first to post a co-author request.</p>
         </div>

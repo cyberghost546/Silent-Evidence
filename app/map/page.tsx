@@ -55,7 +55,7 @@ export default async function MapPage() {
           <div>
             <h1 className="text-2xl font-bold text-white">Horror Map</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              {stories.length} {stories.length === 1 ? 'story' : 'stories'} pinned to real locations 💀
+              {stories.length} {stories.length === 1 ? 'story' : 'stories'} pinned to real locations
             </p>
           </div>
         </div>
@@ -73,7 +73,6 @@ export default async function MapPage() {
             {stories.map(story => (
               <a key={story.id} href={`/story/${story.slug}`}
                 className="group flex items-center gap-3 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 transition">
-                <span className="text-2xl flex-shrink-0">💀</span>
                 <div className="min-w-0">
                   <p className="text-xs text-red-400 font-semibold truncate">{story.locationName}</p>
                   <p className="text-sm text-white group-hover:text-red-300 transition truncate">{story.title}</p>

@@ -123,7 +123,6 @@ export default function ApplyFormClient() {
       {success ? (
         /* ── Success confirmation card ─────────────────────────────────── */
         <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-8 text-center">
-          <p className="text-4xl mb-4">✅</p>
           <h2 className="text-lg font-bold text-white mb-2">Application received!</h2>
           <p className="text-gray-400 text-sm leading-relaxed mb-6">
             Thank you for applying. Our team reviews applications manually and will update your

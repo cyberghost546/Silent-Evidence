@@ -7,6 +7,7 @@
 // To reuse: drop <MonsterEncyclopedia /> on any page — it fetches its own data.
 
 import { useState, useEffect, useCallback } from 'react';
+import { Skull } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -35,7 +36,12 @@ function ScullsRating({ score }: { score: number }) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 10 }).map((_, i) => (
-        <span key={i} className={`text-xs ${i < score ? 'text-red-500' : 'text-gray-700'}`}>💀</span>
+        <Skull
+          key={i}
+          className={`w-3 h-3 ${i < score ? 'text-red-500' : 'text-gray-700'}`}
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
       ))}
     </div>
   );
@@ -98,7 +104,6 @@ export default function MonsterEncyclopedia() {
 
       {!loading && monsters.length === 0 && (
         <div className="text-center py-20 text-gray-600">
-          <div className="text-4xl mb-3">🔦</div>
           <p>No monsters found. They must be hiding.</p>
         </div>
       )}
@@ -117,7 +122,6 @@ export default function MonsterEncyclopedia() {
                 <Image src={m.image} alt={m.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-5xl text-gray-700">
-                  👹
                 </div>
               )}
               {/* Type badge */}

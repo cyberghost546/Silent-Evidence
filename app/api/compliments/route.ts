@@ -45,11 +45,11 @@ import {
 // This prevents users from sending arbitrary text through the compliment system.
 // Whitelist of allowed compliment messages — prevents arbitrary text being sent
 const ALLOWED_COMPLIMENTS = new Set([
-  "Your writing genuinely scared me — great work! 🖤",
+  "Your writing genuinely scared me — great work!",
   "I couldn't stop reading. Incredible story!",
-  "The atmosphere you created was perfect 🕯️",
+  "The atmosphere you created was perfect",
   "This gave me chills. Please write more!",
-  "You have a real talent for horror writing. Keep going 🙌",
+  "You have a real talent for horror writing. Keep going",
 ]);
 
 // ── POST handler ──────────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@ export async function POST(req: Request) {
         userId: toUserId,  // deliver the notification to the recipient
         type: 'DIRECT_MESSAGE', // notification type (used by the UI to choose an icon)
         // ?? 'Someone' fallback handles the rare case where the sender query returned null
-        message: `${sender?.username ?? 'Someone'} sent you a compliment 💌`,
+        message: `${sender?.username ?? 'Someone'} sent you a compliment`,
       },
     }).catch(() => {}); // swallow errors — notification is best-effort
 

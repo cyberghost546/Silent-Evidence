@@ -57,7 +57,6 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="max-w-sm w-full bg-gray-900 border border-blue-900/50 rounded-2xl p-8 text-center shadow-2xl">
-          <div className="text-5xl mb-4">🔵</div>
           <h2 className="text-xl font-bold text-white mb-2">Content Not Available</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
             This story is rated{' '}
@@ -83,7 +82,6 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="max-w-sm w-full bg-gray-900 border border-yellow-900/50 rounded-2xl p-8 text-center shadow-2xl">
-          <div className="text-5xl mb-4">🔞</div>
           <h2 className="text-xl font-bold text-white mb-2">18+ Content</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
             This story contains mature content for adults only.
@@ -118,7 +116,6 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="max-w-sm w-full bg-gray-900 border border-red-900/50 rounded-2xl p-8 text-center shadow-2xl">
-          <div className="text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-white mb-2">Mature Content Warning</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
             This story is rated <span className="text-red-400 font-semibold">Mature (18+)</span>

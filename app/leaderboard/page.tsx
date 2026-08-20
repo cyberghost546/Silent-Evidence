@@ -48,7 +48,8 @@ export default async function LeaderboardPage({ searchParams }: Props) {
   const isElite = tab === 'elite';
 
   const ranked = await fetchRanked(isElite);
-  const medals = ['🥇', '🥈', '🥉'];
+  // Top three are distinguished by colour rather than a glyph.
+const medalTone = ['text-yellow-400', 'text-gray-300', 'text-amber-600'];
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -61,7 +62,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           : 'bg-[radial-gradient(ellipse_at_top,_rgba(220,38,38,0.08)_0%,_transparent_60%)]'}`} />
         <div className="max-w-3xl mx-auto px-4 text-center relative">
           <h1 className="text-3xl font-extrabold text-white">
-            {isElite ? '👑 Elite Leaderboard' : 'Leaderboard'}
+            {isElite ? 'Elite Leaderboard' : 'Leaderboard'}
           </h1>
           <p className={`mt-2 text-sm ${isElite ? 'text-yellow-400/80' : 'text-gray-400'}`}>
             {isElite
@@ -82,7 +83,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
                 : 'border-transparent text-gray-500 hover:text-gray-300'
             }`}
           >
-            🔥 All Writers
+ All Writers
           </Link>
           <Link
             href="/leaderboard?tab=elite"
@@ -92,7 +93,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
                 : 'border-transparent text-gray-500 hover:text-gray-300'
             }`}
           >
-            👑 Elite Members
+ Elite Members
           </Link>
         </div>
       </div>
@@ -116,8 +117,8 @@ export default async function LeaderboardPage({ searchParams }: Props) {
                 } ${i === 0 && isElite ? 'ring-1 ring-yellow-500/30' : ''}`}
               >
                 {/* Rank */}
-                <span className="text-xl w-8 text-center shrink-0">
-                  {medals[i] ?? <span className="text-gray-500 font-bold text-sm">#{i + 1}</span>}
+                <span className={`w-8 text-center shrink-0 font-bold text-sm ${medalTone[i] ?? 'text-gray-500'}`}>
+                  #{i + 1}
                 </span>
 
                 {/* Avatar */}

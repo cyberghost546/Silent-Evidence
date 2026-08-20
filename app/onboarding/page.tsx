@@ -8,17 +8,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PenLine, Library, Flame, Users, Circle } from 'lucide-react';
+import { moodIcon } from '@/lib/moodIcons';
 
 // Available horror moods matching the Mood enum in schema.prisma
 const MOODS = [
-  { value: 'EPIC',          label: 'Epic',          icon: '⚔️' },
-  { value: 'HEARTWARMING',  label: 'Heartwarming',  icon: '💖' },
-  { value: 'MYSTERIOUS',    label: 'Mysterious',    icon: '🔮' },
-  { value: 'ACTION',        label: 'Action',        icon: '💥' },
-  { value: 'ROMANTIC',      label: 'Romantic',      icon: '🌸' },
-  { value: 'COMEDIC',       label: 'Comedic',       icon: '😂' },
-  { value: 'DRAMATIC',      label: 'Dramatic',      icon: '🎭' },
-  { value: 'DARK',          label: 'Dark',          icon: '🌑' },
+  { value: 'EPIC',          label: 'Epic',          icon: moodIcon('EPIC') },
+  { value: 'HEARTWARMING',  label: 'Heartwarming',  icon: moodIcon('HEARTWARMING') },
+  { value: 'MYSTERIOUS',    label: 'Mysterious',    icon: moodIcon('MYSTERIOUS') },
+  { value: 'ACTION',        label: 'Action',        icon: moodIcon('ACTION') },
+  { value: 'ROMANTIC',      label: 'Romantic',      icon: moodIcon('ROMANTIC') },
+  { value: 'COMEDIC',       label: 'Comedic',       icon: moodIcon('COMEDIC') },
+  { value: 'DRAMATIC',      label: 'Dramatic',      icon: moodIcon('DRAMATIC') },
+  { value: 'DARK',          label: 'Dark',          icon: moodIcon('DARK') },
 ];
 
 export default function OnboardingPage() {
@@ -85,7 +87,6 @@ export default function OnboardingPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
               <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 1 of 4</p>
-              <div className="text-4xl mb-2">🎂</div>
               <h1 className="text-2xl font-bold text-white">How old are you?</h1>
               <p className="text-gray-400 text-sm mt-1">
                 We use your age to make sure you only see content that&apos;s right for you.
@@ -109,12 +110,14 @@ export default function OnboardingPage() {
             {/* Age group preview */}
             <div className="grid grid-cols-3 gap-2 mb-5 text-center text-xs">
               {[
-                { icon: '🔵', age: 'Under 13', access: 'General only' },
-                { icon: '🟡', age: '13 – 17',  access: 'Teen + General' },
-                { icon: '🟢', age: '18+',       access: 'Full access' },
+                { icon: Circle, tone: 'text-blue-400',   age: 'Under 13', access: 'General only' },
+                { icon: Circle, tone: 'text-yellow-400', age: '13 – 17',  access: 'Teen + General' },
+                { icon: Circle, tone: 'text-green-400',  age: '18+',      access: 'Full access' },
               ].map(r => (
                 <div key={r.age} className="bg-gray-800 rounded-lg p-2">
-                  <div className="text-lg mb-1">{r.icon}</div>
+                  <div className="flex justify-center mb-1">
+                    <r.icon className={`w-4 h-4 ${r.tone}`} strokeWidth={2} aria-hidden="true" />
+                  </div>
                   <div className="font-semibold text-gray-300">{r.age}</div>
                   <div className="text-gray-500 text-[10px] mt-0.5">{r.access}</div>
                 </div>
@@ -150,7 +153,7 @@ export default function OnboardingPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
               <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 2 of 4</p>
-              <h1 className="text-2xl font-bold text-white">Welcome to Silent Evidence 💀</h1>
+              <h1 className="text-2xl font-bold text-white">Welcome to Silent Evidence</h1>
               <p className="text-gray-400 text-sm mt-1">Let's set up your profile so other readers can find you.</p>
             </div>
 
@@ -203,7 +206,7 @@ export default function OnboardingPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
               <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 3 of 4</p>
-              <h1 className="text-2xl font-bold text-white">What scares you? 😱</h1>
+              <h1 className="text-2xl font-bold text-white">What scares you?</h1>
               <p className="text-gray-400 text-sm mt-1">
                 Pick your favorite horror types so we can recommend stories you'll love.
               </p>
@@ -224,7 +227,7 @@ export default function OnboardingPage() {
                         : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
                     }`}
                   >
-                    <span className="text-lg">{mood.icon}</span>
+                    <mood.icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
                     {mood.label}
                   </button>
                 );
@@ -253,7 +256,6 @@ export default function OnboardingPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
             <div className="mb-6">
               <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 4 of 4</p>
-              <div className="text-5xl mb-3">🎉</div>
               <h1 className="text-2xl font-bold text-white">You're all set!</h1>
               <p className="text-gray-400 text-sm mt-1">Where would you like to go first?</p>
             </div>
@@ -261,18 +263,18 @@ export default function OnboardingPage() {
             {/* Quick-start options */}
             <div className="grid grid-cols-1 gap-3 mb-8">
               {[
-                { href: '/write',      icon: '✍️',  label: 'Write my first story', desc: 'Share something that haunts you' },
-                { href: '/',           icon: '📚',  label: 'Browse stories',        desc: 'Read what others have written' },
-                { href: '/trending',   icon: '🔥',  label: 'See what\'s trending',  desc: 'Discover the most popular stories' },
-                { href: '/explore',    icon: '👥',  label: 'Find authors to follow', desc: 'Build your reading feed' },
-              ].map(({ href, icon, label, desc }) => (
+                { href: '/write',      icon: PenLine, label: 'Write my first story',   desc: 'Share something that haunts you' },
+                { href: '/',           icon: Library, label: 'Browse stories',         desc: 'Read what others have written' },
+                { href: '/trending',   icon: Flame,   label: "See what's trending",    desc: 'Discover the most popular stories' },
+                { href: '/explore',    icon: Users,   label: 'Find authors to follow', desc: 'Build your reading feed' },
+              ].map(({ href, icon: Icon, label, desc }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={finish}
                   className="flex items-center gap-4 px-4 py-3 bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-red-600/40 rounded-xl transition text-left"
                 >
-                  <span className="text-2xl">{icon}</span>
+                  <Icon className="w-6 h-6 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
                   <div>
                     <p className="text-sm font-semibold text-white">{label}</p>
                     <p className="text-xs text-gray-500">{desc}</p>

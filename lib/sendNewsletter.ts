@@ -59,7 +59,7 @@ function buildHtml({
               </p>
               ${s.excerpt ? `<p style="margin:0 0 6px;font-size:12px;color:#9ca3af;line-height:1.5;">${s.excerpt.slice(0, 100)}${s.excerpt.length > 100 ? '…' : ''}</p>` : ''}
               <p style="margin:0;font-size:11px;color:#6b7280;">
-                by ${s.author.username} &nbsp;·&nbsp; ♥ ${s._count.likes} &nbsp;·&nbsp; 👁 ${s.views.toLocaleString()}
+                by ${s.author.username} &nbsp;·&nbsp; ${s._count.likes} &nbsp;·&nbsp; ${s.views.toLocaleString()}
               </p>
             </td>
           </tr>
@@ -81,7 +81,7 @@ function buildHtml({
         <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#1a0a0a 0%,#2d0808 100%);padding:32px 32px 24px;">
-            <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">💀 Silent Evidence</p>
+            <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">Silent Evidence</p>
             <p style="margin:4px 0 0;font-size:12px;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase;">Weekly Horror Digest</p>
           </td>
         </tr>
@@ -108,7 +108,7 @@ function buildHtml({
           <td style="padding:8px 32px 32px;text-align:center;">
             <p style="margin:0 0 16px;font-size:13px;color:#9ca3af;">Have a story of your own lurking in the dark?</p>
             <a href="${BASE_URL}/write" style="display:inline-block;padding:12px 28px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;border-radius:8px;text-decoration:none;">
-              ✍️ Share Your Story
+ Share Your Story
             </a>
           </td>
         </tr>
@@ -179,7 +179,7 @@ export async function sendWeeklyNewsletter(): Promise<NewsletterResult> {
 
     const ok = await sendMail({
       to: user.email,
-      subject: `🩸 This week on Silent Evidence — top horror stories`,
+      subject: `This week on Silent Evidence — top horror stories`,
       html: buildHtml({
         username: user.username,
         stories: scored,

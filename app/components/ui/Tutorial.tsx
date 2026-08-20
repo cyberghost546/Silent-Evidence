@@ -11,55 +11,56 @@
 //   - No server interaction — everything is stored in localStorage.
 
 import { useState, useEffect } from 'react';
+import { Skull, BookOpen, Search, PenLine, Bell, MessageSquare, SunMoon, Swords } from 'lucide-react';
 
 // ── Tutorial step data ────────────────────────────────────────────────────────
 // Each step has an icon, title, description, and an optional tip.
 // To add a new step, add an object to this array.
 const STEPS = [
   {
-    icon: '💀',
+    icon: Skull,
     title: 'Welcome to Silent Evidence',
     desc: 'A community for real horror stories — true crime, paranormal encounters, unexplained disappearances, and campfire tales from people who were actually there.',
     tip: 'Use the arrow buttons below to navigate through this tutorial.',
   },
   {
-    icon: '📖',
+    icon: BookOpen,
     title: 'Read Stories',
     desc: 'Browse the homepage to find Featured Stories, Story of the Day, Trending, and more. Click any story card to start reading.',
     tip: 'Use the Categories menu in the header to find stories by type — True Crime, Paranormal, Haunted Locations, and more.',
   },
   {
-    icon: '🔍',
+    icon: Search,
     title: 'Search & Discover',
     desc: 'Click the search icon in the top-right header to search by title, author, or keyword. Use "Discover" in the Explore menu to browse stories one at a time.',
     tip: 'Try searching for a location near you — you might find a local story.',
   },
   {
-    icon: '✍️',
+    icon: PenLine,
     title: 'Share Your Story',
     desc: 'Have something that happened to you? Click "Write a Story" in the navigation. Pick a template to get started quickly, or start from a blank page.',
     tip: 'Your story is saved as a Draft automatically — you can publish it whenever you\'re ready.',
   },
   {
-    icon: '🔔',
+    icon: Bell,
     title: 'Notifications',
     desc: 'The bell icon in the header shows your notifications — likes, comments, replies, and new followers. A red badge appears when you have unread ones.',
     tip: 'You can also enable Push Notifications in your settings to get alerts even when the site is closed.',
   },
   {
-    icon: '💬',
+    icon: MessageSquare,
     title: 'Chat & Messages',
     desc: 'The message icon in the header takes you to your direct messages. You can send private messages to any member of the community.',
     tip: 'Follow authors you enjoy — their new stories will appear in your personal feed.',
   },
   {
-    icon: '🌗',
+    icon: SunMoon,
     title: 'Dark & Light Mode',
     desc: 'Click the moon/sun icon in the header to switch between dark mode and light mode. Your preference is saved automatically.',
     tip: 'Dark mode is recommended for the full horror atmosphere.',
   },
   {
-    icon: '⚔️',
+    icon: Swords,
     title: 'Challenges & Community',
     desc: 'Join writing challenges, explore the Horror Map to find stories by location, take the trivia quiz, and join or create Horror Squads with other fans.',
     tip: 'Check the Explore menu in the header to find all community features.',
@@ -163,7 +164,7 @@ export default function Tutorial() {
             {/* Step content */}
             <div className="px-6 py-8 text-center">
               {/* Large emoji icon for the step */}
-              <div className="text-6xl mb-5">{current.icon}</div>
+              <div className="flex justify-center mb-5"><current.icon className="w-14 h-14 text-gray-400" strokeWidth={1} aria-hidden="true" /></div>
 
               {/* Step title */}
               <h2 className="text-xl font-bold text-white mb-3">{current.title}</h2>
@@ -177,7 +178,7 @@ export default function Tutorial() {
               {current.tip && (
                 <div className="bg-red-600/10 border border-red-600/20 rounded-xl px-4 py-3 text-left">
                   <p className="text-xs text-red-400">
-                    <span className="font-bold">💡 Tip: </span>
+                    <span className="font-bold">Tip: </span>
                     {current.tip}
                   </p>
                 </div>
@@ -220,7 +221,7 @@ export default function Tutorial() {
                 onClick={next}
                 className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition"
               >
-                {isLast ? '🎉 Let\'s go!' : 'Next →'}
+                {isLast ? 'Let\'s go!' : 'Next →'}
               </button>
 
             </div>

@@ -5,9 +5,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Axe, Repeat, Drama, Flame, FlameKindling, Wheat, Leaf, Ghost, Skull, Moon, Trophy, type LucideIcon } from 'lucide-react';
+import { eventIcon } from '@/lib/calendarIcons';
 
 type HorrorDate = {
-  month: number; day: number; label: string; icon: string;
+  month: number; day: number; label: string; icon: LucideIcon;
 };
 
 type CalendarEvent = {
@@ -17,7 +19,7 @@ type CalendarEvent = {
 
 type UpcomingItem = {
   key: string;
-  icon: string;
+  icon: LucideIcon;
   label: string;
   note: string | null;
   linkUrl: string | null;
@@ -27,21 +29,21 @@ type UpcomingItem = {
 };
 
 const HORROR_DATES: HorrorDate[] = [
-  { month: 1,  day: 13, label: 'Friday the 13th',              icon: '🔪' },
-  { month: 2,  day: 2,  label: 'Groundhog Day',                icon: '🌀' },
-  { month: 3,  day: 13, label: 'Friday the 13th',              icon: '🔪' },
-  { month: 4,  day: 1,  label: 'All Fools Day',                icon: '🃏' },
-  { month: 5,  day: 1,  label: "Walpurgis Night",              icon: '🕯️' },
-  { month: 6,  day: 6,  label: "The Omen Day (6/6)",           icon: '😈' },
-  { month: 7,  day: 13, label: 'Friday the 13th',              icon: '🔪' },
-  { month: 8,  day: 1,  label: 'Lammas — Harvest Dread',      icon: '🌾' },
-  { month: 9,  day: 22, label: 'Autumnal Equinox',             icon: '🍂' },
-  { month: 10, day: 13, label: 'Friday the 13th',              icon: '🔪' },
-  { month: 10, day: 31, label: 'Halloween',                    icon: '🎃' },
-  { month: 11, day: 1,  label: "All Saints' Day",              icon: '💀' },
-  { month: 12, day: 13, label: 'Friday the 13th',              icon: '🔪' },
-  { month: 12, day: 21, label: 'Winter Solstice — Dark Night', icon: '🌑' },
-  { month: 12, day: 31, label: 'Year-End Horror Awards',       icon: '🏆' },
+  { month: 1,  day: 13, label: 'Friday the 13th',              icon: Axe },
+  { month: 2,  day: 2,  label: 'Groundhog Day',                icon: Repeat },
+  { month: 3,  day: 13, label: 'Friday the 13th',              icon: Axe },
+  { month: 4,  day: 1,  label: 'All Fools Day',                icon: Drama },
+  { month: 5,  day: 1,  label: "Walpurgis Night",              icon: Flame },
+  { month: 6,  day: 6,  label: "The Omen Day (6/6)",           icon: FlameKindling },
+  { month: 7,  day: 13, label: 'Friday the 13th',              icon: Axe },
+  { month: 8,  day: 1,  label: 'Lammas — Harvest Dread',      icon: Wheat },
+  { month: 9,  day: 22, label: 'Autumnal Equinox',             icon: Leaf },
+  { month: 10, day: 13, label: 'Friday the 13th',              icon: Axe },
+  { month: 10, day: 31, label: 'Halloween',                    icon: Ghost },
+  { month: 11, day: 1,  label: "All Saints' Day",              icon: Skull },
+  { month: 12, day: 13, label: 'Friday the 13th',              icon: Axe },
+  { month: 12, day: 21, label: 'Winter Solstice — Dark Night', icon: Moon },
+  { month: 12, day: 31, label: 'Year-End Horror Awards',       icon: Trophy },
 ];
 
 function daysUntil(target: Date, now: Date): number {
@@ -88,7 +90,7 @@ export default function HorrorCalendar() {
       target.setHours(0, 0, 0, 0);
       return {
         key: `custom-${e.id}`,
-        icon: e.icon,
+        icon: eventIcon(e.icon),
         label: e.title,
         note: e.note,
         linkUrl: e.linkUrl,
@@ -107,7 +109,6 @@ export default function HorrorCalendar() {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xl">🗓️</span>
         <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Horror Calendar</h2>
       </div>
 
@@ -115,7 +116,7 @@ export default function HorrorCalendar() {
         {upcoming.map((event) => {
           const content = (
             <>
-              <span className="text-xl w-8 text-center shrink-0">{event.icon}</span>
+              <event.icon className="w-5 h-5 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium leading-tight ${event.isCustom ? 'text-purple-300' : 'text-white'}`}>
                   {event.label}

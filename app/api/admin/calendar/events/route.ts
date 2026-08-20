@@ -3,6 +3,7 @@
 // POST — create a new calendar event
 
 import { NextResponse } from 'next/server';
+import { DEFAULT_EVENT_ICON_ID } from '@/lib/calendarIcons';
 import { prisma } from '@/lib/prisma';
 import { getSessionUserId } from '@/lib/session';
 import { serverError } from '@/lib/apiError';
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
       data: {
         date:    new Date(date),
         title:   title.trim(),
-        icon:    icon?.trim() || '📅',
+        icon:    icon?.trim() || DEFAULT_EVENT_ICON_ID,
         note:    note?.trim() || null,
         linkUrl: linkUrl?.trim() || null,
       },

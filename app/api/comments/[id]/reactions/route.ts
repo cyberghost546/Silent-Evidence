@@ -152,7 +152,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       data: {
         commentId, // which comment is being reacted to
         userId,    // which user is adding the reaction
-        emoji,     // the emoji string they chose (e.g. "😱")
+        emoji,     // the stored reaction id they chose (see lib/reactions)
       },
     });
 

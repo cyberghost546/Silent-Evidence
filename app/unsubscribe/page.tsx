@@ -26,6 +26,7 @@
 // =============================================================================
 
 import { redirect } from 'next/navigation';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
@@ -102,7 +103,11 @@ function Result({ success, message }: { success: boolean; message: string }) {
       {/* max-w-sm caps the card at a readable narrow width on wide screens */}
       <div className="max-w-sm w-full bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
         {/* Dynamic icon — green checkmark on success, red X on failure */}
-        <p className="text-4xl mb-4">{success ? '✅' : '❌'}</p>
+        <p className="flex justify-center mb-4">
+          {success
+            ? <CheckCircle2 className="w-10 h-10 text-green-400" strokeWidth={1.5} aria-hidden="true" />
+            : <XCircle className="w-10 h-10 text-red-400" strokeWidth={1.5} aria-hidden="true" />}
+        </p>
         <h1 className="text-xl font-bold text-white mb-2">
           {success ? 'Unsubscribed' : 'Something went wrong'}
         </h1>

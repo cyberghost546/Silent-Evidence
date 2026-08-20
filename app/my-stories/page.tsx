@@ -118,7 +118,7 @@ export default async function MyStoriesPage({
                       </span>
                       {story.status === 'SCHEDULED' && story.scheduledAt && (
                         <span className="text-[10px] text-blue-400/70">
-                          🕐 {new Date(story.scheduledAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+ {new Date(story.scheduledAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                         </span>
                       )}
                       {story.featured && (
@@ -129,9 +129,9 @@ export default async function MyStoriesPage({
                       {story.category.name} · {new Date(story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                     <div className="flex items-center gap-4 text-xs text-gray-600 mt-1">
-                      <span>👁 {story.views.toLocaleString()}</span>
-                      <span>♥ {story._count.likes}</span>
-                      <span>💬 {story._count.comments}</span>
+                      <span>{story.views.toLocaleString()}</span>
+                      <span>{story._count.likes}</span>
+                      <span>{story._count.comments}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">

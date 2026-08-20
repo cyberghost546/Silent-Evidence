@@ -155,7 +155,6 @@ export default function PWAInstallPrompt() {
 
           {/* App icon — red skull emoji on a red background to match the horror theme */}
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-lg">☠</span>
           </div>
 
           <div className="flex-1 min-w-0">

@@ -12,6 +12,7 @@
 // The chosen mood and playing state are persisted in localStorage under the key 'se-ambient'.
 
 import { useEffect, useRef, useState } from "react";
+import { CloudRain, HeartPulse, Radio, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
 
 // Mood names in the order the button cycles through them
 type Mood = "Rain" | "Heartbeat" | "Static";
@@ -20,11 +21,11 @@ const MOODS: Mood[] = ["Rain", "Heartbeat", "Static"];
 // localStorage key for persisting the user's last chosen mood
 const LS_KEY = "se-ambient";
 
-// Emoji labels shown in the panel
-const MOOD_ICONS: Record<Mood, string> = {
-  Rain: "🌧️",
-  Heartbeat: "💓",
-  Static: "📻",
+// Icons shown in the panel
+const MOOD_ICONS: Record<Mood, LucideIcon> = {
+  Rain: CloudRain,
+  Heartbeat: HeartPulse,
+  Static: Radio,
 };
 
 // ─── Web Audio helpers ────────────────────────────────────────────────────────
@@ -288,7 +289,10 @@ export default function AmbientSound() {
                   : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
               }`}
             >
-              <span>{MOOD_ICONS[m]}</span>
+              {(() => {
+                const MIcon = MOOD_ICONS[m];
+                return <MIcon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />;
+              })()}
               <span>{m}</span>
               {/* Active indicator dot */}
               {mood === m && playing && (
@@ -317,7 +321,11 @@ export default function AmbientSound() {
           title="Choose ambient mood"
           className="bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-500 text-xs px-2 py-1.5 rounded-lg transition-colors shadow-lg"
         >
-          {MOOD_ICONS[mood]} {mood}
+          {(() => {
+            const MIcon = MOOD_ICONS[mood];
+            return <MIcon className="w-4 h-4 inline-block mr-1 align-[-2px]" strokeWidth={1.75} aria-hidden="true" />;
+          })()}
+          {mood}
         </button>
 
         {/* Main toggle button — shows 🔇 when silent, 🔊 when playing */}
@@ -330,7 +338,9 @@ export default function AmbientSound() {
               : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
           }`}
         >
-          {playing ? "🔊" : "🔇"}
+          {playing
+            ? <Volume2 className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+            : <VolumeX className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
         </button>
       </div>
     </div>

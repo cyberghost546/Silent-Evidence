@@ -58,7 +58,6 @@ export default function HorrorQuoteOfDay() {
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xl">🕯️</span>
         <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Quote of the Day</h2>
       </div>
 

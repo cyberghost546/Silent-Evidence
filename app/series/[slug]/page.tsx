@@ -96,9 +96,9 @@ export default async function SeriesPage({ params }: Props) {
                 <div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
                   <span>{readingTime(story.content)}</span>
                   <span>·</span>
-                  <span>♥ {story._count.likes}</span>
+                  <span>{story._count.likes}</span>
                   <span>·</span>
-                  <span>💬 {story._count.comments}</span>
+                  <span>{story._count.comments}</span>
                 </div>
               </div>
             </Link>

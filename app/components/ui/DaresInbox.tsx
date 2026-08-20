@@ -118,7 +118,6 @@ export default function DaresInbox({ userId }: Props) {
   if (dares.length === 0) {
     return (
       <div className="text-center py-12 text-gray-600">
-        <p className="text-3xl mb-3">💀</p>
         <p className="text-sm">No dares yet. Share a scary story with a friend!</p>
       </div>
     );
@@ -142,7 +141,6 @@ export default function DaresInbox({ userId }: Props) {
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex items-center gap-2">
             {/* Ghost icon decorates the sender name */}
-            <span className="text-lg">👻</span>
             <span className="text-sm font-semibold text-white">
               {dare.sender.username}
             </span>
@@ -160,7 +158,7 @@ export default function DaresInbox({ userId }: Props) {
           href={`/story/${dare.story.slug}`}
           className="block text-red-400 hover:text-red-300 font-medium text-sm mb-3 transition underline underline-offset-2"
         >
-          📖 {dare.story.title}
+ {dare.story.title}
         </Link>
 
         {/* ── Optional personal message ────────────────────── */}
@@ -203,7 +201,7 @@ export default function DaresInbox({ userId }: Props) {
                   : 'bg-gray-800 text-gray-500'
               }`}
             >
-              {dare.accepted ? '💀 You accepted this dare' : 'Declined'}
+              {dare.accepted ? 'You accepted this dare' : 'Declined'}
             </span>
           </div>
         )}

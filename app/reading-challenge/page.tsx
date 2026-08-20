@@ -2,6 +2,7 @@
 // Personal reading challenge hub — goal progress, streak, and recent reading history.
 
 import { Metadata } from 'next';
+import { BookOpen, Flame, Trophy } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -70,7 +71,6 @@ export default async function ReadingChallengePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,rgba(34,197,94,0.1),transparent_70%)]" />
         <div className="max-w-3xl mx-auto px-4 relative">
           <div className="flex items-center gap-3 mb-1">
-            <span className="text-3xl">📚</span>
             <h1 className="text-3xl font-extrabold text-white">Reading Challenge</h1>
           </div>
           <p className="text-gray-400 text-sm">Track your horror reading streak and hit your goals.</p>
@@ -82,12 +82,12 @@ export default async function ReadingChallengePage() {
         {/* Streak + all-time stats */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Current Streak', value: `${streak?.currentStreak ?? 0}d`, icon: '🔥' },
-            { label: 'Best Streak',    value: `${streak?.longestStreak ?? 0}d`, icon: '🏆' },
-            { label: 'Stories Read',   value: fmt(allTimeCount),                icon: '📖' },
-          ].map(({ label, value, icon }) => (
+            { label: 'Current Streak', value: `${streak?.currentStreak ?? 0}d`, icon: Flame },
+            { label: 'Best Streak',    value: `${streak?.longestStreak ?? 0}d`, icon: Trophy },
+            { label: 'Stories Read',   value: fmt(allTimeCount),                icon: BookOpen },
+          ].map(({ label, value, icon: Icon }) => (
             <div key={label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
-              <p className="text-3xl mb-2">{icon}</p>
+              <div className="flex justify-center mb-2"><Icon className="w-7 h-7 text-gray-400" strokeWidth={1.5} aria-hidden="true" /></div>
               <p className="text-2xl font-extrabold text-white">{value}</p>
               <p className="text-xs text-gray-500 mt-1">{label}</p>
             </div>
@@ -128,7 +128,6 @@ export default async function ReadingChallengePage() {
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">Recently Read</h2>
           {history.length === 0 ? (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-500">
-              <p className="text-4xl mb-3">👻</p>
               <p>You haven&apos;t read any stories yet.</p>
               <Link href="/discover" className="inline-block mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold text-white transition">
                 Explore Stories
@@ -143,7 +142,9 @@ export default async function ReadingChallengePage() {
                     <Image src={h.story.coverImage} alt={h.story.title}
                       width={56} height={56} className="object-cover rounded-xl shrink-0" />
                   ) : (
-                    <div className="w-14 h-14 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center text-2xl">📕</div>
+                    <div className="w-14 h-14 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                    </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-semibold text-sm group-hover:text-red-300 transition truncate">

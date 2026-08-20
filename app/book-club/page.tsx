@@ -26,7 +26,6 @@ export default async function BookClubPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(220,38,38,0.12)_0%,transparent_70%)]" />
         <div className="max-w-4xl mx-auto px-4 relative">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-3xl">📖</span>
             <h1 className="text-4xl font-extrabold text-white">Horror Book Clubs</h1>
           </div>
           <p className="text-gray-400 text-sm mt-1">

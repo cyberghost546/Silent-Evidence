@@ -55,7 +55,6 @@ export default function MessagesClient({
 
       {conversations.length === 0 ? (
         <div className="text-center py-20 text-gray-600">
-          <p className="text-4xl mb-3">💬</p>
           <p>No messages yet. Visit a user profile to start a conversation.</p>
         </div>
       ) : (

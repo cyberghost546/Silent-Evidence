@@ -3,17 +3,18 @@
 // Dropdown nav item grouping Challenges, Map, and Quiz under "Explore".
 
 import Link from 'next/link';
+import { Sparkles, Newspaper, Compass, Swords, Map, Puzzle, Download, Clapperboard } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 const items = [
-  { href: '/for-you',      label: 'For You',      icon: '✨', desc: 'Personalised story picks' },
-  { href: '/feed',         label: 'My Feed',      icon: '📰', desc: 'Stories from who you follow' },
-  { href: '/discover',     label: 'Discover',     icon: '🌟', desc: 'Swipe through horror stories' },
-  { href: '/challenges',   label: 'Challenges',   icon: '⚔️', desc: 'Writing challenges' },
-  { href: '/map',          label: 'Horror Map',   icon: '🗺️', desc: 'Stories by location' },
-  { href: '/quiz',         label: 'Trivia Quiz',  icon: '🧩', desc: 'Test your horror knowledge' },
-  { href: '/offline-reads',label: 'Offline Reads',icon: '📥', desc: 'Your saved stories' },
-  { href: '/videos',       label: 'Videos',       icon: '🎬', desc: 'Horror story videos' },
+  { href: '/for-you',      label: 'For You',       icon: Sparkles,  desc: 'Personalised story picks' },
+  { href: '/feed',         label: 'My Feed',       icon: Newspaper, desc: 'Stories from who you follow' },
+  { href: '/discover',     label: 'Discover',      icon: Compass,   desc: 'Swipe through horror stories' },
+  { href: '/challenges',   label: 'Challenges',    icon: Swords,    desc: 'Writing challenges' },
+  { href: '/map',          label: 'Horror Map',    icon: Map,       desc: 'Stories by location' },
+  { href: '/quiz',         label: 'Trivia Quiz',   icon: Puzzle,    desc: 'Test your horror knowledge' },
+  { href: '/offline-reads',label: 'Offline Reads', icon: Download,  desc: 'Your saved stories' },
+  { href: '/videos',       label: 'Videos',        icon: Clapperboard, desc: 'Horror story videos' },
 ];
 
 export default function ExploreDropdown() {
@@ -50,7 +51,7 @@ export default function ExploreDropdown() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition light-dropdown-item"
             >
-              <span className="text-lg">{item.icon}</span>
+              <item.icon className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-white">{item.label}</p>
                 <p className="text-xs text-gray-500">{item.desc}</p>

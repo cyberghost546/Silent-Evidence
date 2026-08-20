@@ -24,7 +24,7 @@ function template(body: string) {
 <body>
 <div class="wrap">
   <div class="hero">
-    <h1>💀 Silent Evidence</h1>
+    <h1>Silent Evidence</h1>
     <p>horror stories that haunt you.</p>
   </div>
   <div class="body">${body}</div>

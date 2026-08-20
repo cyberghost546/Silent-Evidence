@@ -293,7 +293,6 @@ export default async function SearchPage({ searchParams }: Props) {
         {/* No query yet */}
         {!hasFilters && (
           <div className="text-center py-20 text-gray-600">
-            <p className="text-5xl mb-4">🔍</p>
             <p>Type something in the search bar or pick a category to find stories.</p>
           </div>
         )}
@@ -301,7 +300,6 @@ export default async function SearchPage({ searchParams }: Props) {
         {/* No results */}
         {hasFilters && results.length === 0 && (
           <div className="text-center py-20 text-gray-600">
-            <p className="text-5xl mb-4">😶</p>
             <p>No stories matched your search.</p>
             <p className="mt-2 text-sm">Try a different word or remove a filter.</p>
           </div>

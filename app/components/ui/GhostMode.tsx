@@ -68,7 +68,6 @@ export default function GhostModeToggle() {
           : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600' // inactive: grey
       }`}
     >
-      <span className="text-base leading-none">👻</span>
       {ghost ? 'Ghost Mode ON' : 'Ghost Mode'}
     </button>
   );

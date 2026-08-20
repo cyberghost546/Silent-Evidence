@@ -45,7 +45,6 @@ export default function ReadingPaywall({ readThisMonth, limit }: Props) {
       <div className="mx-4 max-w-md rounded-2xl border border-gray-800 bg-gray-950 p-8 text-center shadow-2xl">
 
         {/* Big lock emoji — immediately communicates "you're blocked" */}
-        <div className="mb-4 text-5xl">🔒</div>
 
         {/* Personalised count — shows "You've read 10 of 10 free stories" */}
         <h2 className="mb-2 text-2xl font-bold text-white">

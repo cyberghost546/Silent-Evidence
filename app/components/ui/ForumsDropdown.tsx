@@ -6,6 +6,7 @@
 // Clicking a forum navigates to /forums/[slug]. Closes on outside click.
 
 import Link from 'next/link';
+import { MessagesSquare } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 // Each forum needs a name, URL slug, optional emoji icon, and optional description
@@ -52,7 +53,6 @@ export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-b border-gray-700"
           >
-            <span className="text-lg">💬</span>
             <div>
               <p className="text-sm font-medium text-white">All Forums</p>
               <p className="text-xs text-gray-500">Browse every category</p>
@@ -68,7 +68,7 @@ export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition"
             >
               {/* Use the forum's custom icon, or fall back to a pin emoji */}
-              <span className="text-lg">{forum.icon ?? '📌'}</span>
+              <MessagesSquare className="w-4 h-4 shrink-0 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-white">{forum.name}</p>
                 {/* Only show description if one has been set in the database */}

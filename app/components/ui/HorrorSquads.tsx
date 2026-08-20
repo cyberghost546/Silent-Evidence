@@ -325,7 +325,7 @@ export default function HorrorSquads({ userId }: Props) {
                                transition-colors"
                   >
                     {/* Link icon + truncated URL */}
-                    🔗 {post.storyUrl}
+ {post.storyUrl}
                   </a>
                 )}
               </div>

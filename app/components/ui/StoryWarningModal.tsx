@@ -59,7 +59,6 @@ export default function StoryWarningModal({ warnings, children }: Props) {
           <div className="relative p-8 text-center">
 
             {/* Pulsing skull emoji — draws attention and reinforces the horror theme */}
-            <div className="text-6xl mb-4 animate-pulse">☠️</div>
 
             {/* Modal title */}
             <h2 className="text-2xl font-extrabold text-red-400 mb-1 tracking-tight">
@@ -81,7 +80,7 @@ export default function StoryWarningModal({ warnings, children }: Props) {
                   key={tag} // tag text used as key — warnings are unique by definition
                   className="px-3 py-1 text-xs font-semibold rounded-full bg-red-950 border border-red-700/50 text-red-300"
                 >
-                  ⚠️ {tag}
+ {tag}
                 </span>
               ))}
             </div>

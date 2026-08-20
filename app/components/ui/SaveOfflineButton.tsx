@@ -30,6 +30,7 @@
  */
 
 import { useState } from 'react';
+import { Check, Download } from 'lucide-react';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 interface SaveOfflineButtonProps {
@@ -176,7 +177,9 @@ export default function SaveOfflineButton({
       ].join(' ')}
     >
       {/* Icon — checkmark confirms the story is saved; inbox tray prompts saving */}
-      <span aria-hidden="true">{saved ? '✓' : '📥'}</span>
+      {saved
+        ? <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+        : <Download className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
 
       {/* Label text — toggled with the icon */}
       <span>{saved ? 'Saved Offline' : 'Save Offline'}</span>

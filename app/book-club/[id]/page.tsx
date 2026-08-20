@@ -58,7 +58,6 @@ export default async function BookClubDetailPage({ params }: Props) {
       <main className="min-h-screen bg-gray-950 text-white flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center flex-col gap-4 px-4">
-          <span className="text-5xl">🔒</span>
           <h1 className="text-2xl font-bold text-white">Private Club</h1>
           <p className="text-gray-400 text-sm text-center max-w-sm">
             This book club is invite-only. Ask a member for the invite code to join.

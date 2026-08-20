@@ -6,6 +6,7 @@
 // and final POST to /api/stories to publish or save as draft.
 // Props: categories — list of {id, name} fetched server-side; initialExcerpt — pre-filled excerpt.
 import { useState, useRef, useCallback, useEffect, ChangeEvent } from 'react';
+import { Circle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { LANGUAGES } from '@/lib/languages';
 import dynamic from 'next/dynamic';
@@ -246,7 +247,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       {/* Draft restored banner — shown when localStorage had unsaved content */}
       {draftRestored && (
         <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm px-4 py-2.5 rounded-lg">
-          <span>📋 Draft restored from your last session.</span>
+          <span>Draft restored from your last session.</span>
           <button
             type="button"
             onClick={() => {
@@ -336,7 +337,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
                 coverTab === tab ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
               }`}
             >
-              {tab === 'upload' ? '📁 Upload from device' : '🔗 Paste URL'}
+              {tab === 'upload' ? 'Upload from device' : 'Paste URL'}
             </button>
           ))}
         </div>
@@ -357,7 +358,6 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
               <p className="text-sm text-gray-400 animate-pulse">Uploading…</p>
             ) : (
               <>
-                <span className="text-3xl">🖼️</span>
                 <p className="text-sm text-gray-400 group-hover:text-white transition">
                   Click to choose an image
                 </p>
@@ -473,7 +473,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       {/* Location (for Horror Map) */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          📍 Location <span className="text-gray-500 font-normal">(optional — pins story on the Horror Map)</span>
+ Location <span className="text-gray-500 font-normal">(optional — pins story on the Horror Map)</span>
         </label>
         <input value={locationName} onChange={e => setLocationName(e.target.value)} placeholder="e.g. Amityville, New York"
           suppressHydrationWarning
@@ -495,14 +495,14 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <select value={mood} onChange={e => setMood(e.target.value)}
           className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition appearance-none">
           <option value="">— No mood selected —</option>
-          <option value="DARK">🌑 Dark</option>
-          <option value="MYSTERIOUS">🌫️ Mysterious</option>
-          <option value="DRAMATIC">🎭 Dramatic</option>
-          <option value="EPIC">⚔️ Epic</option>
-          <option value="ACTION">💥 Action</option>
-          <option value="HEARTWARMING">❤️ Heartwarming</option>
-          <option value="ROMANTIC">🌹 Romantic</option>
-          <option value="COMEDIC">😂 Comedic</option>
+          <option value="DARK">Dark</option>
+          <option value="MYSTERIOUS">Mysterious</option>
+          <option value="DRAMATIC">Dramatic</option>
+          <option value="EPIC">Epic</option>
+          <option value="ACTION">Action</option>
+          <option value="HEARTWARMING">Heartwarming</option>
+          <option value="ROMANTIC">Romantic</option>
+          <option value="COMEDIC">Comedic</option>
         </select>
       </div>
 
@@ -513,9 +513,9 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         </label>
         <div className="grid grid-cols-3 gap-2">
           {([
-            { value: 'ALL',    icon: '🔵', label: 'All Ages',    desc: 'Safe for everyone' },
-            { value: 'TEEN',   icon: '🟡', label: '13+ Teen',    desc: 'Mild action / violence' },
-            { value: 'MATURE', icon: '🔴', label: '18+ Mature',  desc: 'Explicit / extreme content' },
+            { value: 'ALL',    tone: 'text-blue-400',   label: 'All Ages',    desc: 'Safe for everyone' },
+            { value: 'TEEN',   tone: 'text-yellow-400', label: '13+ Teen',    desc: 'Mild action / violence' },
+            { value: 'MATURE', tone: 'text-red-400',    label: '18+ Mature',  desc: 'Explicit / extreme content' },
           ] as const).map(r => (
             <button
               key={r.value}
@@ -527,7 +527,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
                   : 'border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600'
               }`}
             >
-              <span className="text-lg mb-1">{r.icon}</span>
+              <Circle className={`w-3.5 h-3.5 mb-1 ${r.tone}`} strokeWidth={3} aria-hidden="true" />
               <span className="font-semibold">{r.label}</span>
               <span className="text-gray-500 mt-0.5 leading-tight">{r.desc}</span>
             </button>
@@ -569,7 +569,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         />
         {scheduledAt && (
           <p className="text-xs text-amber-400/80 mt-1.5">
-            🕐 Will auto-publish on {new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+ Will auto-publish on {new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </p>
         )}
       </div>
@@ -577,7 +577,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       {/* Audio narration URL */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          🎙️ Audio Narration URL <span className="text-gray-500 font-normal">(optional — MP3 link for premium listeners)</span>
+ Audio Narration URL <span className="text-gray-500 font-normal">(optional — MP3 link for premium listeners)</span>
         </label>
         <input
           type="url"
@@ -596,7 +596,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         {/* Members-only toggle */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-gray-300">🔒 Members-Only Story</p>
+            <p className="text-sm font-medium text-gray-300">Members-Only Story</p>
             <p className="text-xs text-gray-500 mt-0.5">Only premium subscribers can read this story. It will never be made free.</p>
           </div>
           <button
@@ -612,7 +612,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         {/* Early access window */}
         <div>
           <label htmlFor="earlyAccessUntil" className="block text-sm font-medium text-gray-300 mb-1">
-            📖 Early Access Until <span className="text-gray-500 font-normal">(optional)</span>
+ Early Access Until <span className="text-gray-500 font-normal">(optional)</span>
           </label>
           <input
             id="earlyAccessUntil"
@@ -640,14 +640,14 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
             onClick={() => { setStatus('DRAFT'); setScheduledAt(''); }}
             className={`px-4 py-2 transition ${status === 'DRAFT' ? 'bg-gray-700 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
           >
-            💾 Draft
+ Draft
           </button>
           <button
             type="button"
             onClick={() => { setStatus('PUBLISHED'); setScheduledAt(''); }}
             className={`px-4 py-2 transition ${status === 'PUBLISHED' ? 'bg-red-600 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
           >
-            🚀 Publish
+ Publish
           </button>
           {/* SCHEDULED button — only shown once a publish date is set above */}
           {scheduledAt && (
@@ -656,7 +656,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
               onClick={() => setStatus('SCHEDULED')}
               className={`px-4 py-2 transition ${status === 'SCHEDULED' ? 'bg-amber-600 text-white font-medium' : 'bg-gray-900 text-gray-400 hover:bg-gray-800'}`}
             >
-              🕐 Scheduled
+ Scheduled
             </button>
           )}
         </div>

@@ -151,7 +151,6 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                   ) : (
                     // Fallback placeholder gradient with a faint skull emoji
                     <div className="w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
-                      <span className="text-5xl opacity-20">💀</span>
                     </div>
                   )}
 
@@ -202,10 +201,10 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                     </span>
 
                     {/* Like count */}
-                    <span className="text-xs text-gray-600">♥ {story._count.likes}</span>
+                    <span className="text-xs text-gray-600">{story._count.likes}</span>
 
                     {/* Comment count */}
-                    <span className="text-xs text-gray-600">💬 {story._count.comments}</span>
+                    <span className="text-xs text-gray-600">{story._count.comments}</span>
                   </div>
                 </div>
               </Link>
@@ -248,7 +247,6 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                   ) : (
                     // Gradient placeholder when no cover image exists
                     <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                      <span className="text-3xl opacity-20">💀</span>
                     </div>
                   )}
                 </div>
@@ -290,13 +288,13 @@ export default function StoryViewToggle({ stories, footer }: Props) {
                     <span>·</span> {/* Separator dot */}
 
                     {/* Like count */}
-                    <span>♥ {story._count.likes}</span>
+                    <span>{story._count.likes}</span>
 
                     {/* Comment count */}
-                    <span>💬 {story._count.comments}</span>
+                    <span>{story._count.comments}</span>
 
                     {/* View count — only shown if the story object includes it */}
-                    {story.views !== undefined && <><span>·</span><span>👁 {story.views.toLocaleString()}</span></>}
+                    {story.views !== undefined && <><span>·</span><span>{story.views.toLocaleString()}</span></>}
 
                     {/* Publication date — pushed to the right with ml-auto; longer format in list view */}
                     <span className="ml-auto">

@@ -29,6 +29,8 @@
 // =============================================================================
 
 import { notFound } from 'next/navigation';
+import { createElement } from 'react';
+import { categoryIcon } from '@/lib/categoryIcons';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
@@ -36,11 +38,7 @@ import Footer from '@/app/components/ui/Footer';
 import Pagination from '@/app/components/ui/Pagination';
 import CategoryStories from './CategoryStories';
 import type { Metadata } from 'next';
-import {
-  BookOpen, Ghost, Brain, Droplet, Eye,
-  MapPin, Monitor, Rocket, Flame, Skull,
-  type LucideIcon,
-} from 'lucide-react';
+import { Ghost } from 'lucide-react';
 
 // Base URL used for generating canonical and Open Graph URLs.
 // Falls back to the production domain if the env var isn't set.
@@ -74,17 +72,7 @@ type Props = {
 // Falls back to Skull (a Lucide icon) for any category not in this map.
 // This is a simple "data-driven UI" pattern — adding new categories only
 // requires adding one entry here, no JSX changes needed.
-const CATEGORY_ICONS: Record<string, string> = {
-  'true-stories':  '📖',
-  'supernatural':  '👻',
-  'psychological': '🧠',
-  'gore':          '🩸',
-  'paranormal':    '👁️',
-  'urban-legends': '🌆',
-  'creepypasta':   '💻',
-  'sci-fi':        '🛸',
-  'occult':        '🕯️',
-};
+// Category icons come from the shared lib/categoryIcons map.
 
 // ---------------------------------------------------------------------------
 // generateMetadata — SEO + social sharing
@@ -206,8 +194,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     },
   });
 
-  // Look up the emoji icon for this category, fall back to Skull Lucide icon
-  const CategoryIcon = CATEGORY_ICONS[slug] ?? Skull;
+
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -233,9 +220,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
           {/* ── Category icon + name ──────────────────────────────────── */}
           <div className="flex items-center gap-4 mb-4">
-            {/* Icon box — emoji from CATEGORY_ICONS map or Lucide Skull fallback */}
-            <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-3xl shrink-0">
-              {CategoryIcon}
+            {/* Icon box — icon resolved from the shared category map */}
+            <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center shrink-0">
+              {createElement(categoryIcon(slug), {
+                className: "w-7 h-7 text-red-400",
+                strokeWidth: 1.5,
+                "aria-hidden": "true",
+              })}
             </div>
             <div>
               {/* Main heading — md:text-5xl applies on ≥768px screens */}

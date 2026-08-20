@@ -57,7 +57,6 @@ export default function RecipesPage() {
         <div className="text-center mb-10">
 
           {/* Decorative large emoji — text-5xl = 48px; mb-4 = 16px bottom margin */}
-          <div className="text-5xl mb-4">🍷</div>
 
           {/* Page title — &amp; renders the & entity safely in JSX */}
           <h1 className="text-4xl font-bold text-white mb-3">Horror Recipes &amp; Rituals</h1>

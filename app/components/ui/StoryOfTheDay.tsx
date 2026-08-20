@@ -48,7 +48,7 @@ export default async function StoryOfTheDay() {
       <div className="flex items-center gap-3 mb-6">
         <span className="w-1 h-6 bg-yellow-500 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Story of the Day</h2>
-        <span className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-full">✨ Today&apos;s pick</span>
+        <span className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-full">Today&apos;s pick</span>
       </div>
 
       <div className="group relative flex flex-col md:flex-row overflow-hidden bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]">
@@ -82,7 +82,7 @@ export default async function StoryOfTheDay() {
             <span className="text-xs text-gray-600">·</span>
             <span className="text-xs text-gray-500">{readingTime(story.content)}</span>
             <span className="text-xs text-gray-600">·</span>
-            <span className="text-xs text-gray-500">♥ {story._count.likes}</span>
+            <span className="text-xs text-gray-500">{story._count.likes}</span>
           </div>
           <Link href={`/story/${story.slug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-yellow-400 mt-1 hover:gap-3 transition-all w-fit">
             Read story

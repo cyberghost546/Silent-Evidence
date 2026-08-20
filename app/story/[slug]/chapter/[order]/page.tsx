@@ -3,6 +3,7 @@
 // Shows the chapter content with prev/next navigation and a link back to the story overview.
 
 import { notFound } from 'next/navigation';
+import { Lock } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -94,7 +95,6 @@ export default async function ChapterPage({ params }: Props) {
         {/* Chapter content — chapters beyond chapter 1 require a premium subscription */}
         {isLockedChapter ? (
           <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-10 text-center mt-4">
-            <p className="text-4xl mb-4">🔒</p>
             <h3 className="text-xl font-bold text-white mb-2">Premium Members Only</h3>
             <p className="text-sm text-gray-400 mb-2">
               Chapter 1 is free for everyone. Continue the story by upgrading to premium.
@@ -104,7 +104,7 @@ export default async function ChapterPage({ params }: Props) {
               href="/premium"
               className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-sm"
             >
-              ⚡ Unlock All Chapters
+ Unlock All Chapters
             </a>
             <div className="mt-4">
               <Link href={`/story/${slug}/chapter/${allChapters[0].order}`} className="text-xs text-gray-500 hover:text-gray-400 transition underline">
@@ -173,7 +173,7 @@ export default async function ChapterPage({ params }: Props) {
                 >
                   <span className="text-xs text-gray-600 w-5 shrink-0">{i + 1}</span>
                   <span className="truncate">{c.title}</span>
-                  {locked && <span className="ml-auto text-xs text-yellow-600">🔒</span>}
+                  {locked && <Lock className="ml-auto w-3 h-3 text-yellow-600 shrink-0" strokeWidth={2} aria-label="Locked" />}
                   {!locked && c.order === order && <span className="ml-auto text-xs">← here</span>}
                 </Link>
               );

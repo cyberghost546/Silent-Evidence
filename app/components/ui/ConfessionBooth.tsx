@@ -8,6 +8,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { UserRound, Droplet } from 'lucide-react';
+import { CONFESSION_REACTIONS } from '@/lib/reactions';
 
 interface Confession {
   id: number;
@@ -18,7 +20,8 @@ interface Confession {
   reactionCounts: Record<string, number>;
 }
 
-const EMOJIS = ['😱', '💀', '👻', '🕯️'];
+// Reaction set lives in lib/reactions — see the note there on why the stored
+// ids still look like emoji even though nothing renders them any more.
 const MAX_CHARS = 500;
 
 export default function ConfessionBooth() {
@@ -81,7 +84,6 @@ export default function ConfessionBooth() {
         <div className="absolute inset-0 rounded-2xl shadow-[0_0_60px_rgba(220,38,38,0.25)]" />
         <div className="relative bg-gray-900/90 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">🕯️</span>
             <span className="text-gray-300 font-medium">Your confession</span>
           </div>
 
@@ -133,7 +135,6 @@ export default function ConfessionBooth() {
 
       {!loading && confessions.length === 0 && (
         <div className="text-center py-16 text-gray-600">
-          <div className="text-4xl mb-3">👻</div>
           <p>No confessions yet. Be the first to whisper into the dark.</p>
         </div>
       )}
@@ -147,7 +148,9 @@ export default function ConfessionBooth() {
             {/* Author line */}
             <div className="flex items-center gap-2 mb-3">
               <div className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-sm">
-                {c.isAnonymous ? '👤' : '🩸'}
+                {c.isAnonymous
+                ? <UserRound className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+                : <Droplet className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
               </div>
               <span className="text-gray-500 text-sm">
                 {c.isAnonymous || !c.author ? 'Anonymous' : c.author.username}
@@ -162,16 +165,18 @@ export default function ConfessionBooth() {
 
             {/* Reactions */}
             <div className="flex gap-2 mt-4 flex-wrap">
-              {EMOJIS.map((emoji) => (
+              {CONFESSION_REACTIONS.map(({ id, icon: Icon, label }) => (
                 <button
-                  key={emoji}
-                  onClick={() => react(c.id, emoji)}
+                  key={id}
+                  onClick={() => react(c.id, id)}
+                  title={label}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700
                              border border-gray-700 hover:border-gray-600 transition-colors text-sm"
                 >
-                  <span>{emoji}</span>
-                  {(c.reactionCounts[emoji] ?? 0) > 0 && (
-                    <span className="text-gray-400 text-xs">{c.reactionCounts[emoji]}</span>
+                  <Icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="sr-only">{label}</span>
+                  {(c.reactionCounts[id] ?? 0) > 0 && (
+                    <span className="text-gray-400 text-xs">{c.reactionCounts[id]}</span>
                   )}
                 </button>
               ))}

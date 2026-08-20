@@ -4,7 +4,8 @@
  * WHAT THIS FILE DOES:
  * A dynamic route that renders a filtered story listing for a specific horror
  * "mood" — e.g. /mood/epic, /mood/dark, /mood/romantic. Each mood has its own
- * label, emoji, description, and Tailwind colour class defined in MOOD_META.
+ * label, description, and Tailwind colour class defined in MOOD_META, plus an
+ * icon from the shared lib/moodIcons map.
  *
  * DYNAMIC ROUTE:
  * The folder name `[mood]` tells Next.js this segment is dynamic. At request
@@ -43,6 +44,8 @@ import { prisma }   from '@/lib/prisma';
 import Header       from '@/app/components/ui/Header';
 import Footer       from '@/app/components/ui/Footer';
 import { readingTime } from '@/lib/readingTime';
+import { createElement } from 'react';
+import { moodIcon } from '@/lib/moodIcons';
 
 // ── TypeScript: dynamic route params ──────────────────────────────────────────
 // In Next.js 14, params are a Promise — we must `await` them inside the component.
@@ -55,15 +58,15 @@ type Props = { params: Promise<{ mood: string }> };
 //   2. border-*    → pill border colour
 //   3. bg-*        → pill background tint
 // All three are applied together to the active pill.
-const MOOD_META: Record<string, { label: string; emoji: string; description: string; color: string }> = {
-  EPIC:         { label: 'Epic',         emoji: '⚔️',  description: 'Grand battles and heroic moments.',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-  HEARTWARMING: { label: 'Heartwarming', emoji: '💖',  description: 'Stories that touch the soul.',        color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
-  MYSTERIOUS:   { label: 'Mysterious',   emoji: '🔮',  description: 'Puzzles, secrets, and intrigue.',     color: 'text-green-400 border-green-500/30 bg-green-500/10' },
-  ACTION:       { label: 'Action',       emoji: '💥',  description: 'Non-stop fights and adrenaline.',     color: 'text-red-400 border-red-500/30 bg-red-500/10' },
-  ROMANTIC:     { label: 'Romantic',     emoji: '🌸',  description: 'Love stories and tender moments.',    color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
-  COMEDIC:      { label: 'Comedic',      emoji: '😂',  description: 'Laughs, gags, and fun chaos.',        color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
-  DRAMATIC:     { label: 'Dramatic',     emoji: '🎭',  description: 'Intense emotions and plot twists.',   color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
-  DARK:         { label: 'Dark',         emoji: '🌑',  description: 'Grim themes and moral ambiguity.',    color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
+const MOOD_META: Record<string, { label: string; description: string; color: string }> = {
+  EPIC:         { label: 'Epic',         description: 'Grand battles and heroic moments.',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
+  HEARTWARMING: { label: 'Heartwarming', description: 'Stories that touch the soul.',        color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
+  MYSTERIOUS:   { label: 'Mysterious',   description: 'Puzzles, secrets, and intrigue.',     color: 'text-green-400 border-green-500/30 bg-green-500/10' },
+  ACTION:       { label: 'Action',       description: 'Non-stop fights and adrenaline.',     color: 'text-red-400 border-red-500/30 bg-red-500/10' },
+  ROMANTIC:     { label: 'Romantic',     description: 'Love stories and tender moments.',    color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
+  COMEDIC:      { label: 'Comedic',      description: 'Laughs, gags, and fun chaos.',        color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
+  DRAMATIC:     { label: 'Dramatic',     description: 'Intense emotions and plot twists.',   color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
+  DARK:         { label: 'Dark',         description: 'Grim themes and moral ambiguity.',    color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
 };
 
 // ── Page component ─────────────────────────────────────────────────────────────
@@ -81,6 +84,7 @@ export default async function MoodPage({ params }: Props) {
   // and we trigger a 404 rather than crashing or showing an empty page.
   const meta = MOOD_META[moodKey];
   if (!meta) return notFound();
+
 
   // ── Prisma query ──────────────────────────────────────────────────────────
   // Fetch all PUBLISHED stories with this mood, newest-first.
@@ -121,10 +125,14 @@ export default async function MoodPage({ params }: Props) {
             <span className="text-xs text-gray-300">{meta.label}</span>
           </div>
 
-          {/* Emoji + heading + description */}
+          {/* Icon + heading + description */}
           <div className="flex items-center gap-4 mt-4">
-            {/* Large emoji acts as the page icon for this mood */}
-            <span className="text-5xl">{meta.emoji}</span>
+            {/* Large icon acts as the page icon for this mood */}
+            {createElement(moodIcon(moodKey), {
+              className: "w-12 h-12 shrink-0 text-gray-400",
+              strokeWidth: 1.25,
+              "aria-hidden": "true",
+            })}
             <div>
               <h1 className="text-3xl font-bold text-white">{meta.label}</h1>
               <p className="text-gray-400 mt-1">{meta.description}</p>
@@ -161,7 +169,8 @@ export default async function MoodPage({ params }: Props) {
                   : 'text-gray-500 border-gray-700 hover:border-gray-500 hover:text-gray-300'
               }`}
             >
-              {m.emoji} {m.label}
+              {createElement(moodIcon(key), { className: "w-3.5 h-3.5", strokeWidth: 1.75, "aria-hidden": "true" })}
+              {m.label}
             </Link>
           ))}
         </div>
@@ -197,9 +206,13 @@ export default async function MoodPage({ params }: Props) {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    // Fallback: gradient placeholder with the mood's emoji centred
-                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-4xl">
-                      {meta.emoji}
+                    // Fallback: gradient placeholder with the mood's icon centred
+                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                      {createElement(moodIcon(moodKey), {
+                        className: "w-10 h-10 text-gray-600",
+                        strokeWidth: 1.25,
+                        "aria-hidden": "true",
+                      })}
                     </div>
                   )}
 
@@ -235,7 +248,7 @@ export default async function MoodPage({ params }: Props) {
                     {/* readingTime() calculates estimated reading time from raw content string */}
                     <span>{readingTime(story.content)}</span>
                     {/* ml-auto pushes the like count to the far right */}
-                    <span className="ml-auto flex items-center gap-1">♥ {story._count.likes}</span>
+                    <span className="ml-auto flex items-center gap-1">{story._count.likes}</span>
                   </div>
                 </div>
               </Link>

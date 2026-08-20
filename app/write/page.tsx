@@ -59,10 +59,10 @@ export default async function WritePage({ searchParams }: Props) {
           {/* Quick links to related writing tools */}
           <div className="flex gap-4 mt-3">
             <Link href="/write/sprints" className="text-xs text-gray-500 hover:text-red-400 transition">
-              ⏱ Writing Sprints
+ Writing Sprints
             </Link>
             <Link href="/coauthor" className="text-xs text-gray-500 hover:text-red-400 transition">
-              ✍️ Co-author Requests
+ Co-author Requests
             </Link>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default async function WritePage({ searchParams }: Props) {
         {prompt && (
           <div className="mb-6 bg-red-950/30 border border-red-900/40 rounded-xl p-4">
             <p className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">
-              ✍️ Writing Prompt{promptTitle ? ` — ${promptTitle}` : ''}
+ Writing Prompt{promptTitle ? ` — ${promptTitle}` : ''}
             </p>
             <p className="text-sm text-gray-300">{prompt}</p>
           </div>

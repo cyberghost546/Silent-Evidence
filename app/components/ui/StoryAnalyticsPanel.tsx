@@ -4,6 +4,8 @@
 // Displays views, likes, comments, bookmarks, reactions, and reading time.
 // All data is passed as props from the server — no client-side fetching needed.
 
+import { Eye, Heart, MessageSquare, Bookmark, Flame, Smile, Zap, HelpCircle, type LucideIcon } from 'lucide-react';
+
 type Props = {
   views:        number;
   likes:        number;
@@ -15,9 +17,9 @@ type Props = {
   updatedAt:    string;
 };
 
-// Emoji icons for each reaction type
-const reactionEmoji: Record<string, string> = {
-  LOVE: '❤️', HYPE: '🔥', KAWAII: '🥰', FIRE: '🔥',
+// Icon for each reaction type
+const reactionEmoji: Record<string, LucideIcon> = {
+  LOVE: Heart, HYPE: Flame, KAWAII: Smile, FIRE: Zap,
 };
 
 export default function StoryAnalyticsPanel({
@@ -34,20 +36,19 @@ export default function StoryAnalyticsPanel({
 
       {/* Header */}
       <div className="flex items-center gap-2">
-        <span className="text-xl">📊</span>
         <h3 className="text-lg font-bold text-white">Story Analytics</h3>
       </div>
 
       {/* Main stat grid — 4 key metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Views',     value: views.toLocaleString(),     icon: '👁',  color: 'text-blue-400'  },
-          { label: 'Likes',     value: likes.toLocaleString(),     icon: '♥',   color: 'text-red-400'   },
-          { label: 'Comments',  value: comments.toLocaleString(),  icon: '💬',  color: 'text-green-400' },
-          { label: 'Bookmarks', value: bookmarks.toLocaleString(), icon: '🔖',  color: 'text-yellow-400'},
-        ].map(({ label, value, icon, color }) => (
+          { label: 'Views',     value: views.toLocaleString(),     icon: Eye,       color: 'text-blue-400'  },
+          { label: 'Likes',     value: likes.toLocaleString(),     icon: Heart,     color: 'text-red-400'   },
+          { label: 'Comments',  value: comments.toLocaleString(),  icon: MessageSquare, color: 'text-green-400' },
+          { label: 'Bookmarks', value: bookmarks.toLocaleString(), icon: Bookmark,  color: 'text-yellow-400'},
+        ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-gray-800 rounded-xl p-4 text-center border border-gray-700">
-            <span className="text-2xl">{icon}</span>
+            <Icon className="w-6 h-6" strokeWidth={1.5} aria-hidden="true" />
             <p className={`text-2xl font-extrabold mt-1 ${color}`}>{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
@@ -77,7 +78,10 @@ export default function StoryAnalyticsPanel({
           <div className="flex flex-wrap gap-3">
             {reactions.map(r => (
               <div key={r.type} className="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2">
-                <span className="text-lg">{reactionEmoji[r.type] ?? '❓'}</span>
+                {(() => {
+              const RIcon = reactionEmoji[r.type] ?? HelpCircle;
+              return <RIcon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />;
+            })()}
                 <div>
                   <p className="text-sm font-bold text-white">{r.count}</p>
                   <p className="text-[10px] text-gray-500">{r.type.charAt(0) + r.type.slice(1).toLowerCase()}</p>
@@ -90,9 +94,9 @@ export default function StoryAnalyticsPanel({
 
       {/* Meta info */}
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 border-t border-gray-800 pt-4">
-        <span>⏱ {readingTime}</span>
-        <span>📅 Published {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-        <span>✏️ Last edited {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        <span>{readingTime}</span>
+        <span>Published {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        <span>Last edited {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
       </div>
     </div>
   );

@@ -69,7 +69,6 @@ export default function ScreamAwards() {
 
   if (!award) return (
     <div className="text-center py-20 text-gray-600">
-      <div className="text-4xl mb-3">🏆</div>
       <p>No awards ceremony running right now. Check back soon!</p>
     </div>
   );
@@ -82,7 +81,6 @@ export default function ScreamAwards() {
     <div className="space-y-8">
       {/* Award header */}
       <div className="bg-gray-900 border border-yellow-900/40 rounded-2xl p-6 text-center">
-        <div className="text-4xl mb-2">🏆</div>
         <h2 className="text-2xl font-black text-yellow-400">{award.year} Scream Awards</h2>
         <p className="text-gray-500 text-sm mt-1">{totalVotesCast.toLocaleString()} votes cast</p>
         {!award.isOpen && (
@@ -105,7 +103,6 @@ export default function ScreamAwards() {
         return (
           <div key={cat.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-              <span className="text-yellow-500">🏆</span>
               {cat.name}
               {myVoteInCat && (
                 <span className="ml-auto text-green-400 text-xs font-normal">✓ You voted</span>

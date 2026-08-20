@@ -31,6 +31,7 @@
 //   chips toggle on/off; the custom input appends arbitrary strings.
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Circle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -282,7 +283,7 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
           disabled={uploadingImg}
           className="px-4 py-2.5 text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-50 border border-gray-600 text-white rounded-xl transition w-full"
         >
-          {uploadingImg ? 'Uploading…' : coverImage ? '🔄 Replace image' : '📁 Upload image'}
+          {uploadingImg ? 'Uploading…' : coverImage ? 'Replace image' : 'Upload image'}
         </button>
         {imgError && <p className="text-xs text-red-400 mt-1">{imgError}</p>}
 
@@ -379,9 +380,9 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
         </label>
         <div className="grid grid-cols-3 gap-2">
           {([
-            { value: 'ALL',    icon: '🔵', label: 'All Ages',   desc: 'Safe for everyone' },
-            { value: 'TEEN',   icon: '🟡', label: '13+ Teen',   desc: 'Mild action / violence' },
-            { value: 'MATURE', icon: '🔴', label: '18+ Mature', desc: 'Explicit / extreme' },
+            { value: 'ALL',    tone: 'text-blue-400',   label: 'All Ages',   desc: 'Safe for everyone' },
+            { value: 'TEEN',   tone: 'text-yellow-400', label: '13+ Teen',   desc: 'Mild action / violence' },
+            { value: 'MATURE', tone: 'text-red-400',    label: '18+ Mature', desc: 'Explicit / extreme' },
           ] as const).map(r => (
             <button
               key={r.value}
@@ -393,7 +394,7 @@ export default function StoryEditForm({ story, categories }: { story: Story; cat
                   : 'border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600'
               }`}
             >
-              <span className="text-lg mb-1">{r.icon}</span>
+              <Circle className={`w-3.5 h-3.5 mb-1 ${r.tone}`} strokeWidth={3} aria-hidden="true" />
               <span className="font-semibold">{r.label}</span>
               <span className="text-gray-500 mt-0.5 leading-tight">{r.desc}</span>
             </button>

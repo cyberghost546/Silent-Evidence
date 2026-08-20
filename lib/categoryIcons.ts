@@ -1,0 +1,103 @@
+// lib/categoryIcons.ts
+// Single source of truth for the icon shown for a story category.
+//
+// This map previously existed in two places - the homepage CategoriesShowcase
+// and the admin AdminCategoriesClient - and the two had drifted apart, so the
+// same category showed a different glyph depending on where you looked
+// (supernatural was one thing on the homepage and another in the admin panel).
+// Import from here rather than declaring another local map.
+//
+// Keys are SLUGS (lowercase, hyphenated - as stored in Category.slug), not
+// display names. A key like 'Analog Horror' would never match anything.
+
+import {
+  Ghost, Brain, Sparkles, Eye, Skull, Orbit, Droplet, Building2, Search, Laptop,
+  Axe, Moon, Video, Wheat, Flower2, Radiation, House, Rocket, Tv, Cable,
+  Tornado, Box, FlameKindling, Church, Landmark, BedDouble, CloudMoon, Hourglass,
+  Palmtree, Snowflake, Trees, Syringe, Bug, Dna, Bot, MonitorSmartphone, Globe,
+  Film, DoorOpen, Clapperboard, Drama, Beef, Link2, Sword, Footprints, UserX,
+  Users, Smartphone, Gamepad2, School, Baby, CircleDashed, Radio, BookOpen,
+  type LucideIcon,
+} from 'lucide-react';
+
+// Shown when a category's slug has no entry in ICONS below, so a newly added
+// category always renders an icon instead of an empty gap in the tile.
+export const DEFAULT_ICON: LucideIcon = CircleDashed;
+
+// A mapping of category slug -> lucide-react icon component.
+// NOTE: keys are SLUGS (lowercase, hyphenated - as stored in Category.slug),
+// not display names. A key like 'Analog Horror' would never match anything.
+export const ICONS: Record<string, LucideIcon> = {
+  'ghost-stories':            Ghost,
+  'psychological':            Brain,
+  'supernatural':             Sparkles,
+  'paranormal':               Eye,
+  'slasher-horror':           Axe,
+  'cosmic-horror':            Orbit,
+  'body-horror':              Droplet,
+  'urban-legends':            Building2,
+  'true-crime':               Search,
+  'tech-horror':              Laptop,
+  'survival-horror':          Footprints,
+  'occult-witchcraft':        Sparkles,
+  'monsters-creatures':       Skull,
+  'dark-fantasy':             Sword,
+  'found-footage':            Video,
+  'folk-horror':              Wheat,
+  'dark-romance':             Flower2,
+  'post-apocalyptic':         Radiation,
+  'haunted-places':           House,
+  'sci-fi-horror':            Rocket,
+
+  // Legacy / alternate slugs that older pages still link to.
+  'true-stories':             BookOpen,
+  'gore':                     Droplet,
+  'creepypasta':              Laptop,
+  'sci-fi':                   Rocket,
+  'occult':                   Sparkles,
+
+  // Sub-genres not yet seeded in the database. Harmless until a Category row
+  // with the matching slug exists - at which point the tile picks up its icon
+  // automatically with no code change.
+  'analog-horror':            Tv,
+  'analog-technology-horror': Cable,
+  'psychological-thriller':   Tornado,
+  'haunted-objects':          Box,
+  'demonic-possession':       FlameKindling,
+  'religious-horror':         Church,
+  'cult-horror':              Landmark,
+  'ritual-horror':            Moon,
+  'sleep-paralysis-horror':   BedDouble,
+  'dream-nightmare-horror':   CloudMoon,
+  'time-loop-horror':         Hourglass,
+  'isolation-horror':         Palmtree,
+  'arctic-ocean-horror':      Snowflake,
+  'jungle-horror':            Trees,
+  'pandemic-horror':          Syringe,
+  'infection-horror':         Bug,
+  'mutation-horror':          Dna,
+  'ai-horror':                Bot,
+  'cyber-horror':             MonitorSmartphone,
+  'internet-horror':          Globe,
+  'lost-media-horror':        Film,
+  'backrooms-liminal-spaces': DoorOpen,
+  'vhs-retro-horror':         Radio,
+  'experimental-horror':      Clapperboard,
+  'gore-extreme-horror':      Beef,
+  'torture-horror':           Link2,
+  'revenge-horror':           Drama,
+  'home-invasion-horror':     DoorOpen,
+  'stalker-horror':           UserX,
+  'psychological-breakdown':  Brain,
+  'doppelganger-horror':      Users,
+  'possessed-technology':     Smartphone,
+  'haunted-games':            Gamepad2,
+  'school-horror':            School,
+  'childhood-trauma-horror':  Baby,
+};
+
+// categoryIcon - safe lookup that always returns a renderable component.
+export function categoryIcon(slug: string | null | undefined): LucideIcon {
+  if (!slug) return DEFAULT_ICON;
+  return ICONS[slug] ?? DEFAULT_ICON;
+}

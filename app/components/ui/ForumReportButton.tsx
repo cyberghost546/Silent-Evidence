@@ -91,7 +91,6 @@ export default function ForumReportButton({
             {done ? (
               // Confirmation screen after report is sent
               <div className="text-center py-4">
-                <p className="text-2xl mb-2">🚩</p>
                 <p className="text-white font-semibold mb-1">Report submitted</p>
                 <p className="text-sm text-gray-400 mb-4">
                   Thank you — our moderators will review it soon.

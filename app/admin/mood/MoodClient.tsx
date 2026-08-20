@@ -36,6 +36,7 @@
  */
 
 import { useState } from 'react';
+import { moodIcon } from '@/lib/moodIcons';
 
 // ── Mood definitions ──────────────────────────────────────────────────────────
 
@@ -43,14 +44,14 @@ import { useState } from 'react';
 // The icon is rendered large (text-2xl) inside the mood grid buttons so admins
 // can quickly identify moods at a glance without reading the label.
 const MOODS = [
-  { value: 'CREEPY',        label: 'Creepy',        icon: '🕷️' },
-  { value: 'PARANOID',      label: 'Paranoid',      icon: '👁️' },
-  { value: 'DISTURBING',    label: 'Disturbing',    icon: '😱' },
-  { value: 'ATMOSPHERIC',   label: 'Atmospheric',   icon: '🌫️' },
-  { value: 'PSYCHOLOGICAL', label: 'Psychological', icon: '🧠' },
-  { value: 'SUPERNATURAL',  label: 'Supernatural',  icon: '👻' },
-  { value: 'GORE',          label: 'Gore',           icon: '🩸' },
-  { value: 'JUMPSCARE',     label: 'Jumpscare',     icon: '⚡' },
+  { value: 'CREEPY',        label: 'Creepy',        icon: moodIcon('CREEPY') },
+  { value: 'PARANOID',      label: 'Paranoid',      icon: moodIcon('PARANOID') },
+  { value: 'DISTURBING',    label: 'Disturbing',    icon: moodIcon('DISTURBING') },
+  { value: 'ATMOSPHERIC',   label: 'Atmospheric',   icon: moodIcon('ATMOSPHERIC') },
+  { value: 'PSYCHOLOGICAL', label: 'Psychological', icon: moodIcon('PSYCHOLOGICAL') },
+  { value: 'SUPERNATURAL',  label: 'Supernatural',  icon: moodIcon('SUPERNATURAL') },
+  { value: 'GORE',          label: 'Gore',          icon: moodIcon('GORE') },
+  { value: 'JUMPSCARE',     label: 'Jumpscare',     icon: moodIcon('JUMPSCARE') },
 ];
 
 // ── Type definitions ──────────────────────────────────────────────────────────
@@ -124,9 +125,13 @@ export default function MoodClient({
       {current && (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
           <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">Current mood</p>
-          {/* MOODS.find() maps the DB value string to the emoji icon from our constant */}
-          <p className="text-lg font-bold text-white">
-            {MOODS.find(m => m.value === current.mood)?.icon} {current.mood}
+          {/* MOODS.find() maps the DB value string to the icon from our constant */}
+          <p className="flex items-center gap-2 text-lg font-bold text-white">
+            {(() => {
+              const Icon = moodIcon(current.mood);
+              return <Icon className="w-5 h-5" strokeWidth={1.75} aria-hidden="true" />;
+            })()}
+            {current.mood}
           </p>
           {/* Optional tagline — only rendered if the admin set one */}
           {current.message && (
@@ -159,7 +164,7 @@ export default function MoodClient({
               }`}
             >
               {/* Large emoji icon — easier to click/scan than text alone */}
-              <span className="text-2xl">{m.icon}</span>
+              <m.icon className="w-6 h-6" strokeWidth={1.5} aria-hidden="true" />
               {m.label}
             </button>
           ))}
@@ -198,8 +203,12 @@ export default function MoodClient({
             {history.map(h => (
               <div key={h.id} className="flex items-center justify-between text-sm">
                 {/* Icon + mood name + optional tagline in one line */}
-                <span className="text-gray-300">
-                  {MOODS.find(m => m.value === h.mood)?.icon} {h.mood}
+                <span className="inline-flex items-center gap-1.5 text-gray-300">
+                  {(() => {
+                    const Icon = moodIcon(h.mood);
+                    return <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />;
+                  })()}
+                  {h.mood}
                   {h.message ? ` — "${h.message}"` : ''}
                 </span>
                 {/* Short date — toLocaleDateString omits the time for a cleaner look */}

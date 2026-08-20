@@ -115,7 +115,6 @@ export default function StoryPurchaseGate({
         ">
 
           {/* Lock icon */}
-          <div className="text-4xl mb-3">🔒</div>
 
           {/* Headline */}
           <h3 className="text-lg font-bold text-white mb-1">This story is locked</h3>
@@ -127,7 +126,7 @@ export default function StoryPurchaseGate({
           {isPremiumOnly ? (
             <>
               <p className="text-sm text-amber-400 font-semibold mb-1">
-                ⚡ Premium members only
+ Premium members only
               </p>
               <p className="text-xs text-gray-500 mb-5">
                 Subscribe to Horror Elite to read all premium stories.
@@ -142,7 +141,7 @@ export default function StoryPurchaseGate({
                   transition text-gray-900
                 "
               >
-                View Premium Plans ⚡
+                View Premium Plans
               </Link>
             </>
           ) : (

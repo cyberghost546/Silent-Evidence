@@ -56,13 +56,13 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
 
       // Dark CARTO tile layer — matches the site's horror aesthetic
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap contributors, © CARTO',
+        attribution: 'OpenStreetMap contributors, CARTO',
         maxZoom: 18,
       }).addTo(map);
 
       // Custom skull marker icon using a div with an emoji + glowing drop-shadow
       const skullIcon = L.divIcon({
-        html: '<div style="font-size:24px;line-height:1;filter:drop-shadow(0 0 4px red)">💀</div>',
+        html: '',
         className: '',    // empty string removes Leaflet's default white box
         iconSize: [28, 28],
         iconAnchor: [14, 28],   // bottom-centre of the icon sits on the coordinate

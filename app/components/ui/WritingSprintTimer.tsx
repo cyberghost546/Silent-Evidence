@@ -220,7 +220,7 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
       {/* Ended state */}
       {isEnded && (
         <p className="text-center text-sm text-gray-500 py-2">
-          This sprint has ended. {participants.length > 0 && `Winner: 🏆 ${[...participants].sort((a, b) => b.wordCount - a.wordCount)[0]?.user.username}`}
+          This sprint has ended. {participants.length > 0 && `Winner: ${[...participants].sort((a, b) => b.wordCount - a.wordCount)[0]?.user.username}`}
         </p>
       )}
     </div>

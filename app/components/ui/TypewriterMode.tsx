@@ -150,7 +150,6 @@ export default function TypewriterMode({ content }: TypewriterModeProps) {
           }`}
         >
           {/* Quill icon */}
-          <span className="text-base">🖊️</span>
           <span>{active ? "Exit Typewriter Mode" : "Typewriter Mode"}</span>
 
           {/* Small animated dot while typing is in progress */}

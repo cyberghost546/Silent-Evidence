@@ -31,6 +31,8 @@
 // =============================================================================
 
 import { Metadata } from 'next';
+import { UtensilsCrossed } from 'lucide-react';
+import { RECIPE_TYPES } from '@/lib/reactions';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 
@@ -88,7 +90,7 @@ export default async function RecipeDetailPage({ params }: Props) {
   // Map each recipe type string to a decorative emoji displayed in the UI.
   // Record<string, string> means: keys are strings, values are strings.
   // Using `?? '🍽️'` provides a safe fallback for any type not in the map.
-  const TYPE_ICON: Record<string, string> = { food: '🍖', drink: '🍷', ritual: '🕯️' };
+  // Type icons come from the shared lib/reactions RECIPE_TYPES list.
 
   return (
     // min-h-screen ensures the dark background fills short-content pages
@@ -118,10 +120,12 @@ export default async function RecipeDetailPage({ params }: Props) {
         )}
         {!raw.image && (
           // Placeholder card when no image has been set. flex+justify-center+items-center
-          // centres the emoji both horizontally and vertically inside the fixed-height box.
-          <div className="w-full h-40 bg-gray-800 rounded-2xl flex items-center justify-center text-6xl text-gray-700 mb-6">
-            {/* TYPE_ICON lookup with nullish coalescing — falls back to generic plate emoji */}
-            {TYPE_ICON[raw.type] ?? '🍽️'}
+          // centres the icon both horizontally and vertically inside the fixed-height box.
+          <div className="w-full h-40 bg-gray-800 rounded-2xl flex items-center justify-center text-gray-700 mb-6">
+            {(() => {
+              const TypeIcon = RECIPE_TYPES.find(t => t.key === raw.type)?.icon ?? UtensilsCrossed;
+              return <TypeIcon className="w-14 h-14" strokeWidth={1.25} aria-hidden="true" />;
+            })()}
           </div>
         )}
 
@@ -132,8 +136,12 @@ export default async function RecipeDetailPage({ params }: Props) {
           <div className="flex gap-2 mb-3 flex-wrap">
 
             {/* Type badge (food / drink / ritual) — `capitalize` makes e.g. "food" → "Food" */}
-            <span className="text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400 capitalize">
-              {TYPE_ICON[raw.type]} {raw.type}
+            <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400 capitalize">
+              {(() => {
+                const TypeIcon = RECIPE_TYPES.find(t => t.key === raw.type)?.icon ?? UtensilsCrossed;
+                return <TypeIcon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />;
+              })()}
+              {raw.type}
             </span>
 
             {/* Difficulty badge */}
@@ -145,14 +153,14 @@ export default async function RecipeDetailPage({ params }: Props) {
                 Optional fields in Prisma schema use Int? which maps to number | null in TS. */}
             {raw.prepMins && (
               <span className="text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400">
-                ⏱ {raw.prepMins} min
+ {raw.prepMins} min
               </span>
             )}
 
             {/* Servings — same optional-field conditional pattern */}
             {raw.servings && (
               <span className="text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400">
-                🍽 Serves {raw.servings}
+ Serves {raw.servings}
               </span>
             )}
           </div>
@@ -170,7 +178,7 @@ export default async function RecipeDetailPage({ params }: Props) {
         {/* ── Ingredients card ────────────────────────────────────────────── */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
           <h2 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-            <span>🧪</span> Ingredients
+             Ingredients
           </h2>
 
           {/* Unordered list — space-y-2 adds 8px between each item */}
@@ -190,7 +198,6 @@ export default async function RecipeDetailPage({ params }: Props) {
         {/* ── Instructions card ───────────────────────────────────────────── */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <h2 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-            <span>📜</span>
             {/* Conditional label — ritual steps feel more dramatic as "The Ritual" */}
             {raw.type === 'ritual' ? 'The Ritual' : 'Instructions'}
           </h2>

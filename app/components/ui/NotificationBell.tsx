@@ -7,6 +7,7 @@
 
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Heart, Reply, UserPlus, MessageSquare, type LucideIcon } from 'lucide-react';
 
 // Shape of a single notification from the /api/notifications endpoint
 type Notification = {
@@ -19,14 +20,14 @@ type Notification = {
 };
 
 // Shape of a toast popup — a simplified subset of Notification
-type Toast = { id: number; message: string; icon: string; href: string };
+type Toast = { id: number; message: string; icon: LucideIcon; href: string };
 
-// iconFor — maps a notification type to an emoji icon displayed in the UI
-function iconFor(type: string) {
-  if (type === 'LIKE')   return '♥';
-  if (type === 'REPLY')  return '↩';
-  if (type === 'FOLLOW') return '👤';
-  return '💬'; // Default for COMMENT and anything else
+// iconFor — maps a notification type to the icon displayed in the UI
+function iconFor(type: string): LucideIcon {
+  if (type === 'LIKE')   return Heart;
+  if (type === 'REPLY')  return Reply;
+  if (type === 'FOLLOW') return UserPlus;
+  return MessageSquare; // Default for COMMENT and anything else
 }
 
 export default function NotificationBell() {
@@ -160,7 +161,10 @@ export default function NotificationBell() {
                     // Slightly lighter background for unread items so they stand out
                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-800 transition border-b border-gray-800/50 ${!n.read ? 'bg-gray-800/40' : ''}`}
                   >
-                    <span className="text-base mt-0.5">{iconFor(n.type)}</span>
+                    {(() => {
+                      const NIcon = iconFor(n.type);
+                      return <NIcon className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />;
+                    })()}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-300 leading-snug">{n.message}</p>
                       {n.story && <p className="text-xs text-gray-600 truncate mt-0.5">{n.story.title}</p>}
@@ -188,7 +192,7 @@ export default function NotificationBell() {
               className="pointer-events-auto flex items-start gap-3 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 shadow-2xl w-80 animate-slide-in hover:border-red-600/50 transition-colors"
               onClick={() => dismissToast(t.id)}
             >
-              <span className="text-lg mt-0.5 flex-shrink-0">{t.icon}</span>
+              <t.icon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
               <p className="text-sm text-gray-200 flex-1 leading-snug">{t.message}</p>
               {/* X button — stops propagation so clicking X doesn't also follow the link */}
               <button

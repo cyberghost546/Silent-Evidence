@@ -31,7 +31,6 @@ export default function Error({ error, reset }: ErrorProps) {
       <div className="relative text-center max-w-xl z-10">
 
         {/* Glitchy warning icon */}
-        <div className="animate-flicker text-7xl mb-6 select-none">⚠️</div>
 
         {/* Heading */}
         <h1 className="animate-float-up text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">

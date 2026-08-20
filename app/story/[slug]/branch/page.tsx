@@ -99,7 +99,6 @@ export default function BranchReader() {
 
   if (error) return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-4 px-4 text-center">
-      <div className="text-5xl">💀</div>
       <p className="text-red-400 text-lg">{error}</p>
       <Link href={`/story/${slug}`} className="text-gray-400 hover:text-white underline text-sm">
         ← Read the regular version
@@ -151,7 +150,7 @@ export default function BranchReader() {
         {/* Ending badge */}
         {current?.isEnding && (
           <div className="mb-6 inline-flex items-center gap-2 bg-red-950/60 border border-red-900 text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider">
-            <span>☠</span> The End
+             The End
           </div>
         )}
 

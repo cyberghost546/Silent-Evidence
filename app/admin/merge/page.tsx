@@ -147,7 +147,7 @@ export default function AdminMergePage() {
       {/* Preview */}
       {source && target && (
         <div className="p-5 bg-gray-900 border border-yellow-600/30 rounded-2xl mb-6 text-sm">
-          <p className="font-semibold text-yellow-400 mb-3">⚠ Merge preview</p>
+          <p className="font-semibold text-yellow-400 mb-3">Merge preview</p>
           <ul className="space-y-1 text-gray-400">
             <li>• <span className="text-white">{source._count.likes}</span> likes moved to target</li>
             <li>• <span className="text-white">{source._count.comments}</span> comments moved to target</li>

@@ -124,7 +124,6 @@ export default async function TrendingPage({ searchParams }: Props) {
         {/* max-w-5xl centres the content and caps its width on large screens */}
         <div className="max-w-5xl mx-auto px-4 relative">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-3xl">🔥</span>
             <h1 className="text-4xl font-extrabold text-white">Trending</h1>
           </div>
           <p className="text-gray-400 text-sm">Stories making waves right now</p>
@@ -164,7 +163,6 @@ export default async function TrendingPage({ searchParams }: Props) {
             the TrendingStories client component with the scored list. */}
         {scored.length === 0 ? (
           <div className="text-center py-24 text-gray-500">
-            <p className="text-5xl mb-4">👻</p>
             <p>No trending stories yet for this period.</p>
           </div>
         ) : (

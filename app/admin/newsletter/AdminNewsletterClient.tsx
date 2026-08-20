@@ -134,7 +134,7 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
       {/* Subscriber count pill */}
       <div className="flex items-center gap-3 mb-6">
         <span className="px-4 py-2 bg-red-600/10 border border-red-600/30 text-red-400 text-sm font-semibold rounded-xl">
-          📧 {preview.subscriberCount.toLocaleString()} subscribers
+ {preview.subscriberCount.toLocaleString()} subscribers
         </span>
         <button
           onClick={refresh}

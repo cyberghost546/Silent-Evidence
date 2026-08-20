@@ -39,7 +39,6 @@ export default async function PickOfMonth() {
       <div className="flex items-center gap-3 mb-5">
         <span className="w-1 h-6 bg-green-600 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Pick of the Month</h2>
-        <span className="text-xl">🏆</span>
       </div>
 
       {/* Main card — green-tinted shadow, border glow, and hover lift effect */}
@@ -55,7 +54,7 @@ export default async function PickOfMonth() {
 
         {/* Floating green crown badge in the top-right corner */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-          👑 Pick of the Month
+ Pick of the Month
         </div>
 
         {/* Card content: category link, title, excerpt, author row, and CTA */}

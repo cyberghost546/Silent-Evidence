@@ -5,6 +5,7 @@
 // request an AI evaluation via POST /api/stories/[id]/scare-score.
 
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 
 // Props — input configuration for the HypeScoreBadge component
 type Props = {
@@ -27,8 +28,8 @@ function renderStars(score: number) {
       className={i < score ? 'opacity-100' : 'opacity-20'}
       aria-hidden="true"
     >
-      {/* Show a filled star for scored positions, empty star for the rest */}
-      {i < score ? '⭐' : '☆'}
+      {/* Scored positions are filled; the rest are outlines only */}
+      <Star className="w-3.5 h-3.5" strokeWidth={1.75} fill={i < score ? 'currentColor' : 'none'} />
     </span>
   ));
 }
@@ -103,7 +104,7 @@ export default function HypeScoreBadge({
             </>
           ) : (
             // Default button label with star emoji
-            <>⭐ Get AI Hype Score</>
+            <>Get AI Hype Score</>
           )}
         </button>
 

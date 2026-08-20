@@ -51,7 +51,6 @@ export default function DeathCountInput({ value, onChange }: Props) {
           className="text-xl drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]"
           aria-hidden="true"
         >
-          💀
         </span>
         Body Count
       </label>
@@ -68,7 +67,6 @@ export default function DeathCountInput({ value, onChange }: Props) {
           className="absolute right-3 top-1/2 -translate-y-1/2 text-red-900/60 text-lg pointer-events-none select-none"
           aria-hidden="true"
         >
-          💀
         </span>
 
         <input

@@ -115,7 +115,6 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
       <div className="max-w-6xl mx-auto px-4 py-10">
         {videos.length === 0 ? (
           <div className="text-center py-32">
-            <p className="text-6xl mb-4">🎥</p>
             <h2 className="text-2xl font-bold text-white mb-2">No videos yet</h2>
             <p className="text-gray-500 text-sm mb-6">Be the first to share a horror video with the community.</p>
             <AddVideoButton categories={allCategories} />

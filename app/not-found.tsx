@@ -38,7 +38,6 @@ export default function NotFound() {
 
         {/* Skull + heading */}
         <div className="animate-float-up">
-          <div className="text-5xl mb-4 select-none">💀</div>
           <h1 className="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">
             This page vanished without a trace
           </h1>

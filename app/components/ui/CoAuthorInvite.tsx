@@ -125,7 +125,7 @@ export default function CoAuthorInvite({ storyId, authorId }: Props) {
       {/* Header */}
       <div>
         <h3 className="text-white font-bold text-lg flex items-center gap-2">
-          ✍️ Co-Author Mode
+ Co-Author Mode
         </h3>
         {/* Informational note about what co-authorship means */}
         <p className="text-xs text-gray-500 mt-1">

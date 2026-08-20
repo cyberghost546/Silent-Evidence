@@ -53,7 +53,7 @@ export default async function StoryOfTheWeek() {
         <span className="w-1 h-6 bg-red-600 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Story of the Week</h2>
         <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">
-          🏆 This week&apos;s pick
+ This week&apos;s pick
         </span>
       </div>
 
@@ -74,7 +74,6 @@ export default async function StoryOfTheWeek() {
           ) : (
             // Gradient placeholder when no cover image is set
             <div className="w-full h-full bg-gradient-to-br from-red-900/40 to-gray-900 flex items-center justify-center">
-              <span className="text-6xl opacity-30">💀</span>
             </div>
           )}
           {/* Fade into the content area on desktop */}
@@ -121,9 +120,9 @@ export default async function StoryOfTheWeek() {
             <span className="text-xs text-gray-600">·</span>
             <span className="text-xs text-gray-500">{readingTime(story.content)}</span>
             <span className="text-xs text-gray-600">·</span>
-            <span className="text-xs text-gray-500">♥ {story._count.likes}</span>
+            <span className="text-xs text-gray-500">{story._count.likes}</span>
             <span className="text-xs text-gray-600">·</span>
-            <span className="text-xs text-gray-500">💬 {story._count.comments}</span>
+            <span className="text-xs text-gray-500">{story._count.comments}</span>
           </div>
 
           {/* CTA link */}

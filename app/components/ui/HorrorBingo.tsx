@@ -26,6 +26,7 @@
 //   but no error UI is shown — bingo is low-stakes enough to tolerate this.
 
 import { useState, useEffect, useCallback } from 'react';
+import { Skull } from 'lucide-react';
 
 interface Template { id: number; title: string; cells: string[] }
 
@@ -38,8 +39,8 @@ function checkBingo(checks: number[]): boolean {
     if ([0,1,2,3,4].every((c) => grid[r * 5 + c])) return true; // row
     if ([0,1,2,3,4].every((c) => grid[c * 5 + r])) return true; // col
   }
-  if ([0,6,12,18,24].every((i) => grid[i])) return true; // diagonal ↘
-  if ([4,8,12,16,20].every((i) => grid[i])) return true; // diagonal ↙
+  if ([0,6,12,18,24].every((i) => grid[i])) return true; // diagonal
+  if ([4,8,12,16,20].every((i) => grid[i])) return true; // diagonal
   return false;
 }
 
@@ -85,7 +86,6 @@ export default function HorrorBingo() {
 
   if (!template) return (
     <div className="text-center py-20 text-gray-600">
-      <div className="text-4xl mb-3">🃏</div>
       <p>No active bingo card right now. Check back soon!</p>
     </div>
   );
@@ -125,7 +125,7 @@ export default function HorrorBingo() {
                 `}
               >
                 {isCenter ? (
-                  <span className="text-lg">💀</span>
+                  <Skull className="w-5 h-5" strokeWidth={1.5} aria-hidden="true" />
                 ) : (
                   <>
                     {checked && (

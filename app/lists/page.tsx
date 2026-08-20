@@ -27,6 +27,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { List as ListIcon } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
@@ -72,7 +73,6 @@ export default async function ListsPage() {
 
         {lists.length === 0 ? (
           <div className="text-center py-24">
-            <div className="text-5xl mb-4">📋</div>
             <h2 className="text-xl font-semibold text-white mb-2">No lists yet</h2>
             <p className="text-gray-500 mb-6">Open any story and click "Add to List" to get started.</p>
             <Link href="/" className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">
@@ -91,7 +91,9 @@ export default async function ListsPage() {
                       ? <div key={item.id} className="relative flex-1 min-w-0 overflow-hidden"><Image src={item.story.coverImage} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-cover" /></div>
                       : <div key={item.id} className="flex-1 bg-gradient-to-br from-gray-700 to-gray-900" />
                   )) : (
-                    <div className="w-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-4xl">📋</div>
+                    <div className="w-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                      <ListIcon className="w-8 h-8 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                    </div>
                   )}
                 </div>
                 <div className="p-4">

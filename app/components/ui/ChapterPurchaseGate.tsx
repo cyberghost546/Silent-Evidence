@@ -110,7 +110,6 @@ export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCe
   return (
     <div className="my-8 border border-red-500/30 bg-red-500/5 rounded-2xl p-6 text-center">
       {/* Lock icon */}
-      <div className="text-4xl mb-3">🔒</div>
 
       <h3 className="text-lg font-bold text-white mb-1">
         {chapterTitle} — Premium Chapter

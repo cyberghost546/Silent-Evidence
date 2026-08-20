@@ -125,7 +125,6 @@ function ReportModal({
         {done ? (
           // Thank-you screen after submission
           <div className="text-center py-4">
-            <p className="text-2xl mb-2">🚩</p>
             <p className="text-white font-semibold mb-1">Report submitted</p>
             <p className="text-sm text-gray-400 mb-4">
               Thank you — our moderators will review it soon.
@@ -295,7 +294,7 @@ function CommentCard({
             <span className="text-xs text-gray-500" suppressHydrationWarning>{timeAgo(comment.createdAt)}</span>
             {comment.pinned && (
               <span className="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full">
-                📌 Pinned
+ Pinned
               </span>
             )}
           </div>
@@ -353,7 +352,7 @@ function CommentCard({
                 }`}
                 title={comment.pinned ? 'Unpin comment' : 'Pin comment'}
               >
-                {comment.pinned ? '📌 Unpin' : '📌 Pin'}
+                {comment.pinned ? 'Unpin' : 'Pin'}
               </button>
             )}
           </div>
