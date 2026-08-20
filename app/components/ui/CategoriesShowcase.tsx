@@ -29,7 +29,13 @@ const ACCENTS = [
   'from-amber-900/40 border-amber-800/50 text-amber-400',
 ];
 
+// Shown when a category's slug has no entry in ICONS below, so a newly added
+// category always renders an icon instead of an empty gap in the tile.
+const DEFAULT_ICON = '🕯️';
+
 // A mapping of category slug → emoji icon.
+// NOTE: keys are SLUGS (lowercase, hyphenated — as stored in Category.slug),
+// not display names. A key like 'Analog Horror' would never match anything.
 const ICONS: Record<string, string> = {
   'ghost-stories':      '👻',
   'psychological':      '🧠',
@@ -51,6 +57,45 @@ const ICONS: Record<string, string> = {
   'post-apocalyptic':   '☢️',
   'haunted-places':     '🏚️',
   'sci-fi-horror':      '🛸',
+
+  // Sub-genres not yet seeded in the database. Harmless until a Category row
+  // with the matching slug exists — at which point the tile picks up its icon
+  // automatically with no code change.
+  'analog-horror':            '📼',
+  'analog-technology-horror': '🔌',
+  'psychological-thriller':   '🌀',
+  'haunted-objects':          '🪆',
+  'demonic-possession':       '😈',
+  'religious-horror':         '✝️',
+  'cult-horror':              '🕯️',
+  'ritual-horror':            '🗿',
+  'sleep-paralysis-horror':   '🛏️',
+  'dream-nightmare-horror':   '💤',
+  'time-loop-horror':         '⏳',
+  'isolation-horror':         '🏝️',
+  'arctic-ocean-horror':      '🧊',
+  'jungle-horror':            '🌴',
+  'pandemic-horror':          '😷',
+  'infection-horror':         '🦠',
+  'mutation-horror':          '🧬',
+  'ai-horror':                '🤖',
+  'cyber-horror':             '🖥️',
+  'internet-horror':          '🌐',
+  'lost-media-horror':        '🎞️',
+  'backrooms-liminal-spaces': '🚪',
+  'vhs-retro-horror':         '📺',
+  'experimental-horror':      '🎭',
+  'gore-extreme-horror':      '🥩',
+  'torture-horror':           '⛓️',
+  'revenge-horror':           '🗡️',
+  'home-invasion-horror':     '🏠',
+  'stalker-horror':           '🕵️',
+  'psychological-breakdown':  '🫥',
+  'doppelganger-horror':      '👥',
+  'possessed-technology':     '📱',
+  'haunted-games':            '🎮',
+  'school-horror':            '🏫',
+  'childhood-trauma-horror':  '🧸',
 };
 
 export default async function CategoriesShowcase() {
@@ -82,9 +127,9 @@ export default async function CategoriesShowcase() {
             // Pick a colour accent by cycling through the ACCENTS array.
             // The modulo (%) wraps back to index 0 once we exceed the array length.
             const accent = ACCENTS[i % ACCENTS.length];
-            // Look up the icon for this category's slug.
-            // If the slug isn't in ICONS, `icon` will be undefined and nothing renders.
-            const icon = ICONS[cat.slug];
+            // Look up the icon for this category's slug, falling back to a
+            // neutral one so an unmapped category still renders a full tile.
+            const icon = ICONS[cat.slug] ?? DEFAULT_ICON;
             return (
               // Each tile is a Next.js Link so the whole card is clickable.
               // `group` on the Link lets child elements respond to hover state

@@ -41,13 +41,6 @@ import Footer from '@/app/components/ui/Footer';
 import Pagination from '@/app/components/ui/Pagination';
 import { cookies } from 'next/headers';
 import SearchStories from './SearchStories';
-import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
-import Header from '@/app/components/ui/Header';
-import Footer from '@/app/components/ui/Footer';
-import Pagination from '@/app/components/ui/Pagination';
-import { cookies } from 'next/headers';
-import SearchStories from './SearchStories';
 
 const PAGE_SIZE = 12;
 

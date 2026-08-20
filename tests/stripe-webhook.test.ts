@@ -4,6 +4,7 @@
 // each payment path writes the correct DB records.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -32,8 +33,11 @@ import { POST as webhookPost } from '@/app/api/stripe/webhook/route';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
 
-function makeWebhookRequest(body = '{}', signature = 'valid-sig'): Request {
-  return new Request('http://localhost/api/stripe/webhook', {
+// The route is typed to take a NextRequest but only uses .text() and .headers,
+// both of which a plain Request provides. Build a real NextRequest so the call
+// type-checks without weakening the route's signature.
+function makeWebhookRequest(body = '{}', signature = 'valid-sig'): NextRequest {
+  return new NextRequest('http://localhost/api/stripe/webhook', {
     method: 'POST',
     headers: { 'stripe-signature': signature },
     body,

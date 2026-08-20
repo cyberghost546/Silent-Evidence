@@ -13,10 +13,19 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
+// POST /api/stories is CSRF-protected (double-submit cookie): the route compares
+// the x-csrf-token header against the csrf_token cookie. Tests must supply both,
+// otherwise every request short-circuits with 403 before the real logic runs.
+const CSRF_TOKEN = 'test-csrf-token';
+
 vi.mock('next/headers', () => ({
   cookies: vi.fn(() =>
     Promise.resolve({
-      get: vi.fn((name: string) => (name === 'userId' ? { value: '1' } : undefined)),
+      get: vi.fn((name: string) =>
+        name === 'userId' ? { value: '1' }
+        : name === 'csrf_token' ? { value: CSRF_TOKEN }
+        : undefined
+      ),
       set: vi.fn(),
     })
   ),
@@ -51,7 +60,11 @@ import { checkStoryToxicity } from '@/lib/toxicityCheck';
 function makeRequest(body: unknown, userId = '1'): Request {
   return new Request('http://localhost/api/stories', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Cookie: `userId=${userId}` },
+    headers: {
+      'Content-Type': 'application/json',
+      Cookie: `userId=${userId}; csrf_token=${CSRF_TOKEN}`,
+      'x-csrf-token': CSRF_TOKEN,
+    },
     body: JSON.stringify(body),
   });
 }
@@ -73,19 +86,35 @@ const MOCK_STORY = {
   _count: { likes: 0, comments: 0 },
 };
 
+// Builds a fake Next.js cookie store. `jar` maps cookie name -> value, so a test
+// can drop the userId cookie while keeping the CSRF pair intact.
+function mockCookieStore(jar: Record<string, string>) {
+  return {
+    get: vi.fn((name: string) => (name in jar ? { value: jar[name] } : undefined)),
+    set: vi.fn(),
+  };
+}
+
 describe('POST /api/stories', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.mocked(prisma.story.create).mockResolvedValue(MOCK_STORY as any);
     vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 1, username: 'testuser', ageGroup: 'ADULT' } as any);
+
+    // The global afterEach in tests/setup.ts calls vi.resetAllMocks(), which clears
+    // the implementation the vi.mock factory installed. Reinstate it every test.
+    const { cookies } = await import('next/headers');
+    vi.mocked(cookies).mockResolvedValue(
+      mockCookieStore({ userId: '1', csrf_token: CSRF_TOKEN }) as any
+    );
   });
 
   it('returns 401 when not logged in', async () => {
-    // Override cookies mock to return no userId
+    // Override cookies mock to return no userId — but keep the CSRF token valid,
+    // otherwise the request is rejected as 403 before the auth check is reached.
     const { cookies } = await import('next/headers');
-    vi.mocked(cookies).mockResolvedValueOnce({
-      get: vi.fn(() => undefined),
-      set: vi.fn(),
-    } as any);
+    vi.mocked(cookies).mockResolvedValue(
+      mockCookieStore({ csrf_token: CSRF_TOKEN }) as any
+    );
 
     const res = await storiesPost(makeRequest(VALID_BODY, ''));
     expect(res.status).toBe(401);

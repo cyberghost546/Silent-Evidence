@@ -89,7 +89,8 @@ describe('POST /api/auth/login', () => {
   });
 
   it('returns 429 when rate limit is exceeded', async () => {
-    vi.mocked(checkRateLimit).mockReturnValueOnce({ blocked: true, remaining: 0, resetAt: Date.now() });
+    // checkRateLimit is async — resolve the result rather than returning it raw.
+    vi.mocked(checkRateLimit).mockResolvedValueOnce({ blocked: true, remaining: 0, resetAt: Date.now() });
     const res = await loginPost(makeRequest({ email: 'test@example.com', password: 'secret123' }));
     expect(res.status).toBe(429);
   });

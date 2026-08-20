@@ -31,8 +31,9 @@ export async function getCsrfToken(): Promise<string> {
     const res = await fetch('/api/csrf');
     if (res.ok) {
       const data = await res.json();
-      cached = data.token ?? '';
-      return cached;
+      const token: string = data.token ?? '';
+      cached = token;
+      return token;
     }
   } catch {
     // If the CSRF endpoint is unreachable, return empty string.
