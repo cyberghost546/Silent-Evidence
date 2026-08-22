@@ -67,7 +67,85 @@ const options = [
   'Possessed Technology',
   'Haunted Games',
   'School Horror',
-  'Childhood Trauma Horror'
+  'Childhood Trauma Horror',
+
+  // Psychological and Mind Horror
+  // (Dream Horror, Isolation Horror and Sleep Horror are already covered above
+  //  by 'Dream / Nightmare Horror', 'Isolation Horror' and 'Sleep Paralysis Horror')
+  'Amnesia Horror',
+  'Identity Horror',
+  'Madness',
+  'Memory Horror',
+  'Paranoia',
+  'Reality Distortion',
+  'Unreliable Narrator',
+
+  // Supernatural Horror
+  // ('Possession' is already covered by 'Demonic Possession')
+  'Cursed Objects',
+  'Demonic Horror',
+  'Exorcism',
+  'Haunted Dolls',
+  'Haunted Houses',
+  'Poltergeists',
+  'Revenge Spirits',
+  'Witch Horror',
+
+  // Creature Horror
+  'Alien Horror',
+  'Cryptids',
+  'Giant Monsters',
+  'Insect Horror',
+  'Killer Animals',
+  'Mutant Creatures',
+  'Sea Monsters',
+  'Vampire Horror',
+  'Werewolf Horror',
+  'Zombie Horror',
+
+  // Dark and Violent Horror
+  // (Gore Horror, Revenge Horror, Torture Horror, Home Invasion and Cult Horror
+  //  are already covered above)
+  'Cannibal Horror',
+  'Killer Horror',
+  'Backwoods Horror',
+  'Survival Games',
+
+  // Sci-Fi Horror
+  // (AI Horror, Cyber Horror, Time Horror and Virus and Infection are already
+  //  covered by 'AI Horror', 'Cyber Horror', 'Time Loop Horror', 'Infection Horror')
+  'Biohorror',
+  'Genetic Experiments',
+  'Space Horror',
+  'Virtual Reality Horror',
+
+  // Mystery and Strange Horror
+  // ('Mystery Horror' is already covered by 'Mystery')
+  'Cursed Media',
+  'Missing Persons',
+  'Secret Experiments',
+  'Unexplained Phenomena',
+  'Urban Exploration',
+  'Conspiracy Horror',
+  'Forbidden Knowledge',
+
+  // Historical and Cultural Horror
+  // (Gothic Horror and Religious Horror are already covered above)
+  'Japanese Horror',
+  'Korean Horror',
+  'Victorian Horror',
+  'Medieval Horror',
+  'Mythological Horror',
+  'Ancient Evil',
+
+  // Internet and Modern Horror
+  // (Analog Horror and Internet Horror are already covered above)
+  'ARG Horror',
+  'Dark Web Horror',
+  'AI Generated Horror',
+  'Social Media Horror',
+  'Surveillance Horror',
+  'Digital Hauntings'
 ];
 
 export default function CategoryDropdown() {

@@ -1,0 +1,19 @@
+// prisma/tsconfig.seed.json
+// tsconfig used only by ts-node when running the seed scripts.
+//
+// The root tsconfig targets the Next.js bundler ("module": "esnext",
+// "moduleResolution": "bundler"), which Node cannot execute directly. The seed
+// scripts are plain Node programs, so they need CommonJS output instead.
+//
+// This lives in a file rather than an inline `--compiler-options {...}` flag on
+// the npm script because Windows shells strip the quotes out of the inline JSON
+// and ts-node then fails with "Expected property name or '}' in JSON".
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "isolatedModules": false
+  }
+}

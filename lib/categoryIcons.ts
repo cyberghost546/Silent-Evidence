@@ -17,6 +17,12 @@ import {
   Palmtree, Snowflake, Trees, Syringe, Bug, Dna, Bot, MonitorSmartphone, Globe,
   Film, DoorOpen, Clapperboard, Drama, Beef, Link2, Sword, Footprints, UserX,
   Users, Smartphone, Gamepad2, School, Baby, CircleDashed, Radio, BookOpen,
+  Eraser, ScanFace, VenetianMask, Archive, ScanEye, Waves, Quote, Gem, Flame,
+  Cross, PersonStanding, Wind, WandSparkles, Satellite, Binoculars, DnaOff,
+  Fish, Rat, MoonStar, Biohazard, Utensils, Crosshair, TreePine, Trophy,
+  FlaskConical, Microscope, Glasses, Disc3, UserSearch, TestTubeDiagonal,
+  CircleHelp, Compass, Network, BookLock, Cherry, Drum, Crown, Castle, Swords,
+  Pyramid, Puzzle, Vault, BotOff, Share2, Cctv, ServerCrash,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -94,6 +100,74 @@ export const ICONS: Record<string, LucideIcon> = {
   'haunted-games':            Gamepad2,
   'school-horror':            School,
   'childhood-trauma-horror':  Baby,
+
+  // ── Psychological and Mind Horror ────────────────────────────
+  'amnesia-horror':           Eraser,
+  'identity-horror':          ScanFace,
+  'madness':                  VenetianMask,
+  'memory-horror':            Archive,
+  'paranoia':                 ScanEye,
+  'reality-distortion':       Waves,
+  'unreliable-narrator':      Quote,
+
+  // ── Supernatural Horror ──────────────────────────────────────
+  'cursed-objects':           Gem,
+  'demonic-horror':           Flame,
+  'exorcism':                 Cross,
+  'haunted-dolls':            PersonStanding,
+  'haunted-houses':           House,
+  'poltergeists':             Wind,
+  'revenge-spirits':          Ghost,
+  'witch-horror':             WandSparkles,
+
+  // ── Creature Horror ──────────────────────────────────────────
+  'alien-horror':             Satellite,
+  'cryptids':                 Binoculars,
+  'giant-monsters':           Footprints,
+  'insect-horror':            Bug,
+  'killer-animals':           Rat,
+  'mutant-creatures':         DnaOff,
+  'sea-monsters':             Fish,
+  'vampire-horror':           Droplet,
+  'werewolf-horror':          MoonStar,
+  'zombie-horror':            Biohazard,
+
+  // ── Dark and Violent Horror ──────────────────────────────────
+  'cannibal-horror':          Utensils,
+  'killer-horror':            Crosshair,
+  'backwoods-horror':         TreePine,
+  'survival-games':           Trophy,
+
+  // ── Sci-Fi Horror ────────────────────────────────────────────
+  'biohorror':                FlaskConical,
+  'genetic-experiments':      Microscope,
+  'space-horror':             Orbit,
+  'virtual-reality-horror':   Glasses,
+
+  // ── Mystery and Strange Horror ───────────────────────────────
+  'cursed-media':             Disc3,
+  'missing-persons':          UserSearch,
+  'secret-experiments':       TestTubeDiagonal,
+  'unexplained-phenomena':    CircleHelp,
+  'urban-exploration':        Compass,
+  'conspiracy-horror':        Network,
+  'forbidden-knowledge':      BookLock,
+
+  // ── Historical and Cultural Horror ───────────────────────────
+  'japanese-horror':          Cherry,
+  'korean-horror':            Drum,
+  'victorian-horror':         Crown,
+  'medieval-horror':          Castle,
+  'mythological-horror':      Swords,
+  'ancient-evil':             Pyramid,
+
+  // ── Internet and Modern Horror ───────────────────────────────
+  'arg-horror':               Puzzle,
+  'dark-web-horror':          Vault,
+  'ai-generated-horror':      BotOff,
+  'social-media-horror':      Share2,
+  'surveillance-horror':      Cctv,
+  'digital-hauntings':        ServerCrash,
 };
 
 // categoryIcon - safe lookup that always returns a renderable component.
