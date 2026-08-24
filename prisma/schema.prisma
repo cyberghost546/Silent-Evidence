@@ -101,14 +101,28 @@ enum ReactionType {
 
 // Horror mood tags used on both stories (the mood of the story) and user profiles
 // (the moods a reader enjoys). Stored as an enum so values are validated by the DB.
+// The emotional register of a story.
+//
+// These were previously generic-fiction labels (EPIC, HEARTWARMING, ROMANTIC,
+// COMEDIC …) inherited from a non-horror template. Meanwhile the admin tools,
+// the AI story generators, and mood auto-detection all used a horror vocabulary
+// that this enum did not accept — so those writes failed at insert time.
+//
+// The horror set is now canonical. DARK is retained from the old set because
+// every existing story used it, which let this change land without touching a
+// single row.
+//
+// Keep in step with MOODS in lib/moods.ts, which is the single source of truth
+// for the application side (labels, descriptions, colours).
 enum Mood {
-  EPIC
-  HEARTWARMING
-  MYSTERIOUS
-  ACTION
-  ROMANTIC
-  COMEDIC
-  DRAMATIC
+  CREEPY
+  PARANOID
+  DISTURBING
+  ATMOSPHERIC
+  PSYCHOLOGICAL
+  SUPERNATURAL
+  GORE
+  JUMPSCARE
   DARK
 }
 
@@ -227,9 +241,23 @@ model User {
 
   // Payment relations
   subscription      Subscription?
+  // Author Pro — the paid plan that unlocks monetisation and publishing tools.
+  // Separate from `subscription` (the reader membership) because the two are
+  // independent purchases: a user can hold both, either, or neither.
+  authorSubscription AuthorSubscription?
+  // Grandfather flag — set for authors who were already using what are now
+  // Author Pro features before the paywall existed. Grants Pro access without a
+  // subscription so their live content never breaks. Set by
+  // `npm run db:grandfather-authors`; never set it by hand for new users.
+  authorGrandfathered Boolean @default(false)
   tipsSent          Tip[]             @relation("TipSender")
   tipsReceived      Tip[]             @relation("TipReceiver")
   storyPurchases    StoryPurchase[]
+  // Bundles this user created as an Author Pro member (admin/site bundles have
+  // a null authorId and so belong to nobody here)
+  authoredBundles   StoryBundle[]     @relation("AuthoredBundles")
+  // Conversion-funnel milestones this user has hit (see model FunnelEvent)
+  funnelEvents      FunnelEvent[]
 
   // Direct messages
   messagesSent      DirectMessage[]   @relation("MessagesSent")
@@ -951,7 +979,19 @@ model CalendarEvent {
   id        Int      @id @default(autoincrement())
   date      DateTime // The date this event falls on (time portion ignored)
   title     String
-  icon      String   @default("📅")
+  // No @default here on purpose. This server reports character_set_system =
+  // utf8 (utf8mb3), and MariaDB stores column DEFAULTs in the table definition
+  // using that charset — so a 4-byte supplementary-plane emoji like 📅 (U+1F4C5)
+  // is silently stored as "?" no matter how the statement is sent. Declaring the
+  // emoji default here therefore produced permanent, unresolvable schema drift:
+  // every `prisma migrate dev` regenerated the same migration, which could never
+  // take effect.
+  //
+  // Nothing is lost. The only place events are created
+  // (app/api/admin/calendar/events/route.ts) already falls back to
+  // DEFAULT_EVENT_ICON_ID from lib/calendarIcons.ts, so the database default was
+  // never reached. The default now lives in application code only.
+  icon      String
   note      String?  @db.Text
   linkUrl   String?  // optional link for "read more"
   createdAt DateTime @default(now())
@@ -1212,6 +1252,46 @@ model Subscription {
   // One subscription record per user
   userId                 Int      @unique
   user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+//  AUTHOR SUBSCRIPTION — "Author Pro", the paid plan for writers
+// ============================================================
+//  Deliberately a separate table from Subscription rather than another row in
+//  it. Subscription has `userId @unique` (one row per user), and the two plans
+//  are independent products a user may hold at the same time: a reader
+//  membership (read premium stories, no ads) and Author Pro (monetise and
+//  publish with the full toolset). Stuffing both into one table would mean a
+//  paying reader could never also be a paying author.
+//
+//  The Stripe customer is shared between the two plans where one already
+//  exists, so a user has a single billing identity and one portal session
+//  showing both subscriptions.
+// ============================================================
+
+model AuthorSubscription {
+  id                     Int      @id @default(autoincrement())
+  // Stripe customer for this user. Mirrors Subscription.stripeCustomerId when
+  // the user also holds a reader membership — same customer, two subscriptions.
+  stripeCustomerId       String
+  // The recurring Stripe subscription object for the Author Pro plan.
+  stripeSubscriptionId   String?  @unique
+  // Mirrors the Stripe subscription status, same vocabulary as Subscription:
+  // "active" | "canceled" | "past_due" | "trialing" | "inactive"
+  status                 String   @default("inactive")
+  // "monthly" or "yearly"
+  plan                   String   @default("monthly")
+  // End of the current paid period — after this, a "canceled" row is expired.
+  currentPeriodEnd       DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // One Author Pro subscription per user
+  userId                 Int      @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([status])
 }
 
 // ============================================================
@@ -1725,8 +1805,17 @@ model StoryBundle {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Which author built this bundle. Nullable because bundles predate
+  // author-created bundles: existing rows were made by admins through
+  // /api/admin/bundles and belong to the site rather than to one writer.
+  // null = site/admin bundle, set = an Author Pro member's own bundle.
+  authorId  Int?
+  author    User?    @relation("AuthoredBundles", fields: [authorId], references: [id], onDelete: Cascade)
+
   items     StoryBundleItem[]
   purchases BundlePurchase[]
+
+  @@index([authorId])
 }
 
 // Junction table: which stories are included in which bundle
@@ -2202,6 +2291,46 @@ model BannedWord {
 //  Logged automatically when admins delete stories, ban users,
 //  change settings, etc. Viewable in /admin/audit-log.
 // ============================================================
+// ============================================================
+//  FUNNEL EVENT — conversion instrumentation
+// ============================================================
+//  Answers one question: of the readers who COULD subscribe, where do they
+//  drop off? Before this existed there was no way to tell whether the paywall
+//  converted badly or simply was not being reached — and no way to notice that
+//  the checkout endpoints were returning 400 to every real request.
+//
+//  Deliberately minimal. One row per user per stage per bucket, not one row per
+//  page view: the table stays small, and a reader who reloads /premium ten times
+//  counts once rather than inflating the numbers.
+//
+//  `bucket` is the dedupe period, and differs per event because the natural
+//  window differs — the reading limit is monthly ("2026-08"), everything else is
+//  daily ("2026-08-23"). The @@unique below turns a repeat into a no-op upsert.
+//
+//  Logged-in users only. Guests have no reading limit and cannot subscribe, so
+//  including them would measure a funnel nobody can walk. userId is nullable
+//  only so a deleted account's history does not vanish mid-analysis.
+// ============================================================
+
+model FunnelEvent {
+  id        Int      @id @default(autoincrement())
+  // 'limit_reached' | 'premium_viewed' | 'checkout_started' | 'subscribed'
+  event     String
+  // Dedupe window key: 'YYYY-MM' for monthly events, 'YYYY-MM-DD' for daily.
+  bucket    String
+  // Optional detail, e.g. the plan chosen at checkout.
+  meta      String?
+  createdAt DateTime @default(now())
+
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // One row per user per stage per window — makes recording idempotent.
+  @@unique([event, userId, bucket])
+  @@index([event, createdAt])
+  @@index([createdAt])
+}
+
 model AuditLog {
   id        Int      @id @default(autoincrement())
   action    String               // Short action label e.g. "BAN_USER", "DELETE_STORY"

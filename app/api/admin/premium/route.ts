@@ -21,7 +21,8 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: 'desc' },
     include: {
       user: {
-        select: { id: true, username: true, email: true, avatar: true },
+        // avatar lives on Profile, not User — reach it through the relation.
+        select: { id: true, username: true, email: true, profile: { select: { avatar: true } } },
       },
     },
   });
@@ -48,7 +49,7 @@ export async function PATCH(req: NextRequest) {
       ...(plan             !== undefined && { plan }),
       ...(currentPeriodEnd !== undefined && { currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : null }),
     },
-    include: { user: { select: { id: true, username: true, email: true, avatar: true } } },
+    include: { user: { select: { id: true, username: true, email: true, profile: { select: { avatar: true } } } } },
   });
 
   return NextResponse.json({ sub: updated });
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
       plan: plan ?? 'monthly',
       currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : null,
     },
-    include: { user: { select: { id: true, username: true, email: true, avatar: true } } },
+    include: { user: { select: { id: true, username: true, email: true, profile: { select: { avatar: true } } } } },
   });
 
   return NextResponse.json({ sub });

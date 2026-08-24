@@ -45,6 +45,7 @@ import { cookies } from 'next/headers';
 
 // Import the Prisma client to query and write to the database
 import { prisma } from '@/lib/prisma';
+import { MOODS as MOOD_VALUES, isMood } from '@/lib/moods';
 
 // Import the Anthropic SDK — this is the official client library for the Claude AI API
 import Anthropic from '@anthropic-ai/sdk';
@@ -82,9 +83,11 @@ const CATEGORY_IMAGES: Record<string, string[]> = {
   'unsolved-mysteries':  ['mystery dark','unsolved crime','evidence board dark','detective dark'],
 };
 
-// All available mood values — these must exactly match the Mood enum in the Prisma schema
-// so that when we write a story to the database the value is accepted without error
-const MOODS = ['CREEPY','PARANOID','DISTURBING','ATMOSPHERIC','PSYCHOLOGICAL','SUPERNATURAL'];
+// All available mood values, imported so they cannot drift from the Mood enum.
+// The local list this replaced carried the comment "must exactly match the Mood
+// enum" while not matching it at all — every story this route generated failed
+// to insert with an enum error.
+const MOODS = MOOD_VALUES;
 
 // ── Helper: pick a mood by index ──────────────────────────────────────────────
 
@@ -300,8 +303,10 @@ export async function POST(req: Request) {
           // ── Save to database ───────────────────────────────────────────────────
           // Create a new Story row — PUBLISHED means it goes live on the site immediately
           // authorId links the story to the admin user who triggered the generation
-          // mood: mood as any — "as any" bypasses TypeScript's type check here because
-          //   we know the mood string matches the enum, but TypeScript can't verify it from a plain string
+          // mood is narrowed with isMood rather than cast with `as any`. The cast
+          // was what let this route ship a mood vocabulary the enum did not
+          // accept: it silenced the compiler, and the mismatch only surfaced as a
+          // runtime enum error on insert. An unrecognised mood is stored as null.
           await prisma.story.create({
             data: {
               title,
@@ -312,7 +317,7 @@ export async function POST(req: Request) {
               status: 'PUBLISHED',
               authorId: userId,
               categoryId: category.id,
-              mood: mood as any,
+              mood: isMood(mood) ? mood : null,
               language: 'en',
             },
           });

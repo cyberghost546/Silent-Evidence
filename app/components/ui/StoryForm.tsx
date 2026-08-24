@@ -6,7 +6,8 @@
 // and final POST to /api/stories to publish or save as draft.
 // Props: categories — list of {id, name} fetched server-side; initialExcerpt — pre-filled excerpt.
 import { useState, useRef, useCallback, useEffect, ChangeEvent } from 'react';
-import { Circle } from 'lucide-react';
+import { Circle, Lock } from 'lucide-react';
+import { MOOD_OPTIONS } from '@/lib/moods';
 import { useRouter } from 'next/navigation';
 import { LANGUAGES } from '@/lib/languages';
 import dynamic from 'next/dynamic';
@@ -18,7 +19,18 @@ const AIWritingAssistant = dynamic(() => import('./AIWritingAssistant'), { ssr: 
 
 type Category = { id: number; name: string };
 
-export default function StoryForm({ categories, initialExcerpt = '' }: { categories: Category[]; initialExcerpt?: string }) {
+export default function StoryForm({
+  categories,
+  initialExcerpt = '',
+  // Author Pro unlocks monetisation and rich-media fields. This only controls
+  // what the form shows — the API rejects these fields for non-subscribers
+  // regardless of what the browser submits.
+  isAuthorPro = false,
+}: {
+  categories: Category[];
+  initialExcerpt?: string;
+  isAuthorPro?: boolean;
+}) {
   const router = useRouter();
 
   const [title, setTitle]           = useState('');
@@ -41,6 +53,9 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
   const [isPremiumOnly, setIsPremiumOnly]       = useState(false);
   const [earlyAccessUntil, setEarlyAccessUntil] = useState('');
   const [audioUrl, setAudioUrl]                 = useState('');
+  // Price as the author types it, in DOLLARS. Converted to integer cents on
+  // submit — Story.price is cents, and sending dollars would undercharge by 100x.
+  const [priceDollars, setPriceDollars]         = useState('');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude]     = useState('');
   const [longitude, setLongitude]   = useState('');
@@ -185,6 +200,13 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
     // Clear the localStorage backup now that the user is submitting intentionally
     try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
 
+    // Dollars → integer cents. Math.round avoids float drift turning "4.99"
+    // into 498.99999… and then 498 once truncated. Empty/0/invalid means free,
+    // sent as null so the API stores no price rather than a price of zero.
+    const parsedPrice = Math.round(parseFloat(priceDollars) * 100);
+    const priceCents =
+      Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null;
+
     if (autosaveId.current !== null) {
       // Patch the existing autosaved draft with final values
       const csrfToken = await getCsrfToken();
@@ -202,7 +224,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
       const res = await fetch('/api/stories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
-        body: JSON.stringify({ title, categoryId: Number(categoryId), excerpt, content, coverImage: coverImage || null, videoUrl: videoUrl || null, audioUrl: audioUrl || null, status, language, mood: mood || null, contentRating, warnings: warnings.length ? JSON.stringify(warnings) : null, scheduledAt: scheduledAt || null, seriesId: seriesId ? Number(seriesId) : null, seriesOrder: seriesOrder ? Number(seriesOrder) : null, locationName: locationName || null, latitude: latitude ? Number(latitude) : null, longitude: longitude ? Number(longitude) : null, isPremiumOnly, earlyAccessUntil: earlyAccessUntil || null }),
+        body: JSON.stringify({ title, categoryId: Number(categoryId), excerpt, content, coverImage: coverImage || null, videoUrl: videoUrl || null, audioUrl: audioUrl || null, status, language, mood: mood || null, contentRating, warnings: warnings.length ? JSON.stringify(warnings) : null, scheduledAt: scheduledAt || null, seriesId: seriesId ? Number(seriesId) : null, seriesOrder: seriesOrder ? Number(seriesOrder) : null, locationName: locationName || null, latitude: latitude ? Number(latitude) : null, longitude: longitude ? Number(longitude) : null, isPremiumOnly, earlyAccessUntil: earlyAccessUntil || null, price: priceCents }),
       });
       const data = await res.json();
       setLoading(false);
@@ -494,15 +516,13 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         <label className="block text-sm font-medium text-gray-300 mb-1.5">Story Mood <span className="text-gray-500 font-normal">(optional)</span></label>
         <select value={mood} onChange={e => setMood(e.target.value)}
           className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition appearance-none">
+          {/* Options come from lib/moods.ts. They were hard-coded, and still
+              offered the old generic vocabulary — so picking "Mysterious" or
+              "Comedic" sent the API a value the Mood enum had no room for. */}
           <option value="">— No mood selected —</option>
-          <option value="DARK">Dark</option>
-          <option value="MYSTERIOUS">Mysterious</option>
-          <option value="DRAMATIC">Dramatic</option>
-          <option value="EPIC">Epic</option>
-          <option value="ACTION">Action</option>
-          <option value="HEARTWARMING">Heartwarming</option>
-          <option value="ROMANTIC">Romantic</option>
-          <option value="COMEDIC">Comedic</option>
+          {MOOD_OPTIONS.map((m) => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
         </select>
       </div>
 
@@ -574,7 +594,33 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         )}
       </div>
 
-      {/* Audio narration URL */}
+      {/* ── Author Pro upsell ──────────────────────────────────────────────
+          Shown in place of the gated fields. Free authors see what the plan
+          unlocks rather than the tools simply being absent — an explained lock
+          converts, a missing section just confuses. */}
+      {!isAuthorPro && (
+        <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-4 flex items-start gap-3">
+          <span className="shrink-0 w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Lock className="w-4 h-4 text-amber-400" strokeWidth={1.75} aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-white">Selling, early access & rich media</p>
+            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+              Charge for this story, publish it members-only, set an early-access
+              window, or attach audio narration — all part of Author Pro.
+            </p>
+          </div>
+          <a
+            href="/author-pro"
+            className="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition"
+          >
+            Upgrade
+          </a>
+        </div>
+      )}
+
+      {/* Audio narration URL — Author Pro only */}
+      {isAuthorPro && (
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
  Audio Narration URL <span className="text-gray-500 font-normal">(optional — MP3 link for premium listeners)</span>
@@ -588,10 +634,37 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
         />
         <p className="text-xs text-gray-600 mt-1">Only premium members will be able to play this audio.</p>
       </div>
+      )}
 
-      {/* Premium options */}
+      {/* Premium options — Author Pro only */}
+      {isAuthorPro && (
       <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 space-y-4">
         <p className="text-xs font-bold uppercase tracking-widest text-yellow-500/70">Premium Options</p>
+
+        {/* Price — readers must buy the story before they can read it */}
+        <div>
+          <label htmlFor="storyPrice" className="block text-sm font-medium text-gray-300 mb-1">
+            Price <span className="text-gray-500 font-normal">(optional — leave blank to publish free)</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">$</span>
+            <input
+              id="storyPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              value={priceDollars}
+              onChange={(e) => setPriceDollars(e.target.value)}
+              placeholder="0.00"
+              className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-7 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
+            />
+          </div>
+          <p className="text-xs text-gray-600 mt-1">
+            Readers pay once for permanent access. Premium members and anyone who
+            already bought it are unaffected.
+          </p>
+        </div>
 
         {/* Members-only toggle */}
         <div className="flex items-start justify-between gap-4">
@@ -631,6 +704,7 @@ export default function StoryForm({ categories, initialExcerpt = '' }: { categor
           )}
         </div>
       </div>
+      )}
 
       {/* Status + Submit */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">

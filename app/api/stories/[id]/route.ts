@@ -6,6 +6,7 @@ import { checkAndAwardBadges } from '@/lib/badges';
 import { sendMail } from '@/lib/email';
 import { updateWritingStreak } from '@/lib/streaks';
 import { sanitizeContent } from '@/lib/sanitize';
+import { enforceAuthorProFields, AUTHOR_PRO_FIELD_LABELS } from '@/lib/authorPro';
 import { z } from 'zod';
 
 const PatchStorySchema = z.object({
@@ -17,6 +18,9 @@ const PatchStorySchema = z.object({
   audioUrl:         z.string().nullable().optional(),
   isPremiumOnly:    z.boolean().optional(),
   earlyAccessUntil: z.string().nullable().optional(),
+  spotifyPlaylistUrl: z.string().nullable().optional(),
+  // Price in cents. 0/null = free. Author Pro only — enforced in the handler.
+  price:            z.number().int().min(0).max(100_000).nullable().optional(),
   status:           z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED']).optional(),
   categoryId:       z.number().int().positive().optional(),
   scheduledAt:      z.string().nullable().optional(),
@@ -141,7 +145,31 @@ export async function PATCH(req: Request, { params }: Params) {
     categoryId,
     scheduledAt:      scheduledAtRaw,
     warnings,
+    spotifyPlaylistUrl: rawSpotifyUrl,
+    price:            rawPrice,
   } = parsed.data;
+
+  // ── Author Pro gate ────────────────────────────────────────────────────────
+  // Same rule as story creation. Note this checks `userId`, the person making
+  // the edit — a collaborator without Author Pro cannot switch on monetisation
+  // for someone else's story, and an author whose plan lapsed cannot turn these
+  // features back on. Clearing a gated field is always permitted, so a lapsed
+  // author is never stuck unable to remove a price they can no longer charge.
+  const { rejected } = await enforceAuthorProFields(userId, {
+    price:              rawPrice,
+    isPremiumOnly,
+    earlyAccessUntil:   earlyAccessUntilRaw,
+    audioUrl:           rawAudioUrl,
+    videoUrl:           rawVideoUrl,
+    spotifyPlaylistUrl: rawSpotifyUrl,
+  });
+  if (rejected.length > 0) {
+    const names = rejected.map((f) => AUTHOR_PRO_FIELD_LABELS[f]).join(', ');
+    return NextResponse.json(
+      { error: `Author Pro is required for: ${names}. Upgrade at /author-pro.`, upgrade: '/author-pro' },
+      { status: 403 },
+    );
+  }
 
   const title      = rawTitle      !== undefined ? rawTitle.trim()                           : undefined;
   const content    = rawContent    !== undefined ? sanitizeContent(rawContent.trim())         : undefined;
@@ -152,6 +180,8 @@ export async function PATCH(req: Request, { params }: Params) {
   const earlyAccessUntil = earlyAccessUntilRaw !== undefined
     ? (earlyAccessUntilRaw ? new Date(earlyAccessUntilRaw) : null)
     : undefined;
+  const spotifyPlaylistUrl = rawSpotifyUrl !== undefined ? (rawSpotifyUrl?.trim() ?? null) : undefined;
+  const price = rawPrice !== undefined ? rawPrice : undefined;
   // warnings: JSON-encoded string[] sent from StoryEditForm — already validated as string
   const scheduledAt = scheduledAtRaw !== undefined
     ? (scheduledAtRaw ? new Date(scheduledAtRaw) : null)
@@ -171,6 +201,8 @@ export async function PATCH(req: Request, { params }: Params) {
   if (audioUrl          !== undefined) data.audioUrl          = audioUrl || null;
   if (isPremiumOnly     !== undefined) data.isPremiumOnly     = isPremiumOnly;
   if (earlyAccessUntil  !== undefined) data.earlyAccessUntil  = earlyAccessUntil;
+  if (spotifyPlaylistUrl !== undefined) data.spotifyPlaylistUrl = spotifyPlaylistUrl || null;
+  if (price             !== undefined) data.price             = price || null;
   if (status       !== undefined) data.status       = status;
   if (categoryId   !== undefined) data.categoryId   = categoryId;
   if (scheduledAt  !== undefined) data.scheduledAt  = scheduledAt;

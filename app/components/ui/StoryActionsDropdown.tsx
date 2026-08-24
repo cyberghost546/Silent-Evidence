@@ -20,11 +20,12 @@ type Props = {
   isLoggedIn: boolean;      // Whether there is a logged-in user — hides Save Offline if false
   initialSaved: boolean;    // Whether the current user has already saved this story for offline reading
   isAuthor: boolean;        // Whether the current user is the story author — shows Edit button if true
+  hasPremium: boolean;      // Whether the current user has premium — offline downloads are gated on this
 };
 
 export default function StoryActionsDropdown({
   storyId, storySlug, storyTitle,
-  initialBookmarked, isLoggedIn, initialSaved, isAuthor,
+  initialBookmarked, isLoggedIn, initialSaved, isAuthor, hasPremium,
 }: Props) {
   // open controls whether the dropdown panel is visible
   const [open, setOpen]     = useState(false);
@@ -124,7 +125,7 @@ export default function StoryActionsDropdown({
           {/* Save Offline — only shown to logged-in users, caches the story in the PWA */}
           {isLoggedIn && (
             <div className="w-full [&>button]:w-full [&>button]:justify-start">
-              <SaveOfflineButton storyId={storyId} storySlug={storySlug} initialSaved={initialSaved} />
+              <SaveOfflineButton storyId={storyId} storySlug={storySlug} initialSaved={initialSaved} hasPremium={hasPremium} />
             </div>
           )}
 

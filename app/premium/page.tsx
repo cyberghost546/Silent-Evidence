@@ -6,12 +6,13 @@
 // this file as one cohesive unit without extra files.
 
 import { cookies } from 'next/headers';
-import { Zap, Unlock, Ban, Crown, Palette } from 'lucide-react';
+import { Zap, Unlock, Ban, Crown, Palette, Clock, Headphones, Download, Sparkles } from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import PremiumBadge from '@/app/components/ui/PremiumBadge';
 import { prisma } from '@/lib/prisma';
 import SubscribeButtons from './SubscribeButtons';
+import { recordFunnelEvent } from '@/lib/funnel';
 
 // ── Plan data ─────────────────────────────────────────────────────────────────
 
@@ -37,13 +38,19 @@ const PLANS = [
   },
 ] as const;
 
-// Perks shared by both plans — rendered as a checklist inside each card
+// Perks shared by both plans — rendered as a checklist inside each card.
+// Keep this honest: every line here is enforced server-side somewhere in the
+// codebase. If you add a line, add the gate with it.
 const PERKS = [
-  { icon: Zap,      text: 'Horror Elite badge on your profile' },
-  { icon: Unlock,   text: 'Access all premium-only stories' },
-  { icon: Ban,      text: 'No ads (coming soon)' },
-  { icon: Crown,    text: 'Priority placement in leaderboards' },
-  { icon: Palette,  text: 'Exclusive blood theme customization' },
+  { icon: Zap,        text: 'Horror Elite badge on your profile' },
+  { icon: Unlock,     text: 'Access all premium-only stories' },
+  { icon: Sparkles,   text: 'Your Year in Horror — your personal reading recap' },
+  { icon: Clock,      text: 'Early access to new stories before free readers' },
+  { icon: Headphones, text: 'Listen to audio narrations' },
+  { icon: Download,   text: 'Download stories for offline reading' },
+  { icon: Ban,        text: 'No ads, anywhere on the site' },
+  { icon: Crown,      text: 'Priority placement in leaderboards' },
+  { icon: Palette,    text: 'Exclusive blood theme customization' },
 ];
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -61,6 +68,13 @@ export default async function PremiumPage() {
       where: { userId, status: 'active' },
     });
     isSubscribed = !!sub;
+  }
+
+  // Funnel stage 2. Existing subscribers are skipped — they are not in the
+  // funnel, and counting them would flatter the conversion rate. Not awaited:
+  // instrumentation never delays the page.
+  if (userId && !isSubscribed) {
+    recordFunnelEvent('premium_viewed', userId).catch(() => {});
   }
 
   return (

@@ -10,18 +10,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PenLine, Library, Flame, Users, Circle } from 'lucide-react';
 import { moodIcon } from '@/lib/moodIcons';
+import { MOODS as MOOD_VALUES, MOOD_META } from '@/lib/moods';
 
-// Available horror moods matching the Mood enum in schema.prisma
-const MOODS = [
-  { value: 'EPIC',          label: 'Epic',          icon: moodIcon('EPIC') },
-  { value: 'HEARTWARMING',  label: 'Heartwarming',  icon: moodIcon('HEARTWARMING') },
-  { value: 'MYSTERIOUS',    label: 'Mysterious',    icon: moodIcon('MYSTERIOUS') },
-  { value: 'ACTION',        label: 'Action',        icon: moodIcon('ACTION') },
-  { value: 'ROMANTIC',      label: 'Romantic',      icon: moodIcon('ROMANTIC') },
-  { value: 'COMEDIC',       label: 'Comedic',       icon: moodIcon('COMEDIC') },
-  { value: 'DRAMATIC',      label: 'Dramatic',      icon: moodIcon('DRAMATIC') },
-  { value: 'DARK',          label: 'Dark',          icon: moodIcon('DARK') },
-];
+// Available horror moods, built from lib/moods.ts so they always match the Mood
+// enum. The hard-coded list this replaced claimed to match the enum but held the
+// old generic vocabulary, so new readers picked preferences no story could have.
+const MOODS = MOOD_VALUES.map((value) => ({
+  value,
+  label: MOOD_META[value].label,
+  icon:  moodIcon(value),
+}));
 
 export default function OnboardingPage() {
   const router = useRouter();

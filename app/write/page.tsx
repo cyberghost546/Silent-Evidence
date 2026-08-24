@@ -19,6 +19,7 @@ import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import StoryForm from '@/app/components/ui/StoryForm';
+import { hasAuthorPro } from '@/lib/authorPro';
 import Link from 'next/link';
 
 // searchParams lets us read URL query strings like ?prompt=... on the server
@@ -38,6 +39,11 @@ export default async function WritePage({ searchParams }: Props) {
     orderBy: { name: 'asc' },
     select: { id: true, name: true },
   });
+
+  // Author Pro decides whether the form offers the monetisation and rich-media
+  // fields. Resolved here on the server so a free author never receives those
+  // controls; the API enforces the same rule on submit.
+  const isAuthorPro = await hasAuthorPro(userId);
 
   // Read the optional query params — a user might arrive here from a writing prompt
   // page that pre-populates the form with inspiration text.
@@ -81,7 +87,7 @@ export default async function WritePage({ searchParams }: Props) {
         {/* StoryForm is a client component (it uses React state for the rich-text editor
             and form inputs). We pass the category list from the server and optionally
             pre-fill the excerpt field with the writing prompt text. */}
-        <StoryForm categories={categories} initialExcerpt={prompt ?? ''} />
+        <StoryForm categories={categories} initialExcerpt={prompt ?? ''} isAuthorPro={isAuthorPro} />
       </div>
       <Footer />
     </main>

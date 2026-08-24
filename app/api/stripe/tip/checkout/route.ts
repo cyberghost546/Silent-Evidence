@@ -7,21 +7,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { getSessionUserId } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
+    // The sender is always the caller. `fromUserId` used to be taken from the
+    // request body with no authentication, so a tip could be attributed to any
+    // account — the webhook writes metadata.fromUserId straight into the Tip
+    // row, meaning the public tip history was forgeable by anyone.
+    const fromUserId = await getSessionUserId();
+    if (!fromUserId) {
+      return NextResponse.json({ error: 'You must be logged in to tip.' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { fromUserId, toUserId, amount, message } = body as {
-      fromUserId: number;
+    const { toUserId, amount, message } = body as {
       toUserId: number;
       amount: number;    // Amount in cents, e.g. 500 = $5.00
       message?: string;  // Optional note from the reader to the author
     };
 
     // Validate all required fields upfront
-    if (!fromUserId || !toUserId || !amount) {
+    if (!toUserId || !amount) {
       return NextResponse.json(
-        { error: 'fromUserId, toUserId, and amount are required' },
+        { error: 'toUserId and amount are required' },
         { status: 400 }
       );
     }

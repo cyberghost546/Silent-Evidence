@@ -23,6 +23,8 @@ const OPTIONAL_VARS: Record<string, string> = {
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'Stripe frontend will not initialize.',
   STRIPE_PREMIUM_MONTHLY_PRICE_ID:'Monthly subscriptions will not work.',
   STRIPE_PREMIUM_YEARLY_PRICE_ID: 'Yearly subscriptions will not work.',
+  STRIPE_AUTHOR_MONTHLY_PRICE_ID: 'Monthly Author Pro plans will not work.',
+  STRIPE_AUTHOR_YEARLY_PRICE_ID:  'Yearly Author Pro plans will not work.',
   GOOGLE_CLIENT_ID:               'Google OAuth login will be disabled.',
   GOOGLE_CLIENT_SECRET:           'Google OAuth login will be disabled.',
   MICROSOFT_CLIENT_ID:            'Microsoft OAuth login will be disabled.',

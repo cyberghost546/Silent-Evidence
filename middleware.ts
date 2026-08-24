@@ -1,6 +1,6 @@
 // middleware.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// Runs on every request (except static assets) and does two jobs:
+// Runs on every request (except static assets) and does three jobs:
 //
 //   1. SESSION INTEGRITY — verifies the HMAC signature on the `userId` cookie.
 //      The signature lives in the `userId_sig` cookie (see lib/sessionCookie.ts).

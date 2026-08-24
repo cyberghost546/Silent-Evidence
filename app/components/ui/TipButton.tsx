@@ -48,7 +48,12 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           toUserId,
-          amount: selectedAmount,   // Amount in dollars; API converts to cents
+          // Cents, not dollars. TIP_AMOUNTS is in dollars for display, but the
+          // API contract (and Stripe's unit_amount) is the smallest currency
+          // unit. This used to send dollars with a comment claiming the API
+          // converted them — it does not, so every tip was rejected by the
+          // server's `amount < 100` minimum check.
+          amount: selectedAmount * 100,
           message: message.trim(),  // Empty string is fine — message is optional
         }),
       });

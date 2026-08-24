@@ -4,10 +4,16 @@
 // GET    — returns all stories the logged-in user has saved for offline reading.
 // POST   — saves a story to the user's offline list (upsert, safe to call twice).
 // DELETE — removes a story from the user's offline list.
+//
+// PREMIUM GATE: saving a story for offline reading is a premium perk, so POST
+// requires an active subscription. GET and DELETE deliberately do NOT — a member
+// who lets their subscription lapse must still be able to see the library they
+// built and remove things from it. Only *adding* new downloads is restricted.
 
 import { NextResponse } from 'next/server';
 import { cookies }       from 'next/headers';
 import { prisma }        from '@/lib/prisma';
+import { requirePremium } from '@/lib/premiumCheck';
 import { unauthorized, notFound, serverError } from '@/lib/apiError';
 
 // ── GET /api/offline-saves ────────────────────────────────────────────────────
@@ -57,6 +63,12 @@ export async function POST(req: Request) {
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0) || null;
   if (!userId) return unauthorized();
+
+  // Offline downloads are a premium perk. This is the real gate — hiding the
+  // button in the UI is only a courtesy, this is what actually stops a free user
+  // POSTing to the endpoint directly.
+  const denied = await requirePremium('Offline downloads are a premium perk.');
+  if (denied) return denied;
 
   try {
     const body    = await req.json();

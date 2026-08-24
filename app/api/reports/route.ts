@@ -8,12 +8,14 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
 const CreateReportSchema = z.object({
+  // Zod v4 replaced the `errorMap` option with `error`, which accepts the
+  // message directly. The old key is no longer part of the params type.
   type:     z.enum(['COMMENT', 'STORY', 'FORUM_POST', 'FORUM_REPLY'], {
-              errorMap: () => ({ message: 'Invalid report type' }),
+              error: 'Invalid report type',
             }),
   targetId: z.number().int().positive('A valid target ID is required.'),
   reason:   z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'OTHER'], {
-              errorMap: () => ({ message: 'Invalid reason' }),
+              error: 'Invalid reason',
             }),
   note:     z.string().max(1000).optional(),
 });

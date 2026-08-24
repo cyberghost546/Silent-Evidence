@@ -23,6 +23,7 @@
  *   - A server page that fetches and orders by timestamp desc
  *   - A client component that renders the list with optional UI controls
  */
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -72,6 +73,27 @@ export default async function HistoryPage() {
           <span className="w-1 h-7 bg-green-600 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Reading History</h1>
         </div>
+
+        {/* Entry point to the recap. This is the natural place for it — someone
+            looking at their reading history is already in the mood to look back.
+            Rendered for everyone: /wrapped does its own premium check and shows
+            non-members a teaser, so the link doubles as discovery for the plan. */}
+        <Link
+          href="/wrapped"
+          className="flex items-center justify-between gap-4 rounded-xl border border-red-500/25 bg-gradient-to-r from-red-950/40 to-orange-950/20 px-5 py-4 mb-6 hover:border-red-500/50 transition group"
+        >
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white group-hover:text-red-200 transition">
+              Your Year in Horror
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Everything you read, rated and survived this year.
+            </p>
+          </div>
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-300 border border-yellow-500/30">
+            Members
+          </span>
+        </Link>
 
         {/* JSON.parse(JSON.stringify(...)) converts Prisma Date objects to plain
             ISO strings so they can be safely passed across the server→client boundary */}

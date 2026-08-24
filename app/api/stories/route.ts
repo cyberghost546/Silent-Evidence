@@ -8,11 +8,12 @@ import { prisma } from '@/lib/prisma';
 import { checkAndAwardBadges } from '@/lib/badges';
 import { cache, invalidatePattern, TTL } from '@/lib/cache';
 import { serverError } from '@/lib/apiError';
-import type { Mood } from '@prisma/client';
+import { isMood, type Mood } from '@/lib/moods';
 import { checkStoryToxicity } from '@/lib/toxicityCheck';
 import { sanitizeContent } from '@/lib/sanitize';
 import { detectMood } from '@/lib/moodDetect';
 import { verifyCsrfToken } from '@/lib/csrf';
+import { enforceAuthorProFields, AUTHOR_PRO_FIELD_LABELS } from '@/lib/authorPro';
 import { sendPushToUser } from '@/lib/webpush';
 import { z } from 'zod';
 
@@ -34,6 +35,10 @@ const CreateStorySchema = z.object({
   audioUrl:         z.string().nullable().optional(),
   isPremiumOnly:    z.boolean().optional().default(false),
   earlyAccessUntil: z.string().nullable().optional(),
+  spotifyPlaylistUrl: z.string().nullable().optional(),
+  // Price in cents. 0/null = free. Author Pro only — enforced below, not here,
+  // because schema validation cannot see who is making the request.
+  price:            z.number().int().min(0).max(100_000).nullable().optional(),
 });
 
 // GET /api/stories?mood=GORE&take=6
@@ -142,7 +147,29 @@ export async function POST(req: Request) {
     audioUrl:         rawAudioUrl,
     isPremiumOnly,
     earlyAccessUntil: earlyAccessUntilRaw,
+    spotifyPlaylistUrl: rawSpotifyUrl,
+    price:            rawPrice,
   } = parsed.data;
+
+  // ── Author Pro gate ────────────────────────────────────────────────────────
+  // Monetisation and rich-media fields require the paid author plan. We reject
+  // the whole request rather than silently dropping the fields — an author who
+  // set a price and got back a free story would reasonably think it worked.
+  const { rejected } = await enforceAuthorProFields(userId, {
+    price:              rawPrice,
+    isPremiumOnly,
+    earlyAccessUntil:   earlyAccessUntilRaw,
+    audioUrl:           rawAudioUrl,
+    videoUrl:           rawVideoUrl,
+    spotifyPlaylistUrl: rawSpotifyUrl,
+  });
+  if (rejected.length > 0) {
+    const names = rejected.map((f) => AUTHOR_PRO_FIELD_LABELS[f]).join(', ');
+    return NextResponse.json(
+      { error: `Author Pro is required for: ${names}. Upgrade at /author-pro.`, upgrade: '/author-pro' },
+      { status: 403 },
+    );
+  }
 
   const title            = rawTitle.trim();
   const content          = sanitizeContent(rawContent.trim());
@@ -152,6 +179,8 @@ export async function POST(req: Request) {
   const earlyAccessUntil = earlyAccessUntilRaw ? new Date(earlyAccessUntilRaw) : null;
   const videoUrl         = rawVideoUrl?.trim() ?? null;
   const audioUrl         = rawAudioUrl?.trim() ?? null;
+  const spotifyPlaylistUrl = rawSpotifyUrl?.trim() ?? null;
+  const price            = rawPrice ?? null;
 
   // Run AI toxicity check on the title and excerpt before publishing
   // Only check published stories — drafts can be edited before they go live
@@ -165,8 +194,15 @@ export async function POST(req: Request) {
     }
   }
 
-  // Auto-detect mood via Ollama when publishing without one set
-  let resolvedMood = mood || null;
+  // Auto-detect mood via Ollama when publishing without one set.
+  //
+  // `mood` arrives from the request body as a plain string, so it is narrowed
+  // against the Mood enum before use: without this an arbitrary value like
+  // "SPOOKY" would be handed to Prisma and fail at runtime with an enum error
+  // (and the assignment was a compile error, since Story.mood is Mood, not string).
+  // detectMood now validates against the same canonical list, so its result is
+  // already a Mood; nothing further is needed here.
+  let resolvedMood: Mood | null = isMood(mood) ? mood : null;
   if (!resolvedMood && status === 'PUBLISHED') {
     resolvedMood = await detectMood(title, excerpt || content.slice(0, 500)) ?? null;
   }
@@ -191,6 +227,8 @@ export async function POST(req: Request) {
       longitude:    longitude ?? null,
       videoUrl:        videoUrl || null,
       audioUrl:        audioUrl || null,
+      spotifyPlaylistUrl: spotifyPlaylistUrl || null,
+      price:           price || null,
       isPremiumOnly,
       earlyAccessUntil: earlyAccessUntil || null,
       authorId:     userId,

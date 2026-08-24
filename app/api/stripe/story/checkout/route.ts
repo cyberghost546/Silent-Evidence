@@ -7,18 +7,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { getSessionUserId } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
+    // The buyer is always the caller. `userId` used to come from the request
+    // body with no authentication, so a checkout could be started that granted
+    // the purchased story to somebody else's account.
+    const userId = await getSessionUserId();
+    if (!userId) {
+      return NextResponse.json({ error: 'You must be logged in to purchase.' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { userId, storyId } = body as { userId: number; storyId: number };
+    const { storyId } = body as { storyId: number };
 
     // Validate required fields before doing any DB work
-    if (!userId || !storyId) {
-      return NextResponse.json(
-        { error: 'userId and storyId are required' },
-        { status: 400 }
-      );
+    if (!storyId) {
+      return NextResponse.json({ error: 'storyId is required' }, { status: 400 });
     }
 
     // Fetch the story from the database — we need its price and title to build

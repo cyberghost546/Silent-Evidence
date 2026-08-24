@@ -52,7 +52,7 @@ async function main() {
       title: 'The Last Light on Hollow Street',
       slug: 'the-last-light-on-hollow-street',
       categorySlug: 'supernatural',
-      mood: Mood.MYSTERIOUS,
+      mood: Mood.ATMOSPHERIC,
       excerpt: 'Every night at midnight, a single light flickers on in the abandoned house at the end of Hollow Street. No one has lived there in thirty years.',
       content: `<p>Every night at midnight, a single light flickered on in the abandoned house at the end of Hollow Street.</p>
 
@@ -100,7 +100,7 @@ async function main() {
       title: 'What the Mirror Remembers',
       slug: 'what-the-mirror-remembers',
       categorySlug: 'psychological',
-      mood: Mood.DRAMATIC,
+      mood: Mood.DISTURBING,
       excerpt: 'After her husband\'s death, Clara notices the old mirror in the hallway shows her rooms the way they used to look—before she changed everything.',
       content: `<p>Clara noticed it first on a Wednesday, three weeks after the funeral.</p>
 
@@ -142,7 +142,7 @@ async function main() {
       title: 'The Cartographer of Dead Places',
       slug: 'the-cartographer-of-dead-places',
       categorySlug: 'cosmic-horror',
-      mood: Mood.MYSTERIOUS,
+      mood: Mood.ATMOSPHERIC,
       excerpt: 'He made maps of places that no longer existed. Then one of his maps showed a place that hadn\'t been destroyed yet.',
       content: `<p>Elias made maps of places that no longer existed.</p>
 
@@ -182,7 +182,7 @@ async function main() {
       title: 'Thirty-Three Steps',
       slug: 'thirty-three-steps',
       categorySlug: 'paranormal',
-      mood: Mood.MYSTERIOUS,
+      mood: Mood.ATMOSPHERIC,
       excerpt: 'The staircase in the old hotel has thirty-three steps. Everyone who counts them agrees. Except the people who make it to the top.',
       content: `<p>The Ashford Hotel had three floors, a grand staircase, and thirty-three steps.</p>
 

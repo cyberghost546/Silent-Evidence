@@ -6,13 +6,13 @@
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL    = process.env.OLLAMA_MODEL    ?? 'llama3.2:3b';
 
-// Valid mood values matching the Prisma Mood enum
-const VALID_MOODS = [
-  'ATMOSPHERIC', 'CREEPY', 'GORE', 'PSYCHOLOGICAL',
-  'SUSPENSEFUL', 'SUPERNATURAL', 'DARK', 'UNSETTLING',
-] as const;
-
-type Mood = typeof VALID_MOODS[number];
+// Valid mood values, imported from the canonical list rather than redeclared.
+//
+// The local list this replaced claimed to match the Prisma Mood enum but did
+// not: it offered SUSPENSEFUL and UNSETTLING, which the enum never accepted, so
+// a story classified as either failed to insert. Importing means the prompt and
+// the database can no longer disagree.
+import { MOODS as VALID_MOODS, isMood, type Mood } from '@/lib/moods';
 
 /**
  * detectMood — asks Ollama to classify the mood of a story.
@@ -43,7 +43,7 @@ export async function detectMood(title: string, excerpt: string): Promise<Mood |
     const data = await res.json();
     const raw = (data.response ?? '').trim().toUpperCase().replace(/[^A-Z_]/g, '');
 
-    return (VALID_MOODS as readonly string[]).includes(raw) ? (raw as Mood) : null;
+    return isMood(raw) ? raw : null;
   } catch {
     return null;
   }

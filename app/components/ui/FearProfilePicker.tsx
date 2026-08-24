@@ -6,17 +6,18 @@
 // Props: initialFearMoods — comma-separated string of pre-selected mood values from the DB.
 
 import { useState } from 'react';
+import { MOODS as MOOD_VALUES, MOOD_META } from '@/lib/moods';
 
-const MOODS = [
-  { value: 'EPIC',         label: 'Epic',        accent: 'bg-orange-500',  desc: 'Grand battles and heroic moments'  },
-  { value: 'HEARTWARMING', label: 'Heartwarming', accent: 'bg-pink-500',    desc: 'Stories that touch the soul'       },
-  { value: 'MYSTERIOUS',   label: 'Mysterious',   accent: 'bg-purple-500',  desc: 'Puzzles, secrets, and intrigue'    },
-  { value: 'ACTION',       label: 'Action',       accent: 'bg-yellow-500',  desc: 'Non-stop fights and adrenaline'    },
-  { value: 'ROMANTIC',     label: 'Romantic',     accent: 'bg-rose-500',    desc: 'Love stories and tender moments'   },
-  { value: 'COMEDIC',      label: 'Comedic',      accent: 'bg-green-500',   desc: 'Laughs, gags, and fun chaos'       },
-  { value: 'DRAMATIC',     label: 'Dramatic',     accent: 'bg-blue-500',    desc: 'Intense emotions and plot twists'  },
-  { value: 'DARK',         label: 'Dark',         accent: 'bg-gray-500',    desc: 'Grim themes and moral ambiguity'   },
-];
+// Built from lib/moods.ts. The hard-coded list this replaced offered the old
+// generic vocabulary, so a reader's saved "fear profile" could contain values
+// (ROMANTIC, COMEDIC …) that no story can ever have — producing recommendations
+// that silently matched nothing.
+const MOODS = MOOD_VALUES.map((value) => ({
+  value,
+  label:  MOOD_META[value].label,
+  accent: MOOD_META[value].accent,
+  desc:   MOOD_META[value].description,
+}));
 
 type Props = { initialFearMoods: string };
 

@@ -46,28 +46,22 @@ import Footer       from '@/app/components/ui/Footer';
 import { readingTime } from '@/lib/readingTime';
 import { createElement } from 'react';
 import { moodIcon } from '@/lib/moodIcons';
+import { MOOD_META, isMood } from '@/lib/moods';
 
 // ── TypeScript: dynamic route params ──────────────────────────────────────────
 // In Next.js 14, params are a Promise — we must `await` them inside the component.
 type Props = { params: Promise<{ mood: string }> };
 
-// ── Mood metadata lookup table ─────────────────────────────────────────────────
-// Keys match the Prisma enum values exactly (uppercase).
-// The `color` string bundles three Tailwind classes:
-//   1. text-*      → pill label colour
-//   2. border-*    → pill border colour
-//   3. bg-*        → pill background tint
-// All three are applied together to the active pill.
-const MOOD_META: Record<string, { label: string; description: string; color: string }> = {
-  EPIC:         { label: 'Epic',         description: 'Grand battles and heroic moments.',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-  HEARTWARMING: { label: 'Heartwarming', description: 'Stories that touch the soul.',        color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
-  MYSTERIOUS:   { label: 'Mysterious',   description: 'Puzzles, secrets, and intrigue.',     color: 'text-green-400 border-green-500/30 bg-green-500/10' },
-  ACTION:       { label: 'Action',       description: 'Non-stop fights and adrenaline.',     color: 'text-red-400 border-red-500/30 bg-red-500/10' },
-  ROMANTIC:     { label: 'Romantic',     description: 'Love stories and tender moments.',    color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
-  COMEDIC:      { label: 'Comedic',      description: 'Laughs, gags, and fun chaos.',        color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
-  DRAMATIC:     { label: 'Dramatic',     description: 'Intense emotions and plot twists.',   color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
-  DARK:         { label: 'Dark',         description: 'Grim themes and moral ambiguity.',    color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
-};
+// ── Mood metadata ──────────────────────────────────────────────────────────────
+// Labels, descriptions and pill colours come from lib/moods.ts, which is the
+// single source of truth for the mood vocabulary.
+//
+// The local table this replaced described generic fiction ("Grand battles and
+// heroic moments", "Love stories and tender moments") — template residue that
+// did not match the horror moods the rest of the app writes.
+//
+// The `color` string bundles three Tailwind classes applied together to the
+// active pill: text-* (label), border-* (border), bg-* (background tint).
 
 // ── Page component ─────────────────────────────────────────────────────────────
 // `async` because we need to await params and run DB queries server-side.
@@ -79,25 +73,24 @@ export default async function MoodPage({ params }: Props) {
   // e.g. "dark" → "DARK"
   const moodKey = mood.toUpperCase();
 
-  // Validate against our lookup table.
-  // If moodKey isn't defined (e.g. /mood/nonexistent), meta is undefined
-  // and we trigger a 404 rather than crashing or showing an empty page.
+  // Validate against the canonical mood list. isMood narrows the string to a
+  // Mood, which both guards /mood/nonexistent with a 404 and lets moodKey be
+  // used as a typed enum value in the Prisma query below.
+  if (!isMood(moodKey)) return notFound();
   const meta = MOOD_META[moodKey];
-  if (!meta) return notFound();
 
 
   // ── Prisma query ──────────────────────────────────────────────────────────
   // Fetch all PUBLISHED stories with this mood, newest-first.
-  // `moodKey as any` is a pragmatic cast: Prisma's generated Mood enum type
-  // doesn't accept a plain string even though the runtime value is valid.
-  // The alternatives (importing the Prisma Mood enum) add more complexity
-  // than the cast is worth.
+  // No cast is needed: the isMood guard above has already narrowed moodKey from
+  // a plain string to a Mood, which is exactly what Prisma wants here. (This
+  // previously used `moodKey as any` because there was no guard to narrow it.)
   // `include` joins related tables in a single query rather than N+1 selects:
   //   - author.username for the "by @username" line
   //   - category.name/slug for the category badge
   //   - _count.likes/_count.comments for the engagement numbers
   const stories = await prisma.story.findMany({
-    where:    { mood: moodKey as any, status: 'PUBLISHED' },
+    where:    { mood: moodKey, status: 'PUBLISHED' },
     orderBy:  { createdAt: 'desc' },
     include: {
       author:   { select: { username: true } },

@@ -3,24 +3,21 @@
 // The frontend calls this to decide whether to show premium content,
 // disable the "upgrade" button, or show the "cancel" option.
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getSessionUserId } from '@/lib/session';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Pull userId out of the query string, e.g. GET /api/stripe/subscription/status?userId=42
-    const { searchParams } = new URL(request.url);
-    const rawUserId = searchParams.get('userId');
-
-    // Validate that userId was provided and is a valid number
-    if (!rawUserId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-    }
-
-    const userId = parseInt(rawUserId, 10);
-
-    if (isNaN(userId)) {
-      return NextResponse.json({ error: 'userId must be a number' }, { status: 400 });
+    // The subscription reported is always the caller's own.
+    //
+    // This route previously read `?userId=42` from the query string with no
+    // authentication, so anyone could enumerate any account's billing status,
+    // plan and renewal date by incrementing a number. Callers no longer pass a
+    // userId at all — it comes from the signed session cookie.
+    const userId = await getSessionUserId();
+    if (!userId) {
+      return NextResponse.json({ error: 'You must be logged in.' }, { status: 401 });
     }
 
     // Find the subscription record for this user.

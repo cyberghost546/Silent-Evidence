@@ -17,7 +17,9 @@ export default async function AdminPremiumPage() {
     prisma.subscription.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        user: { select: { id: true, username: true, email: true, avatar: true } },
+        // avatar lives on Profile, not User — selecting it directly on User is
+        // a type error. Reach it through the relation, as the rest of the app does.
+        user: { select: { id: true, username: true, email: true, profile: { select: { avatar: true } } } },
       },
     }),
     prisma.subscription.groupBy({

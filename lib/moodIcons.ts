@@ -7,21 +7,19 @@
 // the same mood rendered a different glyph depending on which page you were on.
 // Import MOOD_ICONS from here instead of declaring another local map.
 //
-// Two vocabularies are in use across the app:
-//   - Story mood enum:  CREEPY, PARANOID, DISTURBING, ATMOSPHERIC, PSYCHOLOGICAL,
-//                       SUPERNATURAL, GORE, JUMPSCARE
-//   - Tone/mood filter: EPIC, HEARTWARMING, MYSTERIOUS, ACTION, ROMANTIC,
-//                       COMEDIC, DRAMATIC, DARK
-// Both are covered below, so a lookup never needs to know which set it is in.
+// This file used to map TWO vocabularies, because the app had split into a
+// horror mood set and a generic-fiction one and a lookup could receive either.
+// That split has since been resolved in favour of the horror set — see
+// lib/moods.ts, which is now the single source of truth for the vocabulary
+// itself (values, labels, descriptions, colours). This file covers icons only,
+// and its keys must stay in step with MOODS there.
 
 import {
-  Eye, Tornado, Skull, CloudFog, Brain, Ghost, Droplet, Zap,
-  Swords, Heart, HelpCircle, Flame, Flower2, Laugh, Drama, Moon,
+  Eye, Tornado, Skull, CloudFog, Brain, Ghost, Droplet, Zap, Drama, Moon,
   type LucideIcon,
 } from 'lucide-react';
 
 export const MOOD_ICONS: Record<string, LucideIcon> = {
-  // Story mood enum
   CREEPY:        Eye,
   PARANOID:      Tornado,
   DISTURBING:    Skull,
@@ -30,15 +28,6 @@ export const MOOD_ICONS: Record<string, LucideIcon> = {
   SUPERNATURAL:  Ghost,
   GORE:          Droplet,
   JUMPSCARE:     Zap,
-
-  // Tone / mood filter
-  EPIC:          Swords,
-  HEARTWARMING:  Heart,
-  MYSTERIOUS:    HelpCircle,
-  ACTION:        Flame,
-  ROMANTIC:      Flower2,
-  COMEDIC:       Laugh,
-  DRAMATIC:      Drama,
   DARK:          Moon,
 };
 

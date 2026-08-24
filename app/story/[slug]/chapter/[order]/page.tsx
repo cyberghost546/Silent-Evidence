@@ -7,7 +7,7 @@ import { Lock } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { hasPremiumAccess } from '@/lib/premiumCheck';
+import { hasPremiumAccess, isEarlyAccessLocked } from '@/lib/premiumCheck';
 import { hasRecentView } from '@/lib/cache';
 import { headers } from 'next/headers';
 import Header from '@/app/components/ui/Header';
@@ -38,6 +38,7 @@ export default async function ChapterPage({ params }: Props) {
   const story = await prisma.story.findUnique({
     where: { slug, status: 'PUBLISHED', isChaptered: true },
     select: { id: true, title: true, slug: true, language: true,
+              isPremiumOnly: true, earlyAccessUntil: true,
               author: { select: { id: true, username: true } } },
   });
   if (!story) return notFound();
@@ -61,7 +62,18 @@ export default async function ChapterPage({ params }: Props) {
   // Admins + premium subscribers can read all chapters; everyone else is limited to chapter 1
   const isAuthor   = userId === story.author.id;
   const hasPremium = await hasPremiumAccess(userId);
-  const isLockedChapter = currentIndex > 0 && !hasPremium && !isAuthor;
+
+  // Three separate reasons a chapter can be locked, all resolving to the same
+  // upsell panel:
+  //   1. It is chapter 2+ and the reader is not a member (the original rule).
+  //   2. The whole story is premium-only — otherwise chapter 1 of a
+  //      premium-only story was readable by anyone who guessed the chapter URL,
+  //      bypassing the paywall on the story page.
+  //   3. The story is still inside its premium early-access window.
+  const isLockedChapter =
+    (currentIndex > 0 && !hasPremium && !isAuthor) ||
+    (story.isPremiumOnly && !hasPremium && !isAuthor) ||
+    isEarlyAccessLocked(story.earlyAccessUntil, hasPremium, isAuthor);
 
   // Deduplicated chapter view counter
   const reqHeaders = await headers();

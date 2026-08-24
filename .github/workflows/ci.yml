@@ -14,8 +14,38 @@ on:
 
 jobs:
   check:
-    name: Type Check, Lint, Format & Test
+    name: Type Check, Lint, Format, Test & Build
     runs-on: ubuntu-latest
+
+    # A throwaway database for the build step.
+    #
+    # `next build` prerenders pages that query the database (/admin/stories is
+    # one), so a placeholder connection string is not enough — the build fails
+    # with a connection-pool timeout. This gives it a real server to talk to.
+    # Image version matches the 10.4 series running in development.
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MARIADB_ROOT_PASSWORD: ci
+          MARIADB_DATABASE: silent_evidence
+        ports:
+          - 3306:3306
+        # Steps must not start until the server is actually accepting
+        # connections, or the migrate step races it and fails intermittently.
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      # Shared by every step that needs them. These are throwaway CI values: the
+      # database is destroyed with the runner, and no real session is ever issued
+      # with this secret.
+      DATABASE_URL: mysql://root:ci@127.0.0.1:3306/silent_evidence
+      NEXT_PUBLIC_BASE_URL: http://localhost:3000
+      SESSION_SECRET: ci-build-only-secret-not-used-for-real-sessions
 
     steps:
       # 1. Check out the code
@@ -52,3 +82,23 @@ jobs:
       # 7. Vitest — runs the unit tests in tests/ (auth, stories, Stripe webhook)
       - name: Test
         run: npm test
+
+      # 8. Production build — the only check that compiles the app the way it
+      #    actually ships.
+      #
+      #    This is NOT redundant with the type check above. `tsc --noEmit` reads
+      #    the source in isolation; `next build` additionally resolves every
+      #    route, runs the App Router's own validation, and type-checks the
+      #    generated route manifest. A component that is referenced but never
+      #    defined passes tsc and fails here — which is precisely how a broken
+      #    production build once sat in this repo while CI stayed green.
+      #
+      #    Runs last because it is the slowest step, so the cheap checks fail
+      #    fast and this only runs when they have all passed.
+      #    Create the schema first — the prerendered pages query real tables, so
+      #    an empty database fails just as surely as a missing one.
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      - name: Production build
+        run: npm run build

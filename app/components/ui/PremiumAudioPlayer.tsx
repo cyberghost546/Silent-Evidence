@@ -6,7 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 
 type Props = {
-  audioUrl: string;
+  // null for free readers — the server withholds the URL so it never appears in
+  // the page payload. Only the locked teaser below is rendered in that case.
+  audioUrl: string | null;
   storyTitle: string;
   hasPremium: boolean;
 };
@@ -57,7 +59,10 @@ export default function PremiumAudioPlayer({ audioUrl, storyTitle, hasPremium }:
     return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   }
 
-  if (!hasPremium) {
+  // Locked teaser. The audioUrl check is not redundant with hasPremium — it is
+  // the guard that makes the missing URL safe, so a premium flag that somehow
+  // arrived true without a URL renders the teaser instead of a broken player.
+  if (!hasPremium || !audioUrl) {
     return (
       <div className="mt-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 flex items-center gap-4">
         <div className="w-10 h-10 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-xl shrink-0">

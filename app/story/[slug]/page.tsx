@@ -14,7 +14,9 @@ import { moodIcon } from '@/lib/moodIcons';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { hasPremiumAccess } from '@/lib/premiumCheck';
+import { hasPremiumAccess, isEarlyAccessLocked } from '@/lib/premiumCheck';
+import { getNextStory } from '@/lib/nextStory';
+import ReadNext from '@/app/components/ui/ReadNext';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import StoryInteractions from '@/app/components/ui/StoryInteractions';
@@ -23,14 +25,12 @@ import ReadingProgress from '@/app/components/ui/ReadingProgress';
 import BackToTop from '@/app/components/ui/BackToTop';
 import ReadingTracker from '@/app/components/ui/ReadingTracker';
 import StoryActionsDropdown from '@/app/components/ui/StoryActionsDropdown';
-import RelatedStories from '@/app/components/ui/RelatedStories';
 import RelatedTagsSidebar from '@/app/components/ui/RelatedTagsSidebar';
 import ReactionBar from '@/app/components/ui/ReactionBar';
 import ScareOMeter from '@/app/components/ui/ScareOMeter';
 import GhostModeToggle from '@/app/components/ui/GhostMode';
 import SeriesNav from '@/app/components/ui/SeriesNav';
 import MoreLikeThis from '@/app/components/ui/MoreLikeThis';
-import YouMightAlsoFear from '@/app/components/ui/YouMightAlsoFear';
 import { getLang } from '@/lib/languages';
 import { readingTime } from '@/lib/readingTime';
 import StoryWarningModal from '@/app/components/ui/StoryWarningModal';
@@ -51,10 +51,8 @@ import ReaderSettings from '@/app/components/ui/ReaderSettings';
 import ScareScoreBadge from '@/app/components/ui/ScareScoreBadge';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { checkReadingLimit, FREE_MONTHLY_LIMIT } from '@/lib/readingLimit';
 import { hasRecentView } from '@/lib/cache';
 import { headers } from 'next/headers';
-import ReadingPaywall from '@/app/components/ui/ReadingPaywall';
 import PremiumAudioPlayer from '@/app/components/ui/PremiumAudioPlayer';
 import ScrollDepthTracker from '@/app/components/ui/ScrollDepthTracker';
 
@@ -161,8 +159,24 @@ export default async function StoryPage({ params }: Props) {
   // Admins always get full access; otherwise check active subscription
   const hasPremium = await hasPremiumAccess(userId);
 
-  // Free tier reading limit check — non-premium users get FREE_MONTHLY_LIMIT stories/month
-  const readingLimit = await checkReadingLimit(userId, story.id);
+  // Is this viewer allowed past the author's premium early-access embargo?
+  const isAuthor = userId === story.author.id;
+  const earlyAccessLocked = isEarlyAccessLocked(story.earlyAccessUntil, hasPremium, isAuthor);
+
+  // The two reasons a viewer may not read the body text. Kept as one flag so
+  // every consumer of story.content agrees — it is not enough to swap the
+  // rendered JSX, because any client component handed story.content receives the
+  // whole text in the page payload whether or not it is displayed.
+  const contentLocked =
+    earlyAccessLocked || (story.isPremiumOnly && !hasPremium && !isAuthor);
+
+  // Audio narration is a premium perk. Resolve the URL server-side and send it
+  // to the browser ONLY for members who may play it. Passing story.audioUrl to a
+  // client component and hiding the player in CSS/JSX would still ship the MP3
+  // URL in the page payload, where any free reader could read it out of the HTML
+  // and play the file directly.
+  const audioUrlForViewer = hasPremium ? story.audioUrl : null;
+
 
   // Run all these database queries in parallel using Promise.all so the page loads faster.
   // Instead of waiting for each query one by one, they all start at the same time.
@@ -207,6 +221,22 @@ export default async function StoryPage({ params }: Props) {
 
   const authorAvatar = story.author.profile?.avatar ?? null;
 
+  // What to put in front of the reader when they finish. Resolved server-side so
+  // the card is in the initial HTML — a suggestion that arrives after a
+  // client-side fetch is too late for a reader already reaching for the back
+  // button. Placed after the Promise.all above because it needs currentUser's
+  // age group to avoid recommending anything above their content rating.
+  const nextStory = await getNextStory({
+    currentStoryId: story.id,
+    userId,
+    ageGroup: currentUser?.ageGroup ?? null,
+    hasPremium,
+    seriesId: story.seriesId,
+    seriesOrder: story.seriesOrder,
+    categoryId: story.categoryId,
+    mood: story.mood,
+  });
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -228,11 +258,6 @@ export default async function StoryPage({ params }: Props) {
       {userId && <ReadingTracker storyId={story.id} />}
       {userId && <ScrollDepthTracker storyId={story.id} />}
       <Header />
-
-      {/* Free tier paywall — shown when user has exceeded monthly reading limit */}
-      {readingLimit.blocked && (
-        <ReadingPaywall readThisMonth={readingLimit.readThisMonth} limit={FREE_MONTHLY_LIMIT} />
-      )}
 
       {/* Cover image — max height capped so tall images don't dominate */}
       {story.coverImage && (
@@ -314,6 +339,7 @@ export default async function StoryPage({ params }: Props) {
               isLoggedIn={!!userId}
               initialSaved={!!userOfflineSave}
               isAuthor={userId === story.author.id}
+              hasPremium={hasPremium}
             />
           </div>
         </div>
@@ -395,8 +421,11 @@ export default async function StoryPage({ params }: Props) {
           </div>
         )}
 
-        {/* Early access gate — free users see a countdown until the embargo lifts */}
-        {!hasPremium && userId !== story.author.id && story.earlyAccessUntil && new Date(story.earlyAccessUntil) > new Date() && (
+        {/* Early access gate — free readers get the countdown INSTEAD of the story.
+            This is the first branch of the chain below so it actually withholds
+            the content; previously the countdown rendered as its own block and
+            the full story still appeared underneath it. */}
+        {earlyAccessLocked && story.earlyAccessUntil ? (
           <div className="mt-10 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8 text-center">
             <h3 className="text-lg font-bold text-white mb-2">Premium Early Access</h3>
             <p className="text-sm text-gray-400 mb-1">This story is available to premium members now.</p>
@@ -413,10 +442,8 @@ export default async function StoryPage({ params }: Props) {
  Read Now with Premium
             </a>
           </div>
-        )}
-
-        {/* Premium paywall — shown when story is premium-only and the viewer is not subscribed */}
-        {story.isPremiumOnly && !hasPremium && userId !== story.author.id ? (
+        ) : /* Premium paywall — shown when story is premium-only and the viewer is not subscribed */
+        story.isPremiumOnly && !hasPremium && !isAuthor ? (
           <div className="mt-10 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
             <h3 className="text-lg font-bold text-white mb-2">Premium Members Only</h3>
             <p className="text-sm text-gray-400 mb-6">This story is exclusive to premium subscribers. Upgrade to read it and unlock all premium content.</p>
@@ -482,14 +509,25 @@ export default async function StoryPage({ params }: Props) {
           </>
         )}
 
-        {/* Audio narration — premium player shown when author has uploaded audio */}
+        {/* Audio narration — premium player shown when author has uploaded audio.
+            We pass audioUrlForViewer (null for free readers) rather than
+            story.audioUrl, so the file URL never reaches a non-member's browser.
+            The player still renders its locked teaser + upgrade CTA. */}
         {story.audioUrl && (
           <PremiumAudioPlayer
-            audioUrl={story.audioUrl}
+            audioUrl={audioUrlForViewer}
             storyTitle={story.title}
             hasPremium={hasPremium}
           />
         )}
+
+        {/* Read next — one decisive suggestion, placed immediately after the
+            story ends and above every other recommendation block. This is the
+            moment the reader decides whether to carry on or leave, and a single
+            confident pick converts far better than the grids further down.
+            Hidden entirely when nothing suitable exists, rather than padding
+            with a weak suggestion that would erode trust in the card. */}
+        {nextStory && <ReadNext story={nextStory} />}
 
         {/* Reading Room — lets logged-in users read together with friends */}
         <ReadingRoom storyId={story.id} isLoggedIn={!!userId} />
@@ -541,28 +579,36 @@ export default async function StoryPage({ params }: Props) {
           <SeriesNav storyId={story.id} seriesId={story.seriesId} seriesOrder={story.seriesOrder} />
         )}
 
-        {/* Personalised picks — "You Might Also Fear" */}
-        <YouMightAlsoFear
-          currentStoryId={story.id}
-          mood={story.mood}
-          categoryId={story.categoryId}
-        />
+        {/* More like this — the single browse grid kept below the fold.
+            This page previously ended with FOUR story grids stacked on top of
+            each other (YouMightAlsoFear, MoreLikeThis, RelatedTagsSidebar,
+            RelatedStories). A reader who finished a story was handed dozens of
+            thumbnails, and the usual outcome of a hard choice is no choice.
+            ReadNext above now makes one confident suggestion; this stays for
+            people who genuinely want to browse rather than be told.
 
-        {/* More like this */}
+            The two removed grids were the redundant ones: YouMightAlsoFear
+            duplicated ReadNext's personalised scoring, and RelatedStories
+            duplicated this component's category matching. */}
         <MoreLikeThis storyId={story.id} categoryId={story.categoryId} mood={story.mood} />
 
-        {/* Tags — browse more stories with the same tags */}
+        {/* Tags — kept because it renders tag pills, not story cards, so it adds
+            navigation without adding another wall of choices. */}
         <RelatedTagsSidebar tags={story.tags} currentStoryId={story.id} />
-
-        {/* Related stories */}
-        <RelatedStories categoryId={story.categoryId} currentStoryId={story.id} />
       </div>
       {/* Video — embedded YouTube or direct video attached to this story */}
       {story.videoUrl && <VideoEmbed videoUrl={story.videoUrl} />}
-      {/* Sticky audio player — only shown when the story has an audio narration */}
-      {story.audioUrl && <AudioPlayer audioUrl={story.audioUrl} title={story.title} />}
-      {/* Read aloud — browser TTS, sticky bottom bar, only shown when active */}
-      <ReadAloudButton content={story.content} />
+      {/* Sticky audio player — only shown when the story has an audio narration
+          AND the viewer is a premium member. This player is deliberately gated on
+          audioUrlForViewer rather than story.audioUrl: it plays the same file as
+          the PremiumAudioPlayer above, so leaving it ungated would hand free
+          readers the narration the locked player just told them to pay for. */}
+      {audioUrlForViewer && <AudioPlayer audioUrl={audioUrlForViewer} title={story.title} />}
+      {/* Read aloud — browser TTS, sticky bottom bar, only shown when active.
+          Gated on contentLocked: this is a client component, so passing
+          story.content would ship the full gated text to a free reader's browser
+          and let them have it read out even though the page shows a paywall. */}
+      {!contentLocked && <ReadAloudButton content={story.content} />}
       {/* Reader settings — floating Aa button for font size and line spacing */}
       <ReaderSettings />
       <Footer />

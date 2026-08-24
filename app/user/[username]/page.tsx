@@ -64,7 +64,7 @@ import { readingTime } from '@/lib/readingTime';
 import WritingStreakBadge from '@/app/components/ui/WritingStreakBadge';
 import VerifiedBadge from '@/app/components/ui/VerifiedBadge';
 import ProfileStoriesGrid from '@/app/components/ui/ProfileStoriesGrid';
-import AdBanner from '@/app/components/ui/AdBanner';
+import AdSlot from '@/app/components/ui/AdSlot';
 import ReadingStreakBadge from '@/app/components/ui/ReadingStreakBadge';
 import ReadingGoalWidget from '@/app/components/ui/ReadingGoalWidget';
 import ComplimentButton from '@/app/components/ui/ComplimentButton';
@@ -459,9 +459,11 @@ export default async function UserProfilePage({ params }: Props) {
 
       {/* ── Ad banner ────────────────────────────────────────────────────────
           Placed between the hero and the story list — a standard leaderboard
-          placement.  max-w-4xl and px-4 keep it aligned with the content below. */}
+          placement.  max-w-4xl and px-4 keep it aligned with the content below.
+          AdSlot renders nothing for premium members, so the "No ads" perk on
+          /premium applies here automatically. */}
       <div className="max-w-4xl mx-auto px-4 pt-8">
-        <AdBanner slot="leaderboard" />
+        <AdSlot slot="leaderboard" />
       </div>
 
       {/* ── Story list ────────────────────────────────────────────────────── */}

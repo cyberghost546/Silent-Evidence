@@ -18,7 +18,66 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { recordFunnelEvent } from '@/lib/funnel';
 import Stripe from 'stripe';
+
+// ── Subscription table routing ───────────────────────────────────────────────
+// There are two independent subscription products, stored in two tables:
+//   Subscription       — the reader membership
+//   AuthorSubscription — Author Pro, the writer plan
+//
+// Stripe's lifecycle events (updated / deleted / payment_failed) identify a
+// subscription only by its Stripe ID and say nothing about which product it is,
+// so every one of those handlers has to look in both tables. Before Author Pro
+// existed these handlers checked Subscription alone; leaving them that way would
+// mean a cancelled or unpaid Author Pro plan silently stayed "active" in our DB
+// forever, because the lookup would miss and the handler would skip.
+type SubKind = 'reader' | 'author';
+
+// Stripe moved `current_period_end` from the subscription object down onto the
+// individual subscription items in a recent API version. Both shapes still
+// appear in the wild depending on the account's pinned version, so read
+// whichever is present. Typed as a narrow structural shape rather than `any` so
+// a typo in a field name is still a compile error.
+type PeriodEndShape = {
+  current_period_end?: number;
+  items?: { data?: { current_period_end?: number }[] };
+};
+
+function readPeriodEnd(subscription: Stripe.Subscription): Date {
+  const s = subscription as Stripe.Subscription & PeriodEndShape;
+  const seconds = s.current_period_end ?? s.items?.data?.[0]?.current_period_end ?? 0;
+  return new Date(seconds * 1000);
+}
+
+async function findSubscriptionByStripeId(
+  stripeSubscriptionId: string,
+): Promise<SubKind | null> {
+  const reader = await prisma.subscription.findUnique({
+    where: { stripeSubscriptionId }, select: { id: true },
+  });
+  if (reader) return 'reader';
+
+  const author = await prisma.authorSubscription.findUnique({
+    where: { stripeSubscriptionId }, select: { id: true },
+  });
+  if (author) return 'author';
+
+  return null;
+}
+
+/** Applies the same update to whichever of the two tables owns this subscription. */
+async function updateSubscriptionByStripeId(
+  stripeSubscriptionId: string,
+  kind: SubKind,
+  data: { status?: string; currentPeriodEnd?: Date },
+) {
+  if (kind === 'reader') {
+    await prisma.subscription.update({ where: { stripeSubscriptionId }, data });
+  } else {
+    await prisma.authorSubscription.update({ where: { stripeSubscriptionId }, data });
+  }
+}
 
 export async function POST(request: NextRequest) {
   // Read the raw request body as a string — required for Stripe signature verification.
@@ -151,6 +210,41 @@ export async function POST(request: NextRequest) {
 
           console.log(`[webhook] Chapter purchase recorded: user ${userId} bought chapter ${chapterId}`);
 
+        } else if (meta.type === 'author_subscription') {
+          // ---- AUTHOR PRO SUBSCRIPTION ----
+          // A writer bought the Author Pro plan. This writes AuthorSubscription,
+          // NOT Subscription — they are separate products and a user may hold
+          // both. This branch must stay ABOVE the catch-all `else` below, which
+          // assumes any unlabelled subscription session is a reader membership.
+          const userId               = parseInt(meta.userId, 10);
+          const plan                 = meta.plan ?? 'monthly';
+          const stripeCustomerId     = session.customer as string;
+          const stripeSubscriptionId = session.subscription as string;
+
+          const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+          const authorPeriodEnd = readPeriodEnd(stripeSubscription);
+
+          await prisma.authorSubscription.upsert({
+            where: { userId },
+            create: {
+              userId,
+              stripeCustomerId,
+              stripeSubscriptionId,
+              status: 'active',
+              plan,
+              currentPeriodEnd: authorPeriodEnd,
+            },
+            update: {
+              stripeCustomerId,
+              stripeSubscriptionId,
+              status: 'active',
+              plan,
+              currentPeriodEnd: authorPeriodEnd,
+            },
+          });
+
+          console.log(`[webhook] Author Pro activated for user ${userId}, plan: ${plan}`);
+
         } else {
           // ---- SUBSCRIPTION CHECKOUT ----
           // No metadata.type means this was a subscription checkout (premium membership).
@@ -192,6 +286,11 @@ export async function POST(request: NextRequest) {
             },
           });
 
+          // Funnel stage 4 — the only place a subscription is genuinely
+          // confirmed. Recorded here rather than on the success page because
+          // the redirect proves nothing about whether money moved.
+          recordFunnelEvent('subscribed', userId, plan).catch(() => {});
+
           console.log(`[webhook] Subscription activated for user ${userId}, plan: ${plan}`);
         }
         break;
@@ -207,12 +306,10 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const stripeSubscription = event.data.object as Stripe.Subscription;
 
-        // Find our DB row by the Stripe subscription ID
-        const existingSubscription = await prisma.subscription.findUnique({
-          where: { stripeSubscriptionId: stripeSubscription.id },
-        });
+        // Find our DB row by the Stripe subscription ID — in either table
+        const kind = await findSubscriptionByStripeId(stripeSubscription.id);
 
-        if (!existingSubscription) {
+        if (!kind) {
           // This can happen if the subscription was created outside our app
           // (e.g. manually in the Stripe dashboard). Log and skip gracefully.
           console.warn(`[webhook] subscription.updated — no DB row for ${stripeSubscription.id}`);
@@ -225,15 +322,12 @@ export async function POST(request: NextRequest) {
         const subAny2 = stripeSubscription as any;
         const periodEnd2 = new Date((subAny2.current_period_end ?? subAny2.items?.data?.[0]?.current_period_end ?? 0) * 1000);
 
-        await prisma.subscription.update({
-          where: { stripeSubscriptionId: stripeSubscription.id },
-          data: {
-            status: stripeSubscription.status,
-            currentPeriodEnd: periodEnd2,
-          },
+        await updateSubscriptionByStripeId(stripeSubscription.id, kind, {
+          status: stripeSubscription.status,
+          currentPeriodEnd: periodEnd2,
         });
 
-        console.log(`[webhook] Subscription updated: ${stripeSubscription.id} → ${stripeSubscription.status}`);
+        console.log(`[webhook] ${kind} subscription updated: ${stripeSubscription.id} → ${stripeSubscription.status}`);
         break;
       }
 
@@ -246,21 +340,18 @@ export async function POST(request: NextRequest) {
         const stripeSubscription = event.data.object as Stripe.Subscription;
 
         // Find and update the matching DB row by Stripe subscription ID
-        const existingSubscription = await prisma.subscription.findUnique({
-          where: { stripeSubscriptionId: stripeSubscription.id },
-        });
+        const kind = await findSubscriptionByStripeId(stripeSubscription.id);
 
-        if (!existingSubscription) {
+        if (!kind) {
           console.warn(`[webhook] subscription.deleted — no DB row for ${stripeSubscription.id}`);
           break;
         }
 
-        await prisma.subscription.update({
-          where: { stripeSubscriptionId: stripeSubscription.id },
-          data: { status: 'canceled' },
+        await updateSubscriptionByStripeId(stripeSubscription.id, kind, {
+          status: 'canceled',
         });
 
-        console.log(`[webhook] Subscription canceled: ${stripeSubscription.id}`);
+        console.log(`[webhook] ${kind} subscription canceled: ${stripeSubscription.id}`);
         break;
       }
 
@@ -285,24 +376,22 @@ export async function POST(request: NextRequest) {
 
         const stripeSubscriptionId = invoice.subscription as string;
 
-        // Find the matching subscription row in our DB
-        const existingSubscription = await prisma.subscription.findUnique({
-          where: { stripeSubscriptionId },
-        });
+        // Find the matching subscription row in our DB — in either table
+        const kind = await findSubscriptionByStripeId(stripeSubscriptionId);
 
-        if (!existingSubscription) {
+        if (!kind) {
           console.warn(`[webhook] invoice.payment_failed — no DB row for subscription ${stripeSubscriptionId}`);
           break;
         }
 
         // Mark the subscription as past_due — the frontend can use this to
-        // show a "please update your payment method" banner.
-        await prisma.subscription.update({
-          where: { stripeSubscriptionId },
-          data: { status: 'past_due' },
+        // show a "please update your payment method" banner. For Author Pro this
+        // also revokes the toolset, since past_due is not a live status.
+        await updateSubscriptionByStripeId(stripeSubscriptionId, kind, {
+          status: 'past_due',
         });
 
-        console.log(`[webhook] Subscription marked past_due: ${stripeSubscriptionId}`);
+        console.log(`[webhook] ${kind} subscription marked past_due: ${stripeSubscriptionId}`);
         break;
       }
 

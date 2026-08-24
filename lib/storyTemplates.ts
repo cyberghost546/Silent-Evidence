@@ -19,7 +19,7 @@ export const STORY_TEMPLATES: StoryTemplate[] = [
   {
     id:        'campfire-horror',
     label:     'Campfire Story',
-    mood:      'MYSTERIOUS',
+    mood:      'ATMOSPHERIC',
     icon:      Flame,
     titleHint: 'The Night We Heard [Something] in the Woods',
     content: `<p>Nobody talks about what happened that summer. We made a pact — all six of us — standing around the dying fire at three in the morning, still shaking. We agreed we would never tell anyone.</p>
@@ -41,7 +41,7 @@ export const STORY_TEMPLATES: StoryTemplate[] = [
   {
     id:        'paranormal-encounter',
     label:     'Real Paranormal',
-    mood:      'MYSTERIOUS',
+    mood:      'SUPERNATURAL',
     icon:      Ghost,
     titleHint: 'What I Saw at [Location] Was Not Natural',
     content: `<p>I am not the kind of person who believes in ghosts. I want to make that clear before I tell you this, because I know how it sounds. I'm a nurse. I work nights. I deal in facts.</p>
@@ -63,7 +63,7 @@ export const STORY_TEMPLATES: StoryTemplate[] = [
   {
     id:        'haunted-location',
     label:     'Haunted Location',
-    mood:      'MYSTERIOUS',
+    mood:      'SUPERNATURAL',
     icon:      House,
     titleHint: 'The Truth About [Place Name]',
     content: `<p>The locals will tell you not to go near the old [place] after dark. They say it with a laugh, the way people do when they're trying to sound like they don't mean it. But watch their eyes when they say it. They mean it.</p>
@@ -74,7 +74,7 @@ export const STORY_TEMPLATES: StoryTemplate[] = [
   {
     id:        'stalker-story',
     label:     'Stalker Story',
-    mood:      'DRAMATIC',
+    mood:      'PARANOID',
     icon:      Eye,
     titleHint: 'Someone Has Been Watching Me',
     content: `<p>It started small. The kind of thing you dismiss because you don't want to seem paranoid. A car parked outside my apartment three days in a row. A shadow that moved when I looked out the window at night. A feeling — persistent, specific — that I was being watched.</p>
@@ -98,7 +98,7 @@ export const STORY_TEMPLATES: StoryTemplate[] = [
   {
     id:        'witness-account',
     label:     'Witness Account',
-    mood:      'MYSTERIOUS',
+    mood:      'ATMOSPHERIC',
     icon:      ClipboardList,
     titleHint: 'I Was There When [Event] Happened',
     content: `<p>I gave a statement to the police at the time. I told them exactly what I saw. They wrote it down, thanked me, and I never heard from them again.</p>

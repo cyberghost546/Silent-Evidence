@@ -22,22 +22,39 @@ export async function GET() {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
   }
 
-  // Look up the user's Stripe customer ID from their subscription record
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId },
-    select: { stripeCustomerId: true },
-  });
+  // Look up the user's Stripe customer ID. It can live on either subscription
+  // record: a writer who bought Author Pro but never a reader membership has an
+  // AuthorSubscription and no Subscription, and checking only the latter would
+  // bounce them to /premium with no way to manage the plan they are paying for.
+  //
+  // Both plans share one Stripe customer, so whichever row we find gives the
+  // same id — and the portal then lists every subscription on that customer.
+  const [readerSub, authorSub] = await Promise.all([
+    prisma.subscription.findUnique({
+      where: { userId }, select: { stripeCustomerId: true },
+    }),
+    prisma.authorSubscription.findUnique({
+      where: { userId }, select: { stripeCustomerId: true },
+    }),
+  ]);
 
-  if (!subscription?.stripeCustomerId) {
-    // User doesn't have a subscription — redirect to the premium page instead
+  const stripeCustomerId =
+    readerSub?.stripeCustomerId ?? authorSub?.stripeCustomerId ?? null;
+
+  if (!stripeCustomerId) {
+    // No billing relationship at all — send them to the reader pricing page
     return NextResponse.redirect(`${BASE_URL}/premium`);
   }
+
+  // Send the user back to whichever plan page they actually hold. An Author Pro
+  // subscriber with no reader membership belongs on /author-pro, not /premium.
+  const returnPath = readerSub ? '/premium' : '/author-pro';
 
   // Create a Stripe billing portal session — Stripe hosts the entire management UI
   // The return_url is where Stripe sends the user after they're done managing
   const portalSession = await stripe.billingPortal.sessions.create({
-    customer: subscription.stripeCustomerId,
-    return_url: `${BASE_URL}/premium`,
+    customer: stripeCustomerId,
+    return_url: `${BASE_URL}${returnPath}`,
   });
 
   // Redirect the user to the Stripe-hosted portal page

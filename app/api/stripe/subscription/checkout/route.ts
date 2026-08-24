@@ -6,19 +6,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { getSessionUserId } from '@/lib/session';
+import { recordFunnelEvent } from '@/lib/funnel';
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse the request body to get userId and chosen plan
-    const body = await request.json();
-    const { userId, plan } = body as { userId: number; plan: 'monthly' | 'yearly' };
+    // The subscriber is always the caller. This route used to take `userId` from
+    // the request body with no authentication, which let anyone start a checkout
+    // that granted premium to an account other than their own, and created
+    // Stripe customer records under a third party's email address.
+    const userId = await getSessionUserId();
+    if (!userId) {
+      return NextResponse.json({ error: 'You must be logged in.' }, { status: 401 });
+    }
 
-    // Validate required fields before touching Stripe or the DB
-    if (!userId || !plan) {
-      return NextResponse.json(
-        { error: 'userId and plan are required' },
-        { status: 400 }
-      );
+    // Parse the request body for the chosen plan
+    const body = await request.json();
+    const { plan } = body as { plan: 'monthly' | 'yearly' };
+
+    if (!plan) {
+      return NextResponse.json({ error: 'plan is required' }, { status: 400 });
     }
 
     if (plan !== 'monthly' && plan !== 'yearly') {
@@ -74,6 +81,12 @@ export async function POST(request: NextRequest) {
         : process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID!;
 
     // Build the base URL for success/cancel redirects.
+    // Funnel stage 3. Recorded before the redirect rather than after, because
+    // the whole point is to measure how many people who START checkout finish
+    // it — recording on success would make that gap invisible, which is exactly
+    // how the endpoint managed to 400 on every request unnoticed.
+    recordFunnelEvent('checkout_started', userId, plan).catch(() => {});
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     // Create the Stripe Checkout Session.

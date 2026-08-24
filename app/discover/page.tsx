@@ -13,6 +13,7 @@ import { prisma } from '@/lib/prisma';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import SwipeDiscovery from '@/app/components/ui/SwipeDiscovery';
+import { MOOD_OPTIONS } from '@/lib/moods';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -21,16 +22,10 @@ export const metadata: Metadata = {
 };
 
 // Mood options — must match the Mood enum values in Prisma schema
-const MOODS = [
-  { value: 'DARK',         label: 'Dark' },
-  { value: 'MYSTERIOUS',   label: 'Mysterious' },
-  { value: 'DRAMATIC',     label: 'Dramatic' },
-  { value: 'EPIC',         label: 'Epic' },
-  { value: 'ACTION',       label: 'Action' },
-  { value: 'HEARTWARMING', label: 'Heartwarming' },
-  { value: 'ROMANTIC',     label: 'Romantic' },
-  { value: 'COMEDIC',      label: 'Comedic' },
-];
+// Derived from lib/moods.ts so the filter can only offer moods the database
+// accepts. The hard-coded list this replaced held the old generic-fiction
+// vocabulary, so most of these filters matched nothing.
+const MOODS = MOOD_OPTIONS;
 
 type Props = {
   searchParams: Promise<{ mood?: string; category?: string }>;

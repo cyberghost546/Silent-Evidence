@@ -9,6 +9,7 @@
 
 import { ImageResponse } from 'next/og';
 import { prisma } from '@/lib/prisma';
+import { moodMeta } from '@/lib/moods';
 
 export const runtime = 'nodejs';
 
@@ -47,8 +48,10 @@ export async function GET(req: Request) {
     : 'A horror story on Silent Evidence';
   // The badge shows the mood name only — this renders to a PNG via Satori,
   // where a text label reproduces far more reliably than any glyph.
-  // Capitalize the mood label for display (e.g. "EPIC" → "Epic")
-  const moodLabel = story.mood ? story.mood.charAt(0) + story.mood.slice(1).toLowerCase() : '';
+  // Use the canonical label from lib/moods.ts rather than title-casing the raw
+  // enum value, so "JUMPSCARE" renders as "Jumpscare" and any future multi-word
+  // mood gets its proper label instead of a mangled one.
+  const moodLabel = story.mood ? moodMeta(story.mood).label : '';
 
   // Generate the image using Next.js ImageResponse (uses Satori under the hood)
   return new ImageResponse(

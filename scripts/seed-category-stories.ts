@@ -1,5 +1,10 @@
 // scripts/seed-category-stories.ts
 // Creates one horror story for each of the 15 remaining categories (ids 6-20).
+//
+// Mood values here were remapped when the Mood enum switched from the generic
+// vocabulary to the horror one: DRAMATIC → DISTURBING and MYSTERIOUS →
+// ATMOSPHERIC. A single consistent mapping was used rather than re-judging each
+// story, since this is demo content.
 // Run with: npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/seed-category-stories.ts
 
 import { PrismaClient, Mood } from '@prisma/client';
@@ -20,7 +25,7 @@ const stories = [
     title: 'The Babysitter\'s Last Call',
     slug: 'the-babysitters-last-call',
     categorySlug: 'slasher',
-    mood: Mood.DRAMATIC,
+    mood: Mood.DISTURBING,
     featured: false,
     excerpt: 'The children were already in bed when the phone rang. The voice on the other end said: "Have you checked on them yet?"',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',
@@ -84,7 +89,7 @@ const stories = [
     title: 'The Itch',
     slug: 'the-itch',
     categorySlug: 'body-horror',
-    mood: Mood.MYSTERIOUS,
+    mood: Mood.ATMOSPHERIC,
     featured: false,
     excerpt: 'It started as a small bump under his left shoulder blade. By Thursday, it was moving.',
     coverImage: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80',
@@ -138,7 +143,7 @@ const stories = [
     title: 'The Room at the End of the Hall',
     slug: 'the-room-at-the-end-of-the-hall',
     categorySlug: 'haunted-house',
-    mood: Mood.MYSTERIOUS,
+    mood: Mood.ATMOSPHERIC,
     featured: true,
     excerpt: 'The real estate listing said five bedrooms. The house only had four doors. Everyone who lived there knew not to ask about the fifth.',
     coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
@@ -250,7 +255,7 @@ const stories = [
     title: 'Something in the Water',
     slug: 'something-in-the-water',
     categorySlug: 'creature-feature',
-    mood: Mood.DRAMATIC,
+    mood: Mood.DISTURBING,
     featured: false,
     excerpt: 'The lake had been drained for forty years. When they refilled it for the resort development, the locals all left town the same week.',
     coverImage: 'https://images.unsplash.com/photo-1548268770-66184a21657e?w=800&q=80',
@@ -300,7 +305,7 @@ const stories = [
     title: 'The Last Radio Signal',
     slug: 'the-last-radio-signal',
     categorySlug: 'post-apocalyptic',
-    mood: Mood.DRAMATIC,
+    mood: Mood.DISTURBING,
     featured: false,
     excerpt: 'Three years after the Collapse, a lone survivor picks up a repeating radio signal. Someone is still broadcasting. The message is: do not come here.',
     coverImage: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80',
@@ -352,7 +357,7 @@ const stories = [
     title: 'Night Three',
     slug: 'night-three',
     categorySlug: 'survival-horror',
-    mood: Mood.DRAMATIC,
+    mood: Mood.DISTURBING,
     featured: false,
     excerpt: 'She had survived two nights in the wilderness after the crash. Night three was different. Something had found the wreckage.',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',
@@ -510,7 +515,7 @@ const stories = [
     title: 'What the Deep Places Know',
     slug: 'what-the-deep-places-know',
     categorySlug: 'lovecraftian',
-    mood: Mood.MYSTERIOUS,
+    mood: Mood.ATMOSPHERIC,
     featured: true,
     excerpt: 'The oceanographic survey found the structure at 11,000 meters. It had geometry that shouldn\'t exist. The crew who saw the footage were changed by it.',
     coverImage: 'https://images.unsplash.com/photo-1548268770-66184a21657e?w=800&q=80',
@@ -556,7 +561,7 @@ const stories = [
     title: 'Still Here',
     slug: 'still-here',
     categorySlug: 'ghost-story',
-    mood: Mood.DRAMATIC,
+    mood: Mood.DISTURBING,
     featured: false,
     excerpt: 'After his daughter died, Thomas kept her bedroom exactly as it was. Then one morning he found the bed made. She had never made her own bed in her life.',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',

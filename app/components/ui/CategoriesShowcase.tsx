@@ -33,10 +33,20 @@ const ACCENTS = [
 
 
 export default async function CategoriesShowcase() {
-  // Fetch all categories alphabetically.
+  // Fetch categories that actually have something to read, alphabetically.
   // _count.stories gives us the total number of stories in each category
   // so we can display it on the tile without a separate query.
+  //
+  // The `where` filters out empty categories. Without it the grid rendered every
+  // category in the database — with a large sub-genre list that meant dozens of
+  // tiles reading "0 stories", which is a wall of dead ends for a reader and
+  // buries the categories that do have content.
+  //
+  // Empty categories are hidden, NOT deleted: /category/[slug] still resolves,
+  // so existing links and search results keep working, and a category reappears
+  // here by itself the moment its first story is published.
   const categories = await prisma.category.findMany({
+    where: { stories: { some: { status: 'PUBLISHED' } } },
     orderBy: { name: 'asc' },
     include: { _count: { select: { stories: { where: { status: 'PUBLISHED' } } } } },
   });

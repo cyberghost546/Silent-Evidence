@@ -343,6 +343,41 @@ export default function DashboardClient() {
         )}
       </Card>
 
+      {/* ── Author Pro entry points ──────────────────────────────────────────
+          Shown to everyone. Each destination does its own Author Pro check and
+          shows non-subscribers an upsell, so these links are safe to render
+          unconditionally and double as discovery for the plan. */}
+      <div className="grid sm:grid-cols-2 gap-3">
+        {[
+          {
+            href: '/dashboard/analytics',
+            title: 'Advanced analytics',
+            sub: 'Per-story reads, engagement rate, sales and tips.',
+          },
+          {
+            href: '/dashboard/bundles',
+            title: 'Story bundles',
+            sub: 'Sell several stories together as one collection.',
+          },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex items-center justify-between gap-4 rounded-xl border border-amber-500/25 bg-amber-500/5 px-5 py-4 hover:border-amber-500/50 transition group"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white group-hover:text-amber-200 transition">
+                {item.title}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">{item.sub}</p>
+            </div>
+            <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              Pro
+            </span>
+          </Link>
+        ))}
+      </div>
+
       {/* ── Top stories ──────────────────────────────────────────────────── */}
       {data.topStories.length > 0 && (
         <Card title="Top Stories" sub="by views">

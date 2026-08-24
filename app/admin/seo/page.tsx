@@ -34,6 +34,41 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
+// ViewBar
+// ---------------------------------------------------------------------------
+// Proportional bar showing one story's views against the most-viewed story.
+// It was referenced in the table below but never defined, which broke the
+// production type check.
+//
+// The ratio is snapped to the nearest 5% and mapped to a fixed scale class
+// rather than an inline style, matching the intent described at the call site:
+// Tailwind only emits classes it can see as complete strings, so a computed
+// `scale-x-[${n}]` would produce no CSS at all and every bar would render full
+// width. Twenty steps is finer than the 1px-per-step this bar can actually show.
+const SCALE_STEPS = [
+  'scale-x-0',    'scale-x-[0.05]', 'scale-x-[0.10]', 'scale-x-[0.15]',
+  'scale-x-[0.20]', 'scale-x-[0.25]', 'scale-x-[0.30]', 'scale-x-[0.35]',
+  'scale-x-[0.40]', 'scale-x-[0.45]', 'scale-x-50',     'scale-x-[0.55]',
+  'scale-x-[0.60]', 'scale-x-[0.65]', 'scale-x-[0.70]', 'scale-x-75',
+  'scale-x-[0.80]', 'scale-x-[0.85]', 'scale-x-[0.90]', 'scale-x-[0.95]',
+  'scale-x-100',
+] as const;
+
+function ViewBar({ ratio }: { ratio: number }) {
+  // Guard against NaN (0/0 when there are no views at all) and clamp to 0–1
+  // so a bad ratio can never index outside the table.
+  const safe = Number.isFinite(ratio) ? Math.min(Math.max(ratio, 0), 1) : 0;
+  const step = SCALE_STEPS[Math.round(safe * 20)];
+
+  return (
+    <div
+      className={`h-full w-full bg-red-600 origin-left transition-transform ${step}`}
+      role="presentation"
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
 // TypeScript types
 // ---------------------------------------------------------------------------
 // Story shape returned by /api/admin/seo — only the fields we render.

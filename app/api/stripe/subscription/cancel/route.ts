@@ -4,18 +4,22 @@
 // webhook after the cancel call, but we update the DB here immediately so the UI
 // reflects the change without waiting for the webhook round-trip.
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { getSessionUserId } from '@/lib/session';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const body = await request.json();
-    const { userId } = body as { userId: number };
-
-    // Validate that a userId was included in the request body
+    // Identify the caller from their signed session cookie.
+    //
+    // This route previously took `userId` from the request body and performed no
+    // authentication at all, so an unauthenticated POST of {"userId": 42} would
+    // immediately cancel user 42's subscription at Stripe — destroying access
+    // they had paid for. A user may now only ever cancel their own subscription.
+    const userId = await getSessionUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+      return NextResponse.json({ error: 'You must be logged in.' }, { status: 401 });
     }
 
     // Fetch the subscription row so we can get the Stripe subscription ID.

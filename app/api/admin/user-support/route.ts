@@ -27,9 +27,12 @@ export async function GET(req: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
+      // No `mode: 'insensitive'` — that filter is Postgres/Mongo only and is a
+      // type error on MySQL. It isn't needed here either: these columns use the
+      // utf8mb4_unicode_ci collation, which already compares case-insensitively.
       OR: [
-        { username: { equals: q, mode: 'insensitive' } },
-        { email:    { equals: q, mode: 'insensitive' } },
+        { username: { equals: q } },
+        { email:    { equals: q } },
       ],
     },
     select: {

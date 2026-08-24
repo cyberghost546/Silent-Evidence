@@ -11,10 +11,9 @@
 // (called "controlled component") means the parent always knows what's selected.
 
 import { useState } from 'react';
-import {
-  Sparkles, Swords, Heart, HelpCircle, Zap, Flower2, Laugh, Drama, Moon,
-  type LucideIcon,
-} from 'lucide-react';
+import { Sparkles, type LucideIcon } from 'lucide-react';
+import { MOODS as MOOD_VALUES, MOOD_META } from '@/lib/moods';
+import { moodIcon } from '@/lib/moodIcons';
 
 // MoodOption — the shape of each item in the MOODS list
 export type MoodOption = {
@@ -23,19 +22,19 @@ export type MoodOption = {
   icon: LucideIcon; // lucide icon rendered next to the label
 };
 
-// MOODS — the master list of all mood options.
+// MOODS — the master list of all mood options, derived from lib/moods.ts so the
+// pills can never offer a value the database will reject. The hard-coded list
+// this replaced still advertised the old generic-fiction vocabulary, so filtering
+// by "Romantic" or "Comedic" queried for enum values that no longer exist.
+//
 // The first entry (empty string value) is the "All" reset option.
-// These value strings must match exactly what's stored in the story.mood field in the database.
 export const MOODS: MoodOption[] = [
-  { value: '',              label: 'All',           icon: Sparkles },
-  { value: 'EPIC',          label: 'Epic',          icon: Swords },
-  { value: 'HEARTWARMING',  label: 'Heartwarming',  icon: Heart },
-  { value: 'MYSTERIOUS',    label: 'Mysterious',    icon: HelpCircle },
-  { value: 'ACTION',        label: 'Action',        icon: Zap },
-  { value: 'ROMANTIC',      label: 'Romantic',      icon: Flower2 },
-  { value: 'COMEDIC',       label: 'Comedic',       icon: Laugh },
-  { value: 'DRAMATIC',      label: 'Dramatic',      icon: Drama },
-  { value: 'DARK',          label: 'Dark',          icon: Moon },
+  { value: '', label: 'All', icon: Sparkles },
+  ...MOOD_VALUES.map((value) => ({
+    value,
+    label: MOOD_META[value].label,
+    icon: moodIcon(value),
+  })),
 ];
 
 type Props = {

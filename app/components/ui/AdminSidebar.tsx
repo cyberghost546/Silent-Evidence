@@ -22,7 +22,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, Users, BookOpen, Bot, Flag, AlertTriangle, ShieldCheck, Map,
-  TrendingUp, Swords, Images, Tags, Megaphone, Trophy, Mail, LifeBuoy, Newspaper,
+  TrendingUp, Filter, Swords, Images, Tags, Megaphone, Trophy, Mail, LifeBuoy, Newspaper,
   MessageSquare, Package, PenLine, Cookie, BadgeCheck, DollarSign, Crown, Ban,
   ShieldAlert, Search, Tag, Clock, Send, HeartPulse, Moon, Star, Flashlight,
   BarChart3, ClipboardList, Calendar, MailOpen, Globe, Flame, Gauge, Settings,
@@ -44,6 +44,7 @@ const links = [
   { href: '/admin/login-logs',      label: 'Login Logs',          icon: ShieldCheck },
   { href: '/admin/login-map',       label: 'Login Map',           icon: Map },
   { href: '/admin/analytics',       label: 'Analytics',           icon: TrendingUp },
+  { href: '/admin/funnel',          label: 'Conversion Funnel',   icon: Filter },
   { href: '/admin/challenges',      label: 'Challenges',          icon: Swords },
   { href: '/admin/slides',          label: 'Slideshow',           icon: Images },
   { href: '/admin/categories',      label: 'Categories',          icon: Tags },

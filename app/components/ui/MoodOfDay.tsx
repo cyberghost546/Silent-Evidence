@@ -5,21 +5,12 @@
 import { prisma } from '@/lib/prisma';
 import { createElement } from 'react';
 import { moodIcon } from '@/lib/moodIcons';
+import { moodMeta } from '@/lib/moods';
 
-// Mood → display config (label, colour classes). The icon comes from the shared
-// lib/moodIcons map so every page shows the same icon for the same mood.
-const MOOD_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  EPIC:         { label: 'Epic',         bg: 'bg-yellow-950/40', text: 'text-yellow-400', border: 'border-yellow-900/50' },
-  HEARTWARMING: { label: 'Heartwarming',  bg: 'bg-orange-950/40', text: 'text-orange-400', border: 'border-orange-900/50' },
-  MYSTERIOUS:   { label: 'Mysterious',    bg: 'bg-purple-950/40', text: 'text-purple-400', border: 'border-purple-900/50' },
-  ACTION:       { label: 'Action',        bg: 'bg-red-950/40',    text: 'text-red-400',    border: 'border-red-900/50'    },
-  ROMANTIC:     { label: 'Romantic',      bg: 'bg-pink-950/40',   text: 'text-pink-400',   border: 'border-pink-900/50'   },
-  COMEDIC:      { label: 'Comedic',       bg: 'bg-green-950/40',  text: 'text-green-400',  border: 'border-green-900/50'  },
-  DRAMATIC:     { label: 'Dramatic',      bg: 'bg-red-950/40',    text: 'text-red-400',    border: 'border-red-900/50'    },
-  DARK:         { label: 'Dark',           bg: 'bg-gray-950/60',   text: 'text-gray-300',   border: 'border-gray-700/50'   },
-};
-
-const FALLBACK = { label: 'Unknown', bg: 'bg-gray-900/40', text: 'text-gray-400', border: 'border-gray-700/50' };
+// Display config now comes from lib/moods.ts. The local map this replaced held
+// the generic-fiction vocabulary (Epic, Heartwarming, Romantic …) while the
+// admin mood-of-day tool wrote horror moods, so every mood an admin actually set
+// missed the map and this banner rendered "Unknown".
 
 export default async function MoodOfDay() {
   const row = await prisma.moodOfDay.findFirst({
@@ -29,7 +20,7 @@ export default async function MoodOfDay() {
 
   if (!row) return null;
 
-  const cfg = MOOD_CONFIG[row.mood] ?? FALLBACK;
+  const cfg = moodMeta(row.mood);
 
   return (
     <div className={`${cfg.bg} border-b ${cfg.border} px-4 py-3`}>

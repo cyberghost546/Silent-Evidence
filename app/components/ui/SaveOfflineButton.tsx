@@ -30,19 +30,21 @@
  */
 
 import { useState } from 'react';
-import { Check, Download } from 'lucide-react';
+import { Check, Download, Lock } from 'lucide-react';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 interface SaveOfflineButtonProps {
   storyId:      number;   // DB id used for the API call body
   storySlug:    string;   // URL slug used to build the cache path: /story/[slug]
   initialSaved: boolean;  // whether the current user already has this story saved (from server)
+  hasPremium:   boolean;  // offline downloads are a premium perk — free users get an upsell
 }
 
 export default function SaveOfflineButton({
   storyId,
   storySlug,
   initialSaved,
+  hasPremium,
 }: SaveOfflineButtonProps) {
 
   // ── Service Worker availability check ─────────────────────────────────────
@@ -141,6 +143,31 @@ export default function SaveOfflineButton({
   // Return nothing if the browser cannot support offline caching at all.
   // Avoids showing a button that would create a confusing no-op experience.
   if (!hasSW) return null;
+
+  // ── Free-tier upsell ──────────────────────────────────────────────────────
+  // Non-subscribers see the perk exists rather than having it hidden — a locked
+  // door sells the subscription, an absent one doesn't. The real enforcement is
+  // the premium check on POST /api/offline-saves; this is presentation only.
+  //
+  // Exception: a lapsed subscriber who still has this story saved keeps the
+  // working button, so they can un-save it. Removing is never gated.
+  if (!hasPremium && !saved) {
+    return (
+      <a
+        href="/premium"
+        aria-label="Offline downloads are a premium perk — see plans"
+        suppressHydrationWarning
+        className={[
+          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+          'transition-colors duration-150 select-none',
+          'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20',
+        ].join(' ')}
+      >
+        <Lock className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+        <span>Save Offline</span>
+      </a>
+    );
+  }
 
   return (
     <button
