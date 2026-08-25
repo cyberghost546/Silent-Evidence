@@ -12,6 +12,10 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
+    // Needed for the "@/*" path alias inherited from the root config to resolve
+    // when these scripts run under ts-node (with -r tsconfig-paths/register).
+    // Relative to THIS file, so ".." is the project root.
+    "baseUrl": "..",
     "moduleResolution": "node",
     "noEmit": false,
     "isolatedModules": false

@@ -35,6 +35,7 @@ import { checkRateLimit, getClientIp, anonymizeIp } from '@/lib/rateLimit';
 // serverError     — 500 response for unexpected failures
 import { badRequest, unauthorized, tooManyRequests, zodError, serverError } from '@/lib/apiError';
 import { lookupGeoIp } from '@/lib/geoip';
+import { onFailedLogin, onSuccessfulLogin, isAccountLocked } from '@/lib/securityMonitor';
 import { setSessionCookies } from '@/lib/sessionCookie';
 
 // ── Zod schema — validates and sanitizes the request body ─────────────────────
@@ -121,7 +122,28 @@ export async function POST(req: Request) {
           lng:       geo?.lng     ?? null,
         },
       })).catch(() => {});
+
+      // Evaluate the intrusion-detection rules against the log we just wrote.
+      // Not awaited: detection must never slow down or break authentication.
+      onFailedLogin(email, anonymizeIp(ip)).catch(() => {});
+
       return unauthorized('Invalid email or password.');
+    }
+
+    // ── Account lockout ───────────────────────────────────────────────────────
+    // Checked AFTER the password comparison on purpose. Checking first would
+    // turn the endpoint into an account-enumeration oracle: a locked account
+    // would answer differently from an unknown one, letting an attacker discover
+    // which addresses are registered simply by hammering them.
+    //
+    // Rate limiting above caps attempts per IP, but a distributed attacker
+    // rotates addresses; this bounds total guesses against one account no matter
+    // how many machines are used. It is time-boxed so a failed attack cannot
+    // permanently lock the real owner out.
+    if (await isAccountLocked(email)) {
+      return tooManyRequests(
+        'This account is temporarily locked after too many failed sign-in attempts. Please try again in 15 minutes.'
+      );
     }
 
     // ── 2FA flow ──────────────────────────────────────────────────────────────
@@ -186,7 +208,11 @@ export async function POST(req: Request) {
         lat:       geo?.lat     ?? null,
         lng:       geo?.lng     ?? null,
       },
-    })).catch(() => {});
+    })).then(() =>
+      // Chained after the log write so the "have we seen this network before?"
+      // check counts the attempt that just happened. Not awaited by the handler.
+      onSuccessfulLogin(user.id, user.email, anonymizeIp(ip))
+    ).catch(() => {});
 
     // Return the response — the browser will store the cookie automatically
     return res;

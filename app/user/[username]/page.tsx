@@ -61,6 +61,7 @@ import FollowButton from '@/app/components/ui/FollowButton';
 import FollowListModal from '@/app/components/ui/FollowListModal';
 import { BADGE_META, type BadgeType } from '@/lib/badges';
 import { readingTime } from '@/lib/readingTime';
+import { requireAdmin } from '@/lib/session';
 import WritingStreakBadge from '@/app/components/ui/WritingStreakBadge';
 import VerifiedBadge from '@/app/components/ui/VerifiedBadge';
 import ProfileStoriesGrid from '@/app/components/ui/ProfileStoriesGrid';
@@ -175,6 +176,11 @@ export default async function UserProfilePage({ params }: Props) {
   // isOwner — viewer is the profile owner (can always see everything)
   // canSeeStories — true when profile is public OR viewer is owner OR following
   const isOwner = viewerId === user.id;
+
+  // Is the viewer an admin? The publication map link below is admin-only, so
+  // non-admins never see it advertised. This is presentation only — the map
+  // page enforces the same rule itself, which is what actually protects it.
+  const viewerIsAdmin = !!(await requireAdmin());
   const canSeeStories = !user.isPrivate || isOwner || isFollowing;
 
   // ── Published stories (conditional) ─────────────────────────────────────
@@ -462,6 +468,28 @@ export default async function UserProfilePage({ params }: Props) {
           placement.  max-w-4xl and px-4 keep it aligned with the content below.
           AdSlot renders nothing for premium members, so the "No ads" perk on
           /premium applies here automatically. */}
+      {/* Admin-only. Readers have no use for another author’s view counts,
+          and the map page enforces the same rule itself — this just avoids
+          advertising a link that would 404 for them. */}
+      {viewerIsAdmin && (
+        <div className="max-w-4xl mx-auto px-4 pt-8">
+          <Link
+            href={`/user/${user.username}/map`}
+            className="flex items-center justify-between gap-4 rounded-xl border border-gray-800 bg-gray-900 px-5 py-4 hover:border-red-500/40 transition group"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white group-hover:text-red-200 transition">
+                Publication map
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Every published story, grouped by category.
+              </p>
+            </div>
+            <span className="shrink-0 text-xs text-gray-600 group-hover:text-gray-400 transition">View →</span>
+          </Link>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-4 pt-8">
         <AdSlot slot="leaderboard" />
       </div>

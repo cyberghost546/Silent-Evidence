@@ -2331,6 +2331,45 @@ model FunnelEvent {
   @@index([createdAt])
 }
 
+// ============================================================
+//  SECURITY ALERT — intrusion detection
+// ============================================================
+//  LoginLog already recorded every authentication attempt with IP, user agent
+//  and outcome, but nothing ever read it: the evidence of an attack was being
+//  collected and then ignored. This table holds the conclusions drawn from it.
+//
+//  One row per (kind, ip, window) rather than one per suspicious request. A
+//  sustained brute-force run produces thousands of failed logins; without the
+//  window key it would produce thousands of alerts, which is indistinguishable
+//  from no alerting at all because nobody reads a flooded inbox.
+// ============================================================
+
+model SecurityAlert {
+  id           Int      @id @default(autoincrement())
+  // Detection rule that fired, e.g. "brute_force", "credential_stuffing".
+  kind         String
+  // low | medium | high | critical. Drives whether an email is sent.
+  severity     String
+  // One-line human summary shown in the admin list.
+  summary      String   @db.Text
+  // JSON blob of supporting evidence (counts, emails targeted, window).
+  detail       String?  @db.Text
+  // Anonymised source IP, matching how LoginLog stores it.
+  ip           String?
+  // The targeted account, when the rule concerns a specific user.
+  userId       Int?
+  // Set once an admin has looked at it, so the dashboard can show what is new.
+  acknowledged Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  // Dedupe window, "YYYY-MM-DD-HH". See the note above.
+  windowKey    String
+
+  @@unique([kind, ip, windowKey])
+  @@index([acknowledged, createdAt])
+  @@index([severity, createdAt])
+}
+
 model AuditLog {
   id        Int      @id @default(autoincrement())
   action    String               // Short action label e.g. "BAN_USER", "DELETE_STORY"

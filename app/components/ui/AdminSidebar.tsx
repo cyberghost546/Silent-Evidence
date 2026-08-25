@@ -43,6 +43,7 @@ const links = [
   { href: '/admin/reports',         label: 'Reports',             icon: AlertTriangle },
   { href: '/admin/login-logs',      label: 'Login Logs',          icon: ShieldCheck },
   { href: '/admin/login-map',       label: 'Login Map',           icon: Map },
+  { href: '/admin/security',        label: 'Security',            icon: ShieldAlert },
   { href: '/admin/analytics',       label: 'Analytics',           icon: TrendingUp },
   { href: '/admin/funnel',          label: 'Conversion Funnel',   icon: Filter },
   { href: '/admin/challenges',      label: 'Challenges',          icon: Swords },
