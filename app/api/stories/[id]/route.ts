@@ -21,6 +21,10 @@ const PatchStorySchema = z.object({
   spotifyPlaylistUrl: z.string().nullable().optional(),
   // Price in cents. 0/null = free. Author Pro only — enforced in the handler.
   price:            z.number().int().min(0).max(100_000).nullable().optional(),
+  // Series membership. null clears it (removes the story from its series).
+  // Ownership is verified in the handler, which the schema cannot do.
+  seriesId:         z.number().int().positive().nullable().optional(),
+  seriesOrder:      z.number().int().positive().nullable().optional(),
   status:           z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED']).optional(),
   categoryId:       z.number().int().positive().optional(),
   scheduledAt:      z.string().nullable().optional(),
@@ -147,6 +151,8 @@ export async function PATCH(req: Request, { params }: Params) {
     warnings,
     spotifyPlaylistUrl: rawSpotifyUrl,
     price:            rawPrice,
+    seriesId:         rawSeriesId,
+    seriesOrder:      rawSeriesOrder,
   } = parsed.data;
 
   // ── Author Pro gate ────────────────────────────────────────────────────────
@@ -203,6 +209,38 @@ export async function PATCH(req: Request, { params }: Params) {
   if (earlyAccessUntil  !== undefined) data.earlyAccessUntil  = earlyAccessUntil;
   if (spotifyPlaylistUrl !== undefined) data.spotifyPlaylistUrl = spotifyPlaylistUrl || null;
   if (price             !== undefined) data.price             = price || null;
+
+  // ── Series ──────────────────────────────────────────────────────────────
+  // Ownership is checked against `userId`, the person making the edit — which
+  // matters here because collaborators can also PATCH a story, and a
+  // collaborator must not be able to move it into a series of their own.
+  //
+  // Passing null clears membership; the order is cleared with it so a story
+  // cannot be left orphaned with a position but no series.
+  if (rawSeriesId !== undefined) {
+    if (rawSeriesId === null) {
+      data.seriesId = null;
+      data.seriesOrder = null;
+    } else {
+      const series = await prisma.series.findUnique({
+        where: { id: rawSeriesId },
+        select: { authorId: true },
+      });
+      if (!series || series.authorId !== userId) {
+        return NextResponse.json(
+          { error: 'That series does not exist, or is not yours.' },
+          { status: 403 },
+        );
+      }
+      data.seriesId = rawSeriesId;
+      // Default to part 1 rather than leaving the order null, which would sort
+      // unpredictably in SeriesNav.
+      data.seriesOrder = rawSeriesOrder ?? 1;
+    }
+  } else if (rawSeriesOrder !== undefined) {
+    // Reordering within a series the story is already in.
+    data.seriesOrder = rawSeriesOrder;
+  }
   if (status       !== undefined) data.status       = status;
   if (categoryId   !== undefined) data.categoryId   = categoryId;
   if (scheduledAt  !== undefined) data.scheduledAt  = scheduledAt;

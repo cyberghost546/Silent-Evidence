@@ -39,6 +39,10 @@ const CreateStorySchema = z.object({
   // Price in cents. 0/null = free. Author Pro only — enforced below, not here,
   // because schema validation cannot see who is making the request.
   price:            z.number().int().min(0).max(100_000).nullable().optional(),
+  // Series membership. Ownership is verified in the handler — the schema
+  // cannot know whether this series belongs to the person posting.
+  seriesId:         z.number().int().positive().nullable().optional(),
+  seriesOrder:      z.number().int().positive().nullable().optional(),
 });
 
 // GET /api/stories?mood=GORE&take=6
@@ -149,6 +153,8 @@ export async function POST(req: Request) {
     earlyAccessUntil: earlyAccessUntilRaw,
     spotifyPlaylistUrl: rawSpotifyUrl,
     price:            rawPrice,
+    seriesId:         rawSeriesId,
+    seriesOrder:      rawSeriesOrder,
   } = parsed.data;
 
   // ── Author Pro gate ────────────────────────────────────────────────────────
@@ -169,6 +175,26 @@ export async function POST(req: Request) {
       { error: `Author Pro is required for: ${names}. Upgrade at /author-pro.`, upgrade: '/author-pro' },
       { status: 403 },
     );
+  }
+
+  // ── Series ownership ──────────────────────────────────────────────────────
+  // A story may only join a series its own author owns. Without this check, any
+  // logged-in user could post a story into somebody else's series just by
+  // sending their seriesId, and it would show up in that author's series page
+  // and navigation as though they had written it.
+  let seriesId: number | null = null;
+  if (rawSeriesId) {
+    const series = await prisma.series.findUnique({
+      where: { id: rawSeriesId },
+      select: { authorId: true },
+    });
+    if (!series || series.authorId !== userId) {
+      return NextResponse.json(
+        { error: 'That series does not exist, or is not yours.' },
+        { status: 403 },
+      );
+    }
+    seriesId = rawSeriesId;
   }
 
   const title            = rawTitle.trim();
@@ -229,6 +255,8 @@ export async function POST(req: Request) {
       audioUrl:        audioUrl || null,
       spotifyPlaylistUrl: spotifyPlaylistUrl || null,
       price:           price || null,
+      seriesId:        seriesId,
+      seriesOrder:     seriesId ? (rawSeriesOrder ?? 1) : null,
       isPremiumOnly,
       earlyAccessUntil: earlyAccessUntil || null,
       authorId:     userId,

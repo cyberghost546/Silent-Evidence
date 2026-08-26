@@ -8,10 +8,11 @@ export type BadgeType =
   | 'TEN_STORIES'
   | 'FIRST_COMMENT'
   | 'CHALLENGE_ENTERED'
-  | 'BINGO_COMPLETE';
+  | 'BINGO_COMPLETE'
+  | 'AUTHOR_STATUS';
 
 import {
-  PenLine, Heart, Flame, Award, Eye, Star, Library, MessageSquare, Swords, Target,
+  PenLine, Heart, Flame, Award, Eye, Star, Library, MessageSquare, Swords, Target, Feather,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -26,12 +27,14 @@ export const BADGE_META: Record<BadgeType, { label: string; icon: LucideIcon; de
   HUNDRED_LIKES:    { icon: Award,          label: '100 Likes',         description: 'Received 100 total likes' },
   HUNDRED_VIEWS:    { icon: Eye,            label: '100 Views',         description: 'Reached 100 total views' },
   THOUSAND_VIEWS:   { icon: Star,           label: '1K Views',          description: 'Reached 1,000 total views' },
+  AUTHOR_STATUS:    { icon: Feather,         label: 'Author',           description: 'Earned author status through readership' },
   TEN_STORIES:      { icon: Library,        label: '10 Stories',        description: 'Published 10 stories' },
   FIRST_COMMENT:    { icon: MessageSquare,  label: 'Conversationalist', description: 'Left your first comment' },
   CHALLENGE_ENTERED:{ icon: Swords,         label: 'Challenger',        description: 'Entered your first writing challenge' },
   BINGO_COMPLETE:   { icon: Target,         label: 'Bingo!',            description: 'Completed a bingo line on a horror bingo card' },
 };
 
+import { maybePromoteToAuthor } from '@/lib/authorStatus';
 import { prisma } from './prisma';
 
 // Silently upsert a single badge — safe to call even if it already exists.
@@ -65,6 +68,16 @@ export async function checkAndAwardBadges(userId: number) {
   if (totalViews >= 1000)    toAward.push('THOUSAND_VIEWS');
   if (comments >= 1)         toAward.push('FIRST_COMMENT');
   if (challengeEntries >= 1) toAward.push('CHALLENGE_ENTERED');
+
+  // Author status is a milestone like any other badge, so it is evaluated here
+  // rather than in its own scheduled job: this function already runs on every
+  // publish, like and comment, and has already computed totalViews. Doing it
+  // anywhere else would mean either a second query or a delay before the
+  // promotion lands.
+  //
+  // Not awaited by callers (they all fire-and-forget this function), and it
+  // swallows its own errors, so a promotion failure cannot break publishing.
+  maybePromoteToAuthor(userId, totalViews).catch(() => {});
 
   for (const type of toAward) {
     await awardBadge(userId, type);
