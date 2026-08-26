@@ -14,6 +14,8 @@
 
 import { useState } from 'react';            // useState — manages the currently displayed content / excerpt
 import TranslateStory from './TranslateStory'; // TranslateStory — the language picker + translate/reset controls
+import ReadingPreferences from './ReadingPreferences'; // per-reader font / size / spacing / theme controls
+import StoryNarration from './StoryNarration'; // browser text-to-speech 'Listen' player
 
 // Props passed in from the story page server component
 type Props = {
@@ -71,6 +73,13 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
           onTranslated={handleTranslated}     // called with translated strings on success
           onReset={handleReset}               // called when user reverts to the original
         />
+        {/* Listen (browser text-to-speech) and per-reader font / size / spacing /
+            theme controls. Pushed to the right to share the toolbar row with the
+            translation control. */}
+        <div className="ml-auto flex items-center gap-2">
+          <StoryNarration content={content} />
+          <ReadingPreferences />
+        </div>
       </div>
 
       {/* ── 3. Story body ───────────────────────────────────────────────────
@@ -80,10 +89,34 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
           (author-submitted or admin-seeded) so XSS risk is controlled at write time.
           prose prose-invert applies the Tailwind Typography stylesheet with
           white text suitable for dark backgrounds.                             */}
+      {/* Reading surface. The CSS custom properties are set by ReadingPreferences;
+          each has a fallback equal to the current styling, so with no preferences
+          saved this renders exactly as before. The sepia/contrast themes paint a
+          background, so we pad and round it only when a background is actually set. */}
       <div
-        className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: displayContent }}
-      />
+        className="reading-surface rounded-lg transition-colors"
+        style={{
+          background: 'var(--reading-bg, transparent)',
+          color: 'var(--reading-fg, inherit)',
+          // --reading-pad is 0 in the default theme (so the layout is pixel-identical
+          // to before) and non-zero when a themed background needs breathing room.
+          padding: 'var(--reading-pad, 0)',
+          maxWidth: 'var(--reading-width, none)',
+          marginInline: 'auto',
+        }}
+      >
+        <div
+          className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed reading-body"
+          style={{
+            fontFamily: 'var(--reading-font, inherit)',
+            fontSize: 'var(--reading-size, inherit)',
+            lineHeight: 'var(--reading-leading, inherit)',
+            // Let the themed foreground colour win over the prose text colour when set.
+            color: 'var(--reading-fg, inherit)',
+          }}
+          dangerouslySetInnerHTML={{ __html: displayContent }}
+        />
+      </div>
     </>
   );
 }
