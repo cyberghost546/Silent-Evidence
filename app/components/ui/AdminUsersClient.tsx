@@ -27,6 +27,7 @@ import { useState, useMemo } from 'react';
 import { Crown, PenLine, User, Ghost, Users, Zap, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getCsrfToken } from '@/lib/getCsrfToken';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -127,20 +128,33 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
 
   const changeRole = async (userId: number, role: string) => {
     setLoading(userId);
-    await fetch(`/api/admin/users/${userId}`, {
+    const res = await fetch(`/api/admin/users/${userId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': await getCsrfToken() },
       body: JSON.stringify({ role }),
     });
     setLoading(null);
+    // Surface the owner / last-admin protection (409) instead of silently
+    // refreshing as if nothing happened.
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      alert(d.error ?? 'Could not change role.');
+    }
     router.refresh();
   };
 
   const deleteUser = async (userId: number, username: string) => {
     if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
     setLoading(userId);
-    await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'x-csrf-token': await getCsrfToken() },
+    });
     setLoading(null);
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      alert(d.error ?? 'Could not delete user.');
+    }
     router.refresh();
   };
 
@@ -149,11 +163,15 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
     const label = action === 'DELETE' ? 'Delete' : action === 'BAN' ? 'Ban' : 'Suspend';
     if (!confirm(`${label} ${selected.size} users?`)) return;
     setBulkLoading(true);
+    const token = await getCsrfToken();
     await Promise.all([...selected].map(id => {
-      if (action === 'DELETE') return fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+      if (action === 'DELETE') return fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-csrf-token': token },
+      });
       return fetch('/api/admin/warnings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
         body: JSON.stringify({ userId: id, action, reason: `Bulk ${label.toLowerCase()} by admin` }),
       });
     }));

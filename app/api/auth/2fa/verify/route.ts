@@ -22,7 +22,8 @@ import { prisma } from '@/lib/prisma';
 // attacker who has the tempUserId can enumerate all codes in seconds.
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { tooManyRequests } from '@/lib/apiError';
-import { setSessionCookies } from '@/lib/sessionCookie';
+import { createSession } from '@/lib/session';
+import { consumeRecoveryCode, countUnused } from '@/lib/recoveryCodes';
 
 // ── POST handler ──────────────────────────────────────────────────────────────
 // This function runs whenever a POST request is made to /api/auth/2fa/verify.
@@ -65,35 +66,69 @@ export async function POST(req: Request) {
     return tooManyRequests('Too many verification attempts for this account. Please request a new code.');
   }
 
-  // ── Validate the code against the database ────────────────────────────────
-  // Look for a TwoFactorCode record that:
-  //   - belongs to this specific user (userId match)
-  //   - exactly matches the submitted code (String() and .trim() normalize whitespace)
-  //   - has NOT been used yet (used: false)
-  //   - has NOT expired yet (expiresAt must be in the future: gt = "greater than")
-  // findFirst returns the first matching record, or null if none found.
-  const record = await prisma.twoFactorCode.findFirst({
-    where: {
-      userId,                          // must belong to this user
-      code: String(code).trim(),       // normalize the submitted code
-      used: false,                     // reject already-used codes
-      expiresAt: { gt: new Date() },   // reject expired codes (gt = greater than now)
-    },
-  });
+  // ── Validate the code ─────────────────────────────────────────────────────
+  // Two kinds of code are accepted here:
+  //   1. The 6-digit code emailed during login (the normal path).
+  //   2. A backup recovery code, for when the user cannot reach their email
+  //      inbox at all. Without this fallback, enabling 2FA and then losing inbox
+  //      access would lock the account out permanently — the exact failure mode
+  //      recovery codes exist to prevent.
+  //
+  // A recovery code is longer and contains letters, so we only try that path
+  // when the submitted value does not look like a 6-digit code. This keeps a
+  // mistyped email code from silently burning a one-time recovery code.
+  const submitted = String(code).trim();
+  const looksLikeEmailCode = /^\d{6}$/.test(submitted);
 
-  // If no valid matching record was found — wrong code, expired, or already used
-  if (!record) {
+  let authenticated = false;
+  let usedRecoveryCode = false;
+
+  if (looksLikeEmailCode) {
+    const record = await prisma.twoFactorCode.findFirst({
+      where: {
+        userId,
+        code: submitted,
+        used: false,
+        expiresAt: { gt: new Date() },
+      },
+    });
+    if (record) {
+      // One-time use: mark it so a replay of the same code cannot work.
+      await prisma.twoFactorCode.update({ where: { id: record.id }, data: { used: true } });
+      authenticated = true;
+    }
+  } else {
+    // consumeRecoveryCode both checks and atomically claims the code.
+    authenticated = await consumeRecoveryCode(userId, submitted);
+    usedRecoveryCode = authenticated;
+  }
+
+  if (!authenticated) {
     return NextResponse.json({ error: 'Invalid or expired code.' }, { status: 401 });
   }
 
-  // ── Mark the code as used ─────────────────────────────────────────────────
-  // Update this specific record to set used: true so it can never be used again.
-  // This enforces one-time-use behavior — replaying the same code won't work.
-  await prisma.twoFactorCode.update({ where: { id: record.id }, data: { used: true } });
+  // Surface how many recovery codes are left so the client can nudge the user to
+  // regenerate before they run out and lock themselves out again.
+  let recoveryCodesRemaining: number | undefined;
+  if (usedRecoveryCode) {
+    recoveryCodesRemaining = await countUnused(userId);
+    await prisma.auditLog.create({
+      data: {
+        adminId: userId,
+        action: 'RECOVERY_CODE_USED',
+        detail: `Recovery code used to complete 2FA login. ${recoveryCodesRemaining} remaining.`,
+        targetType: 'User',
+        targetId: userId,
+      },
+    }).catch(() => {});
+  }
 
   // ── Complete the login by setting the session cookie ──────────────────────
-  // Build the success JSON response
-  const res = NextResponse.json({ ok: true });
+  // Build the success JSON response. recoveryCodesRemaining is present only when
+  // a recovery code was spent, so the UI can warn when the supply runs low.
+  const res = NextResponse.json(
+    usedRecoveryCode ? { ok: true, usedRecoveryCode: true, recoveryCodesRemaining } : { ok: true },
+  );
 
   // Now that 2FA is verified, set the userId cookie — the user is fully logged in.
   // httpOnly: true   — JavaScript in the browser cannot read this cookie (XSS protection).
@@ -101,7 +136,7 @@ export async function POST(req: Request) {
   // sameSite: 'lax'  — CSRF protection while still allowing normal link navigation.
   // secure in production — only transmitted over HTTPS, not plain HTTP.
   // maxAge: 7 days   — the session lasts for one week.
-  await setSessionCookies(res, userId);
+  await createSession(res, userId);
 
   // Return the response — the browser stores the cookie, and the user is now logged in
   return res;
