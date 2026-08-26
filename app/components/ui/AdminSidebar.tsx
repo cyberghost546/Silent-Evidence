@@ -26,7 +26,7 @@ import {
   MessageSquare, Package, PenLine, Cookie, BadgeCheck, DollarSign, Crown, Ban,
   ShieldAlert, Search, Tag, Clock, Send, HeartPulse, Moon, Star, Flashlight,
   BarChart3, ClipboardList, Calendar, MailOpen, Globe, Flame, Gauge, Settings,
-  GitMerge, ShieldX,
+  GitMerge, ShieldX, Gavel,
 } from 'lucide-react';
 
 // links — the full list of admin navigation items.
@@ -41,6 +41,7 @@ const links = [
   { href: '/admin/generate',        label: 'AI Generator',        icon: Bot },
   { href: '/admin/comments',        label: 'Moderation',          icon: Flag },
   { href: '/admin/reports',         label: 'Reports',             icon: AlertTriangle },
+  { href: '/admin/appeals',         label: 'Appeals',             icon: Gavel },
   { href: '/admin/login-logs',      label: 'Login Logs',          icon: ShieldCheck },
   { href: '/admin/login-map',       label: 'Login Map',           icon: Map },
   { href: '/admin/security',        label: 'Security',            icon: ShieldAlert },
