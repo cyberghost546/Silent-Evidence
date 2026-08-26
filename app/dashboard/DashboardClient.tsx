@@ -359,6 +359,11 @@ export default function DashboardClient() {
             title: 'Story bundles',
             sub: 'Sell several stories together as one collection.',
           },
+          {
+            href: '/dashboard/earnings',
+            title: 'Earnings & payouts',
+            sub: 'Your tips and sales, the platform split, and withdrawals.',
+          },
         ].map((item) => (
           <Link
             key={item.href}
