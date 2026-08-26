@@ -30,6 +30,7 @@ import Footer        from '@/app/components/ui/Footer';
 import UserAvatar    from '@/app/components/ui/UserAvatar';
 import { readingTime } from '@/lib/readingTime';
 import { getTheme } from '@/app/lib/themes';
+import { moodMeta } from '@/lib/moods';
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -39,17 +40,11 @@ function fmt(n: number) {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
 
-// MOOD_COLORS maps each horror-genre mood value to a Tailwind colour set.
-// The `/10` and `/20` opacity modifiers give translucent coloured backgrounds
-// that sit nicely on the dark gray card backgrounds.
-const MOOD_COLORS: Record<string, string> = {
-  GOTHIC:      'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  PARANORMAL:  'bg-blue-500/10   text-blue-400   border-blue-500/20',
-  COSMIC:      'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-  SLASHER:     'bg-red-500/10    text-red-400    border-red-500/20',
-  PSYCHOLOGICAL:'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  SUPERNATURAL:'bg-cyan-500/10   text-cyan-400   border-cyan-500/20',
-};
+// Mood presentation comes from lib/moods.ts, the single source of truth.
+// This file used to carry its own MOOD_COLORS map keyed on the old non-horror
+// vocabulary (GOTHIC, PARANORMAL, COSMIC, SLASHER…). Only two of its six keys
+// were still valid Mood values, so seven of the nine real moods fell through to
+// the gray fallback and the colour coding silently stopped working.
 
 export default async function ProfilePage({ params }: Props) {
   // In Next.js 14 App Router, `params` is a Promise — must be awaited
@@ -312,8 +307,8 @@ export default async function ProfilePage({ params }: Props) {
                   <div className="flex flex-wrap gap-1.5">
                     {fearMoods.map(mood => (
                       <span key={mood}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${MOOD_COLORS[mood] ?? 'bg-gray-800 text-gray-400 border-gray-700'}`}>
-                        {mood.charAt(0) + mood.slice(1).toLowerCase()}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${moodMeta(mood).color}`}>
+                        {moodMeta(mood).label}
                       </span>
                     ))}
                   </div>
@@ -349,8 +344,8 @@ export default async function ProfilePage({ params }: Props) {
                   {favMood && (
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-500">Favourite mood</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border ${MOOD_COLORS[favMood] ?? 'bg-gray-800 text-gray-400 border-gray-700'}`}>
-                        {favMood.charAt(0) + favMood.slice(1).toLowerCase()}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border ${moodMeta(favMood).color}`}>
+                        {moodMeta(favMood).label}
                       </span>
                     </div>
                   )}

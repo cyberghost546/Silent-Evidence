@@ -37,6 +37,7 @@ import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import Pagination from '@/app/components/ui/Pagination';
 import CategoryStories from './CategoryStories';
+import { viewerRatings, ratingFilter } from '@/lib/ageGate';
 import type { Metadata } from 'next';
 import { Ghost } from 'lucide-react';
 
@@ -150,11 +151,25 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   // status code — important for SEO (bots should know the page doesn't exist).
   if (!category) return notFound();
 
+  // ── Age gate ──────────────────────────────────────────────────────────────
+  // Restrict to the ratings this viewer is old enough to see. Without it a minor
+  // browsing a category saw MATURE stories listed — title, excerpt and cover —
+  // even though opening one is blocked. Shared with /search and /tag: the
+  // mapping lives in lib/ageGate.ts.
+  const allowedRatings = await viewerRatings();
+
+  // One filter object shared by the count and the page query below. Keeping it
+  // in a single constant is what stops the two from drifting apart and reporting
+  // a total that disagrees with the stories actually listed.
+  const storyWhere = {
+    status: 'PUBLISHED' as const,
+    categoryId: category.id,
+    ...ratingFilter(allowedRatings),
+  };
+
   // ── Pagination maths ──────────────────────────────────────────────────────
   // Count only PUBLISHED stories — drafts and moderated content are excluded.
-  const total = await prisma.story.count({
-    where: { status: 'PUBLISHED', categoryId: category.id },
-  });
+  const total = await prisma.story.count({ where: storyWhere });
 
   // How many pages exist? Math.ceil rounds up: 13 stories / 12 per page = 2 pages
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -178,7 +193,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   // take: limit (only load PAGE_SIZE records)
   // This is server-side pagination — no client state is needed.
   const stories = await prisma.story.findMany({
-    where: { status: 'PUBLISHED', categoryId: category.id },
+    where: storyWhere,
     orderBy,
     skip: (currentPage - 1) * PAGE_SIZE, // e.g. page 3 → skip 24
     take: PAGE_SIZE,
