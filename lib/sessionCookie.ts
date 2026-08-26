@@ -22,6 +22,13 @@ import type { NextResponse } from 'next/server';
 
 export const SESSION_COOKIE = 'userId';
 export const SESSION_SIG_COOKIE = 'userId_sig';
+// Carries the account's sessionVersion at the time the session was issued. It is
+// bound into the signature (see signSession), so it cannot be forged — an
+// attacker cannot bump it to match a rotated server-side version. Comparing this
+// against the live DB value (in getSessionUser) is what makes "log out everywhere"
+// and break-glass recovery actually evict a session, rather than merely bumping a
+// counter nothing reads.
+export const SESSION_VER_COOKIE = 'userId_v';
 
 const encoder = new TextEncoder();
 
@@ -63,21 +70,40 @@ function fromBase64Url(s: string): Uint8Array {
   return out;
 }
 
+// The signed payload binds the user id to the session version, so a valid
+// signature vouches for both. Kept in one helper so signing and verifying can
+// never disagree about the format.
+function sessionPayload(id: string | number, version: string | number): string {
+  return `${id}.${version}`;
+}
+
 /**
- * signUserId — produces the HMAC signature for a given user id.
+ * signSession — produces the HMAC signature covering both the user id and the
+ * session version. Rotating the version (logout-all, break-glass) changes what a
+ * fresh cookie must be signed over, so previously-issued cookies stop verifying
+ * once the DB check compares versions.
  */
-export async function signUserId(id: string | number): Promise<string> {
+export async function signSession(id: string | number, version: string | number): Promise<string> {
   const key = await getKey();
-  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(String(id)));
+  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(sessionPayload(id, version)));
   return toBase64Url(new Uint8Array(sig));
 }
 
 /**
- * verifyUserId — returns true only if `sig` is the signature we produced for `id`.
- * Uses crypto.subtle.verify, which compares in constant time.
+ * verifyUserId — returns true only if `sig` is the signature we produced for this
+ * (id, version) pair. Uses crypto.subtle.verify, which compares in constant time.
+ *
+ * This proves the cookie is authentic and untampered. It does NOT prove the
+ * version is still current — that freshness check requires the database and lives
+ * in getSessionUser. Middleware uses this for integrity; the session helper adds
+ * the freshness comparison.
  */
-export async function verifyUserId(id: string | undefined, sig: string | undefined): Promise<boolean> {
-  if (!id || !sig) return false;
+export async function verifyUserId(
+  id: string | undefined,
+  sig: string | undefined,
+  version: string | undefined,
+): Promise<boolean> {
+  if (!id || !sig || version === undefined) return false;
   let sigBytes: Uint8Array;
   try {
     sigBytes = fromBase64Url(sig);
@@ -86,7 +112,7 @@ export async function verifyUserId(id: string | undefined, sig: string | undefin
   }
   try {
     const key = await getKey();
-    return await crypto.subtle.verify('HMAC', key, sigBytes as BufferSource, encoder.encode(String(id)));
+    return await crypto.subtle.verify('HMAC', key, sigBytes as BufferSource, encoder.encode(sessionPayload(id, version)));
   } catch {
     return false;
   }
@@ -102,20 +128,32 @@ const COOKIE_OPTIONS = {
 };
 
 /**
- * setSessionCookies — log a user in by setting BOTH the userId cookie and its
- * signature. Use this everywhere a session is created (login, register, 2FA,
- * OAuth callbacks) instead of setting the userId cookie directly.
+ * setSessionCookies — log a user in by setting the userId cookie, the version
+ * cookie, and the signature that binds them. Use this everywhere a session is
+ * created (login, register, 2FA, OAuth callbacks) instead of setting the userId
+ * cookie directly.
+ *
+ * `version` must be the account's current sessionVersion. Callers that only have
+ * the user id should use createSession() in lib/session.ts, which reads the
+ * version from the database first. It defaults to 0 so an accidental omission
+ * fails safe as "oldest version" rather than throwing.
  */
-export async function setSessionCookies(res: NextResponse, id: string | number): Promise<void> {
-  const sig = await signUserId(id);
+export async function setSessionCookies(
+  res: NextResponse,
+  id: string | number,
+  version: string | number = 0,
+): Promise<void> {
+  const sig = await signSession(id, version);
   res.cookies.set(SESSION_COOKIE, String(id), COOKIE_OPTIONS);
+  res.cookies.set(SESSION_VER_COOKIE, String(version), COOKIE_OPTIONS);
   res.cookies.set(SESSION_SIG_COOKIE, sig, COOKIE_OPTIONS);
 }
 
 /**
- * clearSessionCookies — log a user out by clearing both cookies.
+ * clearSessionCookies — log a user out by clearing all session cookies.
  */
 export function clearSessionCookies(res: NextResponse): void {
   res.cookies.set(SESSION_COOKIE, '', { maxAge: 0, path: '/' });
+  res.cookies.set(SESSION_VER_COOKIE, '', { maxAge: 0, path: '/' });
   res.cookies.set(SESSION_SIG_COOKIE, '', { maxAge: 0, path: '/' });
 }

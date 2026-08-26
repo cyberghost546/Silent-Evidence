@@ -40,6 +40,7 @@ import { tooManyRequests, zodError, serverError } from '@/lib/apiError';
 // Import the Node.js crypto module to generate cryptographically secure random tokens.
 // Math.random() is NOT cryptographically secure — crypto.randomBytes() is.
 import crypto from 'crypto';
+import { hashToken } from '@/lib/token';
 
 // The base URL of the site — used to build the password reset link in the email.
 // Falls back through two environment variables before defaulting to the production URL.
@@ -119,9 +120,12 @@ export async function POST(req: NextRequest) {
       // Calculate when this token should expire (1 hour from now)
       const expiresAt = new Date(Date.now() + EXPIRES_IN_MS);
 
-      // Save the token to the database, linked to the user and with an expiry timestamp
+      // Store only the HASH of the token, never the token itself. The raw token
+      // goes out in the email link below and is hashed again on the way back in
+      // reset-password. This way a database leak yields no usable reset tokens —
+      // an attacker with the stored hash cannot reverse it to the emailed value.
       await prisma.passwordResetToken.create({
-        data: { token, expiresAt, userId: user.id },
+        data: { token: hashToken(token), expiresAt, userId: user.id },
       });
 
       // Build the full reset URL that will be included in the email.

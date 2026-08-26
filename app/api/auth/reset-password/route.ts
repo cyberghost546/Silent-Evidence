@@ -23,6 +23,7 @@ import { prisma } from '@/lib/prisma';
 
 // Import bcrypt to hash the new password before storing it
 import bcrypt from 'bcryptjs';
+import { hashToken } from '@/lib/token';
 
 // Import rate-limiting helpers to count and block excessive reset attempts
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -87,8 +88,11 @@ export async function POST(req: NextRequest) {
     // Look up the token in the passwordResetToken table.
     // findUnique only returns a result if the token string matches exactly.
     // select: only retrieve the columns we need to keep the query efficient.
+    // The DB stores only the hash of the token (see forgot-password), so hash the
+    // value from the email link the same way and look it up by that. The raw
+    // token never exists in the database.
     const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
+      where: { token: hashToken(token) },
       select: { id: true, used: true, expiresAt: true, userId: true },
     });
 
@@ -105,11 +109,13 @@ export async function POST(req: NextRequest) {
     // This is the same cost factor used at registration for consistency.
     const hashed = await bcrypt.hash(password, 12);
 
-    // Update the user's password in the database.
-    // resetToken.userId tells us which user this token belongs to.
+    // Update the user's password in the database. Bumping sessionVersion evicts
+    // every existing session for this account (see lib/session.ts) — a password
+    // reset often means the account was compromised, so any session an attacker
+    // holds must be invalidated, not just the password changed.
     await prisma.user.update({
       where: { id: resetToken.userId }, // target the correct user
-      data: { password: hashed },       // overwrite the stored hash with the new one
+      data: { password: hashed, sessionVersion: { increment: 1 } },
     });
 
     // ── Invalidate token ──────────────────────────────────────────────────────

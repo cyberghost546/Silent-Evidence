@@ -38,7 +38,7 @@ import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 // zodError        — 400 response with field-level validation errors from Zod
 // serverError     — 500 response for unexpected failures
 import { conflict, tooManyRequests, zodError, serverError } from '@/lib/apiError';
-import { signUserId, SESSION_COOKIE, SESSION_SIG_COOKIE } from '@/lib/sessionCookie';
+import { signSession, SESSION_COOKIE, SESSION_SIG_COOKIE, SESSION_VER_COOKIE } from '@/lib/sessionCookie';
 
 // ── Zod schema — declares validation rules for all registration fields ─────────
 // Each field has its own chain of validators that run left-to-right.
@@ -159,9 +159,12 @@ export async function POST(req: Request) {
       sameSite: 'lax' as const,
       secure: process.env.NODE_ENV === 'production',
     };
-    // Set the signed `userId` + `userId_sig` cookies so the session can't be forged.
+    // Set the signed session cookies so the session can't be forged. A brand-new
+    // account is at sessionVersion 0, and that version is bound into the signature
+    // (see lib/sessionCookie.ts) and carried in its own cookie so it can be checked.
     c.set(SESSION_COOKIE, String(user.id), cookieOpts);
-    c.set(SESSION_SIG_COOKIE, await signUserId(user.id), cookieOpts);
+    c.set(SESSION_VER_COOKIE, '0', cookieOpts);
+    c.set(SESSION_SIG_COOKIE, await signSession(user.id, 0), cookieOpts);
 
     // Return 201 Created — the registration and auto-login succeeded
     return NextResponse.json({ ok: true }, { status: 201 });

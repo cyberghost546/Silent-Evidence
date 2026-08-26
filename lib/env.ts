@@ -30,6 +30,11 @@ const OPTIONAL_VARS: Record<string, string> = {
   MICROSOFT_CLIENT_ID:            'Microsoft OAuth login will be disabled.',
   MICROSOFT_CLIENT_SECRET:        'Microsoft OAuth login will be disabled.',
   REDIS_URL:                      'Redis caching will be disabled — all requests hit the DB.',
+  // The protected owner account (lib/owner.ts). Without it there is no owner to
+  // protect from demotion and no target for break-glass recovery — the last-admin
+  // guard still applies, but owner-specific protection is off.
+  OWNER_EMAIL:                    'Owner-account protection and break-glass recovery will be disabled.',
+  CRON_SECRET:                    'Scheduled jobs (publishing, retention, newsletter) cannot be triggered securely.',
 };
 
 // ── Validation function ───────────────────────────────────────────────────────
@@ -57,6 +62,22 @@ export function validateEnv(): void {
       missing.map((k) => `  - ${k}`).join('\n') +
       `\n\nCopy .env.example to .env and fill in the values.`
     );
+  }
+
+  // SESSION_SECRET strength. It signs every session cookie; a short or default
+  // value would let an attacker forge sessions. Fail at boot rather than
+  // discovering it only when the first cookie is signed. 32 hex chars = the
+  // output of `openssl rand -hex 32` truncated is still 32; we require >= 32.
+  const sessionSecret = process.env.SESSION_SECRET ?? '';
+  if (sessionSecret.length < 32) {
+    throw new Error(
+      '[env] SESSION_SECRET must be at least 32 characters of random data. ' +
+      'Generate one with: openssl rand -hex 32'
+    );
+  }
+  const WEAK_SECRETS = ['changeme', 'change-me', 'your-secret', 'placeholder', 'example'];
+  if (WEAK_SECRETS.some((w) => sessionSecret.toLowerCase().includes(w))) {
+    throw new Error('[env] SESSION_SECRET looks like a placeholder. Set a real random value.');
   }
 
   // Check optional variables — warn but don't crash

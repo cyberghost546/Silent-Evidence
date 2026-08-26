@@ -192,7 +192,7 @@ export async function POST(req: Request) {
     // secure: true in production — cookie is only sent over HTTPS, not plain HTTP.
     // maxAge           — how long the cookie lives, in seconds (7 days here).
     // Sets the signed `userId` + `userId_sig` cookies so the session can't be forged.
-    await setSessionCookies(res, user.id);
+    await setSessionCookies(res, user.id, user.sessionVersion);
 
     // Record the successful login — geo-lookup runs in parallel, never blocks response
     lookupGeoIp(ip).then(geo => prisma.loginLog.create({

@@ -17,7 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Import the Prisma database client to look up or create user records
 import { prisma } from '@/lib/prisma';
-import { setSessionCookies } from '@/lib/sessionCookie';
+import { createSession } from '@/lib/session';
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // This function runs when Google redirects the browser back to our callback URL.
@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
   // path: '/'      — cookie is sent on every request to the site.
   // maxAge: 7 days — session lasts 1 week.
   // sameSite: 'lax' — CSRF protection while still allowing normal navigation.
-  await setSessionCookies(res, user.id);
+  await createSession(res, user.id);
 
   return res;
 }
