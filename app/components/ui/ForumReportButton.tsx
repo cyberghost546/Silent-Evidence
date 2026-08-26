@@ -23,6 +23,11 @@ const REASONS = [
   { value: 'SPAM',          label: 'Spam' },
   { value: 'INAPPROPRIATE', label: 'Inappropriate content' },
   { value: 'THREATS',       label: 'Threats or violence' },
+  // Legally-mandated notice routes, kept as explicit options rather than folded
+  // into "Other": DMCA §512(c) for copyright, EU DSA Art. 16 for illegal
+  // content. Both carry obligations that ordinary house-rule reports do not.
+  { value: 'COPYRIGHT',       label: 'Copyright infringement' },
+  { value: 'ILLEGAL_CONTENT', label: 'Illegal content' },
   { value: 'OTHER',         label: 'Other' },
 ];
 

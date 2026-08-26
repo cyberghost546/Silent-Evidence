@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import CookieSettingsButton from './CookieSettingsButton';
 
 export default async function Footer() {
   // Fetch the first 8 categories alphabetically for the footer's category column.
@@ -103,11 +104,22 @@ export default async function Footer() {
               {[
                 { label: 'Privacy Policy', href: '/privacy' },
                 { label: 'Terms of Service', href: '/terms' },
+                { label: 'Acceptable Use', href: '/acceptable-use' },
+                // DMCA §512 requires the takedown contact to be reasonably
+                // discoverable, and DSA Art. 16 the same for illegal-content
+                // notices — a footer link on every page is the usual answer.
+                { label: 'Copyright & Illegal Content', href: '/copyright' },
               ].map(({ label, href }) => (
                 <li key={href}>
                   <Link href={href} className="text-gray-500 hover:text-white transition">{label}</Link>
                 </li>
               ))}
+              {/* Persistent way to change or withdraw cookie consent — required
+                  by GDPR Art. 7(3), which says withdrawing must be as easy as
+                  giving. Reopens the banner rather than navigating. */}
+              <li>
+                <CookieSettingsButton />
+              </li>
             </ul>
           </div>
 

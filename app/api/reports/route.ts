@@ -14,7 +14,10 @@ const CreateReportSchema = z.object({
               error: 'Invalid report type',
             }),
   targetId: z.number().int().positive('A valid target ID is required.'),
-  reason:   z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'OTHER'], {
+  // COPYRIGHT and ILLEGAL_CONTENT are the legally-mandated notice paths — DMCA
+  // §512(c) and EU DSA Art. 16 respectively — rather than ordinary house-rule
+  // violations. See /copyright for the process each one triggers.
+  reason:   z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'COPYRIGHT', 'ILLEGAL_CONTENT', 'OTHER'], {
               error: 'Invalid reason',
             }),
   note:     z.string().max(1000).optional(),

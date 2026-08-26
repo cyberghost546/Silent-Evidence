@@ -96,6 +96,9 @@ function ReportModal({
     { value: 'SPAM',        label: 'Spam' },
     { value: 'INAPPROPRIATE', label: 'Inappropriate content' },
     { value: 'THREATS',     label: 'Threats or violence' },
+    // Legally-mandated notice routes — see ForumReportButton for the rationale.
+    { value: 'COPYRIGHT',       label: 'Copyright infringement' },
+    { value: 'ILLEGAL_CONTENT', label: 'Illegal content' },
     { value: 'OTHER',       label: 'Other' },
   ];
 
