@@ -46,6 +46,13 @@ export function validateEnv(): void {
   if (validated) return;
   validated = true;
 
+  // Skip during `next build`. Env validation is a RUNTIME concern: the build
+  // step compiles code and prerenders pages, and legitimately may not have every
+  // runtime secret available. Throwing here would fail the build (e.g. on Vercel)
+  // for a value that is perfectly fine at request time. NEXT_PHASE is set by
+  // Next.js to 'phase-production-build' during the build.
+  if (process.env.NEXT_PHASE === 'phase-production-build') return;
+
   const missing: string[] = [];
 
   // Check required variables — any missing one is a fatal error
@@ -65,19 +72,22 @@ export function validateEnv(): void {
   }
 
   // SESSION_SECRET strength. It signs every session cookie; a short or default
-  // value would let an attacker forge sessions. Fail at boot rather than
-  // discovering it only when the first cookie is signed. 32 hex chars = the
-  // output of `openssl rand -hex 32` truncated is still 32; we require >= 32.
+  // value would let an attacker forge sessions.
+  //   - Below 16 chars it is genuinely unsafe (and lib/sessionCookie.ts already
+  //     refuses to sign with it), so that is a hard failure.
+  //   - 16–31 chars works but is weaker than we'd like: WARN rather than throw,
+  //     so we never crash a deployment whose secret was acceptable before this
+  //     check existed. 32+ (e.g. `openssl rand -hex 32`) is recommended.
   const sessionSecret = process.env.SESSION_SECRET ?? '';
-  if (sessionSecret.length < 32) {
+  const WEAK_SECRETS = ['changeme', 'change-me', 'your-secret', 'placeholder'];
+  if (sessionSecret.length < 16 || WEAK_SECRETS.some((w) => sessionSecret.toLowerCase().includes(w))) {
     throw new Error(
-      '[env] SESSION_SECRET must be at least 32 characters of random data. ' +
-      'Generate one with: openssl rand -hex 32'
+      '[env] SESSION_SECRET is missing, too short, or a placeholder. ' +
+      'Set a real random value (32+ chars) with: openssl rand -hex 32'
     );
   }
-  const WEAK_SECRETS = ['changeme', 'change-me', 'your-secret', 'placeholder', 'example'];
-  if (WEAK_SECRETS.some((w) => sessionSecret.toLowerCase().includes(w))) {
-    throw new Error('[env] SESSION_SECRET looks like a placeholder. Set a real random value.');
+  if (sessionSecret.length < 32) {
+    console.warn('[env] SESSION_SECRET is under 32 characters — consider a longer random value (openssl rand -hex 32).');
   }
 
   // Check optional variables — warn but don't crash
