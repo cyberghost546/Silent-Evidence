@@ -79,7 +79,13 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      # 7. Vitest — runs the unit tests in tests/ (auth, stories, Stripe webhook)
+      # 7. Apply migrations BEFORE the tests. Several suites are integration tests
+      #    that talk to the MariaDB service above (search, appeals, earnings, etc.),
+      #    so the tables must exist first. (The build in step 9 relies on this too.)
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      # 8. Vitest — unit + DB-backed integration tests in tests/
       - name: Test
         run: npm test
 
@@ -94,11 +100,9 @@ jobs:
       #    production build once sat in this repo while CI stayed green.
       #
       #    Runs last because it is the slowest step, so the cheap checks fail
-      #    fast and this only runs when they have all passed.
-      #    Create the schema first — the prerendered pages query real tables, so
-      #    an empty database fails just as surely as a missing one.
-      - name: Apply migrations
-        run: npx prisma migrate deploy
-
+      #    fast and this only runs when they have all passed. Migrations were
+      #    already applied before the test step, so the prerendered pages that
+      #    query real tables have a populated schema to talk to.
+      # 9. Production build — the only check that compiles the app as it ships.
       - name: Production build
         run: npm run build

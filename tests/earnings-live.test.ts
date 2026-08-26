@@ -12,8 +12,15 @@ beforeAll(async () => {
   const author = await prisma.user.create({ data: { username: 'zz_earn_author', email: 'zz_ea@x.invalid', password: 'x'.repeat(60) }, select: { id: true } });
   const buyer = await prisma.user.create({ data: { username: 'zz_earn_buyer', email: 'zz_eb@x.invalid', password: 'x'.repeat(60) }, select: { id: true } });
   authorId = author.id; buyerId = buyer.id;
-  const cat = await prisma.category.findFirst({ select: { id: true } });
-  catId = cat!.id;
+  // Create (or reuse) a dedicated category so the test does not depend on seed
+  // data — CI runs against a freshly-migrated, empty database.
+  const cat = await prisma.category.upsert({
+    where: { slug: 'zz-earn-cat' },
+    update: {},
+    create: { name: 'zz earn cat', slug: 'zz-earn-cat' },
+    select: { id: true },
+  });
+  catId = cat.id;
   const story = await prisma.story.create({ data: { title: 'zz earn story', slug: `zz-earn-${Date.now()}`, content: 'x', authorId, categoryId: catId, status: 'PUBLISHED' }, select: { id: true } });
   storyId = story.id;
   const chapter = await prisma.storyChapter.create({ data: { title: 'ch', content: 'x', storyId }, select: { id: true } });
@@ -38,6 +45,7 @@ afterAll(async () => {
   await prisma.storyChapter.delete({ where: { id: chapterId } }).catch(()=>{});
   await prisma.story.delete({ where: { id: storyId } }).catch(()=>{});
   await prisma.user.deleteMany({ where: { username: { startsWith: 'zz_earn_' } } });
+  await prisma.category.delete({ where: { slug: 'zz-earn-cat' } }).catch(()=>{});
   await prisma.$disconnect();
 });
 
