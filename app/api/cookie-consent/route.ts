@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server';
 import { cookies, headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { anonymizeIp } from '@/lib/rateLimit';
+import { requireAdmin } from '@/lib/session';
+import { forbidden } from '@/lib/apiError';
 
 const VALID_CHOICES = ['all', 'essential', 'rejected'] as const;
 type Choice = (typeof VALID_CHOICES)[number];
@@ -35,8 +37,16 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-// GET /api/cookie-consent — admin endpoint: returns aggregated stats
+// GET /api/cookie-consent — admin endpoint: returns aggregated stats.
+//
+// This handler was documented as admin-only but never actually checked, so any
+// anonymous visitor could read the last 100 consent records — each one carrying a
+// userId, an IP address and a user-agent string. That is personal data under
+// GDPR Art. 4, and an unauthenticated route handing it out is a reportable
+// breach, not just an authorisation slip. The role check is now enforced.
 export async function GET() {
+  if (!(await requireAdmin())) return forbidden();
+
   const [total, byChoice, recent] = await Promise.all([
     prisma.cookieConsent.count(),
     prisma.cookieConsent.groupBy({

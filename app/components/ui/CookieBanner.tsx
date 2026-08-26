@@ -17,6 +17,9 @@ import Link from 'next/link';
 
 const LS_KEY = 'se_cookie_consent';
 
+/** Fired by CookieSettingsButton to reopen the banner so a choice can be changed. */
+export const OPEN_EVENT = 'se:open-cookie-settings';
+
 type Choice = 'all' | 'essential' | 'rejected';
 
 export default function CookieBanner() {
@@ -29,6 +32,16 @@ export default function CookieBanner() {
     if (!localStorage.getItem(LS_KEY)) {
       setVisible(true);
     }
+  }, []);
+
+  // GDPR Art. 7(3): withdrawing consent must be as easy as giving it. Once a
+  // choice was stored there was no way to reach the banner again from anywhere
+  // in the UI, so a reader who clicked "Accept all" could never take it back.
+  // The "Cookie settings" link in the footer dispatches this event to reopen it.
+  useEffect(() => {
+    const reopen = () => setVisible(true);
+    window.addEventListener(OPEN_EVENT, reopen);
+    return () => window.removeEventListener(OPEN_EVENT, reopen);
   }, []);
 
   const choose = async (choice: Choice) => {

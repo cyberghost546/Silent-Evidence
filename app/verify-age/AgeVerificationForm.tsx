@@ -51,6 +51,12 @@ export default function AgeVerificationForm() {
     if (!res.ok) {
       setError(data.error ?? 'Something went wrong. Please try again.');
       setSaving(false);
+      // An under-13 date deletes the account server-side and clears the session,
+      // so there is nothing left to stay on this page for. Show the reason, then
+      // send them to the home page as a signed-out visitor.
+      if (data.ageBlocked) {
+        setTimeout(() => { router.push('/'); router.refresh(); }, 5000);
+      }
       return;
     }
 

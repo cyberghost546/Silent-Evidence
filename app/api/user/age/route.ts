@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { unauthorized, zodError, serverError } from '@/lib/apiError';
+import { clearSessionCookies } from '@/lib/sessionCookie';
 
 // Helper: calculate age in full years from a Date
 function calcAge(dob: Date): number {
@@ -48,6 +49,35 @@ export async function PATCH(req: Request) {
     const year = dob.getFullYear();
     if (year < 1900 || dob > new Date()) {
       return NextResponse.json({ error: 'Invalid date of birth.' }, { status: 400 });
+    }
+
+    // ── Under-13 block ────────────────────────────────────────────────────────
+    // COPPA (16 CFR §312) forbids collecting personal data from a child under 13
+    // without verifiable parental consent, and GDPR Art. 8 requires parental
+    // authorisation below the national age of digital consent. We do not operate
+    // a parental consent process, and this is a horror fiction site, so the only
+    // lawful option is not to hold the account at all.
+    //
+    // Registration happens before age is known, so by this point we already hold
+    // an email address and username for this person. Refusing the date alone
+    // would leave that data in the database — the remedy has to be deletion, not
+    // a flag. Cascades in the schema remove anything else created in between.
+    //
+    // The date of birth itself is deliberately never written for this case.
+    if (age < 13) {
+      await prisma.user.delete({ where: { id: userId } });
+
+      const res = NextResponse.json(
+        {
+          error:
+            'You must be at least 13 years old to use Silent Evidence. ' +
+            'Your account has been removed and no date of birth was stored.',
+          ageBlocked: true,
+        },
+        { status: 403 },
+      );
+      clearSessionCookies(res);
+      return res;
     }
 
     await prisma.user.update({

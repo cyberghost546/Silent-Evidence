@@ -36,12 +36,26 @@ export default function OnboardingPage() {
     if (!dob) { setAgeError('Please enter your date of birth to continue.'); return; }
     setAgeError('');
     setSaving(true);
-    await fetch('/api/user/age', {
+    const res = await fetch('/api/user/age', {
       method:  'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ dateOfBirth: dob }),
     });
     setSaving(false);
+
+    // This response used to be discarded, so a rejected date still advanced to
+    // step 2. That now matters: an under-13 date deletes the account and clears
+    // the session, and carrying on would walk a signed-out user through the rest
+    // of onboarding with every later request failing.
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setAgeError(data.error ?? 'We could not save your date of birth.');
+      if (data.ageBlocked) {
+        setTimeout(() => { router.push('/'); router.refresh(); }, 5000);
+      }
+      return;
+    }
+
     setStep(2);
   };
 
