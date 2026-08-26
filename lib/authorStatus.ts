@@ -112,10 +112,7 @@ export async function getAuthorProgress(userId: number): Promise<AuthorProgress>
  *
  * Never throws — a failure here must not break publishing.
  */
-export async function maybePromoteToAuthor(
-  userId: number,
-  totalReads: number,
-): Promise<boolean> {
+export async function maybePromoteToAuthor(userId: number, totalReads: number): Promise<boolean> {
   if (totalReads < AUTHOR_THRESHOLD) return false;
 
   try {

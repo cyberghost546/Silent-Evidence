@@ -10,17 +10,29 @@ import { z } from 'zod';
 const CreateReportSchema = z.object({
   // Zod v4 replaced the `errorMap` option with `error`, which accepts the
   // message directly. The old key is no longer part of the params type.
-  type:     z.enum(['COMMENT', 'STORY', 'FORUM_POST', 'FORUM_REPLY'], {
-              error: 'Invalid report type',
-            }),
+  type: z.enum(['COMMENT', 'STORY', 'FORUM_POST', 'FORUM_REPLY'], {
+    error: 'Invalid report type',
+  }),
   targetId: z.number().int().positive('A valid target ID is required.'),
   // COPYRIGHT and ILLEGAL_CONTENT are the legally-mandated notice paths — DMCA
   // §512(c) and EU DSA Art. 16 respectively — rather than ordinary house-rule
   // violations. See /copyright for the process each one triggers.
-  reason:   z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'COPYRIGHT', 'ILLEGAL_CONTENT', 'OTHER'], {
-              error: 'Invalid reason',
-            }),
-  note:     z.string().max(1000).optional(),
+  reason: z.enum(
+    [
+      'HARASSMENT',
+      'HATE_SPEECH',
+      'SPAM',
+      'INAPPROPRIATE',
+      'THREATS',
+      'COPYRIGHT',
+      'ILLEGAL_CONTENT',
+      'OTHER',
+    ],
+    {
+      error: 'Invalid reason',
+    }
+  ),
+  note: z.string().max(1000).optional(),
 });
 
 export async function POST(req: Request) {
@@ -37,7 +49,10 @@ export async function POST(req: Request) {
   const rawBody = await req.json();
   const parsed = CreateReportSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid request', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
   const { type, targetId, reason, note } = parsed.data;
 

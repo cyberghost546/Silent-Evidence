@@ -64,19 +64,28 @@ export async function POST(req: NextRequest, { params }: Props) {
   const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
 
   // If the challenge doesn't exist OR is not active (paused by admin), reject the entry
-  if (!challenge || !challenge.active) return NextResponse.json({ error: 'Challenge not found or closed' }, { status: 404 });
+  if (!challenge || !challenge.active)
+    return NextResponse.json({ error: 'Challenge not found or closed' }, { status: 404 });
 
   // ── Validate the story ────────────────────────────────────────────────────
   // Look up the story to verify ownership and publication status.
   // We only select authorId and status — those are the only fields we need for validation.
-  const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true, status: true } });
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { authorId: true, status: true },
+  });
 
   // If the story doesn't exist, or if the caller isn't the author, reject the submission.
   // story.authorId !== userId prevents entering someone else's story in your name.
-  if (!story || story.authorId !== userId) return NextResponse.json({ error: 'You can only submit your own published stories' }, { status: 403 });
+  if (!story || story.authorId !== userId)
+    return NextResponse.json(
+      { error: 'You can only submit your own published stories' },
+      { status: 403 }
+    );
 
   // Only published stories are allowed — drafts are not visible to challenge voters anyway
-  if (story.status !== 'PUBLISHED') return NextResponse.json({ error: 'Story must be published' }, { status: 400 });
+  if (story.status !== 'PUBLISHED')
+    return NextResponse.json({ error: 'Story must be published' }, { status: 400 });
 
   try {
     // ── Create the entry ──────────────────────────────────────────────────────
@@ -90,7 +99,6 @@ export async function POST(req: NextRequest, { params }: Props) {
 
     // Return 201 Created with the newly created entry record
     return NextResponse.json(entry, { status: 201 });
-
   } catch {
     // If Prisma throws here, it's almost certainly a unique constraint violation —
     // meaning this user already submitted an entry to this challenge.

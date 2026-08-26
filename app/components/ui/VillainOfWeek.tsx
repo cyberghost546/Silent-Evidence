@@ -275,8 +275,10 @@ export default function VillainOfWeek({ userId }: Props) {
               >
                 {/* Crown badge — only shown for the leader */}
                 {isTop && (
-                  <span className="absolute top-3 right-3 inline-flex items-center gap-1 text-xs font-bold text-red-400
-                                   bg-red-900/40 border border-red-700/40 px-2 py-0.5 rounded-full">
+                  <span
+                    className="absolute top-3 right-3 inline-flex items-center gap-1 text-xs font-bold text-red-400
+                                   bg-red-900/40 border border-red-700/40 px-2 py-0.5 rounded-full"
+                  >
                     <Crown className="w-3 h-3" /> Leading
                   </span>
                 )}
@@ -305,7 +307,8 @@ export default function VillainOfWeek({ userId }: Props) {
                 <div className="mt-auto flex items-center justify-between pt-2 border-t border-gray-800">
                   {/* Total vote count */}
                   <span className="inline-flex items-center gap-1 text-sm text-gray-400">
-                    <Droplet className="w-3.5 h-3.5 text-red-500" /> {villain.voteCount} {villain.voteCount === 1 ? 'vote' : 'votes'}
+                    <Droplet className="w-3.5 h-3.5 text-red-500" /> {villain.voteCount}{' '}
+                    {villain.voteCount === 1 ? 'vote' : 'votes'}
                   </span>
 
                   {/* Vote / Un-vote toggle button */}
@@ -320,11 +323,15 @@ export default function VillainOfWeek({ userId }: Props) {
                         : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-red-700 hover:text-red-400',
                     ].join(' ')}
                   >
-                    {votingId === villain.id
-                      ? '…'
-                      : hasVoted
-                      ? <span className="inline-flex items-center gap-1"><Check className="w-3 h-3" /> Voted</span>
-                      : 'Vote'}
+                    {votingId === villain.id ? (
+                      '…'
+                    ) : hasVoted ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Voted
+                      </span>
+                    ) : (
+                      'Vote'
+                    )}
                   </button>
                 </div>
               </div>

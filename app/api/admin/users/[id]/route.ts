@@ -68,15 +68,17 @@ export async function PATCH(req: Request, { params }: Params) {
 
   // Role changes are exactly the kind of privileged action the audit log exists
   // for, and this route logged nothing before.
-  await prisma.auditLog.create({
-    data: {
-      adminId: actingAdminId,
-      action: 'CHANGE_USER_ROLE',
-      detail: `Changed role of user ${target.id} (${target.email}) from ${target.role} to ${role}.`,
-      targetType: 'User',
-      targetId: target.id,
-    },
-  }).catch(() => {});
+  await prisma.auditLog
+    .create({
+      data: {
+        adminId: actingAdminId,
+        action: 'CHANGE_USER_ROLE',
+        detail: `Changed role of user ${target.id} (${target.email}) from ${target.role} to ${role}.`,
+        targetType: 'User',
+        targetId: target.id,
+      },
+    })
+    .catch(() => {});
 
   return NextResponse.json({ ok: true });
 }
@@ -107,15 +109,17 @@ export async function DELETE(req: Request, { params }: Params) {
 
   await prisma.user.delete({ where: { id: target.id } });
 
-  await prisma.auditLog.create({
-    data: {
-      adminId: actingAdminId,
-      action: 'DELETE_USER',
-      detail: `Deleted user ${target.id} (${target.email}), role ${target.role}.`,
-      targetType: 'User',
-      targetId: target.id,
-    },
-  }).catch(() => {});
+  await prisma.auditLog
+    .create({
+      data: {
+        adminId: actingAdminId,
+        action: 'DELETE_USER',
+        detail: `Deleted user ${target.id} (${target.email}), role ${target.role}.`,
+        targetType: 'User',
+        targetId: target.id,
+      },
+    })
+    .catch(() => {});
 
   return NextResponse.json({ ok: true });
 }

@@ -101,7 +101,7 @@ export async function signSession(id: string | number, version: string | number)
 export async function verifyUserId(
   id: string | undefined,
   sig: string | undefined,
-  version: string | undefined,
+  version: string | undefined
 ): Promise<boolean> {
   if (!id || !sig || version === undefined) return false;
   let sigBytes: Uint8Array;
@@ -112,7 +112,12 @@ export async function verifyUserId(
   }
   try {
     const key = await getKey();
-    return await crypto.subtle.verify('HMAC', key, sigBytes as BufferSource, encoder.encode(sessionPayload(id, version)));
+    return await crypto.subtle.verify(
+      'HMAC',
+      key,
+      sigBytes as BufferSource,
+      encoder.encode(sessionPayload(id, version))
+    );
   } catch {
     return false;
   }
@@ -141,7 +146,7 @@ const COOKIE_OPTIONS = {
 export async function setSessionCookies(
   res: NextResponse,
   id: string | number,
-  version: string | number = 0,
+  version: string | number = 0
 ): Promise<void> {
   const sig = await signSession(id, version);
   res.cookies.set(SESSION_COOKIE, String(id), COOKIE_OPTIONS);

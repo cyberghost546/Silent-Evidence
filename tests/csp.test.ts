@@ -8,7 +8,7 @@ describe('buildCsp — production', () => {
   const { value, headerName } = buildCsp('NONCE123', true);
 
   it('drops unsafe-inline from script-src in production', () => {
-    const scriptSrc = value.split(';').find(d => d.trim().startsWith('script-src'))!;
+    const scriptSrc = value.split(';').find((d) => d.trim().startsWith('script-src'))!;
     expect(scriptSrc).not.toContain('unsafe-inline');
     expect(scriptSrc).not.toContain('unsafe-eval');
   });
@@ -35,7 +35,9 @@ describe('buildCsp — production', () => {
 
 describe('buildCsp — development', () => {
   it('keeps the looser policy so HMR works', () => {
-    const scriptSrc = buildCsp('N', false).value.split(';').find(d => d.trim().startsWith('script-src'))!;
+    const scriptSrc = buildCsp('N', false)
+      .value.split(';')
+      .find((d) => d.trim().startsWith('script-src'))!;
     expect(scriptSrc).toContain('unsafe-inline');
     expect(scriptSrc).toContain('unsafe-eval');
   });

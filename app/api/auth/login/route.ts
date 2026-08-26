@@ -44,7 +44,7 @@ import { setSessionCookies } from '@/lib/sessionCookie';
 const LoginSchema = z.object({
   // Email must be a valid email format; .toLowerCase() and .trim() normalize it
   // before we look it up in the database (avoids case-sensitivity mismatches)
-  email:    z.string().min(1, 'Email is required').email('Invalid email address').toLowerCase().trim(),
+  email: z.string().min(1, 'Email is required').email('Invalid email address').toLowerCase().trim(),
 
   // Password just needs to be present — we never reveal complexity rules at login
   // because that helps attackers know what kinds of passwords to guess
@@ -64,7 +64,6 @@ function gen6() {
 // This function runs whenever a POST request is made to /api/auth/login.
 // "req" is a standard Web API Request object containing headers, body, etc.
 export async function POST(req: Request) {
-
   // ── Rate limiting ──────────────────────────────────────────────────────────
   // Identify the client's IP address so we can track how many attempts they've made.
   // Some proxies put the real IP in X-Forwarded-For; getClientIp handles that.
@@ -73,7 +72,7 @@ export async function POST(req: Request) {
   // Check whether this IP has exceeded 5 login attempts in the last 15 minutes.
   // The second argument 'login' namespaces this counter separately from other endpoints.
   const rateLimit = await checkRateLimit(ip, 'login', {
-    limit: 5,            // maximum allowed attempts before blocking
+    limit: 5, // maximum allowed attempts before blocking
     windowMs: 15 * 60 * 1000, // 15-minute sliding window (in milliseconds)
   });
 
@@ -108,20 +107,24 @@ export async function POST(req: Request) {
     // or the password was wrong, to avoid helping attackers enumerate accounts.
     if (!user || !(await bcrypt.compare(password, user.password))) {
       // Record the failed attempt — geo-lookup runs in parallel, never blocks response
-      lookupGeoIp(ip).then(geo => prisma.loginLog.create({
-        data: {
-          userId:    user?.id ?? null,
-          username:  user?.username ?? null,
-          email,
-          ip:        anonymizeIp(ip),
-          userAgent: req.headers.get('user-agent') ?? null,
-          success:   false,
-          country:   geo?.country ?? null,
-          city:      geo?.city    ?? null,
-          lat:       geo?.lat     ?? null,
-          lng:       geo?.lng     ?? null,
-        },
-      })).catch(() => {});
+      lookupGeoIp(ip)
+        .then((geo) =>
+          prisma.loginLog.create({
+            data: {
+              userId: user?.id ?? null,
+              username: user?.username ?? null,
+              email,
+              ip: anonymizeIp(ip),
+              userAgent: req.headers.get('user-agent') ?? null,
+              success: false,
+              country: geo?.country ?? null,
+              city: geo?.city ?? null,
+              lat: geo?.lat ?? null,
+              lng: geo?.lng ?? null,
+            },
+          })
+        )
+        .catch(() => {});
 
       // Evaluate the intrusion-detection rules against the log we just wrote.
       // Not awaited: detection must never slow down or break authentication.
@@ -195,28 +198,32 @@ export async function POST(req: Request) {
     await setSessionCookies(res, user.id, user.sessionVersion);
 
     // Record the successful login — geo-lookup runs in parallel, never blocks response
-    lookupGeoIp(ip).then(geo => prisma.loginLog.create({
-      data: {
-        userId:    user.id,
-        username:  user.username,
-        email:     user.email,
-        ip:        anonymizeIp(ip),
-        userAgent: req.headers.get('user-agent') ?? null,
-        success:   true,
-        country:   geo?.country ?? null,
-        city:      geo?.city    ?? null,
-        lat:       geo?.lat     ?? null,
-        lng:       geo?.lng     ?? null,
-      },
-    })).then(() =>
-      // Chained after the log write so the "have we seen this network before?"
-      // check counts the attempt that just happened. Not awaited by the handler.
-      onSuccessfulLogin(user.id, user.email, anonymizeIp(ip))
-    ).catch(() => {});
+    lookupGeoIp(ip)
+      .then((geo) =>
+        prisma.loginLog.create({
+          data: {
+            userId: user.id,
+            username: user.username,
+            email: user.email,
+            ip: anonymizeIp(ip),
+            userAgent: req.headers.get('user-agent') ?? null,
+            success: true,
+            country: geo?.country ?? null,
+            city: geo?.city ?? null,
+            lat: geo?.lat ?? null,
+            lng: geo?.lng ?? null,
+          },
+        })
+      )
+      .then(() =>
+        // Chained after the log write so the "have we seen this network before?"
+        // check counts the attempt that just happened. Not awaited by the handler.
+        onSuccessfulLogin(user.id, user.email, anonymizeIp(ip))
+      )
+      .catch(() => {});
 
     // Return the response — the browser will store the cookie automatically
     return res;
-
   } catch (err) {
     // Log the unexpected error to the server console for debugging
     console.error('[login]', err);

@@ -38,7 +38,10 @@ export async function POST(req: Request) {
   if (!userId) return unauthorized();
 
   if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: 'Payouts are not configured on this site yet.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Payouts are not configured on this site yet.' },
+      { status: 503 }
+    );
   }
 
   try {
@@ -51,13 +54,15 @@ export async function POST(req: Request) {
     if (!user.stripeConnectId || !user.stripeConnectOnboarded) {
       return NextResponse.json(
         { error: 'Finish setting up payouts before withdrawing.', needsOnboarding: true },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const earnings = await getEarnings(userId);
     if (earnings.available < MIN_PAYOUT_CENTS) {
-      return badRequest(`You need at least $${(MIN_PAYOUT_CENTS / 100).toFixed(2)} available to withdraw.`);
+      return badRequest(
+        `You need at least $${(MIN_PAYOUT_CENTS / 100).toFixed(2)} available to withdraw.`
+      );
     }
 
     const amount = earnings.available;
@@ -65,7 +70,12 @@ export async function POST(req: Request) {
     // Record the intent first so the withdrawal is never invisible, even if the
     // transfer call then fails.
     const payout = await prisma.payout.create({
-      data: { authorId: userId, amountCents: amount, status: 'pending', coveredThrough: new Date() },
+      data: {
+        authorId: userId,
+        amountCents: amount,
+        status: 'pending',
+        coveredThrough: new Date(),
+      },
       select: { id: true },
     });
 
@@ -84,9 +94,13 @@ export async function POST(req: Request) {
     } catch (transferErr) {
       // Mark the payout failed so it does not sit forever as pending and is not
       // counted against the balance (getEarnings counts only `paid`).
-      await prisma.payout.update({ where: { id: payout.id }, data: { status: 'failed' } }).catch(() => {});
+      await prisma.payout
+        .update({ where: { id: payout.id }, data: { status: 'failed' } })
+        .catch(() => {});
       console.error('[POST /api/author/payout] transfer failed', transferErr);
-      return serverError('The payout could not be completed. No funds were moved; please try again later.');
+      return serverError(
+        'The payout could not be completed. No funds were moved; please try again later.'
+      );
     }
   } catch (err) {
     console.error('[POST /api/author/payout]', err);

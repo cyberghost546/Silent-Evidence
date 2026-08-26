@@ -59,9 +59,7 @@ export async function getOwnerUser<T extends Record<string, boolean>>(select: T)
  * Reasons a role change or deletion is refused. Returned rather than thrown so
  * callers can turn them into the right HTTP status and message.
  */
-export type ProtectionResult =
-  | { allowed: true }
-  | { allowed: false; reason: string };
+export type ProtectionResult = { allowed: true } | { allowed: false; reason: string };
 
 /**
  * Decides whether `targetUser` may have their role changed to `newRole`, or be
@@ -80,7 +78,7 @@ export type ProtectionResult =
 export function checkOwnerProtection(
   targetUser: { id: number; email: string; role: string },
   newRole: string | null,
-  currentAdminCount: number,
+  currentAdminCount: number
 ): ProtectionResult {
   const demotingFromAdmin = targetUser.role === 'ADMIN' && newRole !== 'ADMIN';
 

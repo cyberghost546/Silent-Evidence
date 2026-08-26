@@ -23,18 +23,25 @@ type Props = { storyId: number; categoryId: number; mood?: string | null };
 
 export default async function MoreLikeThis({ storyId, categoryId, mood }: Props) {
   // Step 1: fetch stories with the same category AND mood (skipped if mood is not set)
-  let stories = mood ? await prisma.story.findMany({
-    where: { status: 'PUBLISHED', categoryId, mood: mood as any, id: { not: storyId } },
-    orderBy: { views: 'desc' },
-    take: 3,
-    select: {
-      id: true, title: true, slug: true, coverImage: true,
-      excerpt: true, content: true, mood: true,
-      author:   { select: { username: true } },
-      category: { select: { name: true } },
-      _count:   { select: { likes: true } },
-    },
-  }) : [];
+  let stories = mood
+    ? await prisma.story.findMany({
+        where: { status: 'PUBLISHED', categoryId, mood: mood as any, id: { not: storyId } },
+        orderBy: { views: 'desc' },
+        take: 3,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          coverImage: true,
+          excerpt: true,
+          content: true,
+          mood: true,
+          author: { select: { username: true } },
+          category: { select: { name: true } },
+          _count: { select: { likes: true } },
+        },
+      })
+    : [];
 
   // Step 2: if we don't have a full 3 yet, fill with category-only matches
   if (stories.length < 3) {
@@ -43,16 +50,21 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
         status: 'PUBLISHED',
         categoryId,
         // Exclude the current story and any already fetched in step 1
-        id: { notIn: [storyId, ...stories.map(s => s.id)] },
+        id: { notIn: [storyId, ...stories.map((s) => s.id)] },
       },
       orderBy: { views: 'desc' },
       take: 3 - stories.length,
       select: {
-        id: true, title: true, slug: true, coverImage: true,
-        excerpt: true, content: true, mood: true,
-        author:   { select: { username: true } },
+        id: true,
+        title: true,
+        slug: true,
+        coverImage: true,
+        excerpt: true,
+        content: true,
+        mood: true,
+        author: { select: { username: true } },
         category: { select: { name: true } },
-        _count:   { select: { likes: true } },
+        _count: { select: { likes: true } },
       },
     });
     stories = [...stories, ...extra];
@@ -73,20 +85,34 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
 
       {/* 3-column grid of story cards */}
       <div className="grid sm:grid-cols-3 gap-4">
-        {stories.map(story => (
-          <Link key={story.id} href={`/story/${story.slug}`}
-            className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)] flex flex-col">
-
+        {stories.map((story) => (
+          <Link
+            key={story.id}
+            href={`/story/${story.slug}`}
+            className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)] flex flex-col"
+          >
             {/* Cover image area — shows mood emoji fallback when no image is set */}
             <div className="h-36 overflow-hidden relative">
               {story.coverImage ? (
-                <Image src={story.coverImage} alt={story.title} fill sizes="(max-width:640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image
+                  src={story.coverImage}
+                  alt={story.title}
+                  fill
+                  sizes="(max-width:640px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               ) : (
                 <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-900 flex items-center justify-center text-3xl">
                   {(() => {
-              const MIcon = story.mood ? moodIcon(story.mood) : BookOpen;
-              return <MIcon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
-            })()}
+                    const MIcon = story.mood ? moodIcon(story.mood) : BookOpen;
+                    return (
+                      <MIcon
+                        className="w-5 h-5 text-gray-400"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
+                    );
+                  })()}
                 </div>
               )}
               {/* Gradient overlay ensures the bottom of the image fades cleanly */}
@@ -95,7 +121,9 @@ export default async function MoreLikeThis({ storyId, categoryId, mood }: Props)
 
             {/* Card body: title, author, reading time, like count */}
             <div className="p-3 flex flex-col gap-1.5 flex-1">
-              <h3 className="text-xs font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-snug">{story.title}</h3>
+              <h3 className="text-xs font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-snug">
+                {story.title}
+              </h3>
               <div className="flex items-center gap-2 mt-auto text-xs text-gray-600">
                 <span>{story.author.username}</span>
                 <span>·</span>

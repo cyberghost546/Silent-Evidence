@@ -69,7 +69,6 @@ export default async function ChallengesPage() {
     <main className="min-h-screen bg-gray-900 text-white">
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-12">
-
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -108,14 +107,12 @@ export default async function ChallengesPage() {
               // isActive requires BOTH admin approval (c.active) AND the
               // time window to be current. Either condition alone is insufficient.
               const isActive = c.active && now >= c.startDate && now <= c.endDate;
-              const isEnded  = now > c.endDate;
+              const isEnded = now > c.endDate;
 
               // Days remaining — used in the "Xd left" badge.
               // 86400000 ms = 24 * 60 * 60 * 1000 (milliseconds in one day).
               // Math.ceil rounds up so "23 hours left" shows as "1d left" not "0d left".
-              const daysLeft = Math.ceil(
-                (c.endDate.getTime() - now.getTime()) / 86_400_000,
-              );
+              const daysLeft = Math.ceil((c.endDate.getTime() - now.getTime()) / 86_400_000);
 
               return (
                 // Entire card is a <Link> — clicking anywhere navigates to the detail page
@@ -134,10 +131,10 @@ export default async function ChallengesPage() {
                     <span
                       className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
                         isEnded
-                          ? 'bg-gray-700 text-gray-400'                              // Grey: ended
+                          ? 'bg-gray-700 text-gray-400' // Grey: ended
                           : isActive
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/30' // Green: active
-                          : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' // Yellow: upcoming
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/30' // Green: active
+                            : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' // Yellow: upcoming
                       }`}
                     >
                       {/* Ternary chain: Ended → "Xd left" → "Upcoming" */}
@@ -161,7 +158,7 @@ export default async function ChallengesPage() {
                   <div className="flex items-center gap-4 text-xs text-gray-500">
                     {/* Short date format: "Apr 1 – Apr 30, 2026" */}
                     <span>
-{' '}
+                      {' '}
                       {new Date(c.startDate).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -176,8 +173,7 @@ export default async function ChallengesPage() {
                     <span>·</span>
                     {/* Proper singular/plural: "1 entry" vs "5 entries" */}
                     <span>
- {c._count.entries}{' '}
-                      {c._count.entries === 1 ? 'entry' : 'entries'}
+                      {c._count.entries} {c._count.entries === 1 ? 'entry' : 'entries'}
                     </span>
                   </div>
                 </Link>

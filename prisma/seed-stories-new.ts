@@ -37,7 +37,16 @@ type Seed = {
   slug: string;
   title: string;
   categorySlug: string;
-  mood: 'CREEPY' | 'PARANOID' | 'DISTURBING' | 'ATMOSPHERIC' | 'PSYCHOLOGICAL' | 'SUPERNATURAL' | 'GORE' | 'JUMPSCARE' | 'DARK';
+  mood:
+    | 'CREEPY'
+    | 'PARANOID'
+    | 'DISTURBING'
+    | 'ATMOSPHERIC'
+    | 'PSYCHOLOGICAL'
+    | 'SUPERNATURAL'
+    | 'GORE'
+    | 'JUMPSCARE'
+    | 'DARK';
   contentRating: 'ALL' | 'TEEN' | 'MATURE';
   warnings?: string[];
   excerpt: string;
@@ -52,7 +61,8 @@ const stories: Seed[] = [
     categorySlug: 'surveillance-horror',
     mood: 'PARANOID',
     contentRating: 'TEEN',
-    excerpt: 'The motion sensor triggered on an empty corridor. Then it stopped triggering, which was worse.',
+    excerpt:
+      'The motion sensor triggered on an empty corridor. Then it stopped triggering, which was worse.',
     content: `<p>The building had nineteen cameras and I watched all of them, which is a way of saying I watched none of them. Nineteen grey rectangles, nineteen empty corridors, nine hours a night. You learn to see the shape of nothing happening. You learn it so well that the first time something does, you almost miss it.</p>
 <p>Camera 12 covered the east stairwell between the third and fourth floors. It was motion-triggered, which meant it sat dark until something moved and then flared into life with a soft click I felt in my teeth. Most nights it clicked four times: the cleaner going up at eleven, the cleaner coming down at midnight, and twice more for the moths that got into the stairwell in summer.</p>
 <p>On the fourteenth of March it clicked at 3:40 a.m. and showed me an empty stairwell.</p>
@@ -77,7 +87,8 @@ const stories: Seed[] = [
     categorySlug: 'haunted-dolls',
     mood: 'CREEPY',
     contentRating: 'TEEN',
-    excerpt: 'My daughter named the doll before we told her its name. We had never told her its name.',
+    excerpt:
+      'My daughter named the doll before we told her its name. We had never told her its name.',
     content: `<p>The doll came with the house, in the way that damp and bad wiring come with a house. She was in the cupboard under the stairs when we did the survey, sitting upright on a shelf with her hands in her lap, and the surveyor made a joke about her that neither of us laughed at.</p>
 <p>My wife wanted to bin her. I said she was probably Victorian and probably worth something, which was my way of saying I did not want to be the person who threw her away.</p>
 <p>Ellie was four. Ellie found her before either of us had decided anything.</p>
@@ -104,7 +115,8 @@ const stories: Seed[] = [
     categorySlug: 'missing-persons',
     mood: 'DARK',
     contentRating: 'TEEN',
-    excerpt: 'The mountain lodge required every guest to sign out. For forty-one days, someone had signed in and never signed out.',
+    excerpt:
+      'The mountain lodge required every guest to sign out. For forty-one days, someone had signed in and never signed out.',
     content: `<p>The Bridehollow Lodge keeps a register because the mountain kills people who do not tell anyone where they have gone. You sign in with your name and your intended route. You sign out when you come back. If you do not sign out by nine in the evening, somebody with a radio starts making calls, and if you turn up alive afterwards you buy that person a drink and take the ribbing.</p>
 <p>It has worked since 1963. It is a good system, because it is a stupid system, and stupid systems do not fail in clever ways.</p>
 <p>I took over as warden in the September. Part of the handover was the register, four decades of it, in identical black ledgers on a shelf behind the desk. Marta showed me how to run the evening check: finger down the in-column, finger down the out-column, anything unmatched gets a phone call.</p>
@@ -133,7 +145,8 @@ const stories: Seed[] = [
     categorySlug: 'cursed-media',
     mood: 'ATMOSPHERIC',
     contentRating: 'TEEN',
-    excerpt: 'The album has ten tracks. Every pressing, every format, every country. Ask anyone who owns one about track eleven.',
+    excerpt:
+      'The album has ten tracks. Every pressing, every format, every country. Ask anyone who owns one about track eleven.',
     content: `<p>I collect dead formats. Minidiscs, DCC, eight-track, the brief unhappy life of the DataPlay disc. It is a hobby for people who like objects more than they like music, and I say that as someone who owns four hundred of them.</p>
 <p>The record is <em>Low Country</em> by an English folk duo who released it in 1978, sold perhaps nine hundred copies, and separated the following year. It has ten tracks. I want to be precise about this because everything else I am going to say depends on it. The sleeve lists ten. The label lists ten. The master tapes, which are in a climate-controlled room in Wapping and which I have held in my own hands, contain ten.</p>
 <p>In 2011 a man in Ghent posted on a forum asking whether anyone else&rsquo;s copy had an eleventh.</p>
@@ -157,7 +170,8 @@ const stories: Seed[] = [
     categorySlug: 'paranoia',
     mood: 'PSYCHOLOGICAL',
     contentRating: 'TEEN',
-    excerpt: 'He stands at his window at seven every evening, and his lips move, and I have finally worked out what he is counting.',
+    excerpt:
+      'He stands at his window at seven every evening, and his lips move, and I have finally worked out what he is counting.',
     content: `<p>I am going to set this down plainly, because when I say it out loud it sounds like something a person says shortly before they are taken somewhere, and I would like there to be a version on paper that does not have my voice shaking in it.</p>
 <p>The man at number 41 stands at his front window every evening at seven. He has done this for the eleven months I have lived here. He does not look at anything. He faces the street, and his hands are at his sides, and his lips move.</p>
 <p>For the first three months I did not notice. For the next three I noticed and did not think about it, which is a different thing. People are strange in small ways. My own mother tapped door frames.</p>
@@ -183,7 +197,8 @@ const stories: Seed[] = [
     categorySlug: 'sea-monsters',
     mood: 'ATMOSPHERIC',
     contentRating: 'TEEN',
-    excerpt: 'The seabed was charted at ninety metres. The echo sounder read ninety metres. Then it read forty. Then it read forty again, nine miles later.',
+    excerpt:
+      'The seabed was charted at ninety metres. The echo sounder read ninety metres. Then it read forty. Then it read forty again, nine miles later.',
     content: `<p>An echo sounder is an honest instrument. It sends a pulse down, it listens for the pulse coming back, and it does arithmetic that a child could check. It does not have opinions. When people talk about the sea being unknowable they are being romantic; the sea is extremely knowable, and we have known most of it for a hundred years, and the charts are very good.</p>
 <p>The Dunmarra Deep is charted at ninety-one metres for eleven miles along the shelf edge. It has been charted at ninety-one metres since 1911. It is a boring, well-behaved piece of water and we ran survey lines across it for six weeks without a single interesting thing happening.</p>
 <p>On the twenty-third the sounder read forty-three metres.</p>
@@ -209,7 +224,8 @@ const stories: Seed[] = [
     mood: 'DISTURBING',
     contentRating: 'MATURE',
     warnings: ['Death of a child (historical, off-page)', 'Institutional cruelty'],
-    excerpt: 'The workhouse ledger recorded every child admitted and every child discharged. The numbers balanced perfectly, which was the problem.',
+    excerpt:
+      'The workhouse ledger recorded every child admitted and every child discharged. The numbers balanced perfectly, which was the problem.',
     content: `<p>The Salford Union workhouse kept its books the way all such places kept their books, which is to say meticulously and without mercy. Admissions on the left. Discharges on the right. Deaths in a third column, narrow, ruled in red, as though the width of the column were a comment on how often it was expected to be needed.</p>
 <p>I was engaged in 1974 by the county archive to catalogue eleven boxes of such ledgers, and I was, at the time, a young man who believed that history was a thing that had finished happening.</p>
 <p>The hand belonging to Mercy Bright, matron between 1868 and 1881, is beautiful. That is the first thing anyone notices. Copperplate of the kind they beat into girls, every letter identical, the pressure never varying, the columns ruled by eye and true to the millimetre. Thirteen years of it without a blot.</p>
@@ -278,7 +294,10 @@ async function main() {
     }
 
     // Idempotent: a slug that already exists is left exactly as it is.
-    const existing = await prisma.story.findFirst({ where: { slug: s.slug }, select: { id: true } });
+    const existing = await prisma.story.findFirst({
+      where: { slug: s.slug },
+      select: { id: true },
+    });
     if (existing) {
       console.warn(`  · already exists: "${s.title}"`);
       skipped++;

@@ -21,12 +21,52 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
-  LayoutDashboard, Users, BookOpen, Bot, Flag, AlertTriangle, ShieldCheck, Map,
-  TrendingUp, Filter, Swords, Images, Tags, Megaphone, Trophy, Mail, LifeBuoy, Newspaper,
-  MessageSquare, Package, PenLine, Cookie, BadgeCheck, DollarSign, Crown, Ban,
-  ShieldAlert, Search, Tag, Clock, Send, HeartPulse, Moon, Star, Flashlight,
-  BarChart3, ClipboardList, Calendar, MailOpen, Globe, Flame, Gauge, Settings,
-  GitMerge, ShieldX, Gavel,
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  Bot,
+  Flag,
+  AlertTriangle,
+  ShieldCheck,
+  Map,
+  TrendingUp,
+  Filter,
+  Swords,
+  Images,
+  Tags,
+  Megaphone,
+  Trophy,
+  Mail,
+  LifeBuoy,
+  Newspaper,
+  MessageSquare,
+  Package,
+  PenLine,
+  Cookie,
+  BadgeCheck,
+  DollarSign,
+  Crown,
+  Ban,
+  ShieldAlert,
+  Search,
+  Tag,
+  Clock,
+  Send,
+  HeartPulse,
+  Moon,
+  Star,
+  Flashlight,
+  BarChart3,
+  ClipboardList,
+  Calendar,
+  MailOpen,
+  Globe,
+  Flame,
+  Gauge,
+  Settings,
+  GitMerge,
+  ShieldX,
+  Gavel,
 } from 'lucide-react';
 
 // links — the full list of admin navigation items.
@@ -35,55 +75,55 @@ import {
 //   label — human-readable name shown in the sidebar
 //   icon  — a lucide-react icon component rendered to the left of the label
 const links = [
-  { href: '/admin',                 label: 'Overview',            icon: LayoutDashboard },
-  { href: '/admin/users',           label: 'Users',               icon: Users },
-  { href: '/admin/stories',         label: 'Stories',             icon: BookOpen },
-  { href: '/admin/generate',        label: 'AI Generator',        icon: Bot },
-  { href: '/admin/comments',        label: 'Moderation',          icon: Flag },
-  { href: '/admin/reports',         label: 'Reports',             icon: AlertTriangle },
-  { href: '/admin/appeals',         label: 'Appeals',             icon: Gavel },
-  { href: '/admin/login-logs',      label: 'Login Logs',          icon: ShieldCheck },
-  { href: '/admin/login-map',       label: 'Login Map',           icon: Map },
-  { href: '/admin/security',        label: 'Security',            icon: ShieldAlert },
-  { href: '/admin/analytics',       label: 'Analytics',           icon: TrendingUp },
-  { href: '/admin/funnel',          label: 'Conversion Funnel',   icon: Filter },
-  { href: '/admin/challenges',      label: 'Challenges',          icon: Swords },
-  { href: '/admin/slides',          label: 'Slideshow',           icon: Images },
-  { href: '/admin/categories',      label: 'Categories',          icon: Tags },
-  { href: '/admin/announcement',    label: 'Announcement',        icon: Megaphone },
-  { href: '/admin/story-of-week',   label: 'Story of Week',       icon: Trophy },
-  { href: '/admin/contact',         label: 'Contact Inbox',       icon: Mail },
-  { href: '/admin/user-support',    label: 'User Support',        icon: LifeBuoy },
-  { href: '/admin/newsletter',      label: 'Newsletter',          icon: Newspaper },
-  { href: '/admin/digest',          label: 'Comment Digest',      icon: MessageSquare },
-  { href: '/admin/bundles',         label: 'Bundles',             icon: Package },
-  { href: '/admin/prompts',         label: 'Writing Prompts',     icon: PenLine },
-  { href: '/admin/cookies',         label: 'Cookie Consent',      icon: Cookie },
+  { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/users', label: 'Users', icon: Users },
+  { href: '/admin/stories', label: 'Stories', icon: BookOpen },
+  { href: '/admin/generate', label: 'AI Generator', icon: Bot },
+  { href: '/admin/comments', label: 'Moderation', icon: Flag },
+  { href: '/admin/reports', label: 'Reports', icon: AlertTriangle },
+  { href: '/admin/appeals', label: 'Appeals', icon: Gavel },
+  { href: '/admin/login-logs', label: 'Login Logs', icon: ShieldCheck },
+  { href: '/admin/login-map', label: 'Login Map', icon: Map },
+  { href: '/admin/security', label: 'Security', icon: ShieldAlert },
+  { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
+  { href: '/admin/funnel', label: 'Conversion Funnel', icon: Filter },
+  { href: '/admin/challenges', label: 'Challenges', icon: Swords },
+  { href: '/admin/slides', label: 'Slideshow', icon: Images },
+  { href: '/admin/categories', label: 'Categories', icon: Tags },
+  { href: '/admin/announcement', label: 'Announcement', icon: Megaphone },
+  { href: '/admin/story-of-week', label: 'Story of Week', icon: Trophy },
+  { href: '/admin/contact', label: 'Contact Inbox', icon: Mail },
+  { href: '/admin/user-support', label: 'User Support', icon: LifeBuoy },
+  { href: '/admin/newsletter', label: 'Newsletter', icon: Newspaper },
+  { href: '/admin/digest', label: 'Comment Digest', icon: MessageSquare },
+  { href: '/admin/bundles', label: 'Bundles', icon: Package },
+  { href: '/admin/prompts', label: 'Writing Prompts', icon: PenLine },
+  { href: '/admin/cookies', label: 'Cookie Consent', icon: Cookie },
   // ── New pages ──
-  { href: '/admin/verification',    label: 'Verification',        icon: BadgeCheck },
-  { href: '/admin/revenue',         label: 'Revenue',             icon: DollarSign },
-  { href: '/admin/premium',         label: 'Premium Members',     icon: Crown },
-  { href: '/admin/banned-words',    label: 'Content Filter',      icon: Ban },
-  { href: '/admin/warnings',        label: 'Warnings & Bans',     icon: ShieldAlert },
-  { href: '/admin/search',          label: 'Admin Search',        icon: Search },
-  { href: '/admin/tags',            label: 'Tag Manager',         icon: Tag },
-  { href: '/admin/scheduled',       label: 'Scheduled Stories',   icon: Clock },
-  { href: '/admin/email-log',       label: 'Email Log',           icon: Send },
-  { href: '/admin/health',          label: 'Site Health',         icon: HeartPulse },
-  { href: '/admin/mood',            label: 'Mood of Day',         icon: Moon },
-  { href: '/admin/featured-authors',label: 'Featured Authors',    icon: Star },
-  { href: '/admin/spotlight',       label: 'Story Spotlight',     icon: Flashlight },
-  { href: '/admin/polls',           label: 'Poll Manager',        icon: BarChart3 },
-  { href: '/admin/audit-log',       label: 'Audit Log',           icon: ClipboardList },
-  { href: '/admin/calendar',        label: 'Content Calendar',    icon: Calendar },
-  { href: '/admin/email-templates', label: 'Email Templates',     icon: MailOpen },
-  { href: '/admin/seo',             label: 'SEO Dashboard',       icon: Globe },
-  { href: '/admin/heatmap',         label: 'Activity Heatmap',    icon: Flame },
-  { href: '/admin/rate-limits',     label: 'Rate Limits',         icon: Gauge },
-  { href: '/admin/settings',        label: 'Site Settings',       icon: Settings },
-  { href: '/admin/merge',           label: 'Merge Stories',       icon: GitMerge },
-  { href: '/admin/toxicity',        label: 'AI Toxicity Queue',   icon: Bot },
-  { href: '/admin/ip-blocklist',    label: 'IP Blocklist',        icon: ShieldX },
+  { href: '/admin/verification', label: 'Verification', icon: BadgeCheck },
+  { href: '/admin/revenue', label: 'Revenue', icon: DollarSign },
+  { href: '/admin/premium', label: 'Premium Members', icon: Crown },
+  { href: '/admin/banned-words', label: 'Content Filter', icon: Ban },
+  { href: '/admin/warnings', label: 'Warnings & Bans', icon: ShieldAlert },
+  { href: '/admin/search', label: 'Admin Search', icon: Search },
+  { href: '/admin/tags', label: 'Tag Manager', icon: Tag },
+  { href: '/admin/scheduled', label: 'Scheduled Stories', icon: Clock },
+  { href: '/admin/email-log', label: 'Email Log', icon: Send },
+  { href: '/admin/health', label: 'Site Health', icon: HeartPulse },
+  { href: '/admin/mood', label: 'Mood of Day', icon: Moon },
+  { href: '/admin/featured-authors', label: 'Featured Authors', icon: Star },
+  { href: '/admin/spotlight', label: 'Story Spotlight', icon: Flashlight },
+  { href: '/admin/polls', label: 'Poll Manager', icon: BarChart3 },
+  { href: '/admin/audit-log', label: 'Audit Log', icon: ClipboardList },
+  { href: '/admin/calendar', label: 'Content Calendar', icon: Calendar },
+  { href: '/admin/email-templates', label: 'Email Templates', icon: MailOpen },
+  { href: '/admin/seo', label: 'SEO Dashboard', icon: Globe },
+  { href: '/admin/heatmap', label: 'Activity Heatmap', icon: Flame },
+  { href: '/admin/rate-limits', label: 'Rate Limits', icon: Gauge },
+  { href: '/admin/settings', label: 'Site Settings', icon: Settings },
+  { href: '/admin/merge', label: 'Merge Stories', icon: GitMerge },
+  { href: '/admin/toxicity', label: 'AI Toxicity Queue', icon: Bot },
+  { href: '/admin/ip-blocklist', label: 'IP Blocklist', icon: ShieldX },
 ];
 
 export default function AdminSidebar({ username }: { username: string }) {
@@ -107,7 +147,13 @@ export default function AdminSidebar({ username }: { username: string }) {
           className="md:hidden p-1 text-gray-500 hover:text-white transition"
           aria-label="Close menu"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -143,7 +189,13 @@ export default function AdminSidebar({ username }: { username: string }) {
                      bg-gray-800 border border-gray-700 text-gray-300
                      hover:bg-gray-700 hover:text-white transition"
         >
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-4 h-4 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back to Site
@@ -165,7 +217,13 @@ export default function AdminSidebar({ username }: { username: string }) {
           aria-label="Open menu"
           className="p-1 text-gray-400 hover:text-white transition"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -181,12 +239,14 @@ export default function AdminSidebar({ username }: { username: string }) {
       )}
 
       {/* Sidebar — always visible on desktop, slide-in on mobile */}
-      <aside className={`
+      <aside
+        className={`
         fixed top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50
         transition-transform duration-300
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
-      `}>
+      `}
+      >
         {sidebarContent}
       </aside>
     </>

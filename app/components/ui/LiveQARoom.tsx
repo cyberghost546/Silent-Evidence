@@ -50,24 +50,23 @@ import { formatDistanceToNow } from 'date-fns';
 // Shape of a single Q&A question as returned by the API.
 interface Question {
   id: number;
-  question: string;          // the reader's question text
-  answer: string | null;     // the author's reply, or null if unanswered
-  isAnonymous: boolean;      // whether the questioner chose to remain anonymous
-  upvotes: number;           // number of upvotes from other readers
-  answered: boolean;         // convenience flag — true when answer is non-null
-  createdAt: string;         // ISO timestamp string
+  question: string; // the reader's question text
+  answer: string | null; // the author's reply, or null if unanswered
+  isAnonymous: boolean; // whether the questioner chose to remain anonymous
+  upvotes: number; // number of upvotes from other readers
+  answered: boolean; // convenience flag — true when answer is non-null
+  createdAt: string; // ISO timestamp string
 }
 
 // Props accepted by this component.
 interface Props {
-  sessionId: number;         // scopes all API calls to this session
-  title: string;             // session title shown in the header card
-  authorUsername: string;    // displayed next to posted answers
-  isAuthor: boolean;         // switches between reader view and author view
+  sessionId: number; // scopes all API calls to this session
+  title: string; // session title shown in the header card
+  authorUsername: string; // displayed next to posted answers
+  isAuthor: boolean; // switches between reader view and author view
 }
 
 export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor }: Props) {
-
   // ── State ─────────────────────────────────────────────────────────────────
 
   // Full list of questions for this session (polled every 10 seconds).
@@ -103,9 +102,9 @@ export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor 
   // appear without refreshing the page. The cleanup function stops the interval
   // when the component unmounts to avoid memory leaks.
   useEffect(() => {
-    load();                                     // fetch immediately on mount
+    load(); // fetch immediately on mount
     const interval = setInterval(load, 10_000); // then every 10 seconds
-    return () => clearInterval(interval);       // cleanup on unmount
+    return () => clearInterval(interval); // cleanup on unmount
   }, [load]); // re-run if `load` changes (i.e. if sessionId changes)
 
   // ── submitQuestion: POST a new question to the API ────────────────────────
@@ -135,8 +134,8 @@ export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor 
         return;
       }
 
-      setDraft('');  // clear the compose box on success
-      load();        // immediately refresh to show the new question
+      setDraft(''); // clear the compose box on success
+      load(); // immediately refresh to show the new question
     } finally {
       setSubmitting(false); // always re-enable the button
     }
@@ -181,14 +180,13 @@ export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor 
   // Split questions into two display groups so the author can see which still
   // need responses and readers can read completed exchanges.
   const unanswered = questions.filter((q) => !q.answered);
-  const answered   = questions.filter((q) =>  q.answered);
+  const answered = questions.filter((q) => q.answered);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     // space-y-6 — vertical rhythm between the session header, compose box,
     // unanswered section, and answered section.
     <div className="space-y-6">
-
       {/* ── Session header card ────────────────────────────────────────────── */}
       {/* Shows the "LIVE" indicator, session title, and question/host info. */}
       <div className="bg-gray-900 border border-red-900/40 rounded-2xl p-5">
@@ -226,7 +224,6 @@ export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor 
 
           {/* Row: anonymous toggle + submit button */}
           <div className="flex items-center justify-between mt-3">
-
             {/* Anonymous checkbox — accent-red-700 applies the brand colour to the
                 native checkbox in supporting browsers (Chrome/Edge). */}
             <label className="flex items-center gap-2 cursor-pointer">
@@ -265,7 +262,6 @@ export default function LiveQARoom({ sessionId, title, authorUsername, isAuthor 
           <div className="space-y-3">
             {unanswered.map((q) => (
               <div key={q.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-
                 {/* Question text + upvote button */}
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-gray-200 text-sm flex-1">{q.question}</p>

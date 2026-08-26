@@ -70,7 +70,8 @@ export default async function BundlesPage() {
           </p>
           <h1 className="text-4xl font-black text-white mb-3">Story Bundles</h1>
           <p className="text-gray-400 max-w-lg mx-auto">
-            Hand-picked collections of the finest horror stories. Buy a bundle and get everything inside.
+            Hand-picked collections of the finest horror stories. Buy a bundle and get everything
+            inside.
           </p>
         </div>
       </div>
@@ -91,7 +92,7 @@ export default async function BundlesPage() {
           // lg:grid-cols-3   → 3 columns on large screens (≥1024px)
           // On mobile (<640px) the grid collapses to a single column by default.
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bundles.map(bundle => (
+            {bundles.map((bundle) => (
               // The entire card is a <Link> so clicking anywhere navigates.
               // group class enables group-hover:* utilities on children.
               <Link
@@ -119,7 +120,13 @@ export default async function BundlesPage() {
                       {bundle.items.slice(0, 3).map((item, i) => (
                         <div key={i} className="relative flex-1 overflow-hidden">
                           {item.story.coverImage ? (
-                            <Image src={item.story.coverImage} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-cover" />
+                            <Image
+                              src={item.story.coverImage}
+                              alt=""
+                              fill
+                              sizes="(max-width: 640px) 33vw, 20vw"
+                              className="object-cover"
+                            />
                           ) : (
                             // Gradient placeholder when a story also has no cover
                             <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />

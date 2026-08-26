@@ -15,19 +15,23 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 interface Props {
   chapterId: number;
   chapterTitle: string;
-  priceInCents: number;  // e.g. 99 = $0.99
+  priceInCents: number; // e.g. 99 = $0.99
 }
 
 // ── Inner form — rendered inside the Stripe <Elements> provider ──────────────
-function CheckoutForm({ chapterId, priceInCents, onSuccess }: {
+function CheckoutForm({
+  chapterId,
+  priceInCents,
+  onSuccess,
+}: {
   chapterId: number;
   priceInCents: number;
   onSuccess: () => void;
 }) {
-  const stripe   = useStripe();
+  const stripe = useStripe();
   const elements = useElements();
   const [processing, setProcessing] = useState(false);
-  const [error, setError]           = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +43,7 @@ function CheckoutForm({ chapterId, priceInCents, onSuccess }: {
     // Confirm the payment with Stripe using the card details entered
     const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
       elements,
-      redirect: 'if_required',  // Don't redirect — stay on page
+      redirect: 'if_required', // Don't redirect — stay on page
     });
 
     if (stripeError) {
@@ -71,9 +75,7 @@ function CheckoutForm({ chapterId, priceInCents, onSuccess }: {
         disabled={processing || !stripe}
         className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition"
       >
-        {processing
-          ? 'Processing...'
-          : `Pay $${(priceInCents / 100).toFixed(2)} — Unlock Chapter`}
+        {processing ? 'Processing...' : `Pay $${(priceInCents / 100).toFixed(2)} — Unlock Chapter`}
       </button>
     </form>
   );
@@ -83,14 +85,16 @@ function CheckoutForm({ chapterId, priceInCents, onSuccess }: {
 export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCents }: Props) {
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [loading, setLoading]           = useState(false);
-  const [purchased, setPurchased]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [purchased, setPurchased] = useState(false);
 
   // Check if already purchased on mount
   useEffect(() => {
     fetch(`/api/chapters/${chapterId}/purchase`)
-      .then(r => r.json())
-      .then(d => { if (d.purchased) setPurchased(true); });
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.purchased) setPurchased(true);
+      });
   }, [chapterId]);
 
   // Request a PaymentIntent from the server
@@ -111,9 +115,7 @@ export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCe
     <div className="my-8 border border-red-500/30 bg-red-500/5 rounded-2xl p-6 text-center">
       {/* Lock icon */}
 
-      <h3 className="text-lg font-bold text-white mb-1">
-        {chapterTitle} — Premium Chapter
-      </h3>
+      <h3 className="text-lg font-bold text-white mb-1">{chapterTitle} — Premium Chapter</h3>
       <p className="text-gray-400 text-sm mb-4">
         Unlock this chapter for a one-time payment of{' '}
         <span className="text-white font-semibold">${(priceInCents / 100).toFixed(2)}</span>
@@ -131,7 +133,10 @@ export default function ChapterPurchaseGate({ chapterId, chapterTitle, priceInCe
       ) : (
         // Show Stripe payment form once we have a clientSecret
         <div className="max-w-sm mx-auto text-left mt-4">
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
+          <Elements
+            stripe={stripePromise}
+            options={{ clientSecret, appearance: { theme: 'night' } }}
+          >
             <CheckoutForm
               chapterId={chapterId}
               priceInCents={priceInCents}

@@ -9,7 +9,13 @@ dotenv.config();
 
 function parseDbUrl() {
   const url = new URL(process.env.DATABASE_URL!);
-  return { host: url.hostname, port: parseInt(url.port) || 3306, user: url.username, password: url.password, database: url.pathname.slice(1) };
+  return {
+    host: url.hostname,
+    port: parseInt(url.port) || 3306,
+    user: url.username,
+    password: url.password,
+    database: url.pathname.slice(1),
+  };
 }
 
 const prisma = new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
@@ -41,7 +47,9 @@ async function main() {
     author = await prisma.user.findFirst();
   }
   if (!author) {
-    console.error('No users found in the database. Create an account first, then re-run this script.');
+    console.error(
+      'No users found in the database. Create an account first, then re-run this script.'
+    );
     process.exit(1);
   }
   console.log(`Using author: ${author.username} (id=${author.id})`);
@@ -53,7 +61,8 @@ async function main() {
       slug: 'the-last-light-on-hollow-street',
       categorySlug: 'supernatural',
       mood: Mood.ATMOSPHERIC,
-      excerpt: 'Every night at midnight, a single light flickers on in the abandoned house at the end of Hollow Street. No one has lived there in thirty years.',
+      excerpt:
+        'Every night at midnight, a single light flickers on in the abandoned house at the end of Hollow Street. No one has lived there in thirty years.',
       content: `<p>Every night at midnight, a single light flickered on in the abandoned house at the end of Hollow Street.</p>
 
 <p>Nobody knew how. The electricity had been shut off in 1994. The property taxes hadn't been paid since before the Millburn family disappeared—all four of them, without a single trace, on a Tuesday evening in October.</p>
@@ -101,7 +110,8 @@ async function main() {
       slug: 'what-the-mirror-remembers',
       categorySlug: 'psychological',
       mood: Mood.DISTURBING,
-      excerpt: 'After her husband\'s death, Clara notices the old mirror in the hallway shows her rooms the way they used to look—before she changed everything.',
+      excerpt:
+        "After her husband's death, Clara notices the old mirror in the hallway shows her rooms the way they used to look—before she changed everything.",
       content: `<p>Clara noticed it first on a Wednesday, three weeks after the funeral.</p>
 
 <p>She was walking past the hallway mirror—the old oval one with the tarnished silver frame that Edward had found at an estate sale and insisted on keeping even though she'd always found it unsettling—when she stopped.</p>
@@ -143,7 +153,8 @@ async function main() {
       slug: 'the-cartographer-of-dead-places',
       categorySlug: 'cosmic-horror',
       mood: Mood.ATMOSPHERIC,
-      excerpt: 'He made maps of places that no longer existed. Then one of his maps showed a place that hadn\'t been destroyed yet.',
+      excerpt:
+        "He made maps of places that no longer existed. Then one of his maps showed a place that hadn't been destroyed yet.",
       content: `<p>Elias made maps of places that no longer existed.</p>
 
 <p>Ghost towns. Submerged villages. Cities erased by fire or flood or the slow indifference of time. He called himself a cartographer of dead places, and he was very good at his work. His maps hung in three university libraries and one museum that had paid an embarrassing amount of money for a rendering of a Romanian village swallowed by a reservoir in 1966.</p>
@@ -183,7 +194,8 @@ async function main() {
       slug: 'thirty-three-steps',
       categorySlug: 'paranormal',
       mood: Mood.ATMOSPHERIC,
-      excerpt: 'The staircase in the old hotel has thirty-three steps. Everyone who counts them agrees. Except the people who make it to the top.',
+      excerpt:
+        'The staircase in the old hotel has thirty-three steps. Everyone who counts them agrees. Except the people who make it to the top.',
       content: `<p>The Ashford Hotel had three floors, a grand staircase, and thirty-three steps.</p>
 
 <p>Everyone agreed on this. The building inspector who'd certified the hotel in 1923 had counted thirty-three. The renovation team in 1987 had counted thirty-three. The paranormal enthusiasts who visited every October counted thirty-three, and argued about it on their forums, and came back the next year and counted thirty-three again.</p>
@@ -231,7 +243,8 @@ async function main() {
       slug: 'the-tenant-in-room-4',
       categorySlug: 'gothic',
       mood: Mood.DARK,
-      excerpt: 'The landlady said Room 4 had been empty for years. The smell coming from under the door suggested otherwise.',
+      excerpt:
+        'The landlady said Room 4 had been empty for years. The smell coming from under the door suggested otherwise.',
       content: `<p>The landlady said Room 4 had been empty for two years.</p>
 
 <p>She said this quickly, with her eyes on the key rack instead of on Nora, and Nora was a journalist and noticed things like that. She also noticed the smell that came from under the door of Room 4 when she walked past it: damp wood and something sweet and slightly wrong, like fruit left too long in a warm room.</p>
@@ -289,15 +302,15 @@ async function main() {
 
     const story = await prisma.story.create({
       data: {
-        title:      s.title,
+        title: s.title,
         slug,
-        content:    s.content,
-        excerpt:    s.excerpt,
+        content: s.content,
+        excerpt: s.excerpt,
         coverImage: s.coverImage,
-        status:     'PUBLISHED',
-        featured:   s.featured,
-        mood:       s.mood,
-        authorId:   author.id,
+        status: 'PUBLISHED',
+        featured: s.featured,
+        mood: s.mood,
+        authorId: author.id,
         categoryId: categories[s.categorySlug],
       },
     });
@@ -358,5 +371,8 @@ async function main() {
 }
 
 main()
-  .catch(e => { console.error(e); process.exit(1); })
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
   .finally(() => prisma.$disconnect());

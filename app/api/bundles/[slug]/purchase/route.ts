@@ -21,13 +21,15 @@ export async function POST(_req: Request, { params }: { params: Promise<{ slug: 
     select: { id: true, title: true, price: true, coverImage: true },
   });
   if (!bundle) return NextResponse.json({ error: 'Bundle not found.' }, { status: 404 });
-  if (bundle.price <= 0) return NextResponse.json({ error: 'This bundle is free.' }, { status: 400 });
+  if (bundle.price <= 0)
+    return NextResponse.json({ error: 'This bundle is free.' }, { status: 400 });
 
   // Check if user already bought this bundle
   const existing = await prisma.bundlePurchase.findUnique({
     where: { userId_bundleId: { userId, bundleId: bundle.id } },
   });
-  if (existing) return NextResponse.json({ error: 'You already own this bundle.' }, { status: 409 });
+  if (existing)
+    return NextResponse.json({ error: 'You already own this bundle.' }, { status: 409 });
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
 
@@ -55,7 +57,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ slug: 
       bundleSlug: slug,
     },
     success_url: `${BASE_URL}/bundles/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${BASE_URL}/bundle/${slug}`,
+    cancel_url: `${BASE_URL}/bundle/${slug}`,
   });
 
   return NextResponse.json({ url: session.url });

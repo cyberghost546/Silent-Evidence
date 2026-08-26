@@ -12,16 +12,16 @@
 //   2. Translation bar — always shown, lets readers pick a language
 //   3. Story body — split on double-newline to create paragraph elements
 
-import { useState } from 'react';            // useState — manages the currently displayed content / excerpt
+import { useState } from 'react'; // useState — manages the currently displayed content / excerpt
 import TranslateStory from './TranslateStory'; // TranslateStory — the language picker + translate/reset controls
 import ReadingPreferences from './ReadingPreferences'; // per-reader font / size / spacing / theme controls
 import StoryNarration from './StoryNarration'; // browser text-to-speech 'Listen' player
 
 // Props passed in from the story page server component
 type Props = {
-  content: string;          // raw HTML body of the story (from TipTap / the DB)
-  excerpt?: string | null;  // optional short description shown above the body
-  storyLang?: string;       // BCP-47 language code of the original story (default: 'en')
+  content: string; // raw HTML body of the story (from TipTap / the DB)
+  excerpt?: string | null; // optional short description shown above the body
+  storyLang?: string; // BCP-47 language code of the original story (default: 'en')
 };
 
 export default function StoryContent({ content, excerpt, storyLang = 'en' }: Props) {
@@ -36,14 +36,14 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
   // handleTranslated — called by TranslateStory when a translation succeeds.
   // Swaps both the body content and (if available) the excerpt with translated versions.
   const handleTranslated = (newContent: string, newExcerpt: string | null) => {
-    setDisplayContent(newContent);                 // swap the body text to the translation
+    setDisplayContent(newContent); // swap the body text to the translation
     if (newExcerpt) setDisplayExcerpt(newExcerpt); // also swap the excerpt if one was translated
   };
 
   // handleReset — called by TranslateStory when the user clicks "Show original".
   // Restores both the body and excerpt back to the values that came from the server.
   const handleReset = () => {
-    setDisplayContent(content);       // revert body to the original prop value
+    setDisplayContent(content); // revert body to the original prop value
     setDisplayExcerpt(excerpt ?? null); // revert excerpt to the original prop value (or null)
   };
 
@@ -67,11 +67,11 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
           separate it from the excerpt above and the story body below.         */}
       <div className="my-6 flex items-center gap-3 py-3 border-y border-gray-800">
         <TranslateStory
-          originalContent={content}           // pass the ORIGINAL prop (not the translated state)
-          originalExcerpt={excerpt}           // pass the ORIGINAL excerpt so we can always re-translate
-          storyLang={storyLang}               // tells the picker which language to exclude from the dropdown
-          onTranslated={handleTranslated}     // called with translated strings on success
-          onReset={handleReset}               // called when user reverts to the original
+          originalContent={content} // pass the ORIGINAL prop (not the translated state)
+          originalExcerpt={excerpt} // pass the ORIGINAL excerpt so we can always re-translate
+          storyLang={storyLang} // tells the picker which language to exclude from the dropdown
+          onTranslated={handleTranslated} // called with translated strings on success
+          onReset={handleReset} // called when user reverts to the original
         />
         {/* Listen (browser text-to-speech) and per-reader font / size / spacing /
             theme controls. Pushed to the right to share the toolbar row with the

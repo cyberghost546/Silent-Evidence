@@ -101,7 +101,7 @@ export async function POST(req: NextRequest, { params }: Props) {
   // is safer in high-traffic situations — Prisma generates an atomic SQL UPDATE
   // which prevents a race condition if two votes arrive at the same moment.
   await prisma.challengeEntry.update({
-    where: { id: entryId },   // target this specific entry by its primary key
+    where: { id: entryId }, // target this specific entry by its primary key
     data: {
       votes: { increment: 1 }, // atomically add 1 to the current vote count
     },

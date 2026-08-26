@@ -12,12 +12,16 @@ vi.mock('@/lib/prisma', () => ({ prisma: {} }));
 import { checkOwnerProtection, isOwnerEmail } from '@/lib/owner';
 
 const OWNER = 'owner@example.com';
-const owner  = { id: 1, email: OWNER, role: 'ADMIN' };
+const owner = { id: 1, email: OWNER, role: 'ADMIN' };
 const admin2 = { id: 2, email: 'other-admin@example.com', role: 'ADMIN' };
 const member = { id: 3, email: 'reader@example.com', role: 'USER' };
 
-beforeEach(() => { process.env.OWNER_EMAIL = OWNER; });
-afterEach(() => { delete process.env.OWNER_EMAIL; });
+beforeEach(() => {
+  process.env.OWNER_EMAIL = OWNER;
+});
+afterEach(() => {
+  delete process.env.OWNER_EMAIL;
+});
 
 describe('isOwnerEmail', () => {
   it('matches the configured owner case-insensitively', () => {

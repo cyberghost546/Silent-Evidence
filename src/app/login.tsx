@@ -23,10 +23,10 @@ import { saveAuth } from '@/lib/auth';
 export default function LoginScreen() {
   const router = useRouter();
 
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
@@ -37,7 +37,7 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const res  = await apiFetch('/api/app/auth/login', {
+      const res = await apiFetch('/api/app/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email: email.trim(), password }),
       });

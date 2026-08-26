@@ -10,7 +10,12 @@ import { cache, TTL } from '@/lib/cache';
 import { readingTime } from '@/lib/readingTime';
 
 const STORY_SELECT = {
-  id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true,
+  id: true,
+  title: true,
+  slug: true,
+  excerpt: true,
+  content: true,
+  coverImage: true,
   author: { select: { username: true, profile: { select: { avatar: true } } } },
   category: { select: { name: true, slug: true } },
   _count: { select: { likes: true, comments: true } },
@@ -43,7 +48,8 @@ export default async function StoryOfTheWeek() {
 
   if (!story) return null;
 
-  const authorAvatar = story.author.profile?.avatar ??
+  const authorAvatar =
+    story.author.profile?.avatar ??
     `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
   return (
@@ -53,15 +59,17 @@ export default async function StoryOfTheWeek() {
         <span className="w-1 h-6 bg-red-600 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Story of the Week</h2>
         <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">
- This week&apos;s pick
+          This week&apos;s pick
         </span>
       </div>
 
       {/* Story card — horizontal layout on desktop */}
       <div className="group relative flex flex-col md:flex-row overflow-hidden bg-gray-800 border border-gray-700 hover:border-red-600/40 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.1)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.35)]">
-
         {/* Cover image */}
-        <Link href={`/story/${story.slug}`} className="md:w-96 h-56 md:h-auto flex-shrink-0 overflow-hidden relative block">
+        <Link
+          href={`/story/${story.slug}`}
+          className="md:w-96 h-56 md:h-auto flex-shrink-0 overflow-hidden relative block"
+        >
           {story.coverImage ? (
             <Image
               src={story.coverImage}
@@ -73,8 +81,7 @@ export default async function StoryOfTheWeek() {
             />
           ) : (
             // Gradient placeholder when no cover image is set
-            <div className="w-full h-full bg-gradient-to-br from-red-900/40 to-gray-900 flex items-center justify-center">
-            </div>
+            <div className="w-full h-full bg-gradient-to-br from-red-900/40 to-gray-900 flex items-center justify-center"></div>
           )}
           {/* Fade into the content area on desktop */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-800 hidden md:block" />
@@ -131,7 +138,14 @@ export default async function StoryOfTheWeek() {
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-400 mt-1 hover:gap-3 transition-all w-fit"
           >
             Read story
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </Link>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 // TypewriterMode.tsx — Story reading enhancement that "types out" the story text
 // letter by letter, simulating an old typewriter effect.
@@ -14,12 +14,7 @@
 //          A "Skip" button jumps instantly to the full text.
 //          The viewport auto-scrolls to keep the cursor visible as text grows.
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 // How many milliseconds to wait between revealing each character
 const CHAR_DELAY_MS = 30;
@@ -29,14 +24,14 @@ const CHAR_DELAY_MS = 30;
 // setting its innerHTML, then reading back the innerText.
 // Falls back to a simple regex when running on the server (no DOM available).
 function htmlToPlainText(html: string): string {
-  if (typeof document !== "undefined") {
-    const el = document.createElement("div");
+  if (typeof document !== 'undefined') {
+    const el = document.createElement('div');
     el.innerHTML = html;
     // innerText respects block-level line breaks better than textContent
-    return el.innerText || el.textContent || "";
+    return el.innerText || el.textContent || '';
   }
   // Server-side fallback: strip tags with a regex (not perfect but avoids crashes)
-  return html.replace(/<[^>]+>/g, "");
+  return html.replace(/<[^>]+>/g, '');
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -54,7 +49,7 @@ export default function TypewriterMode({ content }: TypewriterModeProps) {
   const [revealed, setRevealed] = useState(0);
 
   // The full plain-text version of the story (computed once per content change)
-  const [plainText, setPlainText] = useState("");
+  const [plainText, setPlainText] = useState('');
 
   // Ref for the interval so we can clear it from any context (toggle, skip, unmount)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -118,7 +113,7 @@ export default function TypewriterMode({ content }: TypewriterModeProps) {
     if (active && cursorRef.current) {
       // scrollIntoView with 'nearest' avoids jumping the whole page — only scrolls
       // enough to make the cursor visible at the bottom of the viewport
-      cursorRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      cursorRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [revealed, active]);
 
@@ -138,19 +133,18 @@ export default function TypewriterMode({ content }: TypewriterModeProps) {
 
   return (
     <div className="w-full">
-
       {/* ── Toolbar: toggle button + skip button ── */}
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={handleToggle}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${
             active
-              ? "bg-amber-950 border-amber-700 text-amber-300 hover:bg-amber-900"
-              : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 hover:border-zinc-500"
+              ? 'bg-amber-950 border-amber-700 text-amber-300 hover:bg-amber-900'
+              : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 hover:border-zinc-500'
           }`}
         >
           {/* Quill icon */}
-          <span>{active ? "Exit Typewriter Mode" : "Typewriter Mode"}</span>
+          <span>{active ? 'Exit Typewriter Mode' : 'Typewriter Mode'}</span>
 
           {/* Small animated dot while typing is in progress */}
           {active && !isComplete && (
@@ -169,9 +163,7 @@ export default function TypewriterMode({ content }: TypewriterModeProps) {
         )}
 
         {/* "Done" badge when typing has completed */}
-        {active && isComplete && (
-          <span className="text-xs text-zinc-600 italic">— typed</span>
-        )}
+        {active && isComplete && <span className="text-xs text-zinc-600 italic">— typed</span>}
       </div>
 
       {/* ── Story content area ── */}

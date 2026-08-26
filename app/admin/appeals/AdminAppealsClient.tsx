@@ -28,11 +28,15 @@ type Appeal = {
 
 export default function AdminAppealsClient({ appeals }: { appeals: Appeal[] }) {
   if (appeals.length === 0) {
-    return <p className="text-gray-600 text-sm py-12 text-center">No open appeals. Nicely quiet.</p>;
+    return (
+      <p className="text-gray-600 text-sm py-12 text-center">No open appeals. Nicely quiet.</p>
+    );
   }
   return (
     <div className="space-y-4">
-      {appeals.map((a) => <AppealRow key={a.id} appeal={a} />)}
+      {appeals.map((a) => (
+        <AppealRow key={a.id} appeal={a} />
+      ))}
     </div>
   );
 }
@@ -53,18 +57,20 @@ function AppealRow({ appeal }: { appeal: Appeal }) {
     });
     setLoading(null);
     if (res.ok) router.refresh();
-    else { const d = await res.json().catch(() => ({})); setError(d.error ?? 'Could not record decision.'); }
+    else {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? 'Could not record decision.');
+    }
   };
 
   return (
     <div className="border border-gray-800 bg-gray-900 rounded-xl p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white">
-            Appeal from {appeal.user.username}
-          </p>
+          <p className="text-sm font-semibold text-white">Appeal from {appeal.user.username}</p>
           <p className="text-xs text-gray-500 mt-0.5">
-            {new Date(appeal.createdAt).toLocaleString()} · original action #{appeal.action.id} ({appeal.action.type})
+            {new Date(appeal.createdAt).toLocaleString()} · original action #{appeal.action.id} (
+            {appeal.action.type})
           </p>
         </div>
       </div>
@@ -75,7 +81,9 @@ function AppealRow({ appeal }: { appeal: Appeal }) {
         <p className="text-gray-300">{appeal.action.explanation}</p>
         <p className="text-xs text-gray-500 mt-1">
           {appeal.action.targetType} #{appeal.action.targetId} · reason {appeal.action.reason} ·{' '}
-          {appeal.action.automated ? 'automated' : `by ${appeal.action.moderator?.username ?? 'unknown'}`}
+          {appeal.action.automated
+            ? 'automated'
+            : `by ${appeal.action.moderator?.username ?? 'unknown'}`}
         </p>
       </div>
 
@@ -99,12 +107,20 @@ function AppealRow({ appeal }: { appeal: Appeal }) {
             />
             {error && <p className="text-xs text-red-400 mb-2">{error}</p>}
             <div className="flex gap-2">
-              <button type="button" onClick={() => decide('OVERTURNED')} disabled={loading !== null}
-                className="px-3 py-1.5 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white rounded-lg transition disabled:opacity-50">
+              <button
+                type="button"
+                onClick={() => decide('OVERTURNED')}
+                disabled={loading !== null}
+                className="px-3 py-1.5 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white rounded-lg transition disabled:opacity-50"
+              >
                 {loading === 'OVERTURNED' ? 'Reversing…' : 'Overturn (reverse decision)'}
               </button>
-              <button type="button" onClick={() => decide('UPHELD')} disabled={loading !== null}
-                className="px-3 py-1.5 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition disabled:opacity-50">
+              <button
+                type="button"
+                onClick={() => decide('UPHELD')}
+                disabled={loading !== null}
+                className="px-3 py-1.5 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition disabled:opacity-50"
+              >
                 {loading === 'UPHELD' ? 'Recording…' : 'Uphold decision'}
               </button>
             </div>

@@ -38,7 +38,6 @@ const SCOPES = ['identify', 'guilds.join'].join('%20');
 // ── GET handler ───────────────────────────────────────────────────────────────
 // Redirects the logged-in user to Discord's OAuth2 authorization page.
 export async function GET() {
-
   // Read all cookies from the request so we can check if the user is logged in
   const c = await cookies();
 
@@ -79,9 +78,9 @@ export async function GET() {
     `https://discord.com/api/oauth2/authorize` +
     `?client_id=${clientId}` +
     `&redirect_uri=${redirectUri}` +
-    `&response_type=code` +    // we want an authorization code, not an implicit token
-    `&scope=${SCOPES}` +       // the permissions we are requesting
-    `&state=${state}`;         // carries the userId through the redirect round-trip
+    `&response_type=code` + // we want an authorization code, not an implicit token
+    `&scope=${SCOPES}` + // the permissions we are requesting
+    `&state=${state}`; // carries the userId through the redirect round-trip
 
   // Redirect the browser to Discord's consent screen.
   // Next.js will send a 307 Temporary Redirect response.

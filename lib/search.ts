@@ -54,9 +54,9 @@ const MIN_TOKEN_LENGTH = 3;
 const CHARS_PER_MINUTE = 1000;
 
 export const READ_TIME_BANDS: Record<string, [number, number]> = {
-  short:  [0,  5],
+  short: [0, 5],
   medium: [5, 15],
-  long:   [15, 999],
+  long: [15, 999],
 };
 
 export type SearchSort = 'relevance' | 'newest' | 'popular' | 'comments';
@@ -142,7 +142,10 @@ export function parseSearchQuery(raw: string): ParsedQuery {
     // is only usable if at least one of its words is long enough to be indexed —
     // MariaDB matches a phrase by first finding its indexed words, so a phrase of
     // entirely short words can never match.
-    const cleaned = phrase.replace(/[^\p{L}\p{N}' ]+/gu, ' ').replace(/\s+/g, ' ').trim();
+    const cleaned = phrase
+      .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     if (!cleaned) continue;
     if (cleaned.split(' ').some((w) => w.length >= MIN_TOKEN_LENGTH)) {
       strictParts.push(`+"${cleaned}"`);
@@ -173,7 +176,7 @@ export function parseSearchQuery(raw: string): ParsedQuery {
 
   return {
     strict: strictParts.join(' '),
-    loose:  looseParts.join(' '),
+    loose: looseParts.join(' '),
     ignored,
     usable: strictParts.length > 0,
   };
@@ -211,7 +214,7 @@ function baseConditions(params: StorySearchParams): Prisma.Sql[] {
     // page count disagree with the visible results.
     conditions.push(
       Prisma.sql`CHAR_LENGTH(s.content) >= ${band[0] * CHARS_PER_MINUTE}
-             AND CHAR_LENGTH(s.content) <  ${band[1] * CHARS_PER_MINUTE}`,
+             AND CHAR_LENGTH(s.content) <  ${band[1] * CHARS_PER_MINUTE}`
     );
   }
 
@@ -293,9 +296,9 @@ function orderClause(sort: SearchSort, expr: string | null): Prisma.Sql {
  * (see `loadStoriesInOrder`) so raw SQL never dictates the result shape.
  */
 export async function searchStoryIds(params: StorySearchParams): Promise<StorySearchResult> {
-  const query    = params.query.trim();
+  const query = params.query.trim();
   const pageSize = Math.max(1, params.pageSize);
-  const sort     = params.sort ?? (query ? 'relevance' : 'newest');
+  const sort = params.sort ?? (query ? 'relevance' : 'newest');
 
   const parsed = query ? parseSearchQuery(query) : null;
 
@@ -327,7 +330,7 @@ export async function searchStoryIds(params: StorySearchParams): Promise<StorySe
       WHERE ${where}`;
 
     const countRows = await prisma.$queryRaw<{ total: bigint | number }[]>(
-      Prisma.sql`SELECT COUNT(*) AS total ${from}`,
+      Prisma.sql`SELECT COUNT(*) AS total ${from}`
     );
     const total = Number(countRows[0]?.total ?? 0);
     if (total === 0) return { ids: [], total: 0 };
@@ -335,10 +338,10 @@ export async function searchStoryIds(params: StorySearchParams): Promise<StorySe
     // Clamp the requested page into range so a stale ?page=9 link shows the last
     // page of results instead of an empty one.
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
-    const page       = Math.min(Math.max(1, params.page), totalPages);
+    const page = Math.min(Math.max(1, params.page), totalPages);
 
     const rows = await prisma.$queryRaw<{ id: number }[]>(
-      Prisma.sql`SELECT s.id ${from} ${orderClause(sort, matchExpr)} LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
+      Prisma.sql`SELECT s.id ${from} ${orderClause(sort, matchExpr)} LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`
     );
 
     return { ids: rows.map((r) => Number(r.id)), total };
@@ -402,9 +405,9 @@ const STORY_CARD_SELECT = {
   content: true,
   createdAt: true,
   views: true,
-  author:   { select: { username: true } },
+  author: { select: { username: true } },
   category: { select: { name: true, slug: true } },
-  _count:   { select: { likes: true, comments: true } },
+  _count: { select: { likes: true, comments: true } },
 } satisfies Prisma.StorySelect;
 
 /**

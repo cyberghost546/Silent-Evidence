@@ -39,7 +39,9 @@ import { prisma } from '@/lib/prisma';
 // Props type — params is a Promise in Next.js 14+ App Router.
 // Every dynamic page receives params as a Promise<{ [key]: string }> where
 // the key matches the folder name in brackets, e.g. [slug] → { slug: string }.
-interface Props { params: Promise<{ slug: string }> }
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
 // -----------------------------------------------------------------------------
 // generateMetadata — runs server-side before the page renders
@@ -85,7 +87,7 @@ export default async function RecipeDetailPage({ params }: Props) {
   // doesn't have a native array type for this schema. JSON.parse brings them
   // back to real JavaScript arrays that we can iterate with .map().
   const ingredients: string[] = raw.ingredients ? JSON.parse(raw.ingredients) : [];
-  const steps: string[]       = raw.steps ? JSON.parse(raw.steps) : [];
+  const steps: string[] = raw.steps ? JSON.parse(raw.steps) : [];
 
   // Map each recipe type string to a decorative emoji displayed in the UI.
   // Record<string, string> means: keys are strings, values are strings.
@@ -96,10 +98,8 @@ export default async function RecipeDetailPage({ params }: Props) {
     // min-h-screen ensures the dark background fills short-content pages
     // py-12 = 48px top/bottom padding; px-4 = 16px horizontal padding on mobile
     <main className="min-h-screen bg-gray-950 py-12 px-4">
-
       {/* max-w-2xl constrains the readable column width (~672px) for long-form content */}
       <div className="max-w-2xl mx-auto">
-
         {/* ── Cover image or emoji placeholder ───────────────────────────────
             Conditional rendering pattern: show <img> if image exists, otherwise
             show a large emoji placeholder that fills the same visual space.
@@ -123,7 +123,8 @@ export default async function RecipeDetailPage({ params }: Props) {
           // centres the icon both horizontally and vertically inside the fixed-height box.
           <div className="w-full h-40 bg-gray-800 rounded-2xl flex items-center justify-center text-gray-700 mb-6">
             {(() => {
-              const TypeIcon = RECIPE_TYPES.find(t => t.key === raw.type)?.icon ?? UtensilsCrossed;
+              const TypeIcon =
+                RECIPE_TYPES.find((t) => t.key === raw.type)?.icon ?? UtensilsCrossed;
               return <TypeIcon className="w-14 h-14" strokeWidth={1.25} aria-hidden="true" />;
             })()}
           </div>
@@ -131,14 +132,13 @@ export default async function RecipeDetailPage({ params }: Props) {
 
         {/* ── Recipe header — badges, title, description, author ─────────── */}
         <div className="mb-8">
-
           {/* Metadata badge row — flex-wrap lets badges wrap to the next line on mobile */}
           <div className="flex gap-2 mb-3 flex-wrap">
-
             {/* Type badge (food / drink / ritual) — `capitalize` makes e.g. "food" → "Food" */}
             <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400 capitalize">
               {(() => {
-                const TypeIcon = RECIPE_TYPES.find(t => t.key === raw.type)?.icon ?? UtensilsCrossed;
+                const TypeIcon =
+                  RECIPE_TYPES.find((t) => t.key === raw.type)?.icon ?? UtensilsCrossed;
                 return <TypeIcon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />;
               })()}
               {raw.type}
@@ -153,14 +153,14 @@ export default async function RecipeDetailPage({ params }: Props) {
                 Optional fields in Prisma schema use Int? which maps to number | null in TS. */}
             {raw.prepMins && (
               <span className="text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400">
- {raw.prepMins} min
+                {raw.prepMins} min
               </span>
             )}
 
             {/* Servings — same optional-field conditional pattern */}
             {raw.servings && (
               <span className="text-sm px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-400">
- Serves {raw.servings}
+                Serves {raw.servings}
               </span>
             )}
           </div>
@@ -177,9 +177,7 @@ export default async function RecipeDetailPage({ params }: Props) {
 
         {/* ── Ingredients card ────────────────────────────────────────────── */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
-          <h2 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-             Ingredients
-          </h2>
+          <h2 className="text-white font-bold text-lg mb-4 flex items-center gap-2">Ingredients</h2>
 
           {/* Unordered list — space-y-2 adds 8px between each item */}
           <ul className="space-y-2">
@@ -218,7 +216,6 @@ export default async function RecipeDetailPage({ params }: Props) {
             ))}
           </ol>
         </div>
-
       </div>
     </main>
   );

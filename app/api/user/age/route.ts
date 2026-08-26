@@ -21,8 +21,8 @@ function calcAge(dob: Date): number {
 
 // Derive AgeGroup enum from age in years
 function toAgeGroup(age: number): 'UNDER_13' | 'TEEN' | 'ADULT' {
-  if (age < 13)  return 'UNDER_13';
-  if (age < 18)  return 'TEEN';
+  if (age < 13) return 'UNDER_13';
+  if (age < 18) return 'TEEN';
   return 'ADULT';
 }
 
@@ -37,12 +37,12 @@ export async function PATCH(req: Request) {
   if (!userId) return unauthorized();
 
   try {
-    const body   = await req.json();
+    const body = await req.json();
     const parsed = Schema.safeParse(body);
     if (!parsed.success) return zodError(parsed.error);
 
-    const dob      = new Date(parsed.data.dateOfBirth + 'T12:00:00Z');
-    const age      = calcAge(dob);
+    const dob = new Date(parsed.data.dateOfBirth + 'T12:00:00Z');
+    const age = calcAge(dob);
     const ageGroup = toAgeGroup(age);
 
     // Reject obviously fake dates (born before 1900 or future dates)
@@ -74,7 +74,7 @@ export async function PATCH(req: Request) {
             'Your account has been removed and no date of birth was stored.',
           ageBlocked: true,
         },
-        { status: 403 },
+        { status: 403 }
       );
       clearSessionCookies(res);
       return res;
@@ -82,7 +82,7 @@ export async function PATCH(req: Request) {
 
     await prisma.user.update({
       where: { id: userId },
-      data:  { dateOfBirth: dob, ageGroup },
+      data: { dateOfBirth: dob, ageGroup },
     });
 
     return NextResponse.json({ ageGroup, age });

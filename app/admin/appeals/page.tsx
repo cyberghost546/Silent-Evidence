@@ -22,12 +22,20 @@ export default async function AdminAppealsPage() {
     orderBy: { createdAt: 'asc' },
     take: 100,
     select: {
-      id: true, message: true, createdAt: true,
+      id: true,
+      message: true,
+      createdAt: true,
       user: { select: { id: true, username: true } },
       action: {
         select: {
-          id: true, type: true, targetType: true, targetId: true, reason: true,
-          explanation: true, automated: true, moderatorId: true,
+          id: true,
+          type: true,
+          targetType: true,
+          targetId: true,
+          reason: true,
+          explanation: true,
+          automated: true,
+          moderatorId: true,
           moderator: { select: { username: true } },
         },
       },
@@ -60,7 +68,9 @@ export default async function AdminAppealsPage() {
         <Gavel className="w-6 h-6 text-red-500" strokeWidth={1.75} aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold text-white">Appeals</h1>
-          <p className="text-sm text-gray-500">{appeals.length} open appeal{appeals.length === 1 ? '' : 's'}</p>
+          <p className="text-sm text-gray-500">
+            {appeals.length} open appeal{appeals.length === 1 ? '' : 's'}
+          </p>
         </div>
       </div>
       <AdminAppealsClient appeals={appeals} />

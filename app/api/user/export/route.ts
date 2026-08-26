@@ -60,25 +60,39 @@ export async function GET() {
         // ── Content the user created ──────────────────────────────────────────
         stories: {
           select: {
-            id: true, title: true, slug: true, content: true, excerpt: true,
-            status: true, language: true, mood: true, warnings: true,
-            contentRating: true, views: true, price: true,
-            createdAt: true, updatedAt: true,
+            id: true,
+            title: true,
+            slug: true,
+            content: true,
+            excerpt: true,
+            status: true,
+            language: true,
+            mood: true,
+            warnings: true,
+            contentRating: true,
+            views: true,
+            price: true,
+            createdAt: true,
+            updatedAt: true,
             category: { select: { name: true } },
             tags: { select: { name: true } },
           },
         },
         comments: {
           select: {
-            id: true, content: true, createdAt: true,
+            id: true,
+            content: true,
+            createdAt: true,
             story: { select: { title: true, slug: true } },
           },
         },
 
         // ── Interactions ──────────────────────────────────────────────────────
-        likes:      { select: { createdAt: true, story: { select: { title: true, slug: true } } } },
-        bookmarks:  { select: { createdAt: true, story: { select: { title: true, slug: true } } } },
-        reactions:  { select: { type: true, createdAt: true, story: { select: { title: true, slug: true } } } },
+        likes: { select: { createdAt: true, story: { select: { title: true, slug: true } } } },
+        bookmarks: { select: { createdAt: true, story: { select: { title: true, slug: true } } } },
+        reactions: {
+          select: { type: true, createdAt: true, story: { select: { title: true, slug: true } } },
+        },
         scareRatings: { select: { rating: true, story: { select: { title: true, slug: true } } } },
 
         // ── Reading behaviour ─────────────────────────────────────────────────
@@ -89,11 +103,11 @@ export async function GET() {
         },
         readingStreak: true,
         writingStreak: true,
-        readingGoal:   true,
+        readingGoal: true,
 
         // ── Social graph ──────────────────────────────────────────────────────
         following: { select: { createdAt: true, following: { select: { username: true } } } },
-        followers: { select: { createdAt: true, follower:  { select: { username: true } } } },
+        followers: { select: { createdAt: true, follower: { select: { username: true } } } },
 
         // ── Recognition ───────────────────────────────────────────────────────
         badges: { select: { type: true, awardedAt: true } },
@@ -101,10 +115,12 @@ export async function GET() {
         // ── Commerce ──────────────────────────────────────────────────────────
         // Amounts and dates only. Card details never touch this database —
         // Stripe holds them — so there is nothing further to export here.
-        storyPurchases: { select: { amount: true, createdAt: true, story: { select: { title: true } } } },
-        tipsSent:       { select: { amount: true, createdAt: true } },
-        tipsReceived:   { select: { amount: true, createdAt: true } },
-        subscription:       { select: { status: true, currentPeriodEnd: true, createdAt: true } },
+        storyPurchases: {
+          select: { amount: true, createdAt: true, story: { select: { title: true } } },
+        },
+        tipsSent: { select: { amount: true, createdAt: true } },
+        tipsReceived: { select: { amount: true, createdAt: true } },
+        subscription: { select: { status: true, currentPeriodEnd: true, createdAt: true } },
         authorSubscription: { select: { status: true, currentPeriodEnd: true, createdAt: true } },
       },
     });

@@ -31,14 +31,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const statics: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-    { url: `${BASE_URL}/login`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
-    { url: `${BASE_URL}/register`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
-    { url: `${BASE_URL}/search`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
-    { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+    {
+      url: `${BASE_URL}/login`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/register`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/search`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
   ];
 
   // Story pages — high priority, changes frequently
-  const storyUrls: MetadataRoute.Sitemap = stories.map(s => ({
+  const storyUrls: MetadataRoute.Sitemap = stories.map((s) => ({
     url: `${BASE_URL}/story/${s.slug}`,
     lastModified: s.updatedAt,
     changeFrequency: 'weekly' as const,
@@ -46,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // User profile pages
-  const userUrls: MetadataRoute.Sitemap = users.map(u => ({
+  const userUrls: MetadataRoute.Sitemap = users.map((u) => ({
     url: `${BASE_URL}/user/${u.username}`,
     lastModified: u.updatedAt,
     changeFrequency: 'weekly' as const,
@@ -54,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Category pages
-  const categoryUrls: MetadataRoute.Sitemap = categories.map(c => ({
+  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${BASE_URL}/category/${c.slug}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,

@@ -31,7 +31,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(
   req: Request,
   // Next.js 15+ delivers params as a Promise — we must await before reading
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Await the params Promise before reading the id segment
@@ -96,7 +96,6 @@ export async function POST(
 
     // Return { liked: true } to signal the heart should appear filled
     return NextResponse.json({ liked: true, likes });
-
   } catch (err) {
     // Log the error server-side for debugging
     console.error('[POST /api/last-words/[id]/like]', err);

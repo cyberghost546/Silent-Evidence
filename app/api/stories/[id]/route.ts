@@ -10,25 +10,25 @@ import { enforceAuthorProFields, AUTHOR_PRO_FIELD_LABELS } from '@/lib/authorPro
 import { z } from 'zod';
 
 const PatchStorySchema = z.object({
-  title:            z.string().min(1).max(200).optional(),
-  content:          z.string().min(1).max(100_000).optional(),
-  excerpt:          z.string().max(500).optional(),
-  coverImage:       z.string().optional(),
-  videoUrl:         z.string().nullable().optional(),
-  audioUrl:         z.string().nullable().optional(),
-  isPremiumOnly:    z.boolean().optional(),
+  title: z.string().min(1).max(200).optional(),
+  content: z.string().min(1).max(100_000).optional(),
+  excerpt: z.string().max(500).optional(),
+  coverImage: z.string().optional(),
+  videoUrl: z.string().nullable().optional(),
+  audioUrl: z.string().nullable().optional(),
+  isPremiumOnly: z.boolean().optional(),
   earlyAccessUntil: z.string().nullable().optional(),
   spotifyPlaylistUrl: z.string().nullable().optional(),
   // Price in cents. 0/null = free. Author Pro only — enforced in the handler.
-  price:            z.number().int().min(0).max(100_000).nullable().optional(),
+  price: z.number().int().min(0).max(100_000).nullable().optional(),
   // Series membership. null clears it (removes the story from its series).
   // Ownership is verified in the handler, which the schema cannot do.
-  seriesId:         z.number().int().positive().nullable().optional(),
-  seriesOrder:      z.number().int().positive().nullable().optional(),
-  status:           z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED']).optional(),
-  categoryId:       z.number().int().positive().optional(),
-  scheduledAt:      z.string().nullable().optional(),
-  warnings:         z.string().optional(),
+  seriesId: z.number().int().positive().nullable().optional(),
+  seriesOrder: z.number().int().positive().nullable().optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SCHEDULED']).optional(),
+  categoryId: z.number().int().positive().optional(),
+  scheduledAt: z.string().nullable().optional(),
+  warnings: z.string().optional(),
 });
 
 type Params = { params: Promise<{ id: string }> };
@@ -119,40 +119,51 @@ export async function PATCH(req: Request, { params }: Params) {
   const { id } = await params;
   const storyId = Number(id);
 
-  const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true } });
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { authorId: true },
+  });
   if (!story) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
 
   // Allow the original author OR any accepted co-author to PATCH (edit)
   const isAuthor = story.authorId === userId;
-  const isCollaborator = !isAuthor && !!(await prisma.storyCollaborator.findUnique({
-    where: { storyId_userId: { storyId, userId } },
-    select: { accepted: true },
-  }).then(r => r?.accepted === true));
-  if (!isAuthor && !isCollaborator) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const isCollaborator =
+    !isAuthor &&
+    !!(await prisma.storyCollaborator
+      .findUnique({
+        where: { storyId_userId: { storyId, userId } },
+        select: { accepted: true },
+      })
+      .then((r) => r?.accepted === true));
+  if (!isAuthor && !isCollaborator)
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const rawBody = await req.json();
   const parsed = PatchStorySchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid request', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
 
   const {
-    title:            rawTitle,
-    content:          rawContent,
-    excerpt:          rawExcerpt,
-    coverImage:       rawCoverImage,
-    videoUrl:         rawVideoUrl,
-    audioUrl:         rawAudioUrl,
+    title: rawTitle,
+    content: rawContent,
+    excerpt: rawExcerpt,
+    coverImage: rawCoverImage,
+    videoUrl: rawVideoUrl,
+    audioUrl: rawAudioUrl,
     isPremiumOnly,
     earlyAccessUntil: earlyAccessUntilRaw,
     status,
     categoryId,
-    scheduledAt:      scheduledAtRaw,
+    scheduledAt: scheduledAtRaw,
     warnings,
     spotifyPlaylistUrl: rawSpotifyUrl,
-    price:            rawPrice,
-    seriesId:         rawSeriesId,
-    seriesOrder:      rawSeriesOrder,
+    price: rawPrice,
+    seriesId: rawSeriesId,
+    seriesOrder: rawSeriesOrder,
   } = parsed.data;
 
   // ── Author Pro gate ────────────────────────────────────────────────────────
@@ -162,36 +173,42 @@ export async function PATCH(req: Request, { params }: Params) {
   // features back on. Clearing a gated field is always permitted, so a lapsed
   // author is never stuck unable to remove a price they can no longer charge.
   const { rejected } = await enforceAuthorProFields(userId, {
-    price:              rawPrice,
+    price: rawPrice,
     isPremiumOnly,
-    earlyAccessUntil:   earlyAccessUntilRaw,
-    audioUrl:           rawAudioUrl,
-    videoUrl:           rawVideoUrl,
+    earlyAccessUntil: earlyAccessUntilRaw,
+    audioUrl: rawAudioUrl,
+    videoUrl: rawVideoUrl,
     spotifyPlaylistUrl: rawSpotifyUrl,
   });
   if (rejected.length > 0) {
     const names = rejected.map((f) => AUTHOR_PRO_FIELD_LABELS[f]).join(', ');
     return NextResponse.json(
-      { error: `Author Pro is required for: ${names}. Upgrade at /author-pro.`, upgrade: '/author-pro' },
-      { status: 403 },
+      {
+        error: `Author Pro is required for: ${names}. Upgrade at /author-pro.`,
+        upgrade: '/author-pro',
+      },
+      { status: 403 }
     );
   }
 
-  const title      = rawTitle      !== undefined ? rawTitle.trim()                           : undefined;
-  const content    = rawContent    !== undefined ? sanitizeContent(rawContent.trim())         : undefined;
-  const excerpt    = rawExcerpt    !== undefined ? rawExcerpt.trim()                          : undefined;
-  const coverImage = rawCoverImage !== undefined ? rawCoverImage.trim()                       : undefined;
-  const videoUrl   = rawVideoUrl   !== undefined ? (rawVideoUrl?.trim() ?? null)              : undefined;
-  const audioUrl   = rawAudioUrl   !== undefined ? (rawAudioUrl?.trim() ?? null)              : undefined;
-  const earlyAccessUntil = earlyAccessUntilRaw !== undefined
-    ? (earlyAccessUntilRaw ? new Date(earlyAccessUntilRaw) : null)
-    : undefined;
-  const spotifyPlaylistUrl = rawSpotifyUrl !== undefined ? (rawSpotifyUrl?.trim() ?? null) : undefined;
+  const title = rawTitle !== undefined ? rawTitle.trim() : undefined;
+  const content = rawContent !== undefined ? sanitizeContent(rawContent.trim()) : undefined;
+  const excerpt = rawExcerpt !== undefined ? rawExcerpt.trim() : undefined;
+  const coverImage = rawCoverImage !== undefined ? rawCoverImage.trim() : undefined;
+  const videoUrl = rawVideoUrl !== undefined ? (rawVideoUrl?.trim() ?? null) : undefined;
+  const audioUrl = rawAudioUrl !== undefined ? (rawAudioUrl?.trim() ?? null) : undefined;
+  const earlyAccessUntil =
+    earlyAccessUntilRaw !== undefined
+      ? earlyAccessUntilRaw
+        ? new Date(earlyAccessUntilRaw)
+        : null
+      : undefined;
+  const spotifyPlaylistUrl =
+    rawSpotifyUrl !== undefined ? (rawSpotifyUrl?.trim() ?? null) : undefined;
   const price = rawPrice !== undefined ? rawPrice : undefined;
   // warnings: JSON-encoded string[] sent from StoryEditForm — already validated as string
-  const scheduledAt = scheduledAtRaw !== undefined
-    ? (scheduledAtRaw ? new Date(scheduledAtRaw) : null)
-    : undefined;
+  const scheduledAt =
+    scheduledAtRaw !== undefined ? (scheduledAtRaw ? new Date(scheduledAtRaw) : null) : undefined;
 
   // SCHEDULED requires a future scheduledAt date
   if (status === 'SCHEDULED' && (!scheduledAt || scheduledAt <= new Date())) {
@@ -199,16 +216,16 @@ export async function PATCH(req: Request, { params }: Params) {
   }
 
   const data: Record<string, unknown> = {};
-  if (title        !== undefined) data.title        = title;
-  if (content      !== undefined) data.content      = content;
-  if (excerpt      !== undefined) data.excerpt      = excerpt || null;
-  if (coverImage   !== undefined) data.coverImage   = coverImage || null;
-  if (videoUrl          !== undefined) data.videoUrl          = videoUrl || null;
-  if (audioUrl          !== undefined) data.audioUrl          = audioUrl || null;
-  if (isPremiumOnly     !== undefined) data.isPremiumOnly     = isPremiumOnly;
-  if (earlyAccessUntil  !== undefined) data.earlyAccessUntil  = earlyAccessUntil;
+  if (title !== undefined) data.title = title;
+  if (content !== undefined) data.content = content;
+  if (excerpt !== undefined) data.excerpt = excerpt || null;
+  if (coverImage !== undefined) data.coverImage = coverImage || null;
+  if (videoUrl !== undefined) data.videoUrl = videoUrl || null;
+  if (audioUrl !== undefined) data.audioUrl = audioUrl || null;
+  if (isPremiumOnly !== undefined) data.isPremiumOnly = isPremiumOnly;
+  if (earlyAccessUntil !== undefined) data.earlyAccessUntil = earlyAccessUntil;
   if (spotifyPlaylistUrl !== undefined) data.spotifyPlaylistUrl = spotifyPlaylistUrl || null;
-  if (price             !== undefined) data.price             = price || null;
+  if (price !== undefined) data.price = price || null;
 
   // ── Series ──────────────────────────────────────────────────────────────
   // Ownership is checked against `userId`, the person making the edit — which
@@ -229,7 +246,7 @@ export async function PATCH(req: Request, { params }: Params) {
       if (!series || series.authorId !== userId) {
         return NextResponse.json(
           { error: 'That series does not exist, or is not yours.' },
-          { status: 403 },
+          { status: 403 }
         );
       }
       data.seriesId = rawSeriesId;
@@ -241,12 +258,16 @@ export async function PATCH(req: Request, { params }: Params) {
     // Reordering within a series the story is already in.
     data.seriesOrder = rawSeriesOrder;
   }
-  if (status       !== undefined) data.status       = status;
-  if (categoryId   !== undefined) data.categoryId   = categoryId;
-  if (scheduledAt  !== undefined) data.scheduledAt  = scheduledAt;
-  if (warnings     !== undefined) data.warnings     = warnings;
+  if (status !== undefined) data.status = status;
+  if (categoryId !== undefined) data.categoryId = categoryId;
+  if (scheduledAt !== undefined) data.scheduledAt = scheduledAt;
+  if (warnings !== undefined) data.warnings = warnings;
 
-  const updated = await prisma.story.update({ where: { id: storyId }, data, select: { slug: true } });
+  const updated = await prisma.story.update({
+    where: { id: storyId },
+    data,
+    select: { slug: true },
+  });
 
   if (status === 'PUBLISHED') {
     // Award story-count badges and update writing streak (fire-and-forget)
@@ -255,7 +276,9 @@ export async function PATCH(req: Request, { params }: Params) {
 
     // Send newsletter emails to all followers who have an email address.
     // Done asynchronously so it doesn't delay the API response.
-    sendNewsletterAsync({ storyId, authorId: userId, slug: updated.slug, storyTitle: title }).catch(() => {});
+    sendNewsletterAsync({ storyId, authorId: userId, slug: updated.slug, storyTitle: title }).catch(
+      () => {}
+    );
   }
 
   return NextResponse.json({ slug: updated.slug });
@@ -269,7 +292,10 @@ export async function DELETE(_req: Request, { params }: Params) {
   const { id } = await params;
   const storyId = Number(id);
 
-  const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true } });
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { authorId: true },
+  });
   if (!story) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   if (story.authorId !== userId) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 

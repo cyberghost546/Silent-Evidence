@@ -14,7 +14,13 @@ dotenv.config();
 
 function parseDbUrl() {
   const url = new URL(process.env.DATABASE_URL!);
-  return { host: url.hostname, port: parseInt(url.port) || 3306, user: url.username, password: url.password, database: url.pathname.slice(1) };
+  return {
+    host: url.hostname,
+    port: parseInt(url.port) || 3306,
+    user: url.username,
+    password: url.password,
+    database: url.pathname.slice(1),
+  };
 }
 
 const prisma = new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
@@ -22,12 +28,13 @@ const prisma = new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
 const stories = [
   // ── Slasher (id=6) ────────────────────────────────────────────────────────
   {
-    title: 'The Babysitter\'s Last Call',
+    title: "The Babysitter's Last Call",
     slug: 'the-babysitters-last-call',
     categorySlug: 'slasher',
     mood: Mood.DISTURBING,
     featured: false,
-    excerpt: 'The children were already in bed when the phone rang. The voice on the other end said: "Have you checked on them yet?"',
+    excerpt:
+      'The children were already in bed when the phone rang. The voice on the other end said: "Have you checked on them yet?"',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',
     content: `<p>The Harmon house was quiet by nine. Both kids — Lily, seven, and Marcus, five — had gone down without a fight, which should have been the first sign that something was wrong.</p>
 
@@ -91,7 +98,8 @@ const stories = [
     categorySlug: 'body-horror',
     mood: Mood.ATMOSPHERIC,
     featured: false,
-    excerpt: 'It started as a small bump under his left shoulder blade. By Thursday, it was moving.',
+    excerpt:
+      'It started as a small bump under his left shoulder blade. By Thursday, it was moving.',
     coverImage: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80',
     content: `<p>It started as a small bump under his left shoulder blade. Owen noticed it in the shower on Monday — not painful, just present. A raised patch of skin, maybe the size of a grape, warm to the touch.</p>
 
@@ -145,7 +153,8 @@ const stories = [
     categorySlug: 'haunted-house',
     mood: Mood.ATMOSPHERIC,
     featured: true,
-    excerpt: 'The real estate listing said five bedrooms. The house only had four doors. Everyone who lived there knew not to ask about the fifth.',
+    excerpt:
+      'The real estate listing said five bedrooms. The house only had four doors. Everyone who lived there knew not to ask about the fifth.',
     coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
     content: `<p>The listing said five bedrooms. Sophie counted four doors when she toured the house.</p>
 
@@ -188,12 +197,13 @@ const stories = [
 
   // ── Occult & Witchcraft (id=9) ────────────────────────────────────────────
   {
-    title: 'The Circle on Midsummer\'s Eve',
+    title: "The Circle on Midsummer's Eve",
     slug: 'the-circle-on-midsummers-eve',
     categorySlug: 'occult-witchcraft',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'They told her the ritual was harmless. Just six women in a field at midnight, calling something old. Nobody mentioned what happened when it answered.',
+    excerpt:
+      'They told her the ritual was harmless. Just six women in a field at midnight, calling something old. Nobody mentioned what happened when it answered.',
     coverImage: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80',
     content: `<p>They told her it was harmless.</p>
 
@@ -257,7 +267,8 @@ const stories = [
     categorySlug: 'creature-feature',
     mood: Mood.DISTURBING,
     featured: false,
-    excerpt: 'The lake had been drained for forty years. When they refilled it for the resort development, the locals all left town the same week.',
+    excerpt:
+      'The lake had been drained for forty years. When they refilled it for the resort development, the locals all left town the same week.',
     coverImage: 'https://images.unsplash.com/photo-1548268770-66184a21657e?w=800&q=80',
     content: `<p>The lake had been drained in 1983, after the third disappearance.</p>
 
@@ -307,7 +318,8 @@ const stories = [
     categorySlug: 'post-apocalyptic',
     mood: Mood.DISTURBING,
     featured: false,
-    excerpt: 'Three years after the Collapse, a lone survivor picks up a repeating radio signal. Someone is still broadcasting. The message is: do not come here.',
+    excerpt:
+      'Three years after the Collapse, a lone survivor picks up a repeating radio signal. Someone is still broadcasting. The message is: do not come here.',
     coverImage: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80',
     content: `<p>Three years after the Collapse, Mara found the signal on a Tuesday in November.</p>
 
@@ -359,7 +371,8 @@ const stories = [
     categorySlug: 'survival-horror',
     mood: Mood.DISTURBING,
     featured: false,
-    excerpt: 'She had survived two nights in the wilderness after the crash. Night three was different. Something had found the wreckage.',
+    excerpt:
+      'She had survived two nights in the wilderness after the crash. Night three was different. Something had found the wreckage.',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',
     content: `<p>Night one, Petra built a fire. Night two, she kept it burning.</p>
 
@@ -407,7 +420,8 @@ const stories = [
     categorySlug: 'folk-horror',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'The village festival happened every seven years. Outsiders were welcome. They were always welcomed warmly. None of them were ever seen leaving.',
+    excerpt:
+      'The village festival happened every seven years. Outsiders were welcome. They were always welcomed warmly. None of them were ever seen leaving.',
     coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
     content: `<p>The village of Ashmore held its festival every seven years.</p>
 
@@ -454,12 +468,13 @@ const stories = [
 
   // ── Serial Killer (id=14) ─────────────────────────────────────────────────
   {
-    title: 'The Collector\'s Archive',
+    title: "The Collector's Archive",
     slug: 'the-collectors-archive',
     categorySlug: 'serial-killer',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'Detective Rivera found the apartment immaculate. One bedroom, one desk, seventeen notebooks. Each notebook was a life. Every life had a final entry.',
+    excerpt:
+      'Detective Rivera found the apartment immaculate. One bedroom, one desk, seventeen notebooks. Each notebook was a life. Every life had a final entry.',
     coverImage: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80',
     content: `<p>The apartment was immaculate.</p>
 
@@ -517,7 +532,8 @@ const stories = [
     categorySlug: 'lovecraftian',
     mood: Mood.ATMOSPHERIC,
     featured: true,
-    excerpt: 'The oceanographic survey found the structure at 11,000 meters. It had geometry that shouldn\'t exist. The crew who saw the footage were changed by it.',
+    excerpt:
+      "The oceanographic survey found the structure at 11,000 meters. It had geometry that shouldn't exist. The crew who saw the footage were changed by it.",
     coverImage: 'https://images.unsplash.com/photo-1548268770-66184a21657e?w=800&q=80',
     content: `<p>The survey vessel <em>Aldous</em> was mapping the Mariana Basin when the sonar returned the anomaly.</p>
 
@@ -563,7 +579,8 @@ const stories = [
     categorySlug: 'ghost-story',
     mood: Mood.DISTURBING,
     featured: false,
-    excerpt: 'After his daughter died, Thomas kept her bedroom exactly as it was. Then one morning he found the bed made. She had never made her own bed in her life.',
+    excerpt:
+      'After his daughter died, Thomas kept her bedroom exactly as it was. Then one morning he found the bed made. She had never made her own bed in her life.',
     coverImage: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=800&q=80',
     content: `<p>Thomas kept her room exactly as it was.</p>
 
@@ -611,7 +628,8 @@ const stories = [
     categorySlug: 'demonic-possession',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'Father Malone had performed twelve exorcisms. He had never once believed in them. The thirteenth case made him wish he still didn\'t.',
+    excerpt:
+      "Father Malone had performed twelve exorcisms. He had never once believed in them. The thirteenth case made him wish he still didn't.",
     coverImage: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80',
     content: `<p>Father Malone had performed twelve exorcisms in thirty-one years of ministry, and he had not believed in a single one.</p>
 
@@ -663,7 +681,8 @@ const stories = [
     categorySlug: 'dystopian-horror',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'In the new system, your score determined everything. Housing, employment, food access. Mira\'s score dropped overnight for no reason she could identify.',
+    excerpt:
+      "In the new system, your score determined everything. Housing, employment, food access. Mira's score dropped overnight for no reason she could identify.",
     coverImage: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80',
     content: `<p>Mira's score was 847 on Monday morning, which was respectable — not excellent, but solidly in the green band. Green meant full access: housing tier three, employment eligibility, standard food allocation. She had been in the green band for nine years.</p>
 
@@ -704,12 +723,13 @@ const stories = [
 
   // ── Dark Fantasy (id=19) ──────────────────────────────────────────────────
   {
-    title: 'The Price of the Witch\'s Bargain',
+    title: "The Price of the Witch's Bargain",
     slug: 'the-price-of-the-witchs-bargain',
     categorySlug: 'dark-fantasy',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'The witch at the crossroads would grant any wish. She was always honest about the price. The horror was that people agreed anyway.',
+    excerpt:
+      'The witch at the crossroads would grant any wish. She was always honest about the price. The horror was that people agreed anyway.',
     coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
     content: `<p>The witch at the crossroads was honest.</p>
 
@@ -771,7 +791,8 @@ const stories = [
     categorySlug: 'true-crime-horror',
     mood: Mood.DARK,
     featured: false,
-    excerpt: 'The detective thought she was investigating a theft ring. Then she found the workshop. Then she found the dolls. Then she understood what had been stolen.',
+    excerpt:
+      'The detective thought she was investigating a theft ring. Then she found the workshop. Then she found the dolls. Then she understood what had been stolen.',
     coverImage: 'https://images.unsplash.com/photo-1548268770-66184a21657e?w=800&q=80',
     content: `<p>Detective Harlow caught the case on a Tuesday in February, which is what she remembered — not because Tuesdays were significant but because the fluorescent in her office had been flickering since Monday and she'd spent Tuesday morning convinced she was getting a migraine and then the call came in and the migraine became irrelevant.</p>
 
@@ -808,8 +829,8 @@ const stories = [
 ];
 
 async function main() {
-  const author = await prisma.user.findFirst({ where: { role: 'ADMIN' } })
-    ?? await prisma.user.findFirst();
+  const author =
+    (await prisma.user.findFirst({ where: { role: 'ADMIN' } })) ?? (await prisma.user.findFirst());
 
   if (!author) {
     console.error('No users found. Create an account first.');
@@ -832,15 +853,15 @@ async function main() {
 
     const story = await prisma.story.create({
       data: {
-        title:      s.title,
-        slug:       s.slug,
-        content:    s.content,
-        excerpt:    s.excerpt,
+        title: s.title,
+        slug: s.slug,
+        content: s.content,
+        excerpt: s.excerpt,
         coverImage: s.coverImage,
-        mood:       s.mood,
-        featured:   s.featured,
-        status:     'PUBLISHED',
-        authorId:   author.id,
+        mood: s.mood,
+        featured: s.featured,
+        status: 'PUBLISHED',
+        authorId: author.id,
         categoryId: category.id,
       },
     });
@@ -851,5 +872,8 @@ async function main() {
 }
 
 main()
-  .catch(e => { console.error(e); process.exit(1); })
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
   .finally(() => prisma.$disconnect());

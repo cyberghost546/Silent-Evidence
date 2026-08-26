@@ -44,8 +44,8 @@ export function buildCsp(nonce: string, isProd: boolean, reportOnly = false): Cs
   // nonced scripts can pull in the bundles they need.
   const scriptSrc = isProd
     ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:`
-    // Dev: Turbopack/HMR need inline + eval. Hosts kept for the external SDKs.
-    : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com";
+    : // Dev: Turbopack/HMR need inline + eval. Hosts kept for the external SDKs.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com";
 
   const directives = [
     "default-src 'self'",
@@ -56,7 +56,7 @@ export function buildCsp(nonce: string, isProd: boolean, reportOnly = false): Cs
     "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos https://i.ytimg.com",
     "font-src 'self'",
     "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
-    "frame-src https://js.stripe.com https://hooks.stripe.com",
+    'frame-src https://js.stripe.com https://hooks.stripe.com',
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

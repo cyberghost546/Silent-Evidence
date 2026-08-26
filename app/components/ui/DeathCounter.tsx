@@ -42,8 +42,7 @@ export default async function DeathCounter() {
             select-none
           "
           aria-hidden="true"
-        >
-        </span>
+        ></span>
 
         {/* Text content */}
         <div className="relative z-10">

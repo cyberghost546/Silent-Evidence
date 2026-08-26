@@ -8,7 +8,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',
@@ -42,7 +44,8 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const qa = await prisma.liveQASession.findUnique({ where: { id: Number(sessionId) } });
-    if (!qa || !qa.isActive) return NextResponse.json({ error: 'Session not active' }, { status: 403 });
+    if (!qa || !qa.isActive)
+      return NextResponse.json({ error: 'Session not active' }, { status: 403 });
 
     const created = await prisma.liveQAQuestion.create({
       data: {

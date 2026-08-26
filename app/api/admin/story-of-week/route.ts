@@ -81,7 +81,10 @@ export async function POST(req: Request) {
   // Look up the story by its primary key ID.
   // select: { id: true, status: true } fetches only what we need for validation.
   // findUnique() returns the story object or null if no story has that ID.
-  const story = await prisma.story.findUnique({ where: { id: storyId }, select: { id: true, status: true } });
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { id: true, status: true },
+  });
 
   // If the story doesn't exist, or it isn't PUBLISHED (e.g. it's a DRAFT),
   // return 404 Not Found — we don't want to feature unpublished content.

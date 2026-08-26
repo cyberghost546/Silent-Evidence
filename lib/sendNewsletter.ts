@@ -65,7 +65,7 @@ function buildHtml({
           </tr>
         </table>
       </td>
-    </tr>`,
+    </tr>`
     )
     .join('');
 
@@ -132,9 +132,9 @@ function buildHtml({
 }
 
 export type NewsletterResult = {
-  sent: number;       // emails successfully delivered
-  skipped: number;    // users without email or already unsubscribed
-  failed: number;     // SMTP errors
+  sent: number; // emails successfully delivered
+  skipped: number; // users without email or already unsubscribed
+  failed: number; // SMTP errors
   topStories: { title: string; slug: string }[];
 };
 
@@ -147,9 +147,9 @@ export async function sendWeeklyNewsletter(): Promise<NewsletterResult> {
   const stories = await prisma.story.findMany({
     where: { status: 'PUBLISHED', createdAt: { gte: since } },
     include: {
-      author:   { select: { username: true } },
+      author: { select: { username: true } },
       category: { select: { name: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: 50, // fetch more, then score-sort in memory
@@ -157,7 +157,7 @@ export async function sendWeeklyNewsletter(): Promise<NewsletterResult> {
 
   // Score = likes × 3 + views ÷ 10 + comments × 2
   const scored = stories
-    .map(s => ({ ...s, score: s._count.likes * 3 + s.views / 10 + s._count.comments * 2 }))
+    .map((s) => ({ ...s, score: s._count.likes * 3 + s.views / 10 + s._count.comments * 2 }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 
@@ -172,10 +172,15 @@ export async function sendWeeklyNewsletter(): Promise<NewsletterResult> {
     select: { username: true, email: true },
   });
 
-  let sent = 0, skipped = 0, failed = 0;
+  let sent = 0,
+    skipped = 0,
+    failed = 0;
 
   for (const user of subscribers) {
-    if (!user.email) { skipped++; continue; }
+    if (!user.email) {
+      skipped++;
+      continue;
+    }
 
     const ok = await sendMail({
       to: user.email,
@@ -187,14 +192,15 @@ export async function sendWeeklyNewsletter(): Promise<NewsletterResult> {
       }),
     });
 
-    if (ok) sent++; else failed++;
+    if (ok) sent++;
+    else failed++;
   }
 
   return {
     sent,
     skipped,
     failed,
-    topStories: scored.map(s => ({ title: s.title, slug: s.slug })),
+    topStories: scored.map((s) => ({ title: s.title, slug: s.slug })),
   };
 }
 
@@ -206,16 +212,16 @@ export async function previewNewsletter() {
   const stories = await prisma.story.findMany({
     where: { status: 'PUBLISHED', createdAt: { gte: since } },
     include: {
-      author:   { select: { username: true } },
+      author: { select: { username: true } },
       category: { select: { name: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: 50,
   });
 
   const scored = stories
-    .map(s => ({ ...s, score: s._count.likes * 3 + s.views / 10 + s._count.comments * 2 }))
+    .map((s) => ({ ...s, score: s._count.likes * 3 + s.views / 10 + s._count.comments * 2 }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 

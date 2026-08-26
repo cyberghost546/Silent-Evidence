@@ -88,7 +88,7 @@ export async function POST(req: Request, { params }: Params) {
   // Verify the option belongs to this specific poll.
   // A user shouldn't be able to vote with an optionId from a different poll.
   // .find() returns undefined if no option matches — truthy check ensures it's valid.
-  if (!poll.options.find(o => o.id === optionId)) {
+  if (!poll.options.find((o) => o.id === optionId)) {
     return NextResponse.json({ error: 'Invalid option.' }, { status: 400 });
   }
 

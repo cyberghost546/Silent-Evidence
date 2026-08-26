@@ -38,24 +38,24 @@ import { useState, useEffect, useRef } from 'react';
 type LastWord = {
   id: number;
   content: string;
-  createdAt: string;        // ISO 8601 string — serialised from a Date by Prisma
+  createdAt: string; // ISO 8601 string — serialised from a Date by Prisma
   likes: number;
   user: {
     username: string;
-    avatar: string;         // ui-avatars URL or a user-uploaded profile image URL
+    avatar: string; // ui-avatars URL or a user-uploaded profile image URL
   };
 };
 
 // Tracks per-post like state locally so hearts update instantly without waiting
 // for a full server re-fetch of the whole list (optimistic UI pattern).
 type LikeState = {
-  liked: boolean;   // has the current user liked this post in this browser session?
-  likes: number;    // current total like count (authoritative after server sync)
+  liked: boolean; // has the current user liked this post in this browser session?
+  likes: number; // current total like count (authoritative after server sync)
 };
 
 // Props accepted by this component
 type Props = {
-  userId: number | null;  // null = unauthenticated guest visitor
+  userId: number | null; // null = unauthenticated guest visitor
 };
 
 // ── Helper: human-readable relative timestamp ─────────────────────────────────
@@ -65,10 +65,10 @@ type Props = {
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime(); // milliseconds since post
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1)  return 'just now';
+  if (mins < 1) return 'just now';
   if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
+  if (hrs < 24) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
   // For very old posts, a locale-formatted date is clearer than "47 days ago"
@@ -83,7 +83,6 @@ function timeAgo(iso: string): string {
 // Named LastWordsFeed (not QuoteFeed) to keep existing API routes and page
 // imports working without a find-and-replace refactor.
 export default function LastWordsFeed({ userId }: Props) {
-
   // ── State ─────────────────────────────────────────────────────────────────
 
   // The ordered list of posts fetched from the API (newest first after prepend).
@@ -171,7 +170,7 @@ export default function LastWordsFeed({ userId }: Props) {
       return;
     }
 
-    setError('');       // clear previous errors
+    setError(''); // clear previous errors
     setSubmitting(true); // disable the button + show "Posting..."
 
     try {
@@ -264,7 +263,7 @@ export default function LastWordsFeed({ userId }: Props) {
         return {
           ...prev,
           [wordId]: {
-            liked: !cur.liked,                              // flip back
+            liked: !cur.liked, // flip back
             likes: cur.liked ? cur.likes + 1 : cur.likes - 1, // undo count change
           },
         };
@@ -277,7 +276,6 @@ export default function LastWordsFeed({ userId }: Props) {
     // max-w-2xl mx-auto — centers the feed and limits its width for readability.
     // px-4 py-6 — padding so content doesn't touch the viewport edges on mobile.
     <div className="w-full max-w-2xl mx-auto px-4 py-6">
-
       {/* ── Section header ──────────────────────────────────────────────────── */}
       <div className="mb-6 text-center">
         {/* Green serif heading — matches the horror blog's typographic palette */}
@@ -285,9 +283,7 @@ export default function LastWordsFeed({ userId }: Props) {
           Last Words
         </h2>
         {/* Subtitle sets the character-limit expectation upfront */}
-        <p className="text-gray-400 text-sm mt-1 italic">
-          280 characters. Drop your best quote.
-        </p>
+        <p className="text-gray-400 text-sm mt-1 italic">280 characters. Drop your best quote.</p>
         {/* Decorative sparkle divider — purely aesthetic, no semantic role */}
         <div className="mt-3 flex justify-center gap-2 text-green-500 text-xs tracking-widest">
           ─ ✦ ─ ✦ ─ ✦ ─
@@ -299,8 +295,10 @@ export default function LastWordsFeed({ userId }: Props) {
         Card wrapper: dark background, border, rounded corners, and a subtle
         green glow shadow to keep the compose area visually distinct from feed cards.
       */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 shadow-lg shadow-green-900/20" suppressHydrationWarning>
-
+      <div
+        className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 shadow-lg shadow-green-900/20"
+        suppressHydrationWarning
+      >
         {/* Controlled textarea — every keystroke updates `draft` state via onChange.
             maxLength is a browser-enforced hard cap; the charsLeft counter
             provides the visual feedback before the user hits that limit.
@@ -326,7 +324,6 @@ export default function LastWordsFeed({ userId }: Props) {
 
         {/* Character counter + submit button row */}
         <div className="flex items-center justify-between mt-2">
-
           {/* Remaining character counter.
               tabular-nums — forces all digits to the same width so the number
                 doesn't cause layout shift as it decreases.
@@ -334,9 +331,7 @@ export default function LastWordsFeed({ userId }: Props) {
               chars remain, acting as a soft warning to the user. */}
           <span
             className={`text-xs font-mono tabular-nums transition-colors ${
-              charsLeft < 30
-                ? 'text-green-500 font-bold'
-                : 'text-gray-500'
+              charsLeft < 30 ? 'text-green-500 font-bold' : 'text-gray-500'
             }`}
           >
             {charsLeft} / {MAX_CHARS}
@@ -361,9 +356,7 @@ export default function LastWordsFeed({ userId }: Props) {
 
         {/* Inline error message — only mounted when error state is non-empty.
             Text is green-400 to stay on-brand while still reading as an alert. */}
-        {error && (
-          <p className="mt-2 text-green-400 text-xs">{error}</p>
-        )}
+        {error && <p className="mt-2 text-green-400 text-xs">{error}</p>}
       </div>
 
       {/* ── Feed area ───────────────────────────────────────────────────────── */}
@@ -374,10 +367,7 @@ export default function LastWordsFeed({ userId }: Props) {
       {loading && (
         <div className="space-y-4">
           {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-gray-800 rounded-lg p-4 animate-pulse"
-            >
+            <div key={i} className="bg-gray-800 rounded-lg p-4 animate-pulse">
               {/* Avatar + username skeleton */}
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-gray-700" />
@@ -431,7 +421,6 @@ export default function LastWordsFeed({ userId }: Props) {
               >
                 {/* ── Card header: avatar + username + timestamp ─────────── */}
                 <div className="flex items-center gap-3 mb-3">
-
                   {/* Circular avatar image.
                       flex-shrink-0 prevents the avatar from being squashed
                       when the username is long. */}
@@ -470,11 +459,12 @@ export default function LastWordsFeed({ userId }: Props) {
                     className={`
                       flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full
                       border transition-all duration-200
-                      ${ls.liked
-                        // Liked state: solid green background + border
-                        ? 'border-green-700 bg-green-900/40 text-green-400'
-                        // Not liked: outlined gray, green on hover
-                        : 'border-gray-700 bg-gray-900/60 text-gray-500 hover:border-green-800 hover:text-green-500'
+                      ${
+                        ls.liked
+                          ? // Liked state: solid green background + border
+                            'border-green-700 bg-green-900/40 text-green-400'
+                          : // Not liked: outlined gray, green on hover
+                            'border-gray-700 bg-gray-900/60 text-gray-500 hover:border-green-800 hover:text-green-500'
                       }
                     `}
                   >

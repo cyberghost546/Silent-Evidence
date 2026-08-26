@@ -104,9 +104,15 @@ function Result({ success, message }: { success: boolean; message: string }) {
       <div className="max-w-sm w-full bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
         {/* Dynamic icon — green checkmark on success, red X on failure */}
         <p className="flex justify-center mb-4">
-          {success
-            ? <CheckCircle2 className="w-10 h-10 text-green-400" strokeWidth={1.5} aria-hidden="true" />
-            : <XCircle className="w-10 h-10 text-red-400" strokeWidth={1.5} aria-hidden="true" />}
+          {success ? (
+            <CheckCircle2
+              className="w-10 h-10 text-green-400"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          ) : (
+            <XCircle className="w-10 h-10 text-red-400" strokeWidth={1.5} aria-hidden="true" />
+          )}
         </p>
         <h1 className="text-xl font-bold text-white mb-2">
           {success ? 'Unsubscribed' : 'Something went wrong'}

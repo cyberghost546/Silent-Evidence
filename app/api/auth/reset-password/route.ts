@@ -53,7 +53,6 @@ const ResetSchema = z.object({
 // This function runs whenever a POST request is made to /api/auth/reset-password.
 // "req" is a NextRequest with URL helpers attached.
 export async function POST(req: NextRequest) {
-
   // ── Rate limiting ──────────────────────────────────────────────────────────
   // Identify the requester's IP address for rate-limit tracking
   const ip = getClientIp(req);
@@ -61,7 +60,7 @@ export async function POST(req: NextRequest) {
   // Allow at most 5 password reset submissions from the same IP per 15 minutes.
   // This prevents systematic token guessing.
   const rateLimit = await checkRateLimit(ip, 'reset-password', {
-    limit: 5,                  // max 5 attempts before blocking
+    limit: 5, // max 5 attempts before blocking
     windowMs: 15 * 60 * 1000, // 15-minute window in milliseconds
   });
 
@@ -123,12 +122,11 @@ export async function POST(req: NextRequest) {
     // Even if someone intercepts the email, they can't change the password again.
     await prisma.passwordResetToken.update({
       where: { id: resetToken.id }, // target this specific token record
-      data: { used: true },         // flag it so future lookups reject it
+      data: { used: true }, // flag it so future lookups reject it
     });
 
     // Return 200 with { ok: true } — password was successfully reset
     return NextResponse.json({ ok: true });
-
   } catch (err) {
     // Log the error server-side for debugging
     console.error('[reset-password]', err);

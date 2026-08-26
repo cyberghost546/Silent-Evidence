@@ -35,7 +35,7 @@ export default async function AdminWarningsPage() {
       orderBy: { issuedAt: 'desc' },
       take: 50,
       include: {
-        user:  { select: { id: true, username: true } },
+        user: { select: { id: true, username: true } },
         admin: { select: { username: true } },
       },
     }),
@@ -52,8 +52,14 @@ export default async function AdminWarningsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Warnings &amp; Bans</h1>
-      <p className="text-gray-500 text-sm mb-8">Issue warnings, suspend or ban users. All actions are logged in the audit trail.</p>
-      <WarningsClient warnings={JSON.parse(JSON.stringify(warnings))} bannedUsers={bannedUsers} suspendedUsers={JSON.parse(JSON.stringify(suspendedUsers))} />
+      <p className="text-gray-500 text-sm mb-8">
+        Issue warnings, suspend or ban users. All actions are logged in the audit trail.
+      </p>
+      <WarningsClient
+        warnings={JSON.parse(JSON.stringify(warnings))}
+        bannedUsers={bannedUsers}
+        suspendedUsers={JSON.parse(JSON.stringify(suspendedUsers))}
+      />
     </div>
   );
 }

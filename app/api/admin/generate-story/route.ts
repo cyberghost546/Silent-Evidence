@@ -76,7 +76,8 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
   // If the user doesn't exist or isn't an ADMIN, return 403 Forbidden
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   // ── Parse request body ───────────────────────────────────────────────────────
 
@@ -143,14 +144,16 @@ Make the story original, immersive, and genuinely unsettling. End with a memorab
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
 
     // If no JSON object was found in the response, something went wrong with Claude
-    if (!jsonMatch) return NextResponse.json({ error: 'Failed to parse AI response.' }, { status: 500 });
+    if (!jsonMatch)
+      return NextResponse.json({ error: 'Failed to parse AI response.' }, { status: 500 });
 
     // JSON.parse() converts the JSON string into a plain JavaScript object
     // Destructure to get the three fields we need from the parsed object
     const { title, excerpt, content } = JSON.parse(jsonMatch[0]);
 
     // If Claude returned JSON but without a title or content, the response is unusable
-    if (!title || !content) return NextResponse.json({ error: 'Incomplete AI response.' }, { status: 500 });
+    if (!title || !content)
+      return NextResponse.json({ error: 'Incomplete AI response.' }, { status: 500 });
 
     // ── Generate a unique URL slug ────────────────────────────────────────────
 
@@ -158,7 +161,10 @@ Make the story original, immersive, and genuinely unsettling. End with a memorab
     //   1. .toLowerCase() — make everything lowercase
     //   2. .replace(/[^a-z0-9]+/g, '-') — replace non-alphanumeric sequences with a hyphen
     //   3. .replace(/^-|-$/g, '') — strip any leading or trailing hyphens
-    const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
 
     // Date.now() returns the current Unix timestamp in milliseconds.
     // Appending it guarantees uniqueness even if two stories have identical titles.
@@ -181,7 +187,7 @@ Make the story original, immersive, and genuinely unsettling. End with a memorab
       data: {
         title,
         slug,
-        excerpt: excerpt ?? null,    // store null if Claude didn't return an excerpt
+        excerpt: excerpt ?? null, // store null if Claude didn't return an excerpt
         content,
         status: 'DRAFT',
         authorId: userId,
@@ -193,7 +199,6 @@ Make the story original, immersive, and genuinely unsettling. End with a memorab
 
     // Return the new story's id, slug, and title so the admin UI can link to it
     return NextResponse.json({ storyId: story.id, slug: story.slug, title: story.title });
-
   } catch (err: any) {
     // Catch any error from Claude or Prisma and return a 500 Internal Server Error
     // err.message is the human-readable description of what went wrong

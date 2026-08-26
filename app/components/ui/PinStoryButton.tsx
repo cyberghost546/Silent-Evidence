@@ -86,10 +86,10 @@ export default function PinStoryButton({ storyId, isPinned }: Props) {
       title={isPinned ? 'Unpin story' : 'Pin to top of profile'}
       className={`text-xs px-2 py-0.5 rounded border transition flex-shrink-0 ${
         isPinned
-          // Pinned state — gold-tinted border and text to match the 📌 icon
-          ? 'border-yellow-500/60 text-yellow-400 hover:bg-yellow-500/10'
-          // Unpinned state — neutral grey that warms to gold on hover
-          : 'border-gray-700 text-gray-500 hover:border-yellow-500/40 hover:text-yellow-400'
+          ? // Pinned state — gold-tinted border and text to match the 📌 icon
+            'border-yellow-500/60 text-yellow-400 hover:bg-yellow-500/10'
+          : // Unpinned state — neutral grey that warms to gold on hover
+            'border-gray-700 text-gray-500 hover:border-yellow-500/40 hover:text-yellow-400'
       } disabled:opacity-40`}
     >
       {/* Label: "…" while loading, then "📌 Unpin" or "📌 Pin" based on current state */}

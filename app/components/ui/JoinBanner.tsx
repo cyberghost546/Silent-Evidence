@@ -34,7 +34,6 @@ export default function JoinBanner() {
     //   from the rest of the dark page.
     // py-16 → generous top/bottom padding so the section breathes on all screens.
     <section className="relative overflow-hidden bg-gray-900 border-y border-gray-800 py-16">
-
       {/* ── Decorative background glow effects ──────────────────────────────── */}
       {/*
         These two divs paint soft red elliptical glows behind the content using
@@ -64,7 +63,6 @@ export default function JoinBanner() {
           divs in normal document flow).
       */}
       <div className="max-w-4xl mx-auto px-4 text-center relative">
-
         {/* ── Pencil icon badge ────────────────────────────────────────────── */}
         {/*
           A small square badge with a pencil icon used as a visual "hook" that
@@ -121,8 +119,8 @@ export default function JoinBanner() {
           leading-relaxed → looser line-height for a paragraph of copy.
         */}
         <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-          An epic adventure. A heartfelt romance. A world only you can imagine.
-          Silent Evidence is the place to share it.
+          An epic adventure. A heartfelt romance. A world only you can imagine. Silent Evidence is
+          the place to share it.
         </p>
 
         {/* ── CTA button row ───────────────────────────────────────────────── */}
@@ -135,7 +133,6 @@ export default function JoinBanner() {
           gap-4 → 16px gap between the two buttons.
         */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-
           {/* Primary CTA — green button leading to the registration page.
               w-full sm:w-auto → full-width on mobile (easier tap target),
                 auto-width on sm+ so the button sizes to its text.

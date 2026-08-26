@@ -82,8 +82,11 @@ export async function POST() {
   // 503 means "the server is running but this feature is not available right now".
   if (!process.env.SMTP_HOST) {
     return NextResponse.json(
-      { error: 'SMTP is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM in your environment.' },
-      { status: 503 },
+      {
+        error:
+          'SMTP is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM in your environment.',
+      },
+      { status: 503 }
     );
   }
 

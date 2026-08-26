@@ -36,10 +36,10 @@
 
 import { useEffect } from 'react';
 import {
-  MapContainer,     // root Leaflet map element — sets up the map instance
-  TileLayer,        // loads and renders the background tile images
-  CircleMarker,     // renders a coloured circle at a lat/lng coordinate
-  Popup,            // renders a popup that appears when a marker is clicked
+  MapContainer, // root Leaflet map element — sets up the map instance
+  TileLayer, // loads and renders the background tile images
+  CircleMarker, // renders a coloured circle at a lat/lng coordinate
+  Popup, // renders a popup that appears when a marker is clicked
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css'; // Leaflet's required base styles
 
@@ -48,14 +48,14 @@ import 'leaflet/dist/leaflet.css'; // Leaflet's required base styles
 // duplicating the type definition.
 export interface LoginMarker {
   id: number;
-  username: string | null;   // null if the login attempt used an unknown username
-  country:  string | null;   // geo-resolved country name (may be null if IP lookup failed)
-  city:     string | null;   // geo-resolved city name
-  lat:      number | null;   // latitude — null if geo-resolution failed
-  lng:      number | null;   // longitude — null if geo-resolution failed
-  success:  boolean;         // true = login succeeded; false = attempt was rejected
-  ip:       string;          // originating IP address
-  createdAt: string;         // ISO timestamp of the login attempt
+  username: string | null; // null if the login attempt used an unknown username
+  country: string | null; // geo-resolved country name (may be null if IP lookup failed)
+  city: string | null; // geo-resolved city name
+  lat: number | null; // latitude — null if geo-resolution failed
+  lng: number | null; // longitude — null if geo-resolution failed
+  success: boolean; // true = login succeeded; false = attempt was rejected
+  ip: string; // originating IP address
+  createdAt: string; // ISO timestamp of the login attempt
 }
 
 // Props accepted by this component.
@@ -64,7 +64,6 @@ interface Props {
 }
 
 export default function LoginMap({ markers }: Props) {
-
   // ── Empty effect: signals client-only usage ───────────────────────────────
   // This empty useEffect serves as a signal to developers (and tools) that this
   // component depends on the browser environment. Leaflet registers event
@@ -78,13 +77,13 @@ export default function LoginMap({ markers }: Props) {
     // MapContainer from react-leaflet creates the Leaflet map instance.
     // All configuration is passed as props rather than calling L.map() imperatively.
     <MapContainer
-      center={[20, 0]}         // initial centre: lat 20°N, lng 0° — roughly central world view
-      zoom={2}                 // zoom level 2 shows the whole world comfortably
-      minZoom={2}              // prevent zooming out past the world overview
-      maxZoom={10}             // prevent zooming in too close (data isn't precise enough)
-      scrollWheelZoom          // allow zooming with the mouse scroll wheel
+      center={[20, 0]} // initial centre: lat 20°N, lng 0° — roughly central world view
+      zoom={2} // zoom level 2 shows the whole world comfortably
+      minZoom={2} // prevent zooming out past the world overview
+      maxZoom={10} // prevent zooming in too close (data isn't precise enough)
+      scrollWheelZoom // allow zooming with the mouse scroll wheel
       className="w-full h-full rounded-xl" // fill the parent container
-      style={{ background: '#0f172a' }}     // dark navy fallback while tiles load
+      style={{ background: '#0f172a' }} // dark navy fallback while tiles load
     >
       {/* ── Background tile layer ─────────────────────────────────────────── */}
       {/*
@@ -106,20 +105,20 @@ export default function LoginMap({ markers }: Props) {
         failed for that IP). Using a conditional expression inside map() is fine
         here because React ignores null children.
       */}
-      {markers.map(m =>
+      {markers.map((m) =>
         m.lat != null && m.lng != null ? (
           <CircleMarker
             key={m.id}
-            center={[m.lat, m.lng]}   // [latitude, longitude] tuple
-            radius={6}                // circle radius in pixels (constant across zoom levels)
+            center={[m.lat, m.lng]} // [latitude, longitude] tuple
+            radius={6} // circle radius in pixels (constant across zoom levels)
             pathOptions={{
               // Colour encodes success/failure at a glance:
               //   Red    → successful login (normal, expected)
               //   Orange → failed attempt (may indicate brute-force or wrong credentials)
-              color:       m.success ? '#dc2626' : '#f97316', // stroke colour
-              fillColor:   m.success ? '#dc2626' : '#f97316', // fill colour
+              color: m.success ? '#dc2626' : '#f97316', // stroke colour
+              fillColor: m.success ? '#dc2626' : '#f97316', // fill colour
               fillOpacity: 0.75, // partially transparent so overlapping markers blend
-              weight: 1,         // 1px stroke width
+              weight: 1, // 1px stroke width
             }}
           >
             {/* ── Popup: shown when the admin clicks a marker ─────────────── */}
@@ -129,11 +128,17 @@ export default function LoginMap({ markers }: Props) {
                 {/* Username (falls back to "Unknown user" if not recorded) */}
                 <p className="font-bold text-sm">{m.username ?? 'Unknown user'}</p>
                 {/* City + Country (both fall back to "—" if geo-resolution failed) */}
-                <p>{m.city ?? '—'}, {m.country ?? '—'}</p>
+                <p>
+                  {m.city ?? '—'}, {m.country ?? '—'}
+                </p>
                 {/* Raw IP address — useful for cross-referencing abuse reports */}
                 <p className="text-gray-400">{m.ip}</p>
                 {/* Success / failure indicator with appropriate colours */}
-                <p className={m.success ? 'text-green-600 font-semibold' : 'text-orange-500 font-semibold'}>
+                <p
+                  className={
+                    m.success ? 'text-green-600 font-semibold' : 'text-orange-500 font-semibold'
+                  }
+                >
                   {m.success ? '✓ Success' : '✗ Failed'}
                 </p>
                 {/* Human-readable local date/time of the attempt */}

@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import bundleAnalyzer from '@next/bundle-analyzer';
 
 // Run `ANALYZE=true npm run build` to open the interactive bundle treemap.
@@ -47,7 +47,7 @@ const securityHeaders = [
       "font-src 'self'",
       // api.anthropic.com is called server-side only — kept here for browser fetch fallback
       "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
-      "frame-src https://js.stripe.com https://hooks.stripe.com",
+      'frame-src https://js.stripe.com https://hooks.stripe.com',
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

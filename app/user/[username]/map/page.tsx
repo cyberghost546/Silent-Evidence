@@ -66,13 +66,13 @@ export default async function StoryMapPage({ params }: Props) {
   // Drafts are shown only when there are any — a permanent "0 drafts" tile is
   // noise, and for an author viewing someone else's map it is meaningless.
   const TILES = [
-    { icon: BookOpen, label: 'Published',  value: totals.published.toLocaleString() },
+    { icon: BookOpen, label: 'Published', value: totals.published.toLocaleString() },
     ...(totals.drafts > 0
       ? [{ icon: FileText, label: 'Drafts', value: totals.drafts.toLocaleString() }]
       : []),
-    { icon: Tags,     label: 'Categories', value: totals.categories.toLocaleString() },
-    { icon: Eye,      label: 'Views',      value: totals.views.toLocaleString() },
-    { icon: Heart,    label: 'Likes',      value: totals.likes.toLocaleString() },
+    { icon: Tags, label: 'Categories', value: totals.categories.toLocaleString() },
+    { icon: Eye, label: 'Views', value: totals.views.toLocaleString() },
+    { icon: Heart, label: 'Likes', value: totals.likes.toLocaleString() },
   ];
 
   return (
@@ -86,7 +86,10 @@ export default async function StoryMapPage({ params }: Props) {
         </div>
         <p className="text-sm text-gray-500 mb-8">
           Everything{' '}
-          <Link href={`/user/${graph.username}`} className="text-gray-300 hover:text-white underline underline-offset-2">
+          <Link
+            href={`/user/${graph.username}`}
+            className="text-gray-300 hover:text-white underline underline-offset-2"
+          >
             @{graph.username}
           </Link>{' '}
           has published, grouped by category. Bigger nodes have more views.
@@ -95,7 +98,11 @@ export default async function StoryMapPage({ params }: Props) {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
           {TILES.map((t) => (
             <div key={t.label} className="rounded-xl border border-gray-800 bg-gray-900 p-4">
-              <t.icon className="w-4 h-4 text-gray-600 mb-2" strokeWidth={1.75} aria-hidden="true" />
+              <t.icon
+                className="w-4 h-4 text-gray-600 mb-2"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <p className="text-2xl font-extrabold leading-none">{t.value}</p>
               <p className="text-xs text-gray-500 mt-1.5">{t.label}</p>
             </div>
@@ -105,8 +112,8 @@ export default async function StoryMapPage({ params }: Props) {
         <StoryGraph data={graph} />
 
         <p className="text-xs text-gray-700 mt-4">
-          Click any node to open it. Published stories only — drafts are counted
-          above but never plotted, so the map matches what readers can actually see.
+          Click any node to open it. Published stories only — drafts are counted above but never
+          plotted, so the map matches what readers can actually see.
         </p>
       </div>
 

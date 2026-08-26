@@ -29,7 +29,6 @@ import { prisma } from '@/lib/prisma';
 // This function is called when someone requests GET /api/forums.
 // No parameters are needed — there is no session check, no query params.
 export async function GET() {
-
   // Fetch all forum boards from the database
   const forums = await prisma.forum.findMany({
     // Order by the admin-controlled `order` column ascending (1, 2, 3 …)
@@ -38,7 +37,6 @@ export async function GET() {
 
     // Include extra data alongside each forum row
     include: {
-
       // Count total posts in this forum.
       // Using _count is much more efficient than fetching all posts and counting in JS —
       // the database counts in a single aggregate operation.

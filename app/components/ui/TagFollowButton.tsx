@@ -49,10 +49,10 @@ import { Bell, BellOff } from 'lucide-react';
 // ── Props interface ────────────────────────────────────────────────────────────
 
 type Props = {
-  tagSlug: string;           // URL slug of the tag (e.g. "supernatural")
-  tagName: string;           // Human-readable tag name shown in aria-label
+  tagSlug: string; // URL slug of the tag (e.g. "supernatural")
+  tagName: string; // Human-readable tag name shown in aria-label
   initialFollowing: boolean; // Whether the current user already follows this tag
-  initialCount: number;      // Total follower count fetched server-side
+  initialCount: number; // Total follower count fetched server-side
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ export default function TagFollowButton({
     // Flip the follow flag immediately so the UI feels instant (no wait for API).
     setFollowing(!wasFollowing);
     // Increment if following, decrement if unfollowing.
-    setCount(prev => (wasFollowing ? prev - 1 : prev + 1));
+    setCount((prev) => (wasFollowing ? prev - 1 : prev + 1));
 
     try {
       // ── Step 2: Persist to server ──────────────────────────────────────
@@ -104,13 +104,13 @@ export default function TagFollowButton({
       if (!res.ok) {
         // ── Step 3a: Server rejected the request — revert optimistic update ──
         setFollowing(wasFollowing);
-        setCount(prev => (wasFollowing ? prev + 1 : prev - 1));
+        setCount((prev) => (wasFollowing ? prev + 1 : prev - 1));
       }
       // On 2xx success, our optimistic values already match the server — no action needed.
     } catch {
       // ── Step 3b: Network error — also revert ──────────────────────────
       setFollowing(wasFollowing);
-      setCount(prev => (wasFollowing ? prev + 1 : prev - 1));
+      setCount((prev) => (wasFollowing ? prev + 1 : prev - 1));
     } finally {
       // Always re-enable the button once the request settles (success or failure).
       setLoading(false);
@@ -122,7 +122,6 @@ export default function TagFollowButton({
   return (
     // Flex row: [button] [count] — keeps the count from jumping inside the button
     <div className="flex items-center gap-2">
-
       {/* ── Toggle button ──────────────────────────────────────────────────────
           Visual design:
             following  → solid red background ("I am following this")
@@ -135,7 +134,7 @@ export default function TagFollowButton({
       <button
         onClick={handleToggle}
         disabled={loading}
-        suppressHydrationWarning  // prevents hydration mismatch from SSR→client delta
+        suppressHydrationWarning // prevents hydration mismatch from SSR→client delta
         aria-label={following ? `Unfollow tag ${tagName}` : `Follow tag ${tagName}`}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
           following

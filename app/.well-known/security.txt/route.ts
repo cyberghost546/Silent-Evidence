@@ -11,7 +11,10 @@
 
 import { NextResponse } from 'next/server';
 
-const BASE_URL = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://silentevidence.com').replace(/\/$/, '');
+const BASE_URL = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://silentevidence.com').replace(
+  /\/$/,
+  ''
+);
 
 export async function GET() {
   // Expires one year out. RFC 9116 mandates an Expires field; keep it fresh.

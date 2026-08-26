@@ -15,7 +15,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { serverError } from '@/lib/apiError';
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export async function GET(_req: Request, { params }: Props) {
   try {
@@ -36,7 +38,7 @@ export async function GET(_req: Request, { params }: Props) {
 
     if (!source) return NextResponse.json({ error: 'Story not found' }, { status: 404 });
 
-    const tagIds = source.tags.map(t => t.id);
+    const tagIds = source.tags.map((t) => t.id);
 
     // Fetch candidate stories: same category OR same mood OR shared tags OR same author
     const candidates = await prisma.story.findMany({
@@ -67,7 +69,7 @@ export async function GET(_req: Request, { params }: Props) {
 
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-    const scored = candidates.map(story => {
+    const scored = candidates.map((story) => {
       let score = 0;
 
       if (story.categoryId === source.categoryId) score += 4;
@@ -76,7 +78,7 @@ export async function GET(_req: Request, { params }: Props) {
       if (story.createdAt >= sevenDaysAgo) score += 1;
 
       // Shared tags
-      const sharedTags = story.tags.filter(t => tagIds.includes(t.id)).length;
+      const sharedTags = story.tags.filter((t) => tagIds.includes(t.id)).length;
       score += sharedTags * 3;
 
       const { tags, ...rest } = story;

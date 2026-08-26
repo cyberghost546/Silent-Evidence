@@ -17,15 +17,15 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
     process.env.VAPID_EMAIL ?? 'mailto:admin@silentevidence.com',
     process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY,
+    process.env.VAPID_PRIVATE_KEY
   );
 }
 
 export type PushPayload = {
   title: string;
   body: string;
-  url?: string;   // page to open when the notification is clicked
-  icon?: string;  // notification icon (defaults to /icon-192.png)
+  url?: string; // page to open when the notification is clicked
+  icon?: string; // notification icon (defaults to /icon-192.png)
 };
 
 // Sends a push notification to every active subscription for a user.
@@ -49,7 +49,7 @@ export async function sendPushToUser(userId: number, payload: PushPayload) {
             body: payload.body,
             url: payload.url ?? '/',
             icon: payload.icon ?? '/icon-192.png',
-          }),
+          })
         );
       } catch (err: unknown) {
         // 410 Gone or 404 means the subscription is expired — mark for cleanup
@@ -58,7 +58,7 @@ export async function sendPushToUser(userId: number, payload: PushPayload) {
           expiredIds.push(sub.id);
         }
       }
-    }),
+    })
   );
 
   // Remove expired subscriptions so we don't keep trying to send to them

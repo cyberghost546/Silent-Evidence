@@ -184,9 +184,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   // `as const` narrows the type from string to the literal 'desc' | 'asc'
   // which Prisma's TypeScript types require.
   const orderBy =
-    sort === 'popular'
-      ? { likes: { _count: 'desc' as const } }
-      : { createdAt: 'desc' as const };
+    sort === 'popular' ? { likes: { _count: 'desc' as const } } : { createdAt: 'desc' as const };
 
   // ── Fetch one page of stories ─────────────────────────────────────────────
   // skip: offset (skip pages we've already seen)
@@ -209,8 +207,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     },
   });
 
-
-
   return (
     <main className="min-h-screen bg-gray-900 text-white">
       <Header />
@@ -224,11 +220,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_80%,rgba(220,38,38,0.06)_0%,transparent_70%)]" />
 
         <div className="max-w-6xl mx-auto px-4 pt-12 pb-14 relative">
-
           {/* ── Breadcrumb ─────────────────────────────────────────────── */}
           {/* Shows "Home / Ghost Stories" to orient the user in the site hierarchy */}
           <div className="flex items-center gap-2 text-xs text-gray-600 mb-8">
-            <Link href="/" className="hover:text-gray-400 transition">Home</Link>
+            <Link href="/" className="hover:text-gray-400 transition">
+              Home
+            </Link>
             <span>/</span>
             <span className="text-gray-400">{category.name}</span>
           </div>
@@ -238,9 +235,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             {/* Icon box — icon resolved from the shared category map */}
             <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center shrink-0">
               {createElement(categoryIcon(slug), {
-                className: "w-7 h-7 text-red-400",
+                className: 'w-7 h-7 text-red-400',
                 strokeWidth: 1.5,
-                "aria-hidden": "true",
+                'aria-hidden': 'true',
               })}
             </div>
             <div>
@@ -277,9 +274,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 href={`/category/${slug}?sort=newest`}
                 // Active style: green background when 'newest' is selected
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
-                  sort !== 'popular'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                  sort !== 'popular' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Newest
@@ -287,9 +282,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <Link
                 href={`/category/${slug}?sort=popular`}
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
-                  sort === 'popular'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                  sort === 'popular' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Popular

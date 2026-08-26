@@ -34,10 +34,12 @@ export default async function AdminChallengesPage() {
   // `_count: { select: { entries: true } }` tells Prisma to run a COUNT(*)
   // on the related entries and attach the result as `_count.entries`.
   // `.catch(() => [])` returns an empty array instead of crashing if the DB is down.
-  const challenges = await prisma.challenge.findMany({
-    orderBy: { startDate: 'asc' },
-    include: { _count: { select: { entries: true } } },
-  }).catch(() => []);
+  const challenges = await prisma.challenge
+    .findMany({
+      orderBy: { startDate: 'asc' },
+      include: { _count: { select: { entries: true } } },
+    })
+    .catch(() => []);
 
   // Pass the data to the client component.
   // Prisma returns Date objects, but client components can only receive plain
@@ -45,17 +47,17 @@ export default async function AdminChallengesPage() {
   // so Next.js can safely pass it across the server→client boundary.
   return (
     <AdminChallengesClient
-      challenges={challenges.map(c => ({
-        id:          c.id,
-        title:       c.title,
+      challenges={challenges.map((c) => ({
+        id: c.id,
+        title: c.title,
         description: c.description,
-        prompt:      c.prompt,
+        prompt: c.prompt,
         // Convert Date objects to ISO strings — client components can't receive Date objects
-        startDate:   c.startDate.toISOString(),
-        endDate:     c.endDate.toISOString(),
-        active:      c.active,
+        startDate: c.startDate.toISOString(),
+        endDate: c.endDate.toISOString(),
+        active: c.active,
         // Flatten the nested `_count.entries` into a simple number
-        entries:     c._count.entries,
+        entries: c._count.entries,
       }))}
     />
   );

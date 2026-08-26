@@ -14,9 +14,9 @@ import { MOODS as MOOD_VALUES, MOOD_META } from '@/lib/moods';
 // that silently matched nothing.
 const MOODS = MOOD_VALUES.map((value) => ({
   value,
-  label:  MOOD_META[value].label,
+  label: MOOD_META[value].label,
   accent: MOOD_META[value].accent,
-  desc:   MOOD_META[value].description,
+  desc: MOOD_META[value].description,
 }));
 
 type Props = { initialFearMoods: string };
@@ -24,18 +24,21 @@ type Props = { initialFearMoods: string };
 export default function FearProfilePicker({ initialFearMoods }: Props) {
   const [selected, setSelected] = useState<string[]>(
     initialFearMoods
-      ? initialFearMoods.split(',').map(v => v.trim()).filter(Boolean)
+      ? initialFearMoods
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean)
       : []
   );
-  const [saving,  setSaving]  = useState(false);
+  const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error,   setError]   = useState('');
+  const [error, setError] = useState('');
 
   const toggle = (value: string) => {
     setSuccess(false);
     setError('');
-    setSelected(prev => {
-      if (prev.includes(value)) return prev.filter(v => v !== value);
+    setSelected((prev) => {
+      if (prev.includes(value)) return prev.filter((v) => v !== value);
       if (prev.length >= 3) return prev;
       return [...prev, value];
     });
@@ -53,7 +56,10 @@ export default function FearProfilePicker({ initialFearMoods }: Props) {
       });
       const data = await res.json();
       setSaving(false);
-      if (!res.ok) { setError(data.error ?? 'Unable to save.'); return; }
+      if (!res.ok) {
+        setError(data.error ?? 'Unable to save.');
+        return;
+      }
       setSuccess(true);
     } catch {
       setSaving(false);
@@ -64,14 +70,18 @@ export default function FearProfilePicker({ initialFearMoods }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">Choose up to <span className="text-white font-semibold">3 moods</span></p>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${selected.length === 3 ? 'border-red-600 text-red-400' : 'border-gray-700 text-gray-500'}`}>
+        <p className="text-sm text-gray-400">
+          Choose up to <span className="text-white font-semibold">3 moods</span>
+        </p>
+        <span
+          className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${selected.length === 3 ? 'border-red-600 text-red-400' : 'border-gray-700 text-gray-500'}`}
+        >
           {selected.length} / 3
         </span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        {MOODS.map(mood => {
+        {MOODS.map((mood) => {
           const isSelected = selected.includes(mood.value);
           const isDisabled = !isSelected && selected.length >= 3;
           return (
@@ -83,12 +93,18 @@ export default function FearProfilePicker({ initialFearMoods }: Props) {
                 isSelected
                   ? 'border-red-600 bg-red-950/30'
                   : isDisabled
-                  ? 'border-gray-800 opacity-40 cursor-not-allowed'
-                  : 'border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
+                    ? 'border-gray-800 opacity-40 cursor-not-allowed'
+                    : 'border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
               }`}
             >
               {isSelected && (
-                <svg className="absolute top-2 right-2 w-3.5 h-3.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg
+                  className="absolute top-2 right-2 w-3.5 h-3.5 text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -110,7 +126,7 @@ export default function FearProfilePicker({ initialFearMoods }: Props) {
           {saving ? 'Saving…' : 'Save Preferences'}
         </button>
         {success && <span className="text-xs text-gray-400">Saved</span>}
-        {error   && <span className="text-xs text-red-400">{error}</span>}
+        {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
     </div>
   );

@@ -11,17 +11,17 @@ import { useRouter } from 'next/navigation';
 const ACCESS_LABELS: Record<string, { label: string; desc: string; color: string }> = {
   UNDER_13: {
     label: 'Kids Mode',
-    desc:  'You can read all general horror stories rated for everyone.',
+    desc: 'You can read all general horror stories rated for everyone.',
     color: 'text-blue-400',
   },
   TEEN: {
     label: 'Teen Access',
-    desc:  'You can read general and teen-rated content. Mature stories are restricted.',
+    desc: 'You can read general and teen-rated content. Mature stories are restricted.',
     color: 'text-yellow-400',
   },
   ADULT: {
     label: 'Full Access',
-    desc:  'You have unrestricted access to all content on the site.',
+    desc: 'You have unrestricted access to all content on the site.',
     color: 'text-green-400',
   },
 };
@@ -29,22 +29,25 @@ const ACCESS_LABELS: Record<string, { label: string; desc: string; color: string
 export default function AgeVerificationForm() {
   const router = useRouter();
 
-  const [dob,      setDob]      = useState('');
-  const [saving,   setSaving]   = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
-  const [result,   setResult]   = useState<{ ageGroup: string; age: number } | null>(null);
+  const [dob, setDob] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ ageGroup: string; age: number } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!dob) { setError('Please enter your date of birth.'); return; }
+    if (!dob) {
+      setError('Please enter your date of birth.');
+      return;
+    }
 
     setSaving(true);
     const res = await fetch('/api/user/age', {
-      method:  'PATCH',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ dateOfBirth: dob }),
+      body: JSON.stringify({ dateOfBirth: dob }),
     });
     const data = await res.json();
 
@@ -55,7 +58,10 @@ export default function AgeVerificationForm() {
       // so there is nothing left to stay on this page for. Show the reason, then
       // send them to the home page as a signed-out visitor.
       if (data.ageBlocked) {
-        setTimeout(() => { router.push('/'); router.refresh(); }, 5000);
+        setTimeout(() => {
+          router.push('/');
+          router.refresh();
+        }, 5000);
       }
       return;
     }
@@ -72,16 +78,14 @@ export default function AgeVerificationForm() {
     <div className="w-full max-w-md">
       {/* Card */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl">
-
         {!result ? (
           // ── Entry form ───────────────────────────────────────────────────────
           <>
             <div className="text-center mb-7">
               <h1 className="text-2xl font-bold text-white mb-2">How old are you?</h1>
               <p className="text-sm text-gray-400 leading-relaxed">
-                We need your date of birth to make sure you only see content
-                that&apos;s right for your age. This is stored securely and
-                never shared.
+                We need your date of birth to make sure you only see content that&apos;s right for
+                your age. This is stored securely and never shared.
               </p>
             </div>
 
@@ -95,7 +99,7 @@ export default function AgeVerificationForm() {
                   suppressHydrationWarning
                   type="date"
                   value={dob}
-                  onChange={e => setDob(e.target.value)}
+                  onChange={(e) => setDob(e.target.value)}
                   // Restrict to realistic range
                   min="1900-01-01"
                   max={new Date().toISOString().slice(0, 10)}
@@ -125,13 +129,31 @@ export default function AgeVerificationForm() {
                 How it works
               </p>
               {[
-                { tone: 'text-blue-400',   age: 'Under 13', desc: 'General content only — no gore or explicit content' },
-                { tone: 'text-yellow-400', age: '13 – 17',  desc: 'General + teen content — some violence, no explicit' },
-                { tone: 'text-green-400',  age: '18+',      desc: 'Full access — all stories including mature content' },
-              ].map(row => (
+                {
+                  tone: 'text-blue-400',
+                  age: 'Under 13',
+                  desc: 'General content only — no gore or explicit content',
+                },
+                {
+                  tone: 'text-yellow-400',
+                  age: '13 – 17',
+                  desc: 'General + teen content — some violence, no explicit',
+                },
+                {
+                  tone: 'text-green-400',
+                  age: '18+',
+                  desc: 'Full access — all stories including mature content',
+                },
+              ].map((row) => (
                 <div key={row.age} className="flex items-start gap-2.5 text-xs text-gray-400">
-                  <Circle className={`w-3 h-3 shrink-0 mt-1 ${row.tone}`} strokeWidth={3} aria-hidden="true" />
-                  <span><span className="text-gray-300 font-medium">{row.age}:</span> {row.desc}</span>
+                  <Circle
+                    className={`w-3 h-3 shrink-0 mt-1 ${row.tone}`}
+                    strokeWidth={3}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span className="text-gray-300 font-medium">{row.age}:</span> {row.desc}
+                  </span>
                 </div>
               ))}
             </div>
@@ -156,8 +178,8 @@ export default function AgeVerificationForm() {
             className="hover:text-gray-400 transition underline"
           >
             Skip for now
-          </button>
-          {' '}(you&apos;ll have full access until you set your age)
+          </button>{' '}
+          (you&apos;ll have full access until you set your age)
         </p>
       )}
     </div>

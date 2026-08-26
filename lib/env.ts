@@ -17,24 +17,24 @@ const REQUIRED_VARS = [
 // ── Optional but warned variables ─────────────────────────────────────────────
 // These are needed for specific features. Missing ones log a warning but don't crash.
 const OPTIONAL_VARS: Record<string, string> = {
-  ANTHROPIC_API_KEY:              'AI story generation and translation will be disabled.',
-  STRIPE_SECRET_KEY:              'Stripe payments will not work.',
-  STRIPE_WEBHOOK_SECRET:          'Stripe webhooks will not be validated.',
+  ANTHROPIC_API_KEY: 'AI story generation and translation will be disabled.',
+  STRIPE_SECRET_KEY: 'Stripe payments will not work.',
+  STRIPE_WEBHOOK_SECRET: 'Stripe webhooks will not be validated.',
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'Stripe frontend will not initialize.',
-  STRIPE_PREMIUM_MONTHLY_PRICE_ID:'Monthly subscriptions will not work.',
+  STRIPE_PREMIUM_MONTHLY_PRICE_ID: 'Monthly subscriptions will not work.',
   STRIPE_PREMIUM_YEARLY_PRICE_ID: 'Yearly subscriptions will not work.',
   STRIPE_AUTHOR_MONTHLY_PRICE_ID: 'Monthly Author Pro plans will not work.',
-  STRIPE_AUTHOR_YEARLY_PRICE_ID:  'Yearly Author Pro plans will not work.',
-  GOOGLE_CLIENT_ID:               'Google OAuth login will be disabled.',
-  GOOGLE_CLIENT_SECRET:           'Google OAuth login will be disabled.',
-  MICROSOFT_CLIENT_ID:            'Microsoft OAuth login will be disabled.',
-  MICROSOFT_CLIENT_SECRET:        'Microsoft OAuth login will be disabled.',
-  REDIS_URL:                      'Redis caching will be disabled — all requests hit the DB.',
+  STRIPE_AUTHOR_YEARLY_PRICE_ID: 'Yearly Author Pro plans will not work.',
+  GOOGLE_CLIENT_ID: 'Google OAuth login will be disabled.',
+  GOOGLE_CLIENT_SECRET: 'Google OAuth login will be disabled.',
+  MICROSOFT_CLIENT_ID: 'Microsoft OAuth login will be disabled.',
+  MICROSOFT_CLIENT_SECRET: 'Microsoft OAuth login will be disabled.',
+  REDIS_URL: 'Redis caching will be disabled — all requests hit the DB.',
   // The protected owner account (lib/owner.ts). Without it there is no owner to
   // protect from demotion and no target for break-glass recovery — the last-admin
   // guard still applies, but owner-specific protection is off.
-  OWNER_EMAIL:                    'Owner-account protection and break-glass recovery will be disabled.',
-  CRON_SECRET:                    'Scheduled jobs (publishing, retention, newsletter) cannot be triggered securely.',
+  OWNER_EMAIL: 'Owner-account protection and break-glass recovery will be disabled.',
+  CRON_SECRET: 'Scheduled jobs (publishing, retention, newsletter) cannot be triggered securely.',
 };
 
 // ── Validation function ───────────────────────────────────────────────────────
@@ -66,8 +66,8 @@ export function validateEnv(): void {
     // Throw so the app refuses to start rather than running in a broken state
     throw new Error(
       `[env] Missing required environment variables:\n` +
-      missing.map((k) => `  - ${k}`).join('\n') +
-      `\n\nCopy .env.example to .env and fill in the values.`
+        missing.map((k) => `  - ${k}`).join('\n') +
+        `\n\nCopy .env.example to .env and fill in the values.`
     );
   }
 
@@ -80,14 +80,19 @@ export function validateEnv(): void {
   //     check existed. 32+ (e.g. `openssl rand -hex 32`) is recommended.
   const sessionSecret = process.env.SESSION_SECRET ?? '';
   const WEAK_SECRETS = ['changeme', 'change-me', 'your-secret', 'placeholder'];
-  if (sessionSecret.length < 16 || WEAK_SECRETS.some((w) => sessionSecret.toLowerCase().includes(w))) {
+  if (
+    sessionSecret.length < 16 ||
+    WEAK_SECRETS.some((w) => sessionSecret.toLowerCase().includes(w))
+  ) {
     throw new Error(
       '[env] SESSION_SECRET is missing, too short, or a placeholder. ' +
-      'Set a real random value (32+ chars) with: openssl rand -hex 32'
+        'Set a real random value (32+ chars) with: openssl rand -hex 32'
     );
   }
   if (sessionSecret.length < 32) {
-    console.warn('[env] SESSION_SECRET is under 32 characters — consider a longer random value (openssl rand -hex 32).');
+    console.warn(
+      '[env] SESSION_SECRET is under 32 characters — consider a longer random value (openssl rand -hex 32).'
+    );
   }
 
   // Check optional variables — warn but don't crash

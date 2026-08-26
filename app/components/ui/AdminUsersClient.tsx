@@ -48,22 +48,31 @@ const ROLES = ['USER', 'AUTHOR', 'ADMIN', 'GUEST'];
 
 // Tailwind classes for each role badge color
 const roleBadge: Record<string, string> = {
-  ADMIN:  'bg-red-600/20 text-red-400 border-red-600/40',
+  ADMIN: 'bg-red-600/20 text-red-400 border-red-600/40',
   AUTHOR: 'bg-blue-600/20 text-blue-400 border-blue-600/40',
-  USER:   'bg-gray-600/20 text-gray-400 border-gray-600/40',
-  GUEST:  'bg-yellow-600/20 text-yellow-400 border-yellow-600/40',
+  USER: 'bg-gray-600/20 text-gray-400 border-gray-600/40',
+  GUEST: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/40',
 };
 
 // Role icons shown in the table
 const roleIcon: Record<string, LucideIcon> = {
-  ADMIN: Crown, AUTHOR: PenLine, USER: User, GUEST: Ghost,
+  ADMIN: Crown,
+  AUTHOR: PenLine,
+  USER: User,
+  GUEST: Ghost,
 };
 
 // RoleIcon — small helper so the icon can be dropped inline next to a role name.
 function RoleIcon({ role, className }: { role: string; className?: string }) {
   const Icon = roleIcon[role];
   if (!Icon) return null;
-  return <Icon className={className ?? 'w-3.5 h-3.5 inline-block'} strokeWidth={1.75} aria-hidden="true" />;
+  return (
+    <Icon
+      className={className ?? 'w-3.5 h-3.5 inline-block'}
+      strokeWidth={1.75}
+      aria-hidden="true"
+    />
+  );
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -72,28 +81,34 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
   const router = useRouter();
 
   // Which user is currently being saved/deleted (shows a spinner)
-  const [loading, setLoading]     = useState<number | null>(null);
-  const [selected, setSelected]   = useState<Set<number>>(new Set());
+  const [loading, setLoading] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
   const toggleSelect = (id: number) =>
-    setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+    setSelected((prev) => {
+      const s = new Set(prev);
+      s.has(id) ? s.delete(id) : s.add(id);
+      return s;
+    });
   const toggleAll = () =>
-    setSelected(prev => prev.size === filtered.length ? new Set() : new Set(filtered.map(u => u.id)));
+    setSelected((prev) =>
+      prev.size === filtered.length ? new Set() : new Set(filtered.map((u) => u.id))
+    );
 
   // Search box input value
-  const [search, setSearch]       = useState('');
+  const [search, setSearch] = useState('');
 
   const [roleFilter, setRoleFilter] = useState('');
   const [premiumOnly, setPremiumOnly] = useState(false);
 
   // Which column to sort by and in what direction
-  const [sortBy, setSortBy]       = useState<'id' | 'username' | 'stories' | 'comments' | 'joined'>('id');
-  const [sortDir, setSortDir]     = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<'id' | 'username' | 'stories' | 'comments' | 'joined'>('id');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   // ── Filter + sort the users list whenever search/filter/sort changes ──
   const filtered = [...users]
-    .filter(u => {
+    .filter((u) => {
       const q = search.toLowerCase();
       return (
         !q ||
@@ -102,27 +117,30 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
         u.email.toLowerCase().includes(q)
       );
     })
-    .filter(u => !roleFilter || u.role === roleFilter)
-    .filter(u => !premiumOnly || u.isPremium)
+    .filter((u) => !roleFilter || u.role === roleFilter)
+    .filter((u) => !premiumOnly || u.isPremium)
     .sort((a, b) => {
       let val = 0;
-      if (sortBy === 'id')       val = a.id - b.id;
+      if (sortBy === 'id') val = a.id - b.id;
       if (sortBy === 'username') val = a.username.localeCompare(b.username);
-      if (sortBy === 'stories')  val = a._count.stories - b._count.stories;
+      if (sortBy === 'stories') val = a._count.stories - b._count.stories;
       if (sortBy === 'comments') val = a._count.comments - b._count.comments;
-      if (sortBy === 'joined')   val = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (sortBy === 'joined')
+        val = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       return sortDir === 'asc' ? val : -val;
     });
 
   // Clicking a column header toggles sort direction or switches column
   const handleSort = (col: typeof sortBy) => {
-    if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
-    else { setSortBy(col); setSortDir('asc'); }
+    if (sortBy === col) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    else {
+      setSortBy(col);
+      setSortDir('asc');
+    }
   };
 
   // Sort indicator arrow shown next to column header
-  const arrow = (col: typeof sortBy) =>
-    sortBy === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
+  const arrow = (col: typeof sortBy) => (sortBy === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '');
 
   // ── API calls ──────────────────────────────────────────────────────────────
 
@@ -164,17 +182,24 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
     if (!confirm(`${label} ${selected.size} users?`)) return;
     setBulkLoading(true);
     const token = await getCsrfToken();
-    await Promise.all([...selected].map(id => {
-      if (action === 'DELETE') return fetch(`/api/admin/users/${id}`, {
-        method: 'DELETE',
-        headers: { 'x-csrf-token': token },
-      });
-      return fetch('/api/admin/warnings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
-        body: JSON.stringify({ userId: id, action, reason: `Bulk ${label.toLowerCase()} by admin` }),
-      });
-    }));
+    await Promise.all(
+      [...selected].map((id) => {
+        if (action === 'DELETE')
+          return fetch(`/api/admin/users/${id}`, {
+            method: 'DELETE',
+            headers: { 'x-csrf-token': token },
+          });
+        return fetch('/api/admin/warnings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+          body: JSON.stringify({
+            userId: id,
+            action,
+            reason: `Bulk ${label.toLowerCase()} by admin`,
+          }),
+        });
+      })
+    );
     setBulkLoading(false);
     setSelected(new Set());
     router.refresh();
@@ -189,27 +214,32 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
   };
 
   // ── Summary stats shown at the top ────────────────────────────────────────
-  const stats = useMemo(() => ({
-    total:   users.length,
-    admins:  users.filter(u => u.role === 'ADMIN').length,
-    authors: users.filter(u => u.role === 'AUTHOR').length,
-    premium: users.filter(u => u.isPremium).length,
-  }), [users]);
+  const stats = useMemo(
+    () => ({
+      total: users.length,
+      admins: users.filter((u) => u.role === 'ADMIN').length,
+      authors: users.filter((u) => u.role === 'AUTHOR').length,
+      premium: users.filter((u) => u.isPremium).length,
+    }),
+    [users]
+  );
 
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-5">
-
       {/* ── Summary stat cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Users',  value: stats.total,   color: 'text-white',       icon: Users },
-          { label: 'Admins',       value: stats.admins,  color: 'text-red-400',     icon: Crown },
-          { label: 'Authors',      value: stats.authors, color: 'text-blue-400',    icon: PenLine },
-          { label: 'Premium',      value: stats.premium, color: 'text-yellow-400',  icon: Zap },
+          { label: 'Total Users', value: stats.total, color: 'text-white', icon: Users },
+          { label: 'Admins', value: stats.admins, color: 'text-red-400', icon: Crown },
+          { label: 'Authors', value: stats.authors, color: 'text-blue-400', icon: PenLine },
+          { label: 'Premium', value: stats.premium, color: 'text-yellow-400', icon: Zap },
         ].map(({ label, value, color, icon: Icon }) => (
-          <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 shadow-[0_4px_20px_rgba(34,197,94,0.1)]">
+          <div
+            key={label}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 shadow-[0_4px_20px_rgba(34,197,94,0.1)]"
+          >
             <Icon className={`w-6 h-6 shrink-0 ${color}`} strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className={`text-xl font-bold ${color}`}>{value}</p>
@@ -221,29 +251,43 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
 
       {/* ── Search + role filter bar ── */}
       <div className="flex flex-col sm:flex-row gap-3">
-
         {/* Search input — filters by ID, username, or email */}
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+            />
           </svg>
           <input
             type="text"
             placeholder="Search by ID, username or email…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             suppressHydrationWarning
             className="w-full pl-9 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600/60 transition"
           />
           {/* Clear button — only shown when there is text */}
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition">✕</button>
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition"
+            >
+              ✕
+            </button>
           )}
         </div>
 
         {/* Role filter pills + Premium pill */}
         <div className="flex items-center gap-2 flex-wrap">
-          {['', ...ROLES].map(r => (
+          {['', ...ROLES].map((r) => (
             <button
               key={r || 'ALL'}
               type="button"
@@ -259,38 +303,68 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           ))}
           <button
             type="button"
-            onClick={() => { setPremiumOnly(v => !v); setRoleFilter(''); }}
+            onClick={() => {
+              setPremiumOnly((v) => !v);
+              setRoleFilter('');
+            }}
             className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
               premiumOnly
                 ? 'bg-yellow-500 border-yellow-500 text-black'
                 : 'border-gray-700 text-gray-400 hover:border-yellow-500/60 hover:text-yellow-400'
             }`}
           >
- Premium
+            Premium
           </button>
         </div>
       </div>
 
       {/* ── Result count ── */}
       <p className="text-xs text-gray-500">
-        Showing <span className="text-white font-semibold">{filtered.length}</span> of {users.length} users
-        {search && <> matching <span className="text-red-400">"{search}"</span></>}
+        Showing <span className="text-white font-semibold">{filtered.length}</span> of{' '}
+        {users.length} users
+        {search && (
+          <>
+            {' '}
+            matching <span className="text-red-400">"{search}"</span>
+          </>
+        )}
       </p>
 
       {/* ── Bulk action bar — shown when rows are selected ── */}
       {selected.size > 0 && (
         <div className="flex items-center gap-3 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl">
           <span className="text-sm font-semibold text-red-300">{selected.size} selected</span>
-          <button type="button" onClick={() => bulkAction('SUSPEND')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 hover:bg-yellow-600/30 transition disabled:opacity-50">
+          <button
+            type="button"
+            onClick={() => bulkAction('SUSPEND')}
+            disabled={bulkLoading}
+            className="text-xs px-3 py-1.5 rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 hover:bg-yellow-600/30 transition disabled:opacity-50"
+          >
             Suspend
           </button>
-          <button type="button" onClick={() => bulkAction('BAN')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600/20 border border-orange-600/40 text-orange-400 hover:bg-orange-600/30 transition disabled:opacity-50">
+          <button
+            type="button"
+            onClick={() => bulkAction('BAN')}
+            disabled={bulkLoading}
+            className="text-xs px-3 py-1.5 rounded-lg bg-orange-600/20 border border-orange-600/40 text-orange-400 hover:bg-orange-600/30 transition disabled:opacity-50"
+          >
             Ban
           </button>
-          <button type="button" onClick={() => bulkAction('DELETE')} disabled={bulkLoading} className="text-xs px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 hover:bg-red-600/30 transition disabled:opacity-50">
+          <button
+            type="button"
+            onClick={() => bulkAction('DELETE')}
+            disabled={bulkLoading}
+            className="text-xs px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 hover:bg-red-600/30 transition disabled:opacity-50"
+          >
             Delete
           </button>
-          <button type="button" onClick={() => setSelected(new Set())} className="ml-auto text-xs text-gray-500 hover:text-white transition">Clear</button>
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="ml-auto text-xs text-gray-500 hover:text-white transition"
+          >
+            Clear
+          </button>
         </div>
       )}
 
@@ -300,10 +374,10 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider bg-gray-950/50">
-
                 {/* Select-all checkbox */}
                 <th className="px-4 py-3 w-8" aria-label="Select all">
-                  <input type="checkbox"
+                  <input
+                    type="checkbox"
                     checked={filtered.length > 0 && selected.size === filtered.length}
                     onChange={toggleAll}
                     aria-label="Select all users"
@@ -312,21 +386,22 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 </th>
                 {/* Sortable column headers */}
                 {[
-                  { key: 'id',       label: 'ID',       align: 'left'   },
-                  { key: 'username', label: 'User',     align: 'left'   },
-                  { key: null,       label: 'Email',    align: 'left'   },
-                  { key: null,       label: 'Role',     align: 'left'   },
-                  { key: 'stories',  label: 'Stories',  align: 'center' },
+                  { key: 'id', label: 'ID', align: 'left' },
+                  { key: 'username', label: 'User', align: 'left' },
+                  { key: null, label: 'Email', align: 'left' },
+                  { key: null, label: 'Role', align: 'left' },
+                  { key: 'stories', label: 'Stories', align: 'center' },
                   { key: 'comments', label: 'Comments', align: 'center' },
-                  { key: 'joined',   label: 'Joined',   align: 'left'   },
-                  { key: null,       label: 'Actions',  align: 'right'  },
+                  { key: 'joined', label: 'Joined', align: 'left' },
+                  { key: null, label: 'Actions', align: 'right' },
                 ].map(({ key, label, align }) => (
                   <th
                     key={label}
                     className={`px-4 py-3 text-${align} ${key ? 'cursor-pointer hover:text-white select-none' : ''} transition`}
                     onClick={key ? () => handleSort(key as typeof sortBy) : undefined}
                   >
-                    {label}{key ? arrow(key as typeof sortBy) : ''}
+                    {label}
+                    {key ? arrow(key as typeof sortBy) : ''}
                   </th>
                 ))}
               </tr>
@@ -342,10 +417,19 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 </tr>
               ) : (
                 filtered.map((user) => (
-                  <tr key={user.id} className={`hover:bg-gray-800/30 transition group ${selected.has(user.id) ? 'bg-red-950/10' : ''}`}>
+                  <tr
+                    key={user.id}
+                    className={`hover:bg-gray-800/30 transition group ${selected.has(user.id) ? 'bg-red-950/10' : ''}`}
+                  >
                     {/* Row checkbox */}
                     <td className="px-4 py-3 w-8">
-                      <input type="checkbox" checked={selected.has(user.id)} onChange={() => toggleSelect(user.id)} aria-label={`Select ${user.username}`} className="accent-red-500 cursor-pointer" />
+                      <input
+                        type="checkbox"
+                        checked={selected.has(user.id)}
+                        onChange={() => toggleSelect(user.id)}
+                        aria-label={`Select ${user.username}`}
+                        className="accent-red-500 cursor-pointer"
+                      />
                     </td>
                     {/* ID — shown as a subtle badge */}
                     <td className="px-4 py-3">
@@ -382,12 +466,16 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                           onChange={(e) => changeRole(user.id, e.target.value)}
                           className={`text-xs font-semibold pl-2 pr-6 py-1 rounded-full border bg-transparent cursor-pointer focus:outline-none appearance-none ${roleBadge[user.role]} disabled:opacity-50`}
                         >
-                          {ROLES.map(r => (
-                            <option key={r} value={r} className="bg-gray-900 text-white">{r}</option>
+                          {ROLES.map((r) => (
+                            <option key={r} value={r} className="bg-gray-900 text-white">
+                              {r}
+                            </option>
                           ))}
                         </select>
                         {/* Custom dropdown arrow */}
-                        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-60">▾</span>
+                        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-60">
+                          ▾
+                        </span>
                       </div>
                     </td>
 
@@ -401,7 +489,11 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
 
                     {/* Join date */}
                     <td className="px-4 py-3 text-gray-500 text-xs">
-                      {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(user.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </td>
 
                     {/* Actions */}

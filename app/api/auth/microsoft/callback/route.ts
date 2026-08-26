@@ -23,7 +23,7 @@ import { createSession } from '@/lib/session';
 // This function runs when Microsoft redirects the browser back to our callback URL.
 // "req" contains the URL with the authorization code as a query parameter.
 export async function GET(req: NextRequest) {
-  const code  = req.nextUrl.searchParams.get('code');
+  const code = req.nextUrl.searchParams.get('code');
   const state = req.nextUrl.searchParams.get('state');
 
   if (!code) return NextResponse.redirect(new URL('/login?error=microsoft', req.url));
@@ -47,11 +47,11 @@ export async function GET(req: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      code,                                                      // the one-time authorization code
-      client_id: process.env.MICROSOFT_CLIENT_ID!,              // our Azure app's public ID
-      client_secret: process.env.MICROSOFT_CLIENT_SECRET!,      // our Azure app's private secret
-      redirect_uri: `${baseUrl}/api/auth/microsoft/callback`,   // must match the registered URI
-      grant_type: 'authorization_code',                         // specifies the OAuth exchange type
+      code, // the one-time authorization code
+      client_id: process.env.MICROSOFT_CLIENT_ID!, // our Azure app's public ID
+      client_secret: process.env.MICROSOFT_CLIENT_SECRET!, // our Azure app's private secret
+      redirect_uri: `${baseUrl}/api/auth/microsoft/callback`, // must match the registered URI
+      grant_type: 'authorization_code', // specifies the OAuth exchange type
     }),
   });
 
@@ -59,7 +59,8 @@ export async function GET(req: NextRequest) {
   const tokens = await tokenRes.json();
 
   // If Microsoft didn't return an access token, something went wrong — send back to login
-  if (!tokens.access_token) return NextResponse.redirect(new URL('/login?error=microsoft', req.url));
+  if (!tokens.access_token)
+    return NextResponse.redirect(new URL('/login?error=microsoft', req.url));
 
   // ── Step 2: Fetch the user's profile from Microsoft Graph ─────────────────
   // Use the access token to call the Microsoft Graph API and get the user's details.
@@ -67,9 +68,12 @@ export async function GET(req: NextRequest) {
   // displayName — the user's full name
   // mail        — the user's primary email address (may be null for some account types)
   // userPrincipalName — the user's login name (often an email; fallback when mail is null)
-  const userRes = await fetch('https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName', {
-    headers: { Authorization: `Bearer ${tokens.access_token}` }, // pass access token as Bearer
-  });
+  const userRes = await fetch(
+    'https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName',
+    {
+      headers: { Authorization: `Bearer ${tokens.access_token}` }, // pass access token as Bearer
+    }
+  );
 
   // Parse the JSON response from Microsoft Graph
   const msUser = await userRes.json();

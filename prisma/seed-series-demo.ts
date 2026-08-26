@@ -74,7 +74,9 @@ async function main() {
     select: { id: true, title: true, categoryId: true, seriesId: true },
   });
   if (!partOne) {
-    console.error(`Part one ("${PART_ONE_SLUG}") not found. Run npm run db:seed:stories:new first.`);
+    console.error(
+      `Part one ("${PART_ONE_SLUG}") not found. Run npm run db:seed:stories:new first.`
+    );
     process.exit(1);
   }
 
@@ -87,8 +89,7 @@ async function main() {
       data: {
         name: 'The East Stairwell',
         slug: SERIES_SLUG,
-        description:
-          'A night watchman notices that one camera has begun to move. Two parts.',
+        description: 'A night watchman notices that one camera has begun to move. Two parts.',
         authorId: keeper.id,
       },
     });

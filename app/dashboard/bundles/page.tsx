@@ -40,8 +40,8 @@ export default async function AuthorBundlesPage() {
           </div>
           <h1 className="text-3xl font-bold mb-3">Bundles are an Author Pro feature</h1>
           <p className="text-gray-400 mb-8">
-            Package several of your stories into one collection and sell it at a
-            single price — readers who buy get permanent access to all of them.
+            Package several of your stories into one collection and sell it at a single price —
+            readers who buy get permanent access to all of them.
           </p>
           <Link
             href="/author-pro"
@@ -60,15 +60,15 @@ export default async function AuthorBundlesPage() {
   // would leave buyers with a dead link.
   const [stories, bundles] = await Promise.all([
     prisma.story.findMany({
-      where:   { authorId: userId, status: { in: ['PUBLISHED', 'DRAFT'] } },
+      where: { authorId: userId, status: { in: ['PUBLISHED', 'DRAFT'] } },
       orderBy: { createdAt: 'desc' },
-      select:  { id: true, title: true, status: true },
+      select: { id: true, title: true, status: true },
     }),
     prisma.storyBundle.findMany({
-      where:   { authorId: userId },
+      where: { authorId: userId },
       orderBy: { createdAt: 'desc' },
       include: {
-        items:  { include: { story: { select: { id: true, title: true, slug: true } } } },
+        items: { include: { story: { select: { id: true, title: true, slug: true } } } },
         _count: { select: { purchases: true } },
       },
     }),

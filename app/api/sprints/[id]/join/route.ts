@@ -30,9 +30,9 @@ export async function POST(_req: Request, { params }: Ctx) {
 
     // upsert: create participant record if it doesn't exist yet
     const participant = await prisma.sprintParticipant.upsert({
-      where:  { sprintId_userId: { sprintId, userId } },
+      where: { sprintId_userId: { sprintId, userId } },
       create: { sprintId, userId, wordCount: 0 },
-      update: {},                                   // don't overwrite existing word count
+      update: {}, // don't overwrite existing word count
     });
 
     return NextResponse.json(participant, { status: 201 });
@@ -62,14 +62,14 @@ export async function PATCH(req: Request, { params }: Ctx) {
       return badRequest('Sprint not found or already ended.');
     }
 
-    const body   = await req.json();
+    const body = await req.json();
     const parsed = UpdateSchema.safeParse(body);
     if (!parsed.success) return badRequest('Invalid word count.');
 
     // Update the participant's word count
     const participant = await prisma.sprintParticipant.update({
-      where:  { sprintId_userId: { sprintId, userId } },
-      data:   { wordCount: parsed.data.wordCount },
+      where: { sprintId_userId: { sprintId, userId } },
+      data: { wordCount: parsed.data.wordCount },
     });
 
     return NextResponse.json(participant);

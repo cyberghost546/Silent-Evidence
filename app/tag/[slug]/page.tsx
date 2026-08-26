@@ -84,7 +84,9 @@ export default async function TagPage({ params }: Props) {
       <div className="relative bg-gray-950 border-b border-gray-800 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-xs text-gray-500 mb-4">
-            <Link href="/" className="hover:text-gray-300 transition">Home</Link>
+            <Link href="/" className="hover:text-gray-300 transition">
+              Home
+            </Link>
             <span className="mx-2 text-gray-700">/</span>
             <span className="text-gray-400">#{tag.name}</span>
           </div>
@@ -104,7 +106,9 @@ export default async function TagPage({ params }: Props) {
           {/* Count the stories actually listed below, not tag._count.stories —
               that relation count includes drafts and stories this viewer is not
               old enough to see, so it read higher than the list it labelled. */}
-          <p className="text-sm text-gray-600 mt-2">{stories.length} {stories.length === 1 ? 'story' : 'stories'}</p>
+          <p className="text-sm text-gray-600 mt-2">
+            {stories.length} {stories.length === 1 ? 'story' : 'stories'}
+          </p>
         </div>
       </div>
 

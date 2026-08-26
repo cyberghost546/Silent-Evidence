@@ -21,7 +21,16 @@ const prisma = new PrismaClient();
 const ai = new Anthropic();
 
 // All available horror moods — stories are distributed across these
-const MOODS = ['CREEPY', 'PARANOID', 'DISTURBING', 'ATMOSPHERIC', 'PSYCHOLOGICAL', 'SUPERNATURAL', 'GORE', 'JUMPSCARE'] as const;
+const MOODS = [
+  'CREEPY',
+  'PARANOID',
+  'DISTURBING',
+  'ATMOSPHERIC',
+  'PSYCHOLOGICAL',
+  'SUPERNATURAL',
+  'GORE',
+  'JUMPSCARE',
+] as const;
 
 // Content ratings — weighted toward ALL so most content is accessible
 const RATINGS = ['ALL', 'ALL', 'ALL', 'TEEN', 'TEEN', 'MATURE'] as const;
@@ -46,7 +55,10 @@ function slugify(title: string): string {
 }
 
 // Generates a single horror story using Claude AI
-async function generateStory(mood: string, categoryName: string): Promise<{
+async function generateStory(
+  mood: string,
+  categoryName: string
+): Promise<{
   title: string;
   content: string;
   excerpt: string;
@@ -93,8 +105,10 @@ Reply with JSON only:
 
 async function main() {
   // Parse --count argument (default: 10)
-  const countArg = process.argv.find(a => a.startsWith('--count'));
-  const count = countArg ? parseInt(countArg.split('=')[1] || process.argv[process.argv.indexOf('--count') + 1] || '10') : 10;
+  const countArg = process.argv.find((a) => a.startsWith('--count'));
+  const count = countArg
+    ? parseInt(countArg.split('=')[1] || process.argv[process.argv.indexOf('--count') + 1] || '10')
+    : 10;
 
   console.log(`\nGenerating ${count} horror stories with Claude AI...\n`);
 
@@ -131,7 +145,9 @@ async function main() {
     const rating = RATINGS[i % RATINGS.length];
 
     try {
-      console.log(`  [${i + 1}/${count}] Generating ${mood} story in "${category.name}" by ${author.username}...`);
+      console.log(
+        `  [${i + 1}/${count}] Generating ${mood} story in "${category.name}" by ${author.username}...`
+      );
 
       const story = await generateStory(mood, category.name);
       const slug = slugify(story.title);
@@ -158,7 +174,7 @@ async function main() {
 
       // Small delay between API calls to avoid rate limiting
       if (i < count - 1) {
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
       }
     } catch (err) {
       failed++;

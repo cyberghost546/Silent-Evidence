@@ -24,7 +24,7 @@ type Choice = 'all' | 'essential' | 'rejected';
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
-  const [saving, setSaving]   = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // After the component mounts, check localStorage.
   // If no choice has been saved yet, show the banner.
@@ -64,7 +64,6 @@ export default function CookieBanner() {
     // Fixed to the bottom of the screen; z-50 keeps it above all page content
     <div className="fixed bottom-0 left-0 right-0 z-[60] bg-gray-950 border-t border-gray-800 shadow-2xl">
       <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-
         {/* Cookie icon + text */}
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div>
@@ -72,7 +71,10 @@ export default function CookieBanner() {
             <p className="text-xs text-gray-400 leading-relaxed">
               We use essential cookies to keep you logged in, and optional analytics cookies to
               understand how readers use Silent Evidence. No tracking without your consent.{' '}
-              <Link href="/privacy" className="text-red-400 hover:text-red-300 underline underline-offset-2">
+              <Link
+                href="/privacy"
+                className="text-red-400 hover:text-red-300 underline underline-offset-2"
+              >
                 Privacy policy
               </Link>
             </p>

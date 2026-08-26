@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         // This is what makes the text appear word-by-word in the chat UI.
         const claudeStream = client.messages.stream({
           model: 'claude-opus-4-6',
-          max_tokens: 1024,       // Maximum reply length in tokens (roughly ~750 words)
+          max_tokens: 1024, // Maximum reply length in tokens (roughly ~750 words)
           system: SYSTEM_PROMPT,
           messages: apiMessages,
         });
@@ -75,10 +75,7 @@ export async function POST(req: NextRequest) {
         // Each event from Claude may carry a small chunk of text (a few characters).
         // We forward each chunk to the client immediately so it renders in real time.
         for await (const event of claudeStream) {
-          if (
-            event.type === 'content_block_delta' &&
-            event.delta.type === 'text_delta'
-          ) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
             controller.enqueue(encoder.encode(event.delta.text));
           }
         }
@@ -86,7 +83,9 @@ export async function POST(req: NextRequest) {
         // If the stream fails partway through, send a thematic error message
         // instead of leaving the chat bubble empty or broken.
         console.error('Chat stream error:', err);
-        controller.enqueue(encoder.encode('\n\n*The darkness swallowed my words. Please try again.*'));
+        controller.enqueue(
+          encoder.encode('\n\n*The darkness swallowed my words. Please try again.*')
+        );
       } finally {
         // Always close the stream — this tells the browser the response is complete.
         controller.close();

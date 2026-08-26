@@ -13,7 +13,7 @@ type Props = {
 // Speed options available in the selector
 const SPEEDS = [
   { label: '0.8×', value: 0.8 },
-  { label: '1×',   value: 1   },
+  { label: '1×', value: 1 },
   { label: '1.25×', value: 1.25 },
   { label: '1.5×', value: 1.5 },
 ];
@@ -22,28 +22,28 @@ const SPEEDS = [
 // returning plain readable text for the speech engine.
 function stripHtml(html: string): string {
   return html
-    .replace(/<[^>]+>/g, ' ')           // remove every tag
-    .replace(/&nbsp;/g, ' ')            // decode non-breaking space
-    .replace(/&amp;/g, '&')             // decode ampersand
-    .replace(/&lt;/g, '<')              // decode less-than
-    .replace(/&gt;/g, '>')              // decode greater-than
-    .replace(/&quot;/g, '"')            // decode double-quote
-    .replace(/&#39;/g, "'")             // decode single-quote
-    .replace(/\s+/g, ' ')               // collapse whitespace
+    .replace(/<[^>]+>/g, ' ') // remove every tag
+    .replace(/&nbsp;/g, ' ') // decode non-breaking space
+    .replace(/&amp;/g, '&') // decode ampersand
+    .replace(/&lt;/g, '<') // decode less-than
+    .replace(/&gt;/g, '>') // decode greater-than
+    .replace(/&quot;/g, '"') // decode double-quote
+    .replace(/&#39;/g, "'") // decode single-quote
+    .replace(/\s+/g, ' ') // collapse whitespace
     .trim();
 }
 
 export default function ReadAloudButton({ content }: Props) {
   // supported — whether the browser has speechSynthesis at all
-  const [supported, setSupported]   = useState(false);
+  const [supported, setSupported] = useState(false);
   // active — whether the sticky bar is visible (playing or paused)
-  const [active,    setActive]      = useState(false);
+  const [active, setActive] = useState(false);
   // playing — true while speech is running (false when paused or stopped)
-  const [playing,   setPlaying]     = useState(false);
+  const [playing, setPlaying] = useState(false);
   // speed — current playback rate chosen by the user
-  const [speed,     setSpeed]       = useState(1);
+  const [speed, setSpeed] = useState(1);
   // wordIndex — approximate current word being spoken
-  const [wordIndex, setWordIndex]   = useState(0);
+  const [wordIndex, setWordIndex] = useState(0);
 
   // utterRef holds the current SpeechSynthesisUtterance so we can cancel it
   const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -67,7 +67,7 @@ export default function ReadAloudButton({ content }: Props) {
 
   // Plain text we'll feed to the speech engine
   const plainText = stripHtml(content);
-  const words     = plainText.split(/\s+/).filter(Boolean);
+  const words = plainText.split(/\s+/).filter(Boolean);
   wordsRef.current = words;
   const totalWords = words.length;
 
@@ -75,9 +75,9 @@ export default function ReadAloudButton({ content }: Props) {
   function start() {
     window.speechSynthesis.cancel(); // cancel any in-progress speech first
 
-    const utter         = new SpeechSynthesisUtterance(plainText);
-    utter.rate          = speed;     // apply the selected speed
-    utterRef.current    = utter;
+    const utter = new SpeechSynthesisUtterance(plainText);
+    utter.rate = speed; // apply the selected speed
+    utterRef.current = utter;
 
     // Track approximate word position as speech progresses
     utter.onboundary = (e: SpeechSynthesisEvent) => {
@@ -128,8 +128,8 @@ export default function ReadAloudButton({ content }: Props) {
     if (active) {
       // Restart with the new rate; speech engine doesn't support mid-stream rate changes
       window.speechSynthesis.cancel();
-      const utter      = new SpeechSynthesisUtterance(plainText);
-      utter.rate       = newSpeed;
+      const utter = new SpeechSynthesisUtterance(plainText);
+      utter.rate = newSpeed;
       utterRef.current = utter;
 
       utter.onboundary = (e: SpeechSynthesisEvent) => {
@@ -161,14 +161,13 @@ export default function ReadAloudButton({ content }: Props) {
           <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
           </svg>
- Read Aloud
+          Read Aloud
         </button>
       )}
 
       {/* ── Sticky bottom bar — shown while active (playing or paused) ── */}
       {active && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-950/95 backdrop-blur border-t border-gray-800 px-4 py-3 flex flex-wrap items-center gap-3 shadow-2xl">
-
           {/* Play / Pause toggle */}
           <button
             onClick={playing ? pause : resume}
@@ -201,9 +200,7 @@ export default function ReadAloudButton({ content }: Props) {
           </button>
 
           {/* Label */}
-          <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">
- Reading aloud
-          </span>
+          <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">Reading aloud</span>
 
           {/* Word progress — "word 142 / 1,234" */}
           <span className="text-xs text-gray-500 tabular-nums flex-shrink-0">
@@ -224,7 +221,9 @@ export default function ReadAloudButton({ content }: Props) {
               suppressHydrationWarning
             >
               {SPEEDS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
               ))}
             </select>
           </div>
@@ -235,7 +234,13 @@ export default function ReadAloudButton({ content }: Props) {
             className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition ml-1"
             aria-label="Close read-aloud player"
           >
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

@@ -46,15 +46,15 @@ type Story = {
 
 export default function ProfileScreen() {
   const { username } = useLocalSearchParams<{ username: string }>();
-  const router       = useRouter();
-  const auth         = getAuth(); // null if not logged in
+  const router = useRouter();
+  const auth = getAuth(); // null if not logged in
 
-  const [profile, setProfile]       = useState<UserProfile | null>(null);
-  const [stories, setStories]       = useState<Story[]>([]);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stories, setStories] = useState<Story[]>([]);
   const [isFollowing, setFollowing] = useState(false);
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
-  const [error, setError]           = useState('');
+  const [error, setError] = useState('');
 
   // Load the profile and stories from the API
   const loadProfile = useCallback(async () => {
@@ -63,7 +63,7 @@ export default function ProfileScreen() {
     setError('');
 
     try {
-      const res  = await apiFetch(`/api/app/user/${username}`);
+      const res = await apiFetch(`/api/app/user/${username}`);
       const json = await res.json();
 
       if (!res.ok) {
@@ -81,7 +81,9 @@ export default function ProfileScreen() {
     }
   }, [username]);
 
-  useEffect(() => { loadProfile(); }, [loadProfile]);
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   // Toggle follow / unfollow
   const handleFollow = async () => {
@@ -93,15 +95,13 @@ export default function ProfileScreen() {
 
     setFollowLoading(true);
     try {
-      const res  = await apiFetch(`/api/app/user/${username}/follow`, { method: 'POST' });
+      const res = await apiFetch(`/api/app/user/${username}/follow`, { method: 'POST' });
       const json = await res.json();
       if (res.ok) {
         // Update local state and adjust the follower count immediately
         setFollowing(json.following);
         setProfile((prev) =>
-          prev
-            ? { ...prev, followerCount: prev.followerCount + (json.following ? 1 : -1) }
-            : prev
+          prev ? { ...prev, followerCount: prev.followerCount + (json.following ? 1 : -1) } : prev
         );
       }
     } catch {
@@ -148,7 +148,7 @@ export default function ProfileScreen() {
 
       {/* Stats row */}
       <View style={styles.statsRow}>
-        <Stat label="Stories"   value={profile.storyCount} />
+        <Stat label="Stories" value={profile.storyCount} />
         <Stat label="Followers" value={profile.followerCount} />
         <Stat label="Following" value={profile.followingCount} />
       </View>
@@ -167,9 +167,7 @@ export default function ProfileScreen() {
           {followLoading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.followBtnText}>
-              {isFollowing ? 'Following' : 'Follow'}
-            </Text>
+            <Text style={styles.followBtnText}>{isFollowing ? 'Following' : 'Follow'}</Text>
           )}
         </Pressable>
       )}
@@ -186,9 +184,7 @@ export default function ProfileScreen() {
         data={stories}
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={Header}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No published stories yet.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.emptyText}>No published stories yet.</Text>}
         renderItem={({ item }) => <StoryCard story={item} />}
         contentContainerStyle={styles.list}
       />
@@ -219,7 +215,11 @@ function StoryCard({ story }: { story: Story }) {
       {/* Cover image if available */}
       {story.coverImage && (
         <Image
-          source={{ uri: story.coverImage.startsWith('http') ? story.coverImage : `${BASE_URL}${story.coverImage}` }}
+          source={{
+            uri: story.coverImage.startsWith('http')
+              ? story.coverImage
+              : `${BASE_URL}${story.coverImage}`,
+          }}
           style={styles.cover}
           contentFit="cover"
         />
@@ -230,11 +230,15 @@ function StoryCard({ story }: { story: Story }) {
         <Text style={styles.category}>{story.category.name.toUpperCase()}</Text>
 
         {/* Title */}
-        <Text style={styles.cardTitle} numberOfLines={2}>{story.title}</Text>
+        <Text style={styles.cardTitle} numberOfLines={2}>
+          {story.title}
+        </Text>
 
         {/* Excerpt */}
         {story.excerpt ? (
-          <Text style={styles.excerpt} numberOfLines={2}>{story.excerpt}</Text>
+          <Text style={styles.excerpt} numberOfLines={2}>
+            {story.excerpt}
+          </Text>
         ) : null}
 
         {/* Meta row */}
@@ -251,12 +255,24 @@ function StoryCard({ story }: { story: Story }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#0a0a0a' },
-  centered: { flex: 1, backgroundColor: '#0a0a0a', justifyContent: 'center', alignItems: 'center', gap: 16 },
+  centered: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
   list: { paddingBottom: 40 },
 
   // Header
   header: { padding: 20, alignItems: 'center', gap: 10 },
-  backRow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, marginBottom: 8 },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    marginBottom: 8,
+  },
   backArrow: { color: '#22c55e', fontSize: 20 },
   backLabel: { color: '#22c55e', fontSize: 16 },
   avatar: { width: 96, height: 96, borderRadius: 48, borderWidth: 3, borderColor: '#2a2a2a' },
@@ -280,10 +296,22 @@ const styles = StyleSheet.create({
   followBtnText: { color: '#fff', fontWeight: '600', fontSize: 15 },
 
   // Section title
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: '#fff', alignSelf: 'flex-start', marginTop: 12 },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#fff',
+    alignSelf: 'flex-start',
+    marginTop: 12,
+  },
 
   // Story cards
-  card: { marginHorizontal: 16, marginBottom: 12, backgroundColor: '#1a1a1a', borderRadius: 12, overflow: 'hidden' },
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
   cover: { width: '100%', height: 140 },
   cardBody: { padding: 12, gap: 4 },
   category: { fontSize: 10, fontWeight: '700', color: '#22c55e', letterSpacing: 1 },
@@ -295,6 +323,11 @@ const styles = StyleSheet.create({
   // Error / empty
   errorText: { color: '#22c55e', fontSize: 16, textAlign: 'center' },
   emptyText: { color: '#555', textAlign: 'center', marginTop: 32, fontSize: 15 },
-  backBtn: { backgroundColor: '#22c55e', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20 },
+  backBtn: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
   backBtnText: { color: '#fff', fontWeight: '600' },
 });

@@ -41,9 +41,9 @@ const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: { value: SearchSort; label: string }[] = [
   { value: 'relevance', label: 'Best match' },
-  { value: 'newest',    label: 'Newest' },
-  { value: 'popular',   label: 'Most liked' },
-  { value: 'comments',  label: 'Most discussed' },
+  { value: 'newest', label: 'Newest' },
+  { value: 'popular', label: 'Most liked' },
+  { value: 'comments', label: 'Most discussed' },
 ];
 
 const VALID_SORTS = new Set<string>(SORT_OPTIONS.map((o) => o.value));
@@ -61,11 +61,11 @@ type Props = {
 
 export default async function SearchPage({ searchParams }: Props) {
   const sp = await searchParams;
-  const query    = sp.q?.trim() ?? '';
-  const catSlug  = sp.category ?? '';
-  const mood     = sp.mood ?? '';
+  const query = sp.q?.trim() ?? '';
+  const catSlug = sp.category ?? '';
+  const mood = sp.mood ?? '';
   const readTime = sp.readTime ?? '';
-  const page     = Math.max(1, Number(sp.page ?? 1) || 1);
+  const page = Math.max(1, Number(sp.page ?? 1) || 1);
 
   // Relevance only means something when there is a query to be relevant to, so
   // a text search defaults to best-match and plain browsing defaults to newest.
@@ -127,14 +127,15 @@ export default async function SearchPage({ searchParams }: Props) {
   // Build URL for filters (preserving other params)
   function filterHref(overrides: Record<string, string>) {
     const p = new URLSearchParams();
-    if (query)         p.set('q',        query);
-    if (catSlug)       p.set('category', catSlug);
-    if (mood)          p.set('mood',     mood);
-    if (readTime)      p.set('readTime', readTime);
-    if (requestedSort) p.set('sort',     requestedSort);
+    if (query) p.set('q', query);
+    if (catSlug) p.set('category', catSlug);
+    if (mood) p.set('mood', mood);
+    if (readTime) p.set('readTime', readTime);
+    if (requestedSort) p.set('sort', requestedSort);
     p.set('page', '1');
     for (const [k, v] of Object.entries(overrides)) {
-      if (v) p.set(k, v); else p.delete(k);
+      if (v) p.set(k, v);
+      else p.delete(k);
     }
     return `/search?${p.toString()}`;
   }
@@ -144,13 +145,18 @@ export default async function SearchPage({ searchParams }: Props) {
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-10">
-
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white">
-            {query ? `Results for "${query}"` : catSlug ? `Category: ${categories.find(c => c.slug === catSlug)?.name ?? catSlug}` : 'Search'}
+            {query
+              ? `Results for "${query}"`
+              : catSlug
+                ? `Category: ${categories.find((c) => c.slug === catSlug)?.name ?? catSlug}`
+                : 'Search'}
           </h1>
           {hasFilters && (
-            <p className="text-gray-500 text-sm mt-1">{total} {total === 1 ? 'story' : 'stories'} found</p>
+            <p className="text-gray-500 text-sm mt-1">
+              {total} {total === 1 ? 'story' : 'stories'} found
+            </p>
           )}
 
           {/* Explain a widened search rather than silently changing what was asked for */}
@@ -161,7 +167,8 @@ export default async function SearchPage({ searchParams }: Props) {
           )}
           {ignoredTerms.length > 0 && (
             <p className="text-gray-600 text-xs mt-2">
-              Ignored short words: {ignoredTerms.map(t => `"${t}"`).join(', ')} — try three letters or more.
+              Ignored short words: {ignoredTerms.map((t) => `"${t}"`).join(', ')} — try three
+              letters or more.
             </p>
           )}
         </div>
@@ -172,13 +179,18 @@ export default async function SearchPage({ searchParams }: Props) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 uppercase tracking-widest">Category</span>
             <div className="flex flex-wrap gap-1">
-              <Link href={filterHref({ category: '' })}
-                className={`px-3 py-1 text-xs rounded-full border transition ${!catSlug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+              <Link
+                href={filterHref({ category: '' })}
+                className={`px-3 py-1 text-xs rounded-full border transition ${!catSlug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+              >
                 All
               </Link>
-              {categories.map(c => (
-                <Link key={c.slug} href={filterHref({ category: c.slug })}
-                  className={`px-3 py-1 text-xs rounded-full border transition ${catSlug === c.slug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+              {categories.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={filterHref({ category: c.slug })}
+                  className={`px-3 py-1 text-xs rounded-full border transition ${catSlug === c.slug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+                >
                   {c.name}
                 </Link>
               ))}
@@ -192,13 +204,18 @@ export default async function SearchPage({ searchParams }: Props) {
           <div className="flex items-center gap-2 w-full">
             <span className="text-xs text-gray-500 uppercase tracking-widest shrink-0">Mood</span>
             <div className="flex flex-wrap gap-1">
-              <Link href={filterHref({ mood: '' })}
-                className={`px-3 py-1 text-xs rounded-full border transition ${!mood ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+              <Link
+                href={filterHref({ mood: '' })}
+                className={`px-3 py-1 text-xs rounded-full border transition ${!mood ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+              >
                 Any
               </Link>
-              {MOODS.map(m => (
-                <Link key={m} href={filterHref({ mood: m })}
-                  className={`px-3 py-1 text-xs rounded-full border transition ${mood === m ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+              {MOODS.map((m) => (
+                <Link
+                  key={m}
+                  href={filterHref({ mood: m })}
+                  className={`px-3 py-1 text-xs rounded-full border transition ${mood === m ? 'bg-purple-700 border-purple-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+                >
                   {MOOD_META[m].label}
                 </Link>
               ))}
@@ -209,9 +226,17 @@ export default async function SearchPage({ searchParams }: Props) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 uppercase tracking-widest shrink-0">Length</span>
             <div className="flex gap-1">
-              {[['', 'Any'], ['short', '< 5 min'], ['medium', '5–15 min'], ['long', '15+ min']].map(([val, label]) => (
-                <Link key={val} href={filterHref({ readTime: val })}
-                  className={`px-3 py-1 text-xs rounded-full border transition ${readTime === val ? 'bg-blue-700 border-blue-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+              {[
+                ['', 'Any'],
+                ['short', '< 5 min'],
+                ['medium', '5–15 min'],
+                ['long', '15+ min'],
+              ].map(([val, label]) => (
+                <Link
+                  key={val}
+                  href={filterHref({ readTime: val })}
+                  className={`px-3 py-1 text-xs rounded-full border transition ${readTime === val ? 'bg-blue-700 border-blue-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+                >
                   {label}
                 </Link>
               ))}
@@ -221,9 +246,12 @@ export default async function SearchPage({ searchParams }: Props) {
           {/* Sort — "Best match" is only offered when there is a query to rank against */}
           <div className="flex items-center gap-2 ml-auto">
             <span className="text-xs text-gray-500 uppercase tracking-widest">Sort</span>
-            {SORT_OPTIONS.filter(opt => opt.value !== 'relevance' || query).map(opt => (
-              <Link key={opt.value} href={filterHref({ sort: opt.value })}
-                className={`px-3 py-1 text-xs rounded-full border transition ${sort === opt.value ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}>
+            {SORT_OPTIONS.filter((opt) => opt.value !== 'relevance' || query).map((opt) => (
+              <Link
+                key={opt.value}
+                href={filterHref({ sort: opt.value })}
+                className={`px-3 py-1 text-xs rounded-full border transition ${sort === opt.value ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+              >
                 {opt.label}
               </Link>
             ))}
@@ -233,7 +261,9 @@ export default async function SearchPage({ searchParams }: Props) {
         {/* ── People results ───────────────────────────────────────────── */}
         {matchedUsers.length > 0 && (
           <div className="mb-10">
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">People</h2>
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
+              People
+            </h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {matchedUsers.map((u) => {
                 const avatar =
@@ -261,13 +291,16 @@ export default async function SearchPage({ searchParams }: Props) {
                         <p className="text-xs text-gray-500 truncate mt-0.5">{u.profile.bio}</p>
                       )}
                       <p className="text-xs text-gray-600 mt-0.5">
-                        {u._count.stories} {u._count.stories === 1 ? 'story' : 'stories'} · {u._count.followers} {u._count.followers === 1 ? 'follower' : 'followers'}
+                        {u._count.stories} {u._count.stories === 1 ? 'story' : 'stories'} ·{' '}
+                        {u._count.followers} {u._count.followers === 1 ? 'follower' : 'followers'}
                       </p>
                     </div>
 
                     {/* Hide the arrow for the viewer's own profile */}
                     {viewerId !== u.id && (
-                      <span className="text-gray-600 group-hover:text-red-500 transition text-lg">›</span>
+                      <span className="text-gray-600 group-hover:text-red-500 transition text-lg">
+                        ›
+                      </span>
                     )}
                   </Link>
                 );
@@ -280,7 +313,9 @@ export default async function SearchPage({ searchParams }: Props) {
         {!hasFilters && (
           <div className="text-center py-20 text-gray-600">
             <p>Type something in the search bar or pick a category to find stories.</p>
-            <p className="mt-2 text-sm">Use &quot;quotation marks&quot; to search for an exact phrase.</p>
+            <p className="mt-2 text-sm">
+              Use &quot;quotation marks&quot; to search for an exact phrase.
+            </p>
           </div>
         )}
 
@@ -297,7 +332,9 @@ export default async function SearchPage({ searchParams }: Props) {
           <>
             {/* "Stories" label — only when user results are also showing */}
             {matchedUsers.length > 0 && (
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">Stories</h2>
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                Stories
+              </h2>
             )}
             <SearchStories
               stories={JSON.parse(JSON.stringify(results))}
@@ -310,11 +347,11 @@ export default async function SearchPage({ searchParams }: Props) {
                   // search silently widened it back out to everything.
                   buildHref={(p) => {
                     const params = new URLSearchParams();
-                    if (query)         params.set('q',        query);
-                    if (catSlug)       params.set('category', catSlug);
-                    if (mood)          params.set('mood',     mood);
-                    if (readTime)      params.set('readTime', readTime);
-                    if (requestedSort) params.set('sort',     requestedSort);
+                    if (query) params.set('q', query);
+                    if (catSlug) params.set('category', catSlug);
+                    if (mood) params.set('mood', mood);
+                    if (readTime) params.set('readTime', readTime);
+                    if (requestedSort) params.set('sort', requestedSort);
                     params.set('page', String(p));
                     return `/search?${params.toString()}`;
                   }}

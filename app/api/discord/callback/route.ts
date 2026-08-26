@@ -49,7 +49,6 @@ const DISCORD_API = 'https://discord.com/api/v10';
 // Next.js calls this function when Discord redirects the user back here.
 // req — the incoming request, which contains the OAuth `code` and `state` query params
 export async function GET(req: NextRequest) {
-
   // Parse the URL so we can read the query string parameters Discord appended
   const { searchParams } = new URL(req.url);
 
@@ -152,7 +151,6 @@ export async function GET(req: NextRequest) {
     // Only proceed if both the guild ID and bot token are configured.
     // If they're not set up, we skip this step silently — the account is still connected.
     if (guildId && botToken) {
-
       // Send a PUT request to add this Discord user as a member of our server.
       // Discord's "Add Guild Member" endpoint requires the guilds.join OAuth scope
       // (which we requested in /connect) and the user's access token.
@@ -195,7 +193,6 @@ export async function GET(req: NextRequest) {
 
     // All steps complete — redirect back to settings with a success flag
     return NextResponse.redirect(`${BASE_URL}/settings?discord=connected`);
-
   } catch (err) {
     // Log the error on the server so we can debug it (won't be visible to the user)
     console.error('[discord-callback]', err);

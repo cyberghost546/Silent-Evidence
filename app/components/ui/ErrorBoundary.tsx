@@ -55,9 +55,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
         <div className="min-h-[300px] flex flex-col items-center justify-center p-8 text-center">
           {/* Spooky ghost icon */}
 
-          <h2 className="text-xl font-bold text-red-500 mb-2">
-            Something went wrong
-          </h2>
+          <h2 className="text-xl font-bold text-red-500 mb-2">Something went wrong</h2>
 
           <p className="text-gray-400 text-sm mb-6 max-w-sm">
             A ghost got into the machine. This part of the page couldn&apos;t load.

@@ -26,7 +26,8 @@ export default async function AuthorProSuccessPage() {
   const [isAuthorPro, sub] = await Promise.all([
     hasAuthorPro(userId),
     prisma.authorSubscription.findUnique({
-      where: { userId }, select: { plan: true, currentPeriodEnd: true },
+      where: { userId },
+      select: { plan: true, currentPeriodEnd: true },
     }),
   ]);
 
@@ -38,17 +39,21 @@ export default async function AuthorProSuccessPage() {
         {isAuthorPro ? (
           <>
             <div className="inline-flex w-14 h-14 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 mb-6">
-              <PartyPopper className="w-6 h-6 text-amber-400" strokeWidth={1.75} aria-hidden="true" />
+              <PartyPopper
+                className="w-6 h-6 text-amber-400"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
             </div>
             <h1 className="text-3xl font-bold mb-3">You&apos;re an Author Pro</h1>
-            <p className="text-gray-400 mb-2">
-              Every writing tool is unlocked on your account.
-            </p>
+            <p className="text-gray-400 mb-2">Every writing tool is unlocked on your account.</p>
             {sub?.currentPeriodEnd && (
               <p className="text-xs text-gray-600 mb-8">
                 {sub.plan === 'yearly' ? 'Yearly' : 'Monthly'} plan — renews{' '}
                 {sub.currentPeriodEnd.toLocaleDateString('en-US', {
-                  month: 'long', day: 'numeric', year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
                 })}
               </p>
             )}
@@ -76,10 +81,9 @@ export default async function AuthorProSuccessPage() {
             </div>
             <h1 className="text-3xl font-bold mb-3">Confirming your payment…</h1>
             <p className="text-gray-400 mb-8">
-              Stripe has your payment and we&apos;re waiting for it to be confirmed.
-              This usually takes a few seconds. Refresh this page in a moment — if
-              it still hasn&apos;t come through after a few minutes, please get in
-              touch and we&apos;ll sort it out.
+              Stripe has your payment and we&apos;re waiting for it to be confirmed. This usually
+              takes a few seconds. Refresh this page in a moment — if it still hasn&apos;t come
+              through after a few minutes, please get in touch and we&apos;ll sort it out.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link

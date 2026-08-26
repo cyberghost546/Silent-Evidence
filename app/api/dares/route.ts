@@ -26,7 +26,6 @@ import { prisma } from '@/lib/prisma';
 // Returns all dares received by a specific user.
 // The receiverId is passed as a URL query parameter, e.g. ?receiverId=42
 export async function GET(req: Request) {
-
   // Parse the URL so we can read the query string
   const { searchParams } = new URL(req.url);
 
@@ -73,7 +72,6 @@ export async function GET(req: Request) {
 //     message?: string           — optional personal message to attach
 //   }
 export async function POST(req: Request) {
-
   // Read and parse the JSON body of the request
   const body = await req.json();
 

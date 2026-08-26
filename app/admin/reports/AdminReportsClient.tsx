@@ -35,12 +35,12 @@ import { useState } from 'react';
 // Shape of a single report record (dates serialised to strings from the server)
 type Report = {
   id: number;
-  type: string;         // COMMENT | STORY | FORUM_POST | FORUM_REPLY
-  targetId: number;     // database ID of the thing being reported
-  reason: string;       // e.g. HARASSMENT, SPAM — why it was reported
-  note: string | null;  // optional free-text the user added when reporting
-  status: string;       // PENDING | REVIEWED | DISMISSED
-  createdAt: string;    // ISO date string — when the report was filed
+  type: string; // COMMENT | STORY | FORUM_POST | FORUM_REPLY
+  targetId: number; // database ID of the thing being reported
+  reason: string; // e.g. HARASSMENT, SPAM — why it was reported
+  note: string | null; // optional free-text the user added when reporting
+  status: string; // PENDING | REVIEWED | DISMISSED
+  createdAt: string; // ISO date string — when the report was filed
   reporter: { username: string }; // who filed the report
 };
 
@@ -51,27 +51,27 @@ type Props = { reports: Report[] };
 // Maps the raw database enum string to a human-readable label for the UI.
 // Using a lookup table avoids a long if/else chain inside the JSX.
 const TYPE_LABELS: Record<string, string> = {
-  COMMENT:     'Comment',
-  STORY:       'Story',
-  FORUM_POST:  'Forum Post',
+  COMMENT: 'Comment',
+  STORY: 'Story',
+  FORUM_POST: 'Forum Post',
   FORUM_REPLY: 'Forum Reply',
 };
 
 // Same pattern for the reason enum values
 const REASON_LABELS: Record<string, string> = {
-  HARASSMENT:    'Harassment',
-  HATE_SPEECH:   'Hate Speech',
-  SPAM:          'Spam',
+  HARASSMENT: 'Harassment',
+  HATE_SPEECH: 'Hate Speech',
+  SPAM: 'Spam',
   INAPPROPRIATE: 'Inappropriate',
-  THREATS:       'Threats',
-  OTHER:         'Other',
+  THREATS: 'Threats',
+  OTHER: 'Other',
 };
 
 // Tailwind colour classes for each status badge — kept in one place so they're
 // easy to update without hunting through the JSX.
 const STATUS_COLORS: Record<string, string> = {
-  PENDING:   'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  REVIEWED:  'bg-red-500/20  text-red-400  border-red-500/30',
+  PENDING: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  REVIEWED: 'bg-red-500/20  text-red-400  border-red-500/30',
   DISMISSED: 'bg-gray-500/20   text-gray-400   border-gray-500/30',
 };
 
@@ -104,9 +104,7 @@ export default function AdminReportsClient({ reports: initial }: Props) {
     if (res.ok) {
       // Replace only the updated report in the list, keeping all others the same.
       // The spread `{ ...r, status }` copies all existing fields and overwrites `status`.
-      setReports((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r))
-      );
+      setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
     }
     setUpdating(null); // re-enable buttons
   };
@@ -134,23 +132,20 @@ export default function AdminReportsClient({ reports: initial }: Props) {
                 : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
             }`}
           >
-            {f === 'PENDING' && pendingCount > 0 ? `Pending (${pendingCount})` : f.charAt(0) + f.slice(1).toLowerCase()}
+            {f === 'PENDING' && pendingCount > 0
+              ? `Pending (${pendingCount})`
+              : f.charAt(0) + f.slice(1).toLowerCase()}
           </button>
         ))}
       </div>
 
       {/* Empty state */}
-      {visible.length === 0 && (
-        <p className="text-gray-500 text-sm">No reports found.</p>
-      )}
+      {visible.length === 0 && <p className="text-gray-500 text-sm">No reports found.</p>}
 
       {/* Reports table */}
       <div className="space-y-3">
         {visible.map((report) => (
-          <div
-            key={report.id}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-5"
-          >
+          <div key={report.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             {/* Top row: type badge + status badge + date */}
             <div className="flex items-center gap-3 flex-wrap mb-3">
               {/* Type pill */}
@@ -158,13 +153,17 @@ export default function AdminReportsClient({ reports: initial }: Props) {
                 {TYPE_LABELS[report.type] ?? report.type}
               </span>
               {/* Status pill */}
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${STATUS_COLORS[report.status]}`}>
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs font-medium border ${STATUS_COLORS[report.status]}`}
+              >
                 {report.status}
               </span>
               {/* Date */}
               <span className="text-xs text-gray-600 ml-auto">
                 {new Date(report.createdAt).toLocaleDateString('en-US', {
-                  month: 'short', day: 'numeric', year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
                 })}
               </span>
             </div>

@@ -30,7 +30,7 @@ import { prisma } from '@/lib/prisma';
 // Returns null if the user is not logged in, allowing clean conditional logic.
 function getUserId() {
   // cookies() returns a Promise — we chain .then() to extract the value
-  return cookies().then(c => Number(c.get('userId')?.value ?? 0) || null);
+  return cookies().then((c) => Number(c.get('userId')?.value ?? 0) || null);
 }
 
 // ── GET /api/reading-history ───────────────────────────────────────────────────
@@ -67,11 +67,11 @@ export async function GET() {
           // When the story was originally published
           createdAt: true,
           // Author's username for the "by username" label
-          author:   { select: { username: true } },
+          author: { select: { username: true } },
           // Category details for the tag badge on the card
           category: { select: { name: true, slug: true } },
           // Like and comment counts for the engagement stats
-          _count:   { select: { likes: true, comments: true } },
+          _count: { select: { likes: true, comments: true } },
         },
       },
     },
@@ -94,9 +94,10 @@ export async function POST(req: NextRequest) {
   // Parse the JSON body — storyId required, progress optional (0–100)
   const body = await req.json();
   const { storyId } = body;
-  const progress = typeof body.progress === 'number'
-    ? Math.max(0, Math.min(100, Math.round(body.progress)))
-    : undefined;
+  const progress =
+    typeof body.progress === 'number'
+      ? Math.max(0, Math.min(100, Math.round(body.progress)))
+      : undefined;
 
   // Validate: storyId must be provided AND must be a number (not a string or null)
   if (!storyId || typeof storyId !== 'number') {
@@ -104,15 +105,15 @@ export async function POST(req: NextRequest) {
   }
 
   // Fetch existing record so we can enforce "progress only ever increases"
-  const existing = progress !== undefined
-    ? await prisma.readingHistory.findUnique({
-        where: { userId_storyId: { userId, storyId } },
-        select: { progress: true },
-      })
-    : null;
+  const existing =
+    progress !== undefined
+      ? await prisma.readingHistory.findUnique({
+          where: { userId_storyId: { userId, storyId } },
+          select: { progress: true },
+        })
+      : null;
 
-  const shouldUpdateProgress =
-    progress !== undefined && progress > (existing?.progress ?? 0);
+  const shouldUpdateProgress = progress !== undefined && progress > (existing?.progress ?? 0);
 
   await prisma.readingHistory.upsert({
     where: { userId_storyId: { userId, storyId } },

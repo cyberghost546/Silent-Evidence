@@ -57,8 +57,11 @@ export async function PATCH(req: Request, { params }: Params) {
     // original human, so any admin may review them.
     if (appeal.action.moderatorId !== null && appeal.action.moderatorId === admin.id) {
       return NextResponse.json(
-        { error: 'You made the original decision, so you cannot review this appeal. Another admin must.' },
-        { status: 403 },
+        {
+          error:
+            'You made the original decision, so you cannot review this appeal. Another admin must.',
+        },
+        { status: 403 }
       );
     }
 
@@ -77,7 +80,12 @@ export async function PATCH(req: Request, { params }: Params) {
         },
       }),
       ...(overturned
-        ? [prisma.moderationAction.update({ where: { id: appeal.action.id }, data: { status: 'REVERSED' } })]
+        ? [
+            prisma.moderationAction.update({
+              where: { id: appeal.action.id },
+              data: { status: 'REVERSED' },
+            }),
+          ]
         : []),
       prisma.notification.create({
         data: {
@@ -90,15 +98,17 @@ export async function PATCH(req: Request, { params }: Params) {
       }),
     ]);
 
-    await prisma.auditLog.create({
-      data: {
-        adminId: admin.id,
-        action: 'APPEAL_DECISION',
-        detail: `Appeal ${appeal.id} ${parsed.data.decision} for action ${appeal.action.id}.`,
-        targetType: 'ModerationAppeal',
-        targetId: appeal.id,
-      },
-    }).catch(() => {});
+    await prisma.auditLog
+      .create({
+        data: {
+          adminId: admin.id,
+          action: 'APPEAL_DECISION',
+          detail: `Appeal ${appeal.id} ${parsed.data.decision} for action ${appeal.action.id}.`,
+          targetType: 'ModerationAppeal',
+          targetId: appeal.id,
+        },
+      })
+      .catch(() => {});
 
     return NextResponse.json({ ok: true });
   } catch (err) {

@@ -145,12 +145,12 @@ async function main() {
     // upsert on email so re-running the script never creates duplicates
     const user = await prisma.user.upsert({
       where: { email: u.email },
-      update: {},   // already exists — skip
+      update: {}, // already exists — skip
       create: {
         username: u.username,
-        email:    u.email,
+        email: u.email,
         password: hashed,
-        role:     u.role,
+        role: u.role,
         // Create the profile record inline
         profile: {
           create: {
@@ -169,5 +169,8 @@ async function main() {
 }
 
 main()
-  .catch((e) => { console.error(e); process.exit(1); })
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
   .finally(() => prisma.$disconnect());

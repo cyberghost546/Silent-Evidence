@@ -9,14 +9,14 @@ import { useState } from 'react';
 type User = { username: string; avatar: string };
 
 type Props = {
-  username: string;         // whose profile we're on
+  username: string; // whose profile we're on
   type: 'followers' | 'following';
   count: number;
 };
 
 export default function FollowListModal({ username, type, count }: Props) {
-  const [open, setOpen]     = useState(false);
-  const [users, setUsers]   = useState<User[]>([]);
+  const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
   const label = type === 'followers' ? 'followers' : 'following';
@@ -27,7 +27,7 @@ export default function FollowListModal({ username, type, count }: Props) {
     if (users.length > 0) return; // already loaded
     setLoading(true);
     try {
-      const res  = await fetch(`/api/user/${username}/${type}`);
+      const res = await fetch(`/api/user/${username}/${type}`);
       const json = await res.json();
       if (res.ok) setUsers(json.users);
     } finally {
@@ -38,10 +38,7 @@ export default function FollowListModal({ username, type, count }: Props) {
   return (
     <>
       {/* Clickable stat — looks the same as the other profile stats */}
-      <button
-        onClick={handleOpen}
-        className="hover:text-white transition cursor-pointer"
-      >
+      <button onClick={handleOpen} className="hover:text-white transition cursor-pointer">
         <span className="text-white font-semibold">{count}</span>{' '}
         <span className="text-gray-500">{label}</span>
       </button>
@@ -70,14 +67,10 @@ export default function FollowListModal({ username, type, count }: Props) {
 
             {/* Body */}
             <div className="overflow-y-auto flex-1 px-4 py-3 space-y-1">
-              {loading && (
-                <p className="text-center text-gray-500 py-8">Loading…</p>
-              )}
+              {loading && <p className="text-center text-gray-500 py-8">Loading…</p>}
 
               {!loading && users.length === 0 && (
-                <p className="text-center text-gray-500 py-8">
-                  No {label} yet.
-                </p>
+                <p className="text-center text-gray-500 py-8">No {label} yet.</p>
               )}
 
               {/* User rows */}

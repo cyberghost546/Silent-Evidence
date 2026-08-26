@@ -6,17 +6,10 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import {
-  unauthorized,
-  notFound,
-  serverError,
-} from '@/lib/apiError';
+import { unauthorized, notFound, serverError } from '@/lib/apiError';
 
 // ── POST /api/tags/[slug]/follow — toggle follow/unfollow ─────────────────────
-export async function POST(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function POST(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Read the logged-in user ID from the session cookie
     const cookieStore = await cookies();
@@ -57,10 +50,7 @@ export async function POST(
 }
 
 // ── GET /api/tags/[slug]/follow — get follow status + follower count ──────────
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Read session cookie — user may not be logged in (guest)
     const cookieStore = await cookies();

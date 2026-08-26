@@ -36,7 +36,14 @@ export async function GET() {
         createdAt: true,
         appeals: {
           where: { userId },
-          select: { id: true, status: true, message: true, decisionNote: true, createdAt: true, decidedAt: true },
+          select: {
+            id: true,
+            status: true,
+            message: true,
+            decisionNote: true,
+            createdAt: true,
+            decidedAt: true,
+          },
         },
       },
     });
@@ -49,7 +56,10 @@ export async function GET() {
 
 const AppealSchema = z.object({
   actionId: z.number().int().positive(),
-  message: z.string().min(10, 'Please explain why you think this decision was wrong (at least 10 characters).').max(4000),
+  message: z
+    .string()
+    .min(10, 'Please explain why you think this decision was wrong (at least 10 characters).')
+    .max(4000),
 });
 
 export async function POST(req: Request) {
@@ -83,7 +93,10 @@ export async function POST(req: Request) {
       select: { id: true },
     });
     if (existing) {
-      return NextResponse.json({ error: 'You have already appealed this decision.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'You have already appealed this decision.' },
+        { status: 409 }
+      );
     }
 
     const appeal = await prisma.moderationAppeal.create({

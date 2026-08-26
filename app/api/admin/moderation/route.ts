@@ -15,11 +15,27 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
 const Schema = z.object({
-  type: z.enum(['CONTENT_REMOVED', 'CONTENT_HIDDEN', 'CONTENT_REJECTED', 'WARNING', 'ACCOUNT_SUSPENDED', 'ACCOUNT_BANNED']),
+  type: z.enum([
+    'CONTENT_REMOVED',
+    'CONTENT_HIDDEN',
+    'CONTENT_REJECTED',
+    'WARNING',
+    'ACCOUNT_SUSPENDED',
+    'ACCOUNT_BANNED',
+  ]),
   targetType: z.enum(['STORY', 'COMMENT', 'FORUM_POST', 'FORUM_REPLY', 'ACCOUNT']),
   targetId: z.number().int().positive(),
   affectedUserId: z.number().int().positive(),
-  reason: z.enum(['HARASSMENT', 'HATE_SPEECH', 'SPAM', 'INAPPROPRIATE', 'THREATS', 'COPYRIGHT', 'ILLEGAL_CONTENT', 'OTHER']),
+  reason: z.enum([
+    'HARASSMENT',
+    'HATE_SPEECH',
+    'SPAM',
+    'INAPPROPRIATE',
+    'THREATS',
+    'COPYRIGHT',
+    'ILLEGAL_CONTENT',
+    'OTHER',
+  ]),
   explanation: z.string().min(5, 'A statement of reasons is required.').max(4000),
   legalGround: z.string().max(500).optional(),
   reportId: z.number().int().positive().optional(),
@@ -44,15 +60,17 @@ export async function POST(req: Request) {
     });
 
     // Also record it in the admin audit log, tying who acted to the decision.
-    await prisma.auditLog.create({
-      data: {
-        adminId: admin.id,
-        action: 'MODERATION_ACTION',
-        detail: `${parsed.data.type} on ${parsed.data.targetType} ${parsed.data.targetId} (user ${parsed.data.affectedUserId}): ${parsed.data.explanation}`,
-        targetType: parsed.data.targetType,
-        targetId: parsed.data.targetId,
-      },
-    }).catch(() => {});
+    await prisma.auditLog
+      .create({
+        data: {
+          adminId: admin.id,
+          action: 'MODERATION_ACTION',
+          detail: `${parsed.data.type} on ${parsed.data.targetType} ${parsed.data.targetId} (user ${parsed.data.affectedUserId}): ${parsed.data.explanation}`,
+          targetType: parsed.data.targetType,
+          targetId: parsed.data.targetId,
+        },
+      })
+      .catch(() => {});
 
     return NextResponse.json({ ok: true, actionId: action.id }, { status: 201 });
   } catch (err) {

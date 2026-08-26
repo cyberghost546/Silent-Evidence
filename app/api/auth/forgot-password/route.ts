@@ -44,7 +44,10 @@ import { hashToken } from '@/lib/token';
 
 // The base URL of the site — used to build the password reset link in the email.
 // Falls back through two environment variables before defaulting to the production URL.
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? 'https://silentevidence.com';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  'https://silentevidence.com';
 
 // How long (in milliseconds) a reset token remains valid: 1 hour = 3,600,000 ms
 const EXPIRES_IN_MS = 60 * 60 * 1000;
@@ -60,7 +63,6 @@ const ForgotSchema = z.object({
 // This function runs whenever a POST request is made to /api/auth/forgot-password.
 // "req" is a NextRequest which extends the standard Request with URL helpers.
 export async function POST(req: NextRequest) {
-
   // ── Rate limiting ──────────────────────────────────────────────────────────
   // Identify the requester's IP address for rate-limit tracking
   const ip = getClientIp(req);
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
   // Allow at most 3 reset email requests from the same IP per hour.
   // Without this, an attacker could spam someone's inbox with reset emails.
   const rateLimit = await checkRateLimit(ip, 'forgot-password', {
-    limit: 3,                  // max 3 requests before blocking
+    limit: 3, // max 3 requests before blocking
     windowMs: 60 * 60 * 1000, // 1-hour window in milliseconds
   });
 
@@ -108,7 +110,7 @@ export async function POST(req: NextRequest) {
       // if the user clicks "forgot password" twice, only the latest link works.
       await prisma.passwordResetToken.updateMany({
         where: { userId: user.id, used: false }, // target only un-used tokens
-        data: { used: true },                    // mark them all as used/expired
+        data: { used: true }, // mark them all as used/expired
       });
 
       // Generate a cryptographically secure random token.
@@ -135,7 +137,7 @@ export async function POST(req: NextRequest) {
       // Send the reset email with a styled HTML button linking to the reset URL.
       // await here ensures we wait for the email to be queued before responding.
       await sendMail({
-        to: email,           // recipient email address
+        to: email, // recipient email address
         subject: 'Reset your Silent Evidence password',
         // Inline-styled HTML email compatible with most email clients
         html: `
@@ -153,7 +155,6 @@ export async function POST(req: NextRequest) {
     // Always return { ok: true } regardless of whether the email existed.
     // This prevents an attacker from using the response to enumerate valid emails.
     return NextResponse.json({ ok: true });
-
   } catch (err) {
     // Log the error server-side for debugging without exposing it to the caller
     console.error('[forgot-password]', err);

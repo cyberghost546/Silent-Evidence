@@ -35,9 +35,9 @@ const PRIVATE = /^(127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|::1$|localhos
 
 export interface GeoResult {
   country: string;
-  city:    string;
-  lat:     number;
-  lng:     number;
+  city: string;
+  lat: number;
+  lng: number;
 }
 
 /** Refuses anything that is not https, so IPs can never travel in cleartext. */
@@ -64,9 +64,12 @@ function normalise(data: Record<string, unknown>): GeoResult | null {
   const lng = Number(data.longitude ?? data.lon ?? data.lng);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-  const country = typeof data.country === 'string' ? data.country
-                : typeof data.country_name === 'string' ? data.country_name
-                : '';
+  const country =
+    typeof data.country === 'string'
+      ? data.country
+      : typeof data.country_name === 'string'
+        ? data.country_name
+        : '';
   const city = typeof data.city === 'string' ? data.city : '';
 
   return { country, city, lat, lng };
@@ -88,7 +91,7 @@ export async function lookupGeoIp(ip: string): Promise<GeoResult | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     if (!res.ok) return null;
-    return normalise(await res.json() as Record<string, unknown>);
+    return normalise((await res.json()) as Record<string, unknown>);
   } catch {
     return null;
   }

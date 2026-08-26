@@ -22,9 +22,11 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(() =>
     Promise.resolve({
       get: vi.fn((name: string) =>
-        name === 'userId' ? { value: '1' }
-        : name === 'csrf_token' ? { value: CSRF_TOKEN }
-        : undefined
+        name === 'userId'
+          ? { value: '1' }
+          : name === 'csrf_token'
+            ? { value: CSRF_TOKEN }
+            : undefined
       ),
       set: vi.fn(),
     })
@@ -50,7 +52,9 @@ vi.mock('@/lib/badges', () => ({
 }));
 
 vi.mock('@/lib/apiError', () => ({
-  serverError: vi.fn(() => new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 })),
+  serverError: vi.fn(
+    () => new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 })
+  ),
 }));
 
 import { POST as storiesPost } from '@/app/api/stories/route';
@@ -100,7 +104,11 @@ function mockCookieStore(jar: Record<string, string>) {
 describe('POST /api/stories', () => {
   beforeEach(async () => {
     vi.mocked(prisma.story.create).mockResolvedValue(MOCK_STORY as any);
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 1, username: 'testuser', ageGroup: 'ADULT' } as any);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: 1,
+      username: 'testuser',
+      ageGroup: 'ADULT',
+    } as any);
 
     // The global afterEach in tests/setup.ts calls vi.resetAllMocks(), which clears
     // the implementation the vi.mock factory installed. Reinstate it every test.
@@ -165,7 +173,10 @@ describe('POST /api/stories', () => {
   });
 
   it('returns 422 when toxicity check flags the content', async () => {
-    vi.mocked(checkStoryToxicity).mockResolvedValueOnce({ flagged: true, reason: 'Hate speech' } as any);
+    vi.mocked(checkStoryToxicity).mockResolvedValueOnce({
+      flagged: true,
+      reason: 'Hate speech',
+    } as any);
     const res = await storiesPost(makeRequest({ ...VALID_BODY, status: 'PUBLISHED' }));
     expect(res.status).toBe(422);
   });

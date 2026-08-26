@@ -48,12 +48,12 @@ import { consumeRecoveryCode } from '@/lib/recoveryCodes';
 import { sendMail } from '@/lib/mailer';
 
 const Schema = z.object({
-  email:        z.string().email('A valid email is required.'),
+  email: z.string().email('A valid email is required.'),
   recoveryCode: z.string().min(1, 'A recovery code is required.'),
   // A recovery necessarily happens because the old password is unusable, so a
   // new one is set as part of the same step. Kept in step with the register
   // route's minimum so recovered accounts are not weaker than new ones.
-  newPassword:  z.string().min(8, 'New password must be at least 8 characters.'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters.'),
 });
 
 // Generic reply for every failure. An attacker probing this endpoint must not be
@@ -95,16 +95,18 @@ export async function POST(req: Request) {
     // is a required foreign key, so this goes to SecurityAlert (nullable userId)
     // instead — which is where attacker signals belong anyway.
     if (!ownerEmail() || !isOwnerEmail(email)) {
-      await prisma.securityAlert.create({
-        data: {
-          kind: 'BREAK_GLASS_NON_OWNER',
-          severity: 'high',
-          summary: 'Break-glass recovery attempted for a non-owner account',
-          detail: `Attempt from ${anonymizeIp(ip)} for email that is not the configured owner.`,
-          ip: anonymizeIp(ip),
-          windowKey: `break-glass:${anonymizeIp(ip)}`,
-        },
-      }).catch(() => {});
+      await prisma.securityAlert
+        .create({
+          data: {
+            kind: 'BREAK_GLASS_NON_OWNER',
+            severity: 'high',
+            summary: 'Break-glass recovery attempted for a non-owner account',
+            detail: `Attempt from ${anonymizeIp(ip)} for email that is not the configured owner.`,
+            ip: anonymizeIp(ip),
+            windowKey: `break-glass:${anonymizeIp(ip)}`,
+          },
+        })
+        .catch(() => {});
       return NextResponse.json(GENERIC_FAILURE, { status: 401 });
     }
 
@@ -119,18 +121,20 @@ export async function POST(req: Request) {
     // Second factor: a valid unused recovery code, atomically consumed.
     const ok = await consumeRecoveryCode(owner.id, recoveryCode);
     if (!ok) {
-      await prisma.auditLog.create({
-        data: {
-          adminId: owner.id,
-          action: 'BREAK_GLASS_FAILED',
-          detail: `Invalid recovery code presented from ${anonymizeIp(ip)}.`,
-          targetType: 'User',
-          targetId: owner.id,
-        },
-      }).catch(() => {});
+      await prisma.auditLog
+        .create({
+          data: {
+            adminId: owner.id,
+            action: 'BREAK_GLASS_FAILED',
+            detail: `Invalid recovery code presented from ${anonymizeIp(ip)}.`,
+            targetType: 'User',
+            targetId: owner.id,
+          },
+        })
+        .catch(() => {});
       await alertOwner(
         'Failed emergency recovery attempt',
-        `Someone tried to use break-glass recovery for your account from ${anonymizeIp(ip)}, with an invalid recovery code.`,
+        `Someone tried to use break-glass recovery for your account from ${anonymizeIp(ip)}, with an invalid recovery code.`
       );
       return NextResponse.json(GENERIC_FAILURE, { status: 401 });
     }
@@ -158,7 +162,7 @@ export async function POST(req: Request) {
 
     await alertOwner(
       'Emergency recovery used',
-      `Your account's break-glass recovery was just used successfully from ${anonymizeIp(ip)}. Your password was reset and admin access restored.`,
+      `Your account's break-glass recovery was just used successfully from ${anonymizeIp(ip)}. Your password was reset and admin access restored.`
     );
 
     const res = NextResponse.json({ ok: true });

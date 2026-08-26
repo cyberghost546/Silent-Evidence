@@ -23,11 +23,25 @@ export async function GET() {
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
   const counts: Record<string, { users: number; stories: number; comments: number }> = {};
-  const ensure = (k: string) => { if (!counts[k]) counts[k] = { users: 0, stories: 0, comments: 0 }; };
+  const ensure = (k: string) => {
+    if (!counts[k]) counts[k] = { users: 0, stories: 0, comments: 0 };
+  };
 
-  for (const u of users)    { const k = fmt(u.createdAt);  ensure(k); counts[k].users++; }
-  for (const s of stories)  { const k = fmt(s.createdAt);  ensure(k); counts[k].stories++; }
-  for (const c of comments) { const k = fmt(c.createdAt);  ensure(k); counts[k].comments++; }
+  for (const u of users) {
+    const k = fmt(u.createdAt);
+    ensure(k);
+    counts[k].users++;
+  }
+  for (const s of stories) {
+    const k = fmt(s.createdAt);
+    ensure(k);
+    counts[k].stories++;
+  }
+  for (const c of comments) {
+    const k = fmt(c.createdAt);
+    ensure(k);
+    counts[k].comments++;
+  }
 
   return NextResponse.json({ counts });
 }

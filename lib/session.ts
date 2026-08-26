@@ -20,8 +20,8 @@ export interface SessionUser {
   id: number;
   username: string;
   email: string;
-  role: string;         // 'GUEST' | 'USER' | 'AUTHOR' | 'ADMIN'
-  verified: boolean;    // email verified or manually verified by admin
+  role: string; // 'GUEST' | 'USER' | 'AUTHOR' | 'ADMIN'
+  verified: boolean; // email verified or manually verified by admin
 }
 
 // ── Session helpers ───────────────────────────────────────────────────────────
@@ -57,7 +57,8 @@ export async function getSessionUserId(): Promise<number | null> {
   // needs a version check in middleware, which requires the Node runtime.)
   const cookieVersion = parseInt(ver ?? '', 10);
   const account = await prisma.user.findUnique({ where: { id }, select: { sessionVersion: true } });
-  if (!account || !Number.isFinite(cookieVersion) || cookieVersion !== account.sessionVersion) return null;
+  if (!account || !Number.isFinite(cookieVersion) || cookieVersion !== account.sessionVersion)
+    return null;
 
   return id;
 }
@@ -102,10 +103,10 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const user = await prisma.user.findUnique({
     where: { id },
     select: {
-      id:       true,
+      id: true,
       username: true,
-      email:    true,
-      role:     true,
+      email: true,
+      role: true,
       isVerified: true,
       sessionVersion: true,
     },
@@ -125,10 +126,10 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   if (cookieVersion === null || cookieVersion !== user.sessionVersion) return null;
 
   return {
-    id:       user.id,
+    id: user.id,
     username: user.username,
-    email:    user.email,
-    role:     user.role,
+    email: user.email,
+    role: user.role,
     verified: user.isVerified ?? false,
   };
 }

@@ -53,11 +53,11 @@ export default async function HistoryPage() {
           slug: true,
           coverImage: true,
           excerpt: true,
-          content: true,  // needed to compute reading time in the client component
+          content: true, // needed to compute reading time in the client component
           createdAt: true,
-          author:   { select: { username: true } },
+          author: { select: { username: true } },
           category: { select: { name: true, slug: true } },
-          _count:   { select: { likes: true, comments: true } },
+          _count: { select: { likes: true, comments: true } },
         },
       },
     },

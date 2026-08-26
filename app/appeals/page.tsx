@@ -24,11 +24,25 @@ export default async function AppealsPage() {
     orderBy: { createdAt: 'desc' },
     take: 100,
     select: {
-      id: true, type: true, targetType: true, reason: true, explanation: true,
-      legalGround: true, automated: true, status: true, createdAt: true,
+      id: true,
+      type: true,
+      targetType: true,
+      reason: true,
+      explanation: true,
+      legalGround: true,
+      automated: true,
+      status: true,
+      createdAt: true,
       appeals: {
         where: { userId },
-        select: { id: true, status: true, message: true, decisionNote: true, createdAt: true, decidedAt: true },
+        select: {
+          id: true,
+          status: true,
+          message: true,
+          decisionNote: true,
+          createdAt: true,
+          decidedAt: true,
+        },
       },
     },
   });

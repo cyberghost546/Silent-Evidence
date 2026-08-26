@@ -9,18 +9,20 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 
 export default function SearchBar() {
-  const [open, setOpen]       = useState(false);
-  const [query, setQuery]     = useState('');
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const router   = useRouter();
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const btnRef   = useRef<HTMLButtonElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Portal requires the DOM to be available
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
@@ -30,12 +32,20 @@ export default function SearchBar() {
     const handleClick = (e: MouseEvent) => {
       const t = e.target as Node;
       if (
-        panelRef.current && !panelRef.current.contains(t) &&
-        btnRef.current   && !btnRef.current.contains(t)
-      ) { setOpen(false); setFocused(false); }
+        panelRef.current &&
+        !panelRef.current.contains(t) &&
+        btnRef.current &&
+        !btnRef.current.contains(t)
+      ) {
+        setOpen(false);
+        setFocused(false);
+      }
     };
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); setFocused(false); }
+      if (e.key === 'Escape') {
+        setOpen(false);
+        setFocused(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     document.addEventListener('keydown', handleKey);
@@ -58,7 +68,10 @@ export default function SearchBar() {
     <>
       {/* Dark backdrop — clicking it closes the panel */}
       <div
-        onClick={() => { setOpen(false); setFocused(false); }}
+        onClick={() => {
+          setOpen(false);
+          setFocused(false);
+        }}
         className={`fixed inset-0 z-9998 transition ${
           open ? 'bg-black/70 pointer-events-auto' : 'bg-transparent pointer-events-none'
         }`}
@@ -68,11 +81,16 @@ export default function SearchBar() {
       <div
         ref={panelRef}
         className={`fixed inset-x-0 top-14.25 z-9999 transition-all duration-300 ${
-          open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'
+          open
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
         <div className="mx-auto max-w-3xl px-4">
-          <form onSubmit={handleSearch} className="rounded-[30px] border border-red-700 bg-gray-950 p-5 shadow-2xl shadow-black/50">
+          <form
+            onSubmit={handleSearch}
+            className="rounded-[30px] border border-red-700 bg-gray-950 p-5 shadow-2xl shadow-black/50"
+          >
             <div className="flex items-center gap-3 rounded-[28px] border border-gray-800 bg-gray-900 px-4 py-3 focus-within:border-red-600 transition-all duration-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +100,11 @@ export default function SearchBar() {
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+                />
               </svg>
 
               <input
@@ -109,7 +131,13 @@ export default function SearchBar() {
                   query ? 'text-gray-300 hover:bg-gray-800' : 'opacity-0 pointer-events-none'
                 }`}
               >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -141,7 +169,10 @@ export default function SearchBar() {
           </form>
 
           <p className="mt-3 text-center text-xs text-gray-500">
-            <kbd className="rounded bg-gray-800 px-2 py-1 text-[10px] font-mono text-gray-400">ESC</kbd> to close
+            <kbd className="rounded bg-gray-800 px-2 py-1 text-[10px] font-mono text-gray-400">
+              ESC
+            </kbd>{' '}
+            to close
           </p>
         </div>
       </div>
@@ -157,11 +188,24 @@ export default function SearchBar() {
         onClick={() => setOpen((o) => !o)}
         aria-label="Search"
         className={`p-2 rounded-xl transition ${
-          open ? 'text-white bg-red-600 shadow-lg shadow-red-500/30' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+          open
+            ? 'text-white bg-red-600 shadow-lg shadow-red-500/30'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'
         }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+          />
         </svg>
       </button>
 

@@ -169,16 +169,18 @@ export async function POST(req: Request) {
 
   // Create a DIRECT_MESSAGE notification for the recipient — fire and forget.
   // .catch(() => {}) means an error here won't break the message send response.
-  prisma.notification.create({
-    data: {
-      // The recipient gets the notification
-      userId: receiverId,
-      // DIRECT_MESSAGE type lets the UI render a chat bubble icon
-      type: 'DIRECT_MESSAGE',
-      // Human-readable message shown in the notification panel
-      message: `${sender?.username ?? 'Someone'} sent you a message.`,
-    },
-  }).catch(() => {});
+  prisma.notification
+    .create({
+      data: {
+        // The recipient gets the notification
+        userId: receiverId,
+        // DIRECT_MESSAGE type lets the UI render a chat bubble icon
+        type: 'DIRECT_MESSAGE',
+        // Human-readable message shown in the notification panel
+        message: `${sender?.username ?? 'Someone'} sent you a message.`,
+      },
+    })
+    .catch(() => {});
 
   // ── Real-time push via Pusher ────────────────────────────────────────────────
   // Push the new message to the recipient's browser over a WebSocket channel.

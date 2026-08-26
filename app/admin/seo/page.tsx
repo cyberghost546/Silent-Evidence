@@ -46,11 +46,26 @@ import Link from 'next/link';
 // `scale-x-[${n}]` would produce no CSS at all and every bar would render full
 // width. Twenty steps is finer than the 1px-per-step this bar can actually show.
 const SCALE_STEPS = [
-  'scale-x-0',    'scale-x-[0.05]', 'scale-x-[0.10]', 'scale-x-[0.15]',
-  'scale-x-[0.20]', 'scale-x-[0.25]', 'scale-x-[0.30]', 'scale-x-[0.35]',
-  'scale-x-[0.40]', 'scale-x-[0.45]', 'scale-x-50',     'scale-x-[0.55]',
-  'scale-x-[0.60]', 'scale-x-[0.65]', 'scale-x-[0.70]', 'scale-x-75',
-  'scale-x-[0.80]', 'scale-x-[0.85]', 'scale-x-[0.90]', 'scale-x-[0.95]',
+  'scale-x-0',
+  'scale-x-[0.05]',
+  'scale-x-[0.10]',
+  'scale-x-[0.15]',
+  'scale-x-[0.20]',
+  'scale-x-[0.25]',
+  'scale-x-[0.30]',
+  'scale-x-[0.35]',
+  'scale-x-[0.40]',
+  'scale-x-[0.45]',
+  'scale-x-50',
+  'scale-x-[0.55]',
+  'scale-x-[0.60]',
+  'scale-x-[0.65]',
+  'scale-x-[0.70]',
+  'scale-x-75',
+  'scale-x-[0.80]',
+  'scale-x-[0.85]',
+  'scale-x-[0.90]',
+  'scale-x-[0.95]',
   'scale-x-100',
 ] as const;
 
@@ -104,9 +119,9 @@ export default function AdminSeoPage() {
   // Each piece of data from the API gets its own state slice so React can
   // re-render individual sections independently.
   const [stories, setStories] = useState<Story[]>([]);
-  const [cats, setCats]       = useState<Cat[]>([]);
-  const [tags, setTags]       = useState<Tag[]>([]);
-  const [nf, setNf]           = useState<NotFound[]>([]);
+  const [cats, setCats] = useState<Cat[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [nf, setNf] = useState<NotFound[]>([]);
 
   // loading: true while the API call is in-flight — drives the skeleton UI
   const [loading, setLoading] = useState(true);
@@ -121,8 +136,8 @@ export default function AdminSeoPage() {
     // GET /api/admin/seo returns all four data slices in one round-trip,
     // keeping the browser <-> server chattiness low.
     fetch('/api/admin/seo')
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         // Nullish-coalescing (??) falls back to [] if the key is missing,
         // preventing "cannot iterate undefined" runtime errors.
         setStories(d.topStories ?? []);
@@ -154,16 +169,16 @@ export default function AdminSeoPage() {
   const ratioToWidthClass = (ratio: number): string => {
     const twelfths = Math.round(ratio * 12); // 0 – 12
     const map: Record<number, string> = {
-      0:  'w-0',
-      1:  'w-1/12',
-      2:  'w-2/12',
-      3:  'w-3/12',
-      4:  'w-4/12',
-      5:  'w-5/12',
-      6:  'w-6/12',
-      7:  'w-7/12',
-      8:  'w-8/12',
-      9:  'w-9/12',
+      0: 'w-0',
+      1: 'w-1/12',
+      2: 'w-2/12',
+      3: 'w-3/12',
+      4: 'w-4/12',
+      5: 'w-5/12',
+      6: 'w-6/12',
+      7: 'w-7/12',
+      8: 'w-8/12',
+      9: 'w-9/12',
       10: 'w-10/12',
       11: 'w-11/12',
       12: 'w-full',
@@ -173,10 +188,10 @@ export default function AdminSeoPage() {
 
   // Tab metadata — label text and badge count shown on each tab button
   const tabs = [
-    { id: 'stories' as const,    label: 'Top Stories',  count: stories.length },
-    { id: 'categories' as const, label: 'Categories',   count: cats.length },
-    { id: 'tags' as const,       label: 'Top Tags',     count: tags.length },
-    { id: '404' as const,        label: '404 Errors',   count: nf.length },
+    { id: 'stories' as const, label: 'Top Stories', count: stories.length },
+    { id: 'categories' as const, label: 'Categories', count: cats.length },
+    { id: 'tags' as const, label: 'Top Tags', count: tags.length },
+    { id: '404' as const, label: '404 Errors', count: nf.length },
   ];
 
   // ---------------------------------------------------------------------------
@@ -185,14 +200,16 @@ export default function AdminSeoPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">SEO Dashboard</h1>
-      <p className="text-gray-500 text-sm mb-6">Traffic performance, top content, and broken links</p>
+      <p className="text-gray-500 text-sm mb-6">
+        Traffic performance, top content, and broken links
+      </p>
 
       {/* ------------------------------------------------------------------ */}
       {/* Tab navigation                                                       */}
       {/* ------------------------------------------------------------------ */}
       {/* flex-wrap lets the tabs collapse to multiple rows on narrow screens */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        {tabs.map(t => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
@@ -204,8 +221,7 @@ export default function AdminSeoPage() {
                 : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
             }`}
           >
-            {t.label}{' '}
-            {/* Small count badge so admins know at a glance how many rows exist */}
+            {t.label} {/* Small count badge so admins know at a glance how many rows exist */}
             <span className="ml-1 text-xs opacity-70">{t.count}</span>
           </button>
         ))}
@@ -295,7 +311,7 @@ export default function AdminSeoPage() {
           {tab === 'categories' && (
             // Responsive grid: 1 column on mobile, 2 on sm (640px+), 3 on lg (1024px+)
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cats.map(c => (
+              {cats.map((c) => (
                 <div key={c.slug} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
                   <p className="font-semibold text-white">{c.name}</p>
                   {/* Large number draws the eye to the primary metric (views) */}
@@ -312,7 +328,7 @@ export default function AdminSeoPage() {
           {tab === 'tags' && (
             // flex-wrap lets the tag pills reflow naturally instead of overflowing
             <div className="flex flex-wrap gap-2">
-              {tags.map(t => (
+              {tags.map((t) => (
                 // Link to the public tag page so the admin can verify tag pages work
                 <Link
                   key={t.slug}
@@ -331,9 +347,9 @@ export default function AdminSeoPage() {
           {/* ---------------------------------------------------------------- */}
           {/* 404 Error log tab                                                 */}
           {/* ---------------------------------------------------------------- */}
-          {tab === '404' && (
+          {tab === '404' &&
             // Ternary: show an empty-state message when no 404s have been logged
-            nf.length === 0 ? (
+            (nf.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 <p>No 404 errors logged yet.</p>
                 <p className="text-xs mt-2">
@@ -352,22 +368,23 @@ export default function AdminSeoPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-800/60">
                     {/* Sort descending by hit count so the most-broken links appear first */}
-                    {nf.sort((a, b) => b.count - a.count).map((r, i) => (
-                      <tr key={i} className="hover:bg-gray-800/30 transition">
-                        {/* font-mono makes URL paths easier to scan */}
-                        <td className="px-4 py-3 font-mono text-red-400 text-xs">{r.path}</td>
-                        <td className="px-4 py-3 text-right font-bold text-white">{r.count}</td>
-                        {/* Format ISO timestamp to a locale-appropriate date string */}
-                        <td className="px-4 py-3 text-right text-gray-500 text-xs">
-                          {new Date(r.lastSeen).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
+                    {nf
+                      .sort((a, b) => b.count - a.count)
+                      .map((r, i) => (
+                        <tr key={i} className="hover:bg-gray-800/30 transition">
+                          {/* font-mono makes URL paths easier to scan */}
+                          <td className="px-4 py-3 font-mono text-red-400 text-xs">{r.path}</td>
+                          <td className="px-4 py-3 text-right font-bold text-white">{r.count}</td>
+                          {/* Format ISO timestamp to a locale-appropriate date string */}
+                          <td className="px-4 py-3 text-right text-gray-500 text-xs">
+                            {new Date(r.lastSeen).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
-            )
-          )}
+            ))}
         </>
       )}
     </div>

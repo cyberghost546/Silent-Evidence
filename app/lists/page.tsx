@@ -63,7 +63,9 @@ export default async function ListsPage() {
             <span className="w-1 h-7 bg-red-600 rounded-full" />
             <div>
               <h1 className="text-2xl font-bold text-white">My Lists</h1>
-              <p className="text-sm text-gray-500 mt-0.5">{lists.length} {lists.length === 1 ? 'list' : 'lists'}</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {lists.length} {lists.length === 1 ? 'list' : 'lists'}
+              </p>
             </div>
           </div>
           <Link href="/" className="text-xs text-gray-500 hover:text-gray-300 transition">
@@ -74,37 +76,72 @@ export default async function ListsPage() {
         {lists.length === 0 ? (
           <div className="text-center py-24">
             <h2 className="text-xl font-semibold text-white mb-2">No lists yet</h2>
-            <p className="text-gray-500 mb-6">Open any story and click "Add to List" to get started.</p>
-            <Link href="/" className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">
+            <p className="text-gray-500 mb-6">
+              Open any story and click "Add to List" to get started.
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition"
+            >
               Explore Stories
             </Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-5">
-            {lists.map(list => (
-              <Link key={list.id} href={`/list/${list.id}`}
-                className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-200">
+            {lists.map((list) => (
+              <Link
+                key={list.id}
+                href={`/list/${list.id}`}
+                className="group bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-200"
+              >
                 {/* Cover collage from first 3 stories */}
                 <div className="h-32 flex overflow-hidden">
-                  {list.items.length > 0 ? list.items.map(item => (
-                    item.story.coverImage
-                      ? <div key={item.id} className="relative flex-1 min-w-0 overflow-hidden"><Image src={item.story.coverImage} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-cover" /></div>
-                      : <div key={item.id} className="flex-1 bg-gradient-to-br from-gray-700 to-gray-900" />
-                  )) : (
+                  {list.items.length > 0 ? (
+                    list.items.map((item) =>
+                      item.story.coverImage ? (
+                        <div key={item.id} className="relative flex-1 min-w-0 overflow-hidden">
+                          <Image
+                            src={item.story.coverImage}
+                            alt=""
+                            fill
+                            sizes="(max-width: 640px) 33vw, 20vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          key={item.id}
+                          className="flex-1 bg-gradient-to-br from-gray-700 to-gray-900"
+                        />
+                      )
+                    )
+                  ) : (
                     <div className="w-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                      <ListIcon className="w-8 h-8 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                      <ListIcon
+                        className="w-8 h-8 text-gray-600"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
                     </div>
                   )}
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors truncate">{list.name}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${list.isPublic ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}>
+                    <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors truncate">
+                      {list.name}
+                    </h3>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${list.isPublic ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}
+                    >
                       {list.isPublic ? 'Public' : 'Private'}
                     </span>
                   </div>
-                  {list.description && <p className="text-xs text-gray-500 line-clamp-1 mb-2">{list.description}</p>}
-                  <p className="text-xs text-gray-600">{list._count.items} {list._count.items === 1 ? 'story' : 'stories'}</p>
+                  {list.description && (
+                    <p className="text-xs text-gray-500 line-clamp-1 mb-2">{list.description}</p>
+                  )}
+                  <p className="text-xs text-gray-600">
+                    {list._count.items} {list._count.items === 1 ? 'story' : 'stories'}
+                  </p>
                 </div>
               </Link>
             ))}

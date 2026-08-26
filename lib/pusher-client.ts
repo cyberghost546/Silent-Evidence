@@ -23,7 +23,7 @@ let pusherInstance: Pusher | null = null;
 
 function getPusherClient(): Pusher | null {
   // Key must be set as a public env var for the browser to use
-  const key     = process.env.NEXT_PUBLIC_PUSHER_KEY;
+  const key = process.env.NEXT_PUBLIC_PUSHER_KEY;
   const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 
   if (!key || !cluster) return null;

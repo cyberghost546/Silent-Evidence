@@ -34,10 +34,10 @@ import { Check, Download, Lock } from 'lucide-react';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 interface SaveOfflineButtonProps {
-  storyId:      number;   // DB id used for the API call body
-  storySlug:    string;   // URL slug used to build the cache path: /story/[slug]
-  initialSaved: boolean;  // whether the current user already has this story saved (from server)
-  hasPremium:   boolean;  // offline downloads are a premium perk — free users get an upsell
+  storyId: number; // DB id used for the API call body
+  storySlug: string; // URL slug used to build the cache path: /story/[slug]
+  initialSaved: boolean; // whether the current user already has this story saved (from server)
+  hasPremium: boolean; // offline downloads are a premium perk — free users get an upsell
 }
 
 export default function SaveOfflineButton({
@@ -46,7 +46,6 @@ export default function SaveOfflineButton({
   initialSaved,
   hasPremium,
 }: SaveOfflineButtonProps) {
-
   // ── Service Worker availability check ─────────────────────────────────────
   // `typeof window !== 'undefined'` is the SSR guard — window doesn't exist on the server.
   // `'serviceWorker' in navigator` checks the browser actually supports SWs.
@@ -57,7 +56,7 @@ export default function SaveOfflineButton({
   // ── Local state ───────────────────────────────────────────────────────────
   // saved — mirrors the current saved/unsaved state. Starts from the prop value
   // (server-rendered truth) and is updated optimistically on each click.
-  const [saved,   setSaved]   = useState(initialSaved);
+  const [saved, setSaved] = useState(initialSaved);
 
   // loading — true while an API request is in-flight.
   // Prevents rapid double-clicks from sending two conflicting requests.
@@ -79,9 +78,9 @@ export default function SaveOfflineButton({
         // ── SAVE path ────────────────────────────────────────────────────
         // Tell the server to persist the save relationship in the database.
         const res = await fetch('/api/offline-saves', {
-          method:  'POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ storyId }),
+          body: JSON.stringify({ storyId }),
         });
 
         if (!res.ok) {
@@ -108,9 +107,9 @@ export default function SaveOfflineButton({
         // ── UNSAVE path ──────────────────────────────────────────────────
         // Ask the server to remove the save relationship from the database.
         const res = await fetch('/api/offline-saves', {
-          method:  'DELETE',
+          method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ storyId }),
+          body: JSON.stringify({ storyId }),
         });
 
         if (!res.ok) {
@@ -204,9 +203,11 @@ export default function SaveOfflineButton({
       ].join(' ')}
     >
       {/* Icon — checkmark confirms the story is saved; inbox tray prompts saving */}
-      {saved
-        ? <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
-        : <Download className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
+      {saved ? (
+        <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+      ) : (
+        <Download className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+      )}
 
       {/* Label text — toggled with the icon */}
       <span>{saved ? 'Saved Offline' : 'Save Offline'}</span>

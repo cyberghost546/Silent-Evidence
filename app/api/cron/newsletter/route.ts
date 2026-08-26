@@ -10,7 +10,7 @@ import { sendWeeklyNewsletter } from '@/lib/sendNewsletter';
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
-  const expected   = `Bearer ${process.env.CRON_SECRET}`;
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
 
   if (!process.env.CRON_SECRET || authHeader !== expected) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

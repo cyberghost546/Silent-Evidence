@@ -40,8 +40,8 @@ function getTimeLeft(target: Date): TimeLeft | null {
   const diff = target.getTime() - Date.now();
   if (diff <= 0) return null;
   return {
-    days:    Math.floor(diff / 86400000),
-    hours:   Math.floor((diff % 86400000) / 3600000),
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor((diff % 86400000) / 3600000),
     minutes: Math.floor((diff % 3600000) / 60000),
     seconds: Math.floor((diff % 60000) / 1000),
   };
@@ -52,7 +52,7 @@ function getTimeLeft(target: Date): TimeLeft | null {
 
 function FlipCard({ value, label }: { value: number; label: string }) {
   const [displayed, setDisplayed] = useState(pad(value));
-  const [flipping, setFlipping]   = useState(false);
+  const [flipping, setFlipping] = useState(false);
   const prevRef = useRef(value);
 
   useEffect(() => {
@@ -72,10 +72,7 @@ function FlipCard({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
       {/* The card that flips */}
-      <div
-        className="relative w-20 h-20 md:w-24 md:h-24"
-        style={{ perspective: '400px' }}
-      >
+      <div className="relative w-20 h-20 md:w-24 md:h-24" style={{ perspective: '400px' }}>
         {/* Outer glow ring */}
         <div className="absolute inset-0 rounded-2xl bg-red-600/20 blur-md scale-110" />
 
@@ -122,10 +119,7 @@ function FlipCard({ value, label }: { value: number; label: string }) {
 
 function Particle({ style }: { style: React.CSSProperties }) {
   return (
-    <div
-      className="absolute w-1 h-1 rounded-full bg-red-500/60 animate-float"
-      style={style}
-    />
+    <div className="absolute w-1 h-1 rounded-full bg-red-500/60 animate-float" style={style} />
   );
 }
 
@@ -133,13 +127,13 @@ function Particle({ style }: { style: React.CSSProperties }) {
 
 export default function ChallengeCountdown({ challenge }: Props) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
-  const [phase, setPhase]       = useState<'upcoming' | 'active' | 'ended' | null>(null);
+  const [phase, setPhase] = useState<'upcoming' | 'active' | 'ended' | null>(null);
 
   // Tick every second to keep the countdown accurate
   useEffect(() => {
     if (!challenge) return;
     const start = new Date(challenge.startDate);
-    const end   = new Date(challenge.endDate);
+    const end = new Date(challenge.endDate);
 
     const tick = () => {
       const now = Date.now();
@@ -164,16 +158,16 @@ export default function ChallengeCountdown({ challenge }: Props) {
 
   // Pre-defined particle positions so they don't shift on re-render
   const particles = [
-    { left: '10%',  top: '20%', animationDelay: '0s',    animationDuration: '6s'  },
-    { left: '20%',  top: '70%', animationDelay: '1s',    animationDuration: '8s'  },
-    { left: '35%',  top: '40%', animationDelay: '2s',    animationDuration: '5s'  },
-    { left: '50%',  top: '15%', animationDelay: '0.5s',  animationDuration: '7s'  },
-    { left: '65%',  top: '60%', animationDelay: '1.5s',  animationDuration: '9s'  },
-    { left: '75%',  top: '30%', animationDelay: '3s',    animationDuration: '6s'  },
-    { left: '88%',  top: '75%', animationDelay: '2.5s',  animationDuration: '8s'  },
-    { left: '5%',   top: '50%', animationDelay: '4s',    animationDuration: '7s'  },
-    { left: '92%',  top: '45%', animationDelay: '0.8s',  animationDuration: '5s'  },
-    { left: '45%',  top: '85%', animationDelay: '3.5s',  animationDuration: '9s'  },
+    { left: '10%', top: '20%', animationDelay: '0s', animationDuration: '6s' },
+    { left: '20%', top: '70%', animationDelay: '1s', animationDuration: '8s' },
+    { left: '35%', top: '40%', animationDelay: '2s', animationDuration: '5s' },
+    { left: '50%', top: '15%', animationDelay: '0.5s', animationDuration: '7s' },
+    { left: '65%', top: '60%', animationDelay: '1.5s', animationDuration: '9s' },
+    { left: '75%', top: '30%', animationDelay: '3s', animationDuration: '6s' },
+    { left: '88%', top: '75%', animationDelay: '2.5s', animationDuration: '8s' },
+    { left: '5%', top: '50%', animationDelay: '4s', animationDuration: '7s' },
+    { left: '92%', top: '45%', animationDelay: '0.8s', animationDuration: '5s' },
+    { left: '45%', top: '85%', animationDelay: '3.5s', animationDuration: '9s' },
   ];
 
   return (
@@ -211,7 +205,6 @@ export default function ChallengeCountdown({ challenge }: Props) {
       `}</style>
 
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-red-950/30 to-gray-950 border-y border-red-900/30 py-16">
-
         {/* ── Background atmosphere ── */}
 
         {/* Large blurred glow at the top center */}
@@ -225,24 +218,29 @@ export default function ChallengeCountdown({ challenge }: Props) {
         {particles.map((p, i) => (
           <Particle
             key={i}
-            style={{
-              left: p.left,
-              top:  p.top,
-              '--dur':   p.animationDuration,
-              '--delay': p.animationDelay,
-            } as React.CSSProperties}
+            style={
+              {
+                left: p.left,
+                top: p.top,
+                '--dur': p.animationDuration,
+                '--delay': p.animationDelay,
+              } as React.CSSProperties
+            }
           />
         ))}
 
         {/* ── Content ── */}
         <div className="relative max-w-4xl mx-auto px-4 text-center">
-
           {/* Status badge with pulsing indicator dot */}
           <div className="inline-flex items-center gap-2 bg-red-600/20 border border-red-600/40 rounded-full px-5 py-1.5 mb-6 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
             {/* Dot + expanding ring */}
             <span className="relative flex h-2.5 w-2.5">
-              <span className={`animate-pulse-ring absolute inline-flex h-full w-full rounded-full opacity-75 ${phase === 'active' ? 'bg-green-400' : 'bg-red-400'}`} />
-              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${phase === 'active' ? 'bg-green-400' : 'bg-red-500'}`} />
+              <span
+                className={`animate-pulse-ring absolute inline-flex h-full w-full rounded-full opacity-75 ${phase === 'active' ? 'bg-green-400' : 'bg-red-400'}`}
+              />
+              <span
+                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${phase === 'active' ? 'bg-green-400' : 'bg-red-500'}`}
+              />
             </span>
             <span className="text-xs font-bold uppercase tracking-widest text-red-300">
               {phase === 'upcoming' ? 'Coming Soon' : phase === 'active' ? 'Live Now' : 'Challenge'}
@@ -251,7 +249,7 @@ export default function ChallengeCountdown({ challenge }: Props) {
 
           {/* Title with shimmer animation */}
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 shimmer-text">
- {challenge.title}
+            {challenge.title}
           </h2>
 
           {/* Description */}
@@ -263,18 +261,24 @@ export default function ChallengeCountdown({ challenge }: Props) {
           {timeLeft ? (
             <>
               <div className="flex items-end justify-center gap-3 md:gap-6 mb-4">
-                <FlipCard value={timeLeft.days}    label="Days"    />
+                <FlipCard value={timeLeft.days} label="Days" />
 
                 {/* Colon separator — blinks every second */}
-                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">:</span>
+                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">
+                  :
+                </span>
 
-                <FlipCard value={timeLeft.hours}   label="Hours"   />
+                <FlipCard value={timeLeft.hours} label="Hours" />
 
-                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">:</span>
+                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">
+                  :
+                </span>
 
                 <FlipCard value={timeLeft.minutes} label="Minutes" />
 
-                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">:</span>
+                <span className="text-red-500 text-3xl font-bold mb-8 animate-pulse select-none">
+                  :
+                </span>
 
                 <FlipCard value={timeLeft.seconds} label="Seconds" />
               </div>

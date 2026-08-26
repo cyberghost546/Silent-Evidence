@@ -19,10 +19,10 @@ import { Heart, Flame, Smile, Zap } from 'lucide-react';
 //   emoji — the visual emoji shown on the button
 //   label — accessible tooltip text (title attribute)
 const REACTIONS = [
-  { type: 'LOVE',   icon: Heart, label: 'Love'   },
-  { type: 'HYPE',   icon: Flame, label: 'Hype'   },
+  { type: 'LOVE', icon: Heart, label: 'Love' },
+  { type: 'HYPE', icon: Flame, label: 'Hype' },
   { type: 'KAWAII', icon: Smile, label: 'Kawaii' },
-  { type: 'FIRE',   icon: Zap,   label: 'Epic'   },
+  { type: 'FIRE', icon: Zap, label: 'Epic' },
 ];
 
 // Counts — a simple mapping from reaction type string to its integer count
@@ -31,14 +31,14 @@ type Counts = Record<string, number>;
 
 // Props passed in from the parent story page
 type Props = {
-  storyId: number;          // the story's database ID — sent to the API with each toggle
-  initialCounts: Counts;    // reaction counts fetched server-side before the page rendered
-  userReactions: string[];  // reaction types the current user has already selected (max 1 item)
+  storyId: number; // the story's database ID — sent to the API with each toggle
+  initialCounts: Counts; // reaction counts fetched server-side before the page rendered
+  userReactions: string[]; // reaction types the current user has already selected (max 1 item)
 };
 
 export default function ReactionBar({ storyId, initialCounts, userReactions }: Props) {
   // counts — live reaction counts, starts from server-side data and updates after each toggle
-  const [counts,  setCounts]  = useState<Counts>(initialCounts);
+  const [counts, setCounts] = useState<Counts>(initialCounts);
 
   // reacted — which reaction type the user currently has active (null = no reaction selected)
   // Only one reaction is allowed at a time, so we store a single string instead of an array
@@ -81,7 +81,6 @@ export default function ReactionBar({ storyId, initialCounts, userReactions }: P
   return (
     // Flex row that wraps on narrow screens so all four buttons fit
     <div className="flex flex-wrap items-center gap-2">
-
       {/* "React:" label — purely visual, not a form label */}
       <span className="text-xs text-gray-500 mr-1">React:</span>
 
@@ -91,17 +90,17 @@ export default function ReactionBar({ storyId, initialCounts, userReactions }: P
         const active = reacted === type;
 
         // count — how many users have this reaction (0 if not in the counts map yet)
-        const count  = counts[type] ?? 0;
+        const count = counts[type] ?? 0;
 
         return (
           <button
-            key={type}                           // unique React key — the reaction type string
-            onClick={() => toggle(type)}          // toggle this reaction on click
-            disabled={loading === type}           // disable only while THIS button's request is in-flight
-            title={label}                         // tooltip shown on hover (e.g. "Love")
+            key={type} // unique React key — the reaction type string
+            onClick={() => toggle(type)} // toggle this reaction on click
+            disabled={loading === type} // disable only while THIS button's request is in-flight
+            title={label} // tooltip shown on hover (e.g. "Love")
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition ${
               active
-                ? 'bg-gray-700 border-gray-500 text-white'            // highlighted when this reaction is selected
+                ? 'bg-gray-700 border-gray-500 text-white' // highlighted when this reaction is selected
                 : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white' // default ghost style
             }`}
           >

@@ -23,7 +23,7 @@ export const PLATFORM_FEE_BPS = 1000;
 
 /** The author's share of a gross amount, in cents, after the platform fee. */
 export function authorShare(grossCents: number): number {
-  return Math.round(grossCents * (10000 - PLATFORM_FEE_BPS) / 10000);
+  return Math.round((grossCents * (10000 - PLATFORM_FEE_BPS)) / 10000);
 }
 
 /** The platform's share of a gross amount, in cents. */
@@ -55,28 +55,32 @@ async function grossBySource(authorId: number, since?: Date) {
 
   const [tips, stories, chapters, bundles] = await Promise.all([
     prisma.tip.aggregate({
-      _sum: { amount: true }, _count: true,
+      _sum: { amount: true },
+      _count: true,
       where: { toUserId: authorId, ...(dateFilter ? { createdAt: dateFilter } : {}) },
     }),
     prisma.storyPurchase.aggregate({
-      _sum: { amount: true }, _count: true,
+      _sum: { amount: true },
+      _count: true,
       where: { story: { authorId }, ...(dateFilter ? { createdAt: dateFilter } : {}) },
     }),
     prisma.chapterPurchase.aggregate({
-      _sum: { amount: true }, _count: true,
+      _sum: { amount: true },
+      _count: true,
       where: { chapter: { story: { authorId } }, ...(dateFilter ? { createdAt: dateFilter } : {}) },
     }),
     prisma.bundlePurchase.aggregate({
-      _sum: { paidCents: true }, _count: true,
+      _sum: { paidCents: true },
+      _count: true,
       where: { bundle: { authorId }, ...(dateFilter ? { createdAt: dateFilter } : {}) },
     }),
   ]);
 
   return {
-    tips:     { sum: tips._sum.amount ?? 0, count: tips._count },
-    stories:  { sum: stories._sum.amount ?? 0, count: stories._count },
+    tips: { sum: tips._sum.amount ?? 0, count: tips._count },
+    stories: { sum: stories._sum.amount ?? 0, count: stories._count },
     chapters: { sum: chapters._sum.amount ?? 0, count: chapters._count },
-    bundles:  { sum: bundles._sum.paidCents ?? 0, count: bundles._count },
+    bundles: { sum: bundles._sum.paidCents ?? 0, count: bundles._count },
   };
 }
 
@@ -97,7 +101,10 @@ export async function getEarnings(authorId: number): Promise<EarningsBreakdown> 
 
   return {
     gross: {
-      tips: g.tips.sum, stories: g.stories.sum, chapters: g.chapters.sum, bundles: g.bundles.sum,
+      tips: g.tips.sum,
+      stories: g.stories.sum,
+      chapters: g.chapters.sum,
+      bundles: g.bundles.sum,
       total: grossTotal,
     },
     net,
@@ -105,6 +112,11 @@ export async function getEarnings(authorId: number): Promise<EarningsBreakdown> 
     feeBps: PLATFORM_FEE_BPS,
     paidOut,
     available: Math.max(0, net - paidOut),
-    counts: { tips: g.tips.count, stories: g.stories.count, chapters: g.chapters.count, bundles: g.bundles.count },
+    counts: {
+      tips: g.tips.count,
+      stories: g.stories.count,
+      chapters: g.chapters.count,
+      bundles: g.bundles.count,
+    },
   };
 }

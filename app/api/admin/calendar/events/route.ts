@@ -17,7 +17,7 @@ async function requireAdmin() {
 
 export async function GET() {
   try {
-    if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const events = await prisma.calendarEvent.findMany({ orderBy: { date: 'asc' } });
     return NextResponse.json(events);
   } catch (err) {
@@ -28,17 +28,17 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const { date, title, icon, note, linkUrl } = await req.json();
     if (!date || !title?.trim()) {
       return NextResponse.json({ error: 'date and title are required' }, { status: 400 });
     }
     const event = await prisma.calendarEvent.create({
       data: {
-        date:    new Date(date),
-        title:   title.trim(),
-        icon:    icon?.trim() || DEFAULT_EVENT_ICON_ID,
-        note:    note?.trim() || null,
+        date: new Date(date),
+        title: title.trim(),
+        icon: icon?.trim() || DEFAULT_EVENT_ICON_ID,
+        note: note?.trim() || null,
         linkUrl: linkUrl?.trim() || null,
       },
     });

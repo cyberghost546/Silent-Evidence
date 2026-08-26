@@ -27,8 +27,8 @@ import type { AgeGroup, ContentRating } from '@prisma/client';
  */
 export const ALLOWED_RATINGS: Record<AgeGroup, ContentRating[]> = {
   UNDER_13: ['ALL'],
-  TEEN:     ['ALL', 'TEEN'],
-  ADULT:    ['ALL', 'TEEN', 'MATURE'],
+  TEEN: ['ALL', 'TEEN'],
+  ADULT: ['ALL', 'TEEN', 'MATURE'],
 };
 
 /** Ratings visible to a signed-out visitor. */

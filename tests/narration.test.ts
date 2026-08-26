@@ -37,8 +37,9 @@ describe('splitSentences', () => {
     // Every produced chunk must be within the utterance safety limit.
     expect(out.every((s) => s.length <= 240)).toBe(true);
     // And reassembling the words loses nothing.
-    expect(out.join(' ').replace(/[.,]/g, '').split(/\s+/).sort())
-      .toEqual(long.replace(/[.,]/g, '').split(/\s+/).sort());
+    expect(out.join(' ').replace(/[.,]/g, '').split(/\s+/).sort()).toEqual(
+      long.replace(/[.,]/g, '').split(/\s+/).sort()
+    );
   });
 
   it('keeps a normal-length sentence intact', () => {

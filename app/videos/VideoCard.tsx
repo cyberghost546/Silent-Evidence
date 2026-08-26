@@ -43,7 +43,9 @@ function getYouTubeEmbedUrl(url: string): string | null {
       if (shorts) return `https://www.youtube-nocookie.com/embed/${shorts[1]}`;
       if (u.pathname.startsWith('/embed/')) return url;
     }
-  } catch { /* invalid url */ }
+  } catch {
+    /* invalid url */
+  }
   return null;
 }
 
@@ -58,7 +60,9 @@ function getYouTubeThumbnail(url: string): string | null {
       if (shorts) id = shorts[1];
     }
     return id ? `https://img.youtube.com/vi/${id}/maxresdefault.jpg` : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function isDirectVideo(url: string) {
@@ -82,7 +86,9 @@ function PlayButton({ size = 'md' }: { size?: 'md' | 'lg' }) {
   const dim = size === 'lg' ? 'w-20 h-20' : 'w-14 h-14';
   const icon = size === 'lg' ? 'w-8 h-8' : 'w-6 h-6';
   return (
-    <div className={`relative z-10 flex items-center justify-center ${dim} rounded-full bg-red-600/90 group-hover/play:bg-red-600 group-hover/play:scale-110 transition-all shadow-2xl ring-4 ring-red-600/30`}>
+    <div
+      className={`relative z-10 flex items-center justify-center ${dim} rounded-full bg-red-600/90 group-hover/play:bg-red-600 group-hover/play:scale-110 transition-all shadow-2xl ring-4 ring-red-600/30`}
+    >
       <svg className={`${icon} text-white ml-1`} fill="currentColor" viewBox="0 0 24 24">
         <path d="M8 5v14l11-7z" />
       </svg>
@@ -112,13 +118,29 @@ function FeaturedCard({ story }: { story: StoryData }) {
                 className="w-full h-full"
               />
             ) : playing && isDirect ? (
-              <video src={story.videoUrl} autoPlay controls className="w-full h-full object-contain" />
+              <video
+                src={story.videoUrl}
+                autoPlay
+                controls
+                className="w-full h-full object-contain"
+              />
             ) : (
-              <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full flex items-center justify-center group/play">
-                {thumbUrl
-                  ? <Image src={thumbUrl} alt={story.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
-                  : <div className="absolute inset-0 bg-gray-800" />
-                }
+              <button
+                type="button"
+                onClick={() => setPlaying(true)}
+                className="absolute inset-0 w-full h-full flex items-center justify-center group/play"
+              >
+                {thumbUrl ? (
+                  <Image
+                    src={thumbUrl}
+                    alt={story.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gray-800" />
+                )}
                 <div className="absolute inset-0 bg-black/50 group-hover/play:bg-black/40 transition" />
                 <PlayButton size="lg" />
               </button>
@@ -128,8 +150,10 @@ function FeaturedCard({ story }: { story: StoryData }) {
 
         {/* Info */}
         <div className="flex flex-col justify-center p-8 gap-4">
-          <Link href={`/category/${story.category.slug}`}
-            className="text-xs text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition w-fit">
+          <Link
+            href={`/category/${story.category.slug}`}
+            className="text-xs text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition w-fit"
+          >
             {story.category.name}
           </Link>
           <Link href={`/story/${story.slug}`}>
@@ -141,7 +165,10 @@ function FeaturedCard({ story }: { story: StoryData }) {
             <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">{story.excerpt}</p>
           )}
           <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
-            <Link href={`/user/${story.author.username}`} className="hover:text-white transition font-semibold">
+            <Link
+              href={`/user/${story.author.username}`}
+              className="hover:text-white transition font-semibold"
+            >
               @{story.author.username}
             </Link>
             <span>·</span>
@@ -151,8 +178,10 @@ function FeaturedCard({ story }: { story: StoryData }) {
             <span>·</span>
             <span>{story._count.comments}</span>
           </div>
-          <Link href={`/story/${story.slug}`}
-            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition w-fit">
+          <Link
+            href={`/story/${story.slug}`}
+            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition w-fit"
+          >
             Read full story →
           </Link>
         </div>
@@ -167,7 +196,11 @@ function GridCard({ story }: { story: StoryData }) {
   const embedUrl = getYouTubeEmbedUrl(story.videoUrl);
   const thumbUrl = getYouTubeThumbnail(story.videoUrl);
   const isDirect = isDirectVideo(story.videoUrl);
-  const date = new Date(story.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const date = new Date(story.createdAt).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 
   return (
     <div className="bg-gray-900 border border-gray-800 hover:border-red-600/40 rounded-2xl overflow-hidden transition-all duration-300 shadow hover:shadow-red-600/10 hover:-translate-y-0.5 group flex flex-col">
@@ -182,13 +215,28 @@ function GridCard({ story }: { story: StoryData }) {
             className="absolute inset-0 w-full h-full"
           />
         ) : playing && isDirect ? (
-          <video src={story.videoUrl} autoPlay controls className="absolute inset-0 w-full h-full object-contain" />
+          <video
+            src={story.videoUrl}
+            autoPlay
+            controls
+            className="absolute inset-0 w-full h-full object-contain"
+          />
         ) : (
-          <button onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full flex items-center justify-center group/play">
-            {thumbUrl
-              ? <Image src={thumbUrl} alt={story.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
-              : <div className="absolute inset-0 bg-gray-800" />
-            }
+          <button
+            onClick={() => setPlaying(true)}
+            className="absolute inset-0 w-full h-full flex items-center justify-center group/play"
+          >
+            {thumbUrl ? (
+              <Image
+                src={thumbUrl}
+                alt={story.title}
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gray-800" />
+            )}
             {/* Bottom gradient for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             {/* Overlay on hover */}
@@ -211,7 +259,10 @@ function GridCard({ story }: { story: StoryData }) {
         </Link>
 
         <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
-          <Link href={`/user/${story.author.username}`} className="hover:text-gray-300 transition font-medium">
+          <Link
+            href={`/user/${story.author.username}`}
+            className="hover:text-gray-300 transition font-medium"
+          >
             @{story.author.username}
           </Link>
           <span>·</span>
@@ -223,8 +274,10 @@ function GridCard({ story }: { story: StoryData }) {
           <span className="flex items-center gap-1">{story.views.toLocaleString()}</span>
           <span className="flex items-center gap-1">{story._count.likes}</span>
           <span className="flex items-center gap-1">{story._count.comments}</span>
-          <Link href={`/story/${story.slug}`}
-            className="ml-auto text-red-500 hover:text-red-400 font-semibold transition">
+          <Link
+            href={`/story/${story.slug}`}
+            className="ml-auto text-red-500 hover:text-red-400 font-semibold transition"
+          >
             Read →
           </Link>
         </div>
@@ -234,6 +287,12 @@ function GridCard({ story }: { story: StoryData }) {
 }
 
 // ── Export ────────────────────────────────────────────────────────────────────
-export default function VideoCard({ story, featured = false }: { story: StoryData; featured?: boolean }) {
+export default function VideoCard({
+  story,
+  featured = false,
+}: {
+  story: StoryData;
+  featured?: boolean;
+}) {
   return featured ? <FeaturedCard story={story} /> : <GridCard story={story} />;
 }

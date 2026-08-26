@@ -2,14 +2,14 @@ import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 export async function uploadToCloudinary(
   buffer: Buffer,
   folder: string,
-  publicId: string,
+  publicId: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -24,7 +24,7 @@ export async function uploadToCloudinary(
       (err, result) => {
         if (err || !result) return reject(err ?? new Error('Upload failed'));
         resolve(result.secure_url);
-      },
+      }
     );
     stream.end(buffer);
   });
@@ -40,8 +40,6 @@ export async function uploadToCloudinary(
  */
 export function optimizeCloudinaryUrl(url: string, width?: number): string {
   if (!url || !url.includes('res.cloudinary.com')) return url;
-  const transforms = width
-    ? `f_auto,q_auto,w_${width}`
-    : 'f_auto,q_auto';
+  const transforms = width ? `f_auto,q_auto,w_${width}` : 'f_auto,q_auto';
   return url.replace('/image/upload/', `/image/upload/${transforms}/`);
 }

@@ -94,10 +94,10 @@ export default async function BundleDetailPage({ params }: Props) {
               excerpt: true,
               coverImage: true,
               // Only the username is needed — no need to load the whole User row
-              author:   { select: { username: true } },
+              author: { select: { username: true } },
               category: { select: { name: true } },
               // Prisma _count aggregates without pulling every like/comment record
-              _count:   { select: { likes: true, comments: true } },
+              _count: { select: { likes: true, comments: true } },
               views: true,
             },
           },

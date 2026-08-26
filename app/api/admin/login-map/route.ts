@@ -19,8 +19,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       take: 500,
       select: {
-        id: true, username: true, country: true, city: true,
-        lat: true, lng: true, success: true, createdAt: true, ip: true,
+        id: true,
+        username: true,
+        country: true,
+        city: true,
+        lat: true,
+        lng: true,
+        success: true,
+        createdAt: true,
+        ip: true,
       },
     });
 
@@ -37,7 +44,7 @@ export async function GET() {
       .map(([country, count]) => ({ country, count }));
 
     return NextResponse.json({
-      markers: logs.map(l => ({
+      markers: logs.map((l) => ({
         ...l,
         createdAt: l.createdAt.toISOString(),
       })),

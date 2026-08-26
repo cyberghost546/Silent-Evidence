@@ -39,7 +39,6 @@ import { sendPushToUser } from '@/lib/webpush';
 // ── POST handler ──────────────────────────────────────────────────────────────
 // Handles a click on the "Follow" or "Unfollow" button.
 export async function POST(req: Request) {
-
   // Read all cookies from the request
   const cookieStore = await cookies();
 
@@ -112,20 +111,21 @@ export async function POST(req: Request) {
   // Create a notification row that will appear in the user's bell dropdown.
   // .catch(() => {}) means "fire and forget" — if this fails it doesn't matter,
   // the follow itself has already been saved and we don't want to return an error.
-  prisma.notification.create({
-    data: {
-      // The notification belongs to the person who was just followed
-      userId: Number(followingId),
-      // The FOLLOW type lets the UI render a follow-specific icon or template
-      type: 'FOLLOW',
-      // Human-readable message shown in the notification panel
-      message: `${follower?.username ?? 'Someone'} started following you.`,
-    },
-  }).catch(() => {});
+  prisma.notification
+    .create({
+      data: {
+        // The notification belongs to the person who was just followed
+        userId: Number(followingId),
+        // The FOLLOW type lets the UI render a follow-specific icon or template
+        type: 'FOLLOW',
+        // Human-readable message shown in the notification panel
+        message: `${follower?.username ?? 'Someone'} started following you.`,
+      },
+    })
+    .catch(() => {});
 
   // Only send email and push if we successfully retrieved both user profiles
   if (follower && followedUser) {
-
     // ── 2. Email notification ─────────────────────────────────────────────
     // Send a "you have a new follower" email to the person who was followed.
     // Fire and forget — an email failure shouldn't fail the follow action.

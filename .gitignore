@@ -48,3 +48,6 @@ next-env.d.ts
 /backups
 
 .vercel
+
+# Claude Code machine-local settings (permissions) — never commit
+.claude/settings.local.json

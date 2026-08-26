@@ -42,7 +42,7 @@ type Chapter = {
   id: number;
   title: string;
   order: number;
-  views: number;    // per-chapter read count, incremented on the chapter reading page
+  views: number; // per-chapter read count, incremented on the chapter reading page
   createdAt: string;
 };
 
@@ -50,20 +50,20 @@ type Props = { storyId: number };
 
 export default function ChapterManager({ storyId }: Props) {
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [loading, setLoading]   = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // Editor state — null = list view, 'new' = creating, number = editing that chapter id
-  const [editing, setEditing]   = useState<'new' | number | null>(null);
-  const [title, setTitle]       = useState('');
-  const [content, setContent]   = useState('');
-  const [saving, setSaving]     = useState(false);
-  const [error, setError]       = useState('');
+  const [editing, setEditing] = useState<'new' | number | null>(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   // Load chapters on mount
   useEffect(() => {
     fetch(`/api/chapters?storyId=${storyId}`)
-      .then(r => r.json())
-      .then(data => setChapters(Array.isArray(data) ? data : []))
+      .then((r) => r.json())
+      .then((data) => setChapters(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [storyId]);
@@ -88,11 +88,17 @@ export default function ChapterManager({ storyId }: Props) {
     setError('');
   };
 
-  const cancel = () => { setEditing(null); setError(''); };
+  const cancel = () => {
+    setEditing(null);
+    setError('');
+  };
 
   // Save new or updated chapter
   const save = async () => {
-    if (!title.trim()) { setError('Title is required.'); return; }
+    if (!title.trim()) {
+      setError('Title is required.');
+      return;
+    }
     setSaving(true);
     setError('');
 
@@ -105,9 +111,23 @@ export default function ChapterManager({ storyId }: Props) {
       });
       const data = await res.json();
       setSaving(false);
-      if (!res.ok) { setError(data.error ?? 'Failed to save.'); return; }
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to save.');
+        return;
+      }
       // Add to list and sort
-      setChapters(prev => [...prev, { id: data.id, title: data.title, order: data.order, views: data.views ?? 0, createdAt: data.createdAt }].sort((a, b) => a.order - b.order));
+      setChapters((prev) =>
+        [
+          ...prev,
+          {
+            id: data.id,
+            title: data.title,
+            order: data.order,
+            views: data.views ?? 0,
+            createdAt: data.createdAt,
+          },
+        ].sort((a, b) => a.order - b.order)
+      );
     } else {
       // Update
       const res = await fetch(`/api/chapters/${editing}`, {
@@ -117,8 +137,11 @@ export default function ChapterManager({ storyId }: Props) {
       });
       const data = await res.json();
       setSaving(false);
-      if (!res.ok) { setError(data.error ?? 'Failed to save.'); return; }
-      setChapters(prev => prev.map(c => c.id === editing ? { ...c, title: data.title } : c));
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to save.');
+        return;
+      }
+      setChapters((prev) => prev.map((c) => (c.id === editing ? { ...c, title: data.title } : c)));
     }
 
     setEditing(null);
@@ -128,12 +151,12 @@ export default function ChapterManager({ storyId }: Props) {
   const remove = async (id: number) => {
     if (!confirm('Delete this chapter? This cannot be undone.')) return;
     const res = await fetch(`/api/chapters/${id}`, { method: 'DELETE' });
-    if (res.ok) setChapters(prev => prev.filter(c => c.id !== id));
+    if (res.ok) setChapters((prev) => prev.filter((c) => c.id !== id));
   };
 
   // Move chapter up or down — swaps order values with the neighbour
   const move = async (id: number, direction: 'up' | 'down') => {
-    const idx = chapters.findIndex(c => c.id === id);
+    const idx = chapters.findIndex((c) => c.id === id);
     const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
     if (swapIdx < 0 || swapIdx >= chapters.length) return;
 
@@ -141,17 +164,27 @@ export default function ChapterManager({ storyId }: Props) {
     const b = chapters[swapIdx];
 
     // Optimistically swap in UI
-    const updated = chapters.map(c => {
-      if (c.id === a.id) return { ...c, order: b.order };
-      if (c.id === b.id) return { ...c, order: a.order };
-      return c;
-    }).sort((x, y) => x.order - y.order);
+    const updated = chapters
+      .map((c) => {
+        if (c.id === a.id) return { ...c, order: b.order };
+        if (c.id === b.id) return { ...c, order: a.order };
+        return c;
+      })
+      .sort((x, y) => x.order - y.order);
     setChapters(updated);
 
     // Persist both order changes
     await Promise.all([
-      fetch(`/api/chapters/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order: b.order }) }),
-      fetch(`/api/chapters/${b.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order: a.order }) }),
+      fetch(`/api/chapters/${a.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: b.order }),
+      }),
+      fetch(`/api/chapters/${b.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: a.order }),
+      }),
     ]);
   };
 
@@ -165,7 +198,7 @@ export default function ChapterManager({ storyId }: Props) {
 
         <input
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="Chapter title"
           className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white mb-4 focus:outline-none focus:ring-2 focus:ring-red-600"
         />
@@ -182,10 +215,17 @@ export default function ChapterManager({ storyId }: Props) {
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
         <div className="flex gap-3">
-          <button onClick={cancel} className="px-4 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-300 rounded-xl transition">
+          <button
+            onClick={cancel}
+            className="px-4 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-300 rounded-xl transition"
+          >
             Cancel
           </button>
-          <button onClick={save} disabled={saving} className="px-5 py-2 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition">
+          <button
+            onClick={save}
+            disabled={saving}
+            className="px-5 py-2 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition"
+          >
             {saving ? 'Saving…' : 'Save Chapter'}
           </button>
         </div>
@@ -200,10 +240,15 @@ export default function ChapterManager({ storyId }: Props) {
         <div className="flex items-center gap-2">
           <h2 className="text-base font-bold text-white">Chapters</h2>
           {chapters.length > 0 && (
-            <span className="text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">{chapters.length}</span>
+            <span className="text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">
+              {chapters.length}
+            </span>
           )}
         </div>
-        <button onClick={startNew} className="px-4 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
+        <button
+          onClick={startNew}
+          className="px-4 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+        >
           + Add Chapter
         </button>
       </div>
@@ -218,7 +263,10 @@ export default function ChapterManager({ storyId }: Props) {
       ) : (
         <div className="space-y-2">
           {chapters.map((c, i) => (
-            <div key={c.id} className="flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3">
+            <div
+              key={c.id}
+              className="flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3"
+            >
               {/* Order number */}
               <span className="text-sm font-bold text-gray-600 w-5 flex-shrink-0">{i + 1}</span>
 
@@ -227,7 +275,7 @@ export default function ChapterManager({ storyId }: Props) {
 
               {/* Per-chapter view count — shows how many times this chapter has been read */}
               <span className="text-xs text-gray-600 flex items-center gap-1 flex-shrink-0">
- {c.views.toLocaleString()}
+                {c.views.toLocaleString()}
               </span>
 
               {/* Up/Down reorder buttons */}
@@ -251,10 +299,17 @@ export default function ChapterManager({ storyId }: Props) {
               </div>
 
               {/* Edit / Delete */}
-              <button onClick={() => startEdit(c.id)} disabled={saving} className="text-xs text-blue-400 hover:text-blue-300 transition disabled:opacity-50">
+              <button
+                onClick={() => startEdit(c.id)}
+                disabled={saving}
+                className="text-xs text-blue-400 hover:text-blue-300 transition disabled:opacity-50"
+              >
                 Edit
               </button>
-              <button onClick={() => remove(c.id)} className="text-xs text-red-400 hover:text-red-300 transition">
+              <button
+                onClick={() => remove(c.id)}
+                className="text-xs text-red-400 hover:text-red-300 transition"
+              >
                 Delete
               </button>
             </div>
@@ -263,7 +318,8 @@ export default function ChapterManager({ storyId }: Props) {
       )}
 
       <p className="text-xs text-gray-600 mt-4">
-        Chapters appear in order on the story page. Readers navigate between them with prev/next buttons.
+        Chapters appear in order on the story page. Readers navigate between them with prev/next
+        buttons.
       </p>
     </div>
   );

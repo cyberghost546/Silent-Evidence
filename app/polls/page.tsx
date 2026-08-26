@@ -22,12 +22,16 @@ export default async function PollsPage() {
     orderBy: { createdAt: 'desc' },
     take: 30,
     select: {
-      id: true, question: true, endsAt: true, createdAt: true,
+      id: true,
+      question: true,
+      endsAt: true,
+      createdAt: true,
       author: { select: { username: true, profile: { select: { avatar: true } } } },
       _count: { select: { votes: true } },
       options: {
         select: {
-          id: true, text: true,
+          id: true,
+          text: true,
           _count: { select: { votes: true } },
           // Only include the user's own vote record if logged in
           votes: userId ? { where: { userId }, select: { id: true } } : false,

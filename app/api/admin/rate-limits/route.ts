@@ -15,7 +15,7 @@ async function requireAdmin() {
 }
 
 export async function GET() {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const now = Date.now();
   const entries = [];
@@ -40,7 +40,7 @@ export async function GET() {
 }
 
 export async function DELETE(req: Request) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const { key } = await req.json().catch(() => ({}));
   if (key) {

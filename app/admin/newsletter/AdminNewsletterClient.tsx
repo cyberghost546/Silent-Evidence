@@ -28,7 +28,16 @@
  */
 
 import { useState } from 'react';
-import { Mail, Heart, Eye, MessageCircle, CheckCircle2, SkipForward, XCircle, Send } from 'lucide-react';
+import {
+  Mail,
+  Heart,
+  Eye,
+  MessageCircle,
+  CheckCircle2,
+  SkipForward,
+  XCircle,
+  Send,
+} from 'lucide-react';
 
 // ── Type definitions ──────────────────────────────────────────────────────────
 
@@ -38,25 +47,25 @@ type Story = {
   title: string;
   slug: string;
   excerpt: string | null;
-  coverImage: string | null;    // URL of the cover photo shown as a thumbnail
+  coverImage: string | null; // URL of the cover photo shown as a thumbnail
   views: number;
   author: { username: string };
   category: { name: string };
   _count: { likes: number; comments: number }; // Prisma nested count syntax
-  score: number;  // engagement score computed server-side to rank stories
+  score: number; // engagement score computed server-side to rank stories
 };
 
 // The preview payload returned by GET /api/admin/newsletter
 type PreviewData = {
-  stories: Story[];          // top stories of the past 7 days (up to 5)
-  subscriberCount: number;   // total users with newsletter opt-in
+  stories: Story[]; // top stories of the past 7 days (up to 5)
+  subscriberCount: number; // total users with newsletter opt-in
 };
 
 // The result returned by POST /api/admin/newsletter after sending
 type SendResult = {
-  sent: number;      // how many emails were successfully delivered
-  skipped: number;   // subscribers already emailed recently (de-duplication)
-  failed: number;    // delivery errors
+  sent: number; // how many emails were successfully delivered
+  skipped: number; // subscribers already emailed recently (de-duplication)
+  failed: number; // delivery errors
   topStories: { title: string; slug: string }[]; // stories that were included
 };
 
@@ -71,17 +80,17 @@ type Props = {
 export default function AdminNewsletterClient({ initialPreview }: Props) {
   // The preview data (stories + subscriber count) shown before sending.
   // Starts as whatever the server fetched; can be refreshed with the button.
-  const [preview, setPreview]   = useState<PreviewData>(initialPreview);
+  const [preview, setPreview] = useState<PreviewData>(initialPreview);
 
   // True while the POST /api/admin/newsletter request is in flight
-  const [sending, setSending]   = useState(false);
+  const [sending, setSending] = useState(false);
 
   // Populated with send stats after a successful POST.
   // null = digest hasn't been sent yet in this session.
-  const [result, setResult]     = useState<SendResult | null>(null);
+  const [result, setResult] = useState<SendResult | null>(null);
 
   // Error message shown if the API returns a non-OK response
-  const [error, setError]       = useState('');
+  const [error, setError] = useState('');
 
   // True while the GET /api/admin/newsletter refresh call is in flight
   const [refreshing, setRefreshing] = useState(false);
@@ -134,7 +143,7 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
       {/* Subscriber count pill */}
       <div className="flex items-center gap-3 mb-6">
         <span className="px-4 py-2 bg-red-600/10 border border-red-600/30 text-red-400 text-sm font-semibold rounded-xl">
- {preview.subscriberCount.toLocaleString()} subscribers
+          {preview.subscriberCount.toLocaleString()} subscribers
         </span>
         <button
           onClick={refresh}
@@ -157,7 +166,9 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
         {preview.stories.length === 0 ? (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
             <p className="text-gray-500 text-sm">No stories published in the last 7 days.</p>
-            <p className="text-gray-600 text-xs mt-1">The newsletter will not be sent if there are no stories.</p>
+            <p className="text-gray-600 text-xs mt-1">
+              The newsletter will not be sent if there are no stories.
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -187,11 +198,17 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
                   <p className="text-xs text-gray-500 mt-0.5 flex items-center flex-wrap gap-x-1">
                     <span>by {story.author.username}</span>
                     <span>&nbsp;·&nbsp;</span>
-                    <span className="inline-flex items-center gap-0.5"><Heart className="w-3 h-3" /> {story._count.likes}</span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <Heart className="w-3 h-3" /> {story._count.likes}
+                    </span>
                     <span>&nbsp;·&nbsp;</span>
-                    <span className="inline-flex items-center gap-0.5"><Eye className="w-3 h-3" /> {story.views.toLocaleString()}</span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <Eye className="w-3 h-3" /> {story.views.toLocaleString()}
+                    </span>
                     <span>&nbsp;·&nbsp;</span>
-                    <span className="inline-flex items-center gap-0.5"><MessageCircle className="w-3 h-3" /> {story._count.comments}</span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <MessageCircle className="w-3 h-3" /> {story._count.comments}
+                    </span>
                   </p>
                 </div>
                 {/* Engagement score */}
@@ -216,11 +233,17 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
         <div className="mb-6 px-4 py-4 bg-red-500/10 border border-red-500/30 rounded-xl">
           <p className="text-red-400 font-semibold text-sm mb-1">Newsletter sent!</p>
           <p className="text-xs text-gray-400 flex items-center flex-wrap gap-x-2">
-            <span className="inline-flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-red-400" /> {result.sent} delivered</span>
+            <span className="inline-flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-red-400" /> {result.sent} delivered
+            </span>
             <span>&nbsp;·&nbsp;</span>
-            <span className="inline-flex items-center gap-1"><SkipForward className="w-3 h-3" /> {result.skipped} skipped</span>
+            <span className="inline-flex items-center gap-1">
+              <SkipForward className="w-3 h-3" /> {result.skipped} skipped
+            </span>
             <span>&nbsp;·&nbsp;</span>
-            <span className="inline-flex items-center gap-1"><XCircle className="w-3 h-3 text-red-400" /> {result.failed} failed</span>
+            <span className="inline-flex items-center gap-1">
+              <XCircle className="w-3 h-3 text-red-400" /> {result.failed} failed
+            </span>
           </p>
         </div>
       )}
@@ -231,7 +254,15 @@ export default function AdminNewsletterClient({ initialPreview }: Props) {
         disabled={sending || preview.stories.length === 0 || preview.subscriberCount === 0}
         className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition text-sm"
       >
-        {sending ? <span className="inline-flex items-center gap-1.5"><Send className="w-4 h-4" /> Sending…</span> : <span className="inline-flex items-center gap-1.5"><Send className="w-4 h-4" /> Send to {preview.subscriberCount} subscribers</span>}
+        {sending ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Send className="w-4 h-4" /> Sending…
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5">
+            <Send className="w-4 h-4" /> Send to {preview.subscriberCount} subscribers
+          </span>
+        )}
       </button>
 
       {preview.stories.length === 0 && (

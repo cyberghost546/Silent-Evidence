@@ -16,8 +16,9 @@ const REAL_IP = '8.8.8.8';
 function stubFetch(payload: unknown, ok = true) {
   // The `input` parameter is declared even though the stub ignores it, so the
   // recorded call is typed and `mock.calls[0][0]` can be read below.
-  const spy = vi.fn(async (_input: RequestInfo | URL) =>
-    ({ ok, json: async () => payload }) as unknown as Response);
+  const spy = vi.fn(
+    async (_input: RequestInfo | URL) => ({ ok, json: async () => payload }) as unknown as Response
+  );
   vi.stubGlobal('fetch', spy);
   return spy;
 }
@@ -49,7 +50,13 @@ describe('lookupGeoIp — cleartext protection', () => {
 
   it('uses https when one is configured', async () => {
     process.env.GEOIP_PROVIDER_URL = 'https://ipwho.is/{ip}';
-    const spy = stubFetch({ success: true, country: 'Ireland', city: 'Cork', latitude: 51.9, longitude: -8.5 });
+    const spy = stubFetch({
+      success: true,
+      country: 'Ireland',
+      city: 'Cork',
+      latitude: 51.9,
+      longitude: -8.5,
+    });
 
     await lookupGeoIp(REAL_IP);
     const calledWith = String(spy.mock.calls[0][0]);
@@ -74,7 +81,7 @@ describe('lookupGeoIp — private addresses', () => {
       const spy = stubFetch({ success: true, latitude: 1, longitude: 2 });
       expect(await lookupGeoIp(ip)).toBeNull();
       expect(spy).not.toHaveBeenCalled();
-    },
+    }
   );
 });
 
@@ -84,18 +91,39 @@ describe('lookupGeoIp — provider response shapes', () => {
   });
 
   it('parses the ipwho.is shape', async () => {
-    stubFetch({ success: true, country: 'Ireland', city: 'Cork', latitude: 51.89, longitude: -8.47 });
-    expect(await lookupGeoIp(REAL_IP)).toEqual({ country: 'Ireland', city: 'Cork', lat: 51.89, lng: -8.47 });
+    stubFetch({
+      success: true,
+      country: 'Ireland',
+      city: 'Cork',
+      latitude: 51.89,
+      longitude: -8.47,
+    });
+    expect(await lookupGeoIp(REAL_IP)).toEqual({
+      country: 'Ireland',
+      city: 'Cork',
+      lat: 51.89,
+      lng: -8.47,
+    });
   });
 
   it('parses the ip-api shape', async () => {
     stubFetch({ status: 'success', country: 'Japan', city: 'Osaka', lat: 34.69, lon: 135.5 });
-    expect(await lookupGeoIp(REAL_IP)).toEqual({ country: 'Japan', city: 'Osaka', lat: 34.69, lng: 135.5 });
+    expect(await lookupGeoIp(REAL_IP)).toEqual({
+      country: 'Japan',
+      city: 'Osaka',
+      lat: 34.69,
+      lng: 135.5,
+    });
   });
 
   it('parses the ipapi.co shape', async () => {
     stubFetch({ country_name: 'Brazil', city: 'Recife', latitude: -8.05, longitude: -34.9 });
-    expect(await lookupGeoIp(REAL_IP)).toEqual({ country: 'Brazil', city: 'Recife', lat: -8.05, lng: -34.9 });
+    expect(await lookupGeoIp(REAL_IP)).toEqual({
+      country: 'Brazil',
+      city: 'Recife',
+      lat: -8.05,
+      lng: -34.9,
+    });
   });
 
   // Providers signal failure in the body with HTTP 200, so a naive parse would
@@ -117,7 +145,12 @@ describe('lookupGeoIp — provider response shapes', () => {
   });
 
   it('returns null when the provider throws', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('network down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network down');
+      })
+    );
     expect(await lookupGeoIp(REAL_IP)).toBeNull();
   });
 });

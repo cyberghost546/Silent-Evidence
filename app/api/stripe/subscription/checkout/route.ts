@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (plan !== 'monthly' && plan !== 'yearly') {
-      return NextResponse.json(
-        { error: 'plan must be "monthly" or "yearly"' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'plan must be "monthly" or "yearly"' }, { status: 400 });
     }
 
     // Look up the user so we can attach their name/email to the Stripe customer.
@@ -117,9 +114,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('[stripe/subscription/checkout] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

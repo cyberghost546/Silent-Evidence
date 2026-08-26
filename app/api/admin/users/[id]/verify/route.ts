@@ -82,7 +82,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   // Look up the target user to find their current isVerified value.
   // We need the current value so we can flip it (toggle it to its opposite).
   // select: { isVerified: true } fetches only the isVerified column — no extra data.
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { isVerified: true } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isVerified: true },
+  });
 
   // If no user exists with that ID, return 404 Not Found.
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });

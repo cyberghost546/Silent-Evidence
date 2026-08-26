@@ -8,10 +8,10 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface PlanNode {
-  id:      string;
-  title:   string;
+  id: string;
+  title: string;
   content: string;
-  order:   number;
+  order: number;
 }
 
 interface Props {
@@ -27,40 +27,46 @@ function uid() {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function StoryPlannerPanel({ storyId }: Props) {
-  const [nodes,    setNodes]    = useState<PlanNode[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
-  const [saved,    setSaved]    = useState(false);
-  const [open,     setOpen]     = useState(false);
-  const saveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dragOver   = useRef<number | null>(null);
+  const [nodes, setNodes] = useState<PlanNode[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [open, setOpen] = useState(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dragOver = useRef<number | null>(null);
 
   // ── Fetch existing planner data ─────────────────────────────────────────
   useEffect(() => {
     fetch(`/api/stories/${storyId}/planner`)
-      .then(r => r.json())
-      .then(d => {
-        try { setNodes(JSON.parse(d.content) ?? []); }
-        catch { setNodes([]); }
+      .then((r) => r.json())
+      .then((d) => {
+        try {
+          setNodes(JSON.parse(d.content) ?? []);
+        } catch {
+          setNodes([]);
+        }
       })
       .finally(() => setLoading(false));
   }, [storyId]);
 
   // ── Auto-save on change (debounced 1.2 s) ────────────────────────────────
-  const save = useCallback((updated: PlanNode[]) => {
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(async () => {
-      setSaving(true);
-      await fetch(`/api/stories/${storyId}/planner`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: JSON.stringify(updated) }),
-      });
-      setSaving(false);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    }, 1200);
-  }, [storyId]);
+  const save = useCallback(
+    (updated: PlanNode[]) => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(async () => {
+        setSaving(true);
+        await fetch(`/api/stories/${storyId}/planner`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: JSON.stringify(updated) }),
+        });
+        setSaving(false);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }, 1200);
+    },
+    [storyId]
+  );
 
   // ── Mutations ─────────────────────────────────────────────────────────────
 
@@ -71,13 +77,13 @@ export default function StoryPlannerPanel({ storyId }: Props) {
   };
 
   const updateNode = (id: string, field: 'title' | 'content', value: string) => {
-    const updated = nodes.map(n => n.id === id ? { ...n, [field]: value } : n);
+    const updated = nodes.map((n) => (n.id === id ? { ...n, [field]: value } : n));
     setNodes(updated);
     save(updated);
   };
 
   const removeNode = (id: string) => {
-    const updated = nodes.filter(n => n.id !== id).map((n, i) => ({ ...n, order: i }));
+    const updated = nodes.filter((n) => n.id !== id).map((n, i) => ({ ...n, order: i }));
     setNodes(updated);
     save(updated);
   };
@@ -111,11 +117,10 @@ export default function StoryPlannerPanel({ storyId }: Props) {
 
   return (
     <div className="mt-8 border border-gray-700 rounded-2xl overflow-hidden">
-
       {/* Header / toggle */}
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-5 py-4 bg-gray-800 hover:bg-gray-750 transition-colors"
       >
         <div className="flex items-center gap-2">
@@ -128,7 +133,7 @@ export default function StoryPlannerPanel({ storyId }: Props) {
         </div>
         <div className="flex items-center gap-3">
           {saving && <span className="text-xs text-gray-500">Saving…</span>}
-          {saved  && <span className="text-xs text-green-500">Saved ✓</span>}
+          {saved && <span className="text-xs text-green-500">Saved ✓</span>}
           <span className="text-gray-500 text-sm">{open ? '▲' : '▼'}</span>
         </div>
       </button>
@@ -150,9 +155,9 @@ export default function StoryPlannerPanel({ storyId }: Props) {
                 <div
                   key={node.id}
                   draggable
-                  onDragStart={e => onDragStart(e, index)}
-                  onDragOver={e  => onDragOver(e, index)}
-                  onDrop={e      => onDrop(e, index)}
+                  onDragStart={(e) => onDragStart(e, index)}
+                  onDragOver={(e) => onDragOver(e, index)}
+                  onDrop={(e) => onDrop(e, index)}
                   className="bg-gray-800 border border-gray-700 rounded-xl p-4 cursor-grab active:cursor-grabbing"
                 >
                   <div className="flex items-start gap-3">
@@ -166,13 +171,13 @@ export default function StoryPlannerPanel({ storyId }: Props) {
                       <input
                         type="text"
                         value={node.title}
-                        onChange={e => updateNode(node.id, 'title', e.target.value)}
+                        onChange={(e) => updateNode(node.id, 'title', e.target.value)}
                         placeholder="Scene title…"
                         className="w-full bg-transparent text-white text-sm font-semibold placeholder-gray-600 border-none outline-none"
                       />
                       <textarea
                         value={node.content}
-                        onChange={e => updateNode(node.id, 'content', e.target.value)}
+                        onChange={(e) => updateNode(node.id, 'content', e.target.value)}
                         placeholder="What happens in this scene?"
                         rows={2}
                         className="w-full bg-transparent text-gray-400 text-sm placeholder-gray-700 border-none outline-none resize-none"

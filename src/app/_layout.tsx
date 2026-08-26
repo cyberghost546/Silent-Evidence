@@ -12,11 +12,11 @@ const SilentEvidenceDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: '#22c55e',        // Blood red accent for active elements
-    background: '#0a0a0a',     // Near-black background
-    card: '#1a1a1a',           // Slightly lighter cards/headers
-    border: '#2a2a2a',         // Subtle dark borders
-    notification: '#22c55e',   // Red notification badge
+    primary: '#22c55e', // Blood red accent for active elements
+    background: '#0a0a0a', // Near-black background
+    card: '#1a1a1a', // Slightly lighter cards/headers
+    border: '#2a2a2a', // Subtle dark borders
+    notification: '#22c55e', // Red notification badge
   },
 };
 
@@ -25,7 +25,7 @@ const SilentEvidenceLightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#22c55e',        // Keep the red accent in light mode too
+    primary: '#22c55e', // Keep the red accent in light mode too
   },
 };
 
@@ -43,7 +43,9 @@ export default function TabLayout() {
   if (!ready) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? SilentEvidenceDarkTheme : SilentEvidenceLightTheme}>
+    <ThemeProvider
+      value={colorScheme === 'dark' ? SilentEvidenceDarkTheme : SilentEvidenceLightTheme}
+    >
       <AnimatedSplashOverlay />
       <AppTabs />
     </ThemeProvider>

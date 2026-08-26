@@ -38,7 +38,12 @@ import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 // zodError        — 400 response with field-level validation errors from Zod
 // serverError     — 500 response for unexpected failures
 import { conflict, tooManyRequests, zodError, serverError } from '@/lib/apiError';
-import { signSession, SESSION_COOKIE, SESSION_SIG_COOKIE, SESSION_VER_COOKIE } from '@/lib/sessionCookie';
+import {
+  signSession,
+  SESSION_COOKIE,
+  SESSION_SIG_COOKIE,
+  SESSION_VER_COOKIE,
+} from '@/lib/sessionCookie';
 
 // ── Zod schema — declares validation rules for all registration fields ─────────
 // Each field has its own chain of validators that run left-to-right.
@@ -80,7 +85,6 @@ const RegisterSchema = z.object({
 // This function runs whenever a POST request is made to /api/auth/register.
 // "req" is a standard Web API Request object (body, headers, etc.)
 export async function POST(req: Request) {
-
   // ── Rate limiting ──────────────────────────────────────────────────────────
   // Get the client's IP address to track how many registrations they've attempted
   const ip = getClientIp(req);
@@ -88,7 +92,7 @@ export async function POST(req: Request) {
   // Allow at most 3 new accounts from the same IP in any 1-hour window.
   // 'register' namespaces this counter separately from the login or other limiters.
   const rateLimit = await checkRateLimit(ip, 'register', {
-    limit: 3,                  // max 3 registrations per window
+    limit: 3, // max 3 registrations per window
     windowMs: 60 * 60 * 1000, // 1-hour window in milliseconds
   });
 
@@ -168,7 +172,6 @@ export async function POST(req: Request) {
 
     // Return 201 Created — the registration and auto-login succeeded
     return NextResponse.json({ ok: true }, { status: 201 });
-
   } catch (err) {
     // Log the unexpected error to the server console for debugging
     console.error('[register]', err);

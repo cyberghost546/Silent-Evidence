@@ -80,18 +80,18 @@ async function checkRedis(): Promise<{ ok: boolean; latencyMs: number }> {
     const parsed = new URL(redisUrl);
     const r = new Redis({
       host: parsed.hostname,
-      port: Number(parsed.port) || 6379,         // default Redis port is 6379
-      password: parsed.password || undefined,     // undefined means no auth
-      lazyConnect: true,                          // don't auto-connect in constructor
-      connectTimeout: 2000,                       // give up after 2 seconds
-      maxRetriesPerRequest: 0,                    // fail immediately on error
-      retryStrategy: () => null,                  // don't retry — fail fast
+      port: Number(parsed.port) || 6379, // default Redis port is 6379
+      password: parsed.password || undefined, // undefined means no auth
+      lazyConnect: true, // don't auto-connect in constructor
+      connectTimeout: 2000, // give up after 2 seconds
+      maxRetriesPerRequest: 0, // fail immediately on error
+      retryStrategy: () => null, // don't retry — fail fast
     });
     // Suppress the unhandled error event that ioredis emits on connection failure;
     // without this, a refused connection would crash the process in Node.js
     r.on('error', () => {});
     await r.connect(); // establish TCP connection
-    await r.ping();    // send PING, expect PONG — confirms the server is processing commands
+    await r.ping(); // send PING, expect PONG — confirms the server is processing commands
     await r.disconnect(); // clean up — don't leave an idle connection open
     return { ok: true, latencyMs: Date.now() - t };
   } catch {
@@ -106,26 +106,26 @@ async function checkRedis(): Promise<{ ok: boolean; latencyMs: number }> {
 // REQUIRED_VARS: the app cannot function correctly without these.
 // If any are missing the CheckRow will show a red FAIL badge.
 const REQUIRED_VARS = [
-  'DATABASE_URL',         // Prisma connection string
-  'NEXTAUTH_SECRET',      // JWT signing secret for NextAuth
-  'SMTP_HOST',            // outgoing mail server hostname
-  'SMTP_PORT',            // SMTP port (usually 587 or 465)
-  'SMTP_USER',            // SMTP login username
-  'SMTP_PASS',            // SMTP login password
-  'REDIS_URL',            // Redis connection string for rate limiting / caching
+  'DATABASE_URL', // Prisma connection string
+  'NEXTAUTH_SECRET', // JWT signing secret for NextAuth
+  'SMTP_HOST', // outgoing mail server hostname
+  'SMTP_PORT', // SMTP port (usually 587 or 465)
+  'SMTP_USER', // SMTP login username
+  'SMTP_PASS', // SMTP login password
+  'REDIS_URL', // Redis connection string for rate limiting / caching
   'NEXT_PUBLIC_SITE_URL', // canonical site URL used in email links and OG tags
 ];
 
 // OPTIONAL_VARS: missing values disable specific features rather than breaking the app.
 // The CheckRow shows "Feature disabled" as a sub-label when the var is absent.
 const OPTIONAL_VARS = [
-  'GOOGLE_CLIENT_ID',             // enables Google OAuth sign-in
-  'MICROSOFT_CLIENT_ID',          // enables Microsoft OAuth sign-in
-  'DISCORD_CLIENT_ID',            // enables Discord OAuth sign-in
-  'STRIPE_SECRET_KEY',            // enables payment/subscription features
-  'OPENAI_API_KEY',               // enables AI-powered writing prompts
+  'GOOGLE_CLIENT_ID', // enables Google OAuth sign-in
+  'MICROSOFT_CLIENT_ID', // enables Microsoft OAuth sign-in
+  'DISCORD_CLIENT_ID', // enables Discord OAuth sign-in
+  'STRIPE_SECRET_KEY', // enables payment/subscription features
+  'OPENAI_API_KEY', // enables AI-powered writing prompts
   'NEXT_PUBLIC_VAPID_PUBLIC_KEY', // enables Web Push notifications
-  'VAPID_PRIVATE_KEY',            // server-side VAPID key for push signing
+  'VAPID_PRIVATE_KEY', // server-side VAPID key for push signing
 ];
 
 // ---------------------------------------------------------------------------
@@ -151,9 +151,7 @@ function Badge({ ok }: { ok: boolean }) {
     );
   }
   return (
-    <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-600 text-white">
-      ✕ FAIL
-    </span>
+    <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-600 text-white">✕ FAIL</span>
   );
 }
 
@@ -220,7 +218,6 @@ export default async function AdminHealthPage() {
       {/* ── Top row: service pings + DB record counts ── */}
       {/* lg:grid-cols-2 stacks to a single column on mobile, two on large screens */}
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
-
         {/* Service checks card */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <h2 className="font-semibold text-white mb-1">Services</h2>
@@ -237,7 +234,9 @@ export default async function AdminHealthPage() {
           <CheckRow
             ok={redis.ok}
             label="Cache (Redis)"
-            sub={redis.ok ? `${redis.latencyMs}ms` : 'Connection failed — rate limiting is memory-only'}
+            sub={
+              redis.ok ? `${redis.latencyMs}ms` : 'Connection failed — rate limiting is memory-only'
+            }
           />
         </div>
 
@@ -248,7 +247,12 @@ export default async function AdminHealthPage() {
 
           {/* Use `as const` so TypeScript knows the tuple types precisely */}
           <div className="grid grid-cols-2 gap-4">
-            {([['Users', userCount], ['Stories', storyCount]] as const).map(([label, value]) => (
+            {(
+              [
+                ['Users', userCount],
+                ['Stories', storyCount],
+              ] as const
+            ).map(([label, value]) => (
               <div key={label} className="bg-gray-800 rounded-xl p-4">
                 {/* toLocaleString adds thousands separators (e.g. 1,234) */}
                 <p className="text-xl font-bold text-white">{Number(value).toLocaleString()}</p>
@@ -262,11 +266,10 @@ export default async function AdminHealthPage() {
 
       {/* ── Bottom row: required and optional environment variables ── */}
       <div className="grid lg:grid-cols-2 gap-6">
-
         {/* Required vars — any FAIL here means a broken feature */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <h2 className="font-semibold text-white mb-4">Required env vars</h2>
-          {REQUIRED_VARS.map(v => (
+          {REQUIRED_VARS.map((v) => (
             // !!process.env[v] coerces the string value (or undefined) to a boolean
             <CheckRow key={v} ok={!!process.env[v]} label={v} />
           ))}
@@ -275,7 +278,7 @@ export default async function AdminHealthPage() {
         {/* Optional vars — FAIL just means the related feature is inactive */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <h2 className="font-semibold text-white mb-4">Optional env vars</h2>
-          {OPTIONAL_VARS.map(v => (
+          {OPTIONAL_VARS.map((v) => (
             <CheckRow
               key={v}
               ok={!!process.env[v]}

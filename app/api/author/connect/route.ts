@@ -39,7 +39,10 @@ export async function POST(req: Request) {
   if (!userId) return unauthorized();
 
   if (!stripeConfigured()) {
-    return NextResponse.json({ error: 'Payouts are not configured on this site yet.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Payouts are not configured on this site yet.' },
+      { status: 503 }
+    );
   }
 
   try {
@@ -104,7 +107,10 @@ export async function GET() {
     const onboarded = Boolean(account.payouts_enabled && account.charges_enabled);
 
     if (onboarded !== user.stripeConnectOnboarded) {
-      await prisma.user.update({ where: { id: userId }, data: { stripeConnectOnboarded: onboarded } });
+      await prisma.user.update({
+        where: { id: userId },
+        data: { stripeConnectOnboarded: onboarded },
+      });
     }
 
     return NextResponse.json({ started: true, onboarded });

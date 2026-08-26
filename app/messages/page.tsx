@@ -54,9 +54,13 @@ export default async function MessagesPage() {
     where: { OR: [{ senderId: userId }, { receiverId: userId }] },
     orderBy: { createdAt: 'desc' },
     select: {
-      id: true, content: true, createdAt: true, read: true,
-      senderId: true, receiverId: true,
-      sender:   { select: { id: true, username: true, profile: { select: { avatar: true } } } },
+      id: true,
+      content: true,
+      createdAt: true,
+      read: true,
+      senderId: true,
+      receiverId: true,
+      sender: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
       receiver: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
     },
   });
@@ -77,7 +81,7 @@ export default async function MessagesPage() {
 
     // Count all unread messages from this partner to the current user
     const unread = messages.filter(
-      m => m.senderId === partner.id && m.receiverId === userId && !m.read
+      (m) => m.senderId === partner.id && m.receiverId === userId && !m.read
     ).length;
 
     conversations.push({

@@ -23,7 +23,10 @@ export default async function WriterOfMonth() {
           orderBy: { likes: { _count: 'desc' } },
           take: 3,
           select: {
-            id: true, title: true, slug: true, coverImage: true,
+            id: true,
+            title: true,
+            slug: true,
+            coverImage: true,
             _count: { select: { likes: true } },
           },
         },
@@ -34,7 +37,8 @@ export default async function WriterOfMonth() {
   if (!writer) return null;
 
   // Build avatar URL — fallback to initials avatar if none set
-  const avatar = writer.profile?.avatar ??
+  const avatar =
+    writer.profile?.avatar ??
     `https://ui-avatars.com/api/?name=${encodeURIComponent(writer.username)}&background=dc2626&color=fff&size=128`;
 
   return (
@@ -48,7 +52,6 @@ export default async function WriterOfMonth() {
 
       {/* Spotlight card */}
       <div className="relative rounded-2xl overflow-hidden border border-yellow-600/30 bg-gray-900 shadow-[0_4px_40px_rgba(234,179,8,0.15)]">
-
         {/* Radial glow background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(234,179,8,0.08)_0%,_transparent_60%)] pointer-events-none" />
 
@@ -58,7 +61,6 @@ export default async function WriterOfMonth() {
         </div>
 
         <div className="relative p-8 md:p-10 flex flex-col md:flex-row items-start gap-8">
-
           {/* Avatar + info */}
           <div className="flex flex-col items-center gap-3 flex-shrink-0">
             {/* Glowing avatar ring */}
@@ -73,10 +75,15 @@ export default async function WriterOfMonth() {
               />
             </div>
             <div className="text-center">
-              <Link href={`/user/${writer.username}`} className="font-bold text-white text-lg hover:text-yellow-300 transition">
+              <Link
+                href={`/user/${writer.username}`}
+                className="font-bold text-white text-lg hover:text-yellow-300 transition"
+              >
                 {writer.username}
               </Link>
-              <p className="text-xs text-gray-500 mt-0.5">{writer._count.stories} stories published</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {writer._count.stories} stories published
+              </p>
             </div>
           </div>
 
@@ -100,13 +107,25 @@ export default async function WriterOfMonth() {
                       className="flex items-center gap-3 group"
                     >
                       {/* Rank number */}
-                      <span className="text-yellow-500 font-extrabold text-sm w-5 flex-shrink-0">#{i + 1}</span>
+                      <span className="text-yellow-500 font-extrabold text-sm w-5 flex-shrink-0">
+                        #{i + 1}
+                      </span>
                       {/* Tiny thumbnail */}
                       {story.coverImage && (
-                        <Image src={story.coverImage} alt={story.title} width={40} height={40} className="rounded-lg object-cover flex-shrink-0" />
+                        <Image
+                          src={story.coverImage}
+                          alt={story.title}
+                          width={40}
+                          height={40}
+                          className="rounded-lg object-cover flex-shrink-0"
+                        />
                       )}
-                      <span className="text-sm text-gray-300 group-hover:text-yellow-300 transition line-clamp-1">{story.title}</span>
-                      <span className="ml-auto text-xs text-gray-500 flex-shrink-0 inline-flex items-center gap-0.5"><Heart className="w-3 h-3" /> {story._count.likes}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-yellow-300 transition line-clamp-1">
+                        {story.title}
+                      </span>
+                      <span className="ml-auto text-xs text-gray-500 flex-shrink-0 inline-flex items-center gap-0.5">
+                        <Heart className="w-3 h-3" /> {story._count.likes}
+                      </span>
                     </Link>
                   ))}
                 </div>

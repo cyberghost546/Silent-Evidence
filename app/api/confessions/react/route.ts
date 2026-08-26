@@ -10,7 +10,9 @@ import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 import { CONFESSION_REACTION_IDS } from '@/lib/reactions';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',

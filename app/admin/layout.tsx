@@ -69,9 +69,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="max-w-md w-full bg-gray-900 border border-red-900/40 rounded-2xl p-6 text-center">
           <h1 className="text-xl font-bold text-white mb-2">Two-factor authentication required</h1>
           <p className="text-sm text-gray-400 mb-5">
-            Admin accounts must have two-factor authentication enabled. Turn it on in
-            your account settings, then return here. You&apos;ll also receive backup
-            recovery codes so you can never be locked out.
+            Admin accounts must have two-factor authentication enabled. Turn it on in your account
+            settings, then return here. You&apos;ll also receive backup recovery codes so you can
+            never be locked out.
           </p>
           <a
             href="/settings"

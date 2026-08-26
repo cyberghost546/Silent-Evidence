@@ -13,10 +13,14 @@ export async function GET() {
         include: {
           story: {
             select: {
-              id: true, title: true, slug: true, coverImage: true, excerpt: true,
-              author:   { select: { username: true } },
+              id: true,
+              title: true,
+              slug: true,
+              coverImage: true,
+              excerpt: true,
+              author: { select: { username: true } },
               category: { select: { name: true } },
-              _count:   { select: { likes: true } },
+              _count: { select: { likes: true } },
             },
           },
         },

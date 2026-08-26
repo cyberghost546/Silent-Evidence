@@ -43,12 +43,17 @@ export function splitSentences(text: string): string[] {
   for (const s of rough) {
     const trimmed = s.trim();
     if (!trimmed) continue;
-    if (trimmed.length <= 240) { out.push(trimmed); continue; }
+    if (trimmed.length <= 240) {
+      out.push(trimmed);
+      continue;
+    }
     // Break an over-long sentence on commas/semicolons to stay within safe limits.
     let buf = '';
     for (const part of trimmed.split(/(?<=[,;:])\s+/)) {
-      if ((buf + ' ' + part).length > 240 && buf) { out.push(buf.trim()); buf = part; }
-      else buf = buf ? `${buf} ${part}` : part;
+      if ((buf + ' ' + part).length > 240 && buf) {
+        out.push(buf.trim());
+        buf = part;
+      } else buf = buf ? `${buf} ${part}` : part;
     }
     if (buf.trim()) out.push(buf.trim());
   }
@@ -82,7 +87,10 @@ export default function StoryNarration({ content }: { content: string }) {
       if (list.length) {
         setVoices(list);
         // Prefer an English voice as the default, else the first available.
-        setVoiceURI((prev) => prev || (list.find((v) => v.lang.startsWith('en'))?.voiceURI ?? list[0].voiceURI));
+        setVoiceURI(
+          (prev) =>
+            prev || (list.find((v) => v.lang.startsWith('en'))?.voiceURI ?? list[0].voiceURI)
+        );
       }
     };
     load();
@@ -94,34 +102,46 @@ export default function StoryNarration({ content }: { content: string }) {
   // away mid-read must not leave a disembodied voice going).
   useEffect(() => {
     return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window)
+        window.speechSynthesis.cancel();
       if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
     };
   }, []);
 
-  const speakFrom = useCallback((index: number) => {
-    const sentences = sentencesRef.current;
-    if (index >= sentences.length) { setStatus('idle'); setCurrent(0); idxRef.current = 0; return; }
+  const speakFrom = useCallback(
+    (index: number) => {
+      const sentences = sentencesRef.current;
+      if (index >= sentences.length) {
+        setStatus('idle');
+        setCurrent(0);
+        idxRef.current = 0;
+        return;
+      }
 
-    idxRef.current = index;
-    setCurrent(index);
+      idxRef.current = index;
+      setCurrent(index);
 
-    const utter = new SpeechSynthesisUtterance(sentences[index]);
-    const voice = voices.find((v) => v.voiceURI === voiceURI);
-    if (voice) utter.voice = voice;
-    utter.rate = rate;
-    utter.onend = () => {
-      if (stoppedRef.current) return; // a manual stop/cancel — do not advance
-      speakFrom(index + 1);
-    };
-    utter.onerror = () => { if (!stoppedRef.current) setStatus('idle'); };
-    window.speechSynthesis.speak(utter);
-  }, [voices, voiceURI, rate]);
+      const utter = new SpeechSynthesisUtterance(sentences[index]);
+      const voice = voices.find((v) => v.voiceURI === voiceURI);
+      if (voice) utter.voice = voice;
+      utter.rate = rate;
+      utter.onend = () => {
+        if (stoppedRef.current) return; // a manual stop/cancel — do not advance
+        speakFrom(index + 1);
+      };
+      utter.onerror = () => {
+        if (!stoppedRef.current) setStatus('idle');
+      };
+      window.speechSynthesis.speak(utter);
+    },
+    [voices, voiceURI, rate]
+  );
 
   const play = useCallback(() => {
     if (!supported) return;
     // Prepare sentences lazily on first play.
-    if (sentencesRef.current.length === 0) sentencesRef.current = splitSentences(htmlToText(content));
+    if (sentencesRef.current.length === 0)
+      sentencesRef.current = splitSentences(htmlToText(content));
     if (sentencesRef.current.length === 0) return;
 
     stoppedRef.current = false;
@@ -147,16 +167,24 @@ export default function StoryNarration({ content }: { content: string }) {
     setStatus('idle');
     setCurrent(0);
     idxRef.current = 0;
-    if (sleepTimerRef.current) { clearTimeout(sleepTimerRef.current); sleepTimerRef.current = null; }
+    if (sleepTimerRef.current) {
+      clearTimeout(sleepTimerRef.current);
+      sleepTimerRef.current = null;
+    }
   }, []);
 
   // Sleep timer — stop narration after the chosen number of minutes.
   useEffect(() => {
-    if (sleepTimerRef.current) { clearTimeout(sleepTimerRef.current); sleepTimerRef.current = null; }
+    if (sleepTimerRef.current) {
+      clearTimeout(sleepTimerRef.current);
+      sleepTimerRef.current = null;
+    }
     if (sleepMin > 0 && status === 'playing') {
       sleepTimerRef.current = setTimeout(() => stop(), sleepMin * 60 * 1000);
     }
-    return () => { if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current); };
+    return () => {
+      if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
+    };
   }, [sleepMin, status, stop]);
 
   // Changing voice or rate mid-read: restart the current sentence with the new
@@ -178,13 +206,24 @@ export default function StoryNarration({ content }: { content: string }) {
     <div className="relative">
       <button
         type="button"
-        onClick={() => { setOpen((v) => !v); if (status === 'idle') play(); }}
+        onClick={() => {
+          setOpen((v) => !v);
+          if (status === 'idle') play();
+        }}
         aria-label={status === 'idle' ? 'Listen to this story' : 'Narration controls'}
         className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
-          status !== 'idle' ? 'bg-red-600 border-red-600 text-white' : 'text-gray-400 hover:text-white border-gray-700 hover:border-gray-500'
+          status !== 'idle'
+            ? 'bg-red-600 border-red-600 text-white'
+            : 'text-gray-400 hover:text-white border-gray-700 hover:border-gray-500'
         }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-3.5 h-3.5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.05A4.5 4.5 0 0016.5 12z" />
         </svg>
         {status === 'idle' ? 'Listen' : status === 'paused' ? 'Paused' : 'Listening'}
@@ -196,19 +235,48 @@ export default function StoryNarration({ content }: { content: string }) {
           <div className="absolute right-0 mt-2 w-72 z-50 bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Narration</h3>
-              {total > 0 && <span className="text-[11px] text-gray-500">{Math.min(current + 1, total)} / {total}</span>}
+              {total > 0 && (
+                <span className="text-[11px] text-gray-500">
+                  {Math.min(current + 1, total)} / {total}
+                </span>
+              )}
             </div>
 
             {/* Transport controls */}
             <div className="flex items-center gap-2">
               {status === 'playing' ? (
-                <button type="button" onClick={pause} className="flex-1 px-3 py-2 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition">Pause</button>
+                <button
+                  type="button"
+                  onClick={pause}
+                  className="flex-1 px-3 py-2 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition"
+                >
+                  Pause
+                </button>
               ) : status === 'paused' ? (
-                <button type="button" onClick={resume} className="flex-1 px-3 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition">Resume</button>
+                <button
+                  type="button"
+                  onClick={resume}
+                  className="flex-1 px-3 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                >
+                  Resume
+                </button>
               ) : (
-                <button type="button" onClick={play} className="flex-1 px-3 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition">Play</button>
+                <button
+                  type="button"
+                  onClick={play}
+                  className="flex-1 px-3 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                >
+                  Play
+                </button>
               )}
-              <button type="button" onClick={stop} disabled={status === 'idle'} className="px-3 py-2 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition disabled:opacity-40">Stop</button>
+              <button
+                type="button"
+                onClick={stop}
+                disabled={status === 'idle'}
+                className="px-3 py-2 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg transition disabled:opacity-40"
+              >
+                Stop
+              </button>
             </div>
 
             {/* Current sentence preview */}
@@ -228,20 +296,37 @@ export default function StoryNarration({ content }: { content: string }) {
                   className="w-full bg-gray-950 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-gray-200"
                   aria-label="Narration voice"
                 >
-                  {voices.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}
+                  {voices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} ({v.lang})
+                    </option>
+                  ))}
                 </select>
               </div>
             )}
 
             {/* Rate */}
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1.5">Speed — {rate.toFixed(1)}×</p>
-              <input type="range" min={0.5} max={2} step={0.1} value={rate} onChange={(e) => setRate(Number(e.target.value))} className="w-full accent-red-600" aria-label="Narration speed" />
+              <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1.5">
+                Speed — {rate.toFixed(1)}×
+              </p>
+              <input
+                type="range"
+                min={0.5}
+                max={2}
+                step={0.1}
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="w-full accent-red-600"
+                aria-label="Narration speed"
+              />
             </div>
 
             {/* Sleep timer */}
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1.5">Sleep timer</p>
+              <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1.5">
+                Sleep timer
+              </p>
               <div className="grid grid-cols-5 gap-1">
                 {SLEEP_OPTIONS.map((m) => (
                   <button

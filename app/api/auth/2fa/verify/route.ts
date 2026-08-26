@@ -63,7 +63,9 @@ export async function POST(req: Request) {
     windowMs: 15 * 60 * 1000,
   });
   if (userLimit.blocked) {
-    return tooManyRequests('Too many verification attempts for this account. Please request a new code.');
+    return tooManyRequests(
+      'Too many verification attempts for this account. Please request a new code.'
+    );
   }
 
   // ── Validate the code ─────────────────────────────────────────────────────
@@ -112,22 +114,24 @@ export async function POST(req: Request) {
   let recoveryCodesRemaining: number | undefined;
   if (usedRecoveryCode) {
     recoveryCodesRemaining = await countUnused(userId);
-    await prisma.auditLog.create({
-      data: {
-        adminId: userId,
-        action: 'RECOVERY_CODE_USED',
-        detail: `Recovery code used to complete 2FA login. ${recoveryCodesRemaining} remaining.`,
-        targetType: 'User',
-        targetId: userId,
-      },
-    }).catch(() => {});
+    await prisma.auditLog
+      .create({
+        data: {
+          adminId: userId,
+          action: 'RECOVERY_CODE_USED',
+          detail: `Recovery code used to complete 2FA login. ${recoveryCodesRemaining} remaining.`,
+          targetType: 'User',
+          targetId: userId,
+        },
+      })
+      .catch(() => {});
   }
 
   // ── Complete the login by setting the session cookie ──────────────────────
   // Build the success JSON response. recoveryCodesRemaining is present only when
   // a recovery code was spent, so the UI can warn when the supply runs low.
   const res = NextResponse.json(
-    usedRecoveryCode ? { ok: true, usedRecoveryCode: true, recoveryCodesRemaining } : { ok: true },
+    usedRecoveryCode ? { ok: true, usedRecoveryCode: true, recoveryCodesRemaining } : { ok: true }
   );
 
   // Now that 2FA is verified, set the userId cookie — the user is fully logged in.

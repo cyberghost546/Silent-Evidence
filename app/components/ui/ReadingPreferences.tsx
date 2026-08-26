@@ -41,7 +41,13 @@ interface Prefs {
 
 // Defaults chosen so every derived CSS value equals the story body's current look
 // (prose-lg ≈ 1.125rem / 1.75 line-height), meaning "no override" is invisible.
-const DEFAULTS: Prefs = { font: 'default', size: 1.125, leading: 1.75, width: 70, theme: 'default' };
+const DEFAULTS: Prefs = {
+  font: 'default',
+  size: 1.125,
+  leading: 1.75,
+  width: 70,
+  theme: 'default',
+};
 
 const FONT_STACKS: Record<FontKey, string> = {
   // '' lets the body inherit the site font — the untouched default.
@@ -56,8 +62,8 @@ const FONT_STACKS: Record<FontKey, string> = {
 // Reading surface colours per theme. `default` uses transparent/inherit so the
 // site's own dark background shows through unchanged.
 const THEME_VARS: Record<ThemeKey, { bg: string; fg: string }> = {
-  default:  { bg: 'transparent', fg: 'inherit' },
-  sepia:    { bg: '#f4ecd8', fg: '#3a2f1c' },
+  default: { bg: 'transparent', fg: 'inherit' },
+  sepia: { bg: '#f4ecd8', fg: '#3a2f1c' },
   contrast: { bg: '#000000', fg: '#ffffff' },
 };
 
@@ -70,11 +76,15 @@ function loadPrefs(): Prefs {
     // Merge over defaults so a partial or older stored shape still yields a full,
     // valid set rather than undefined values reaching the CSS.
     return {
-      font: (['default', 'serif', 'sans', 'legible'] as FontKey[]).includes(parsed.font as FontKey) ? parsed.font as FontKey : DEFAULTS.font,
+      font: (['default', 'serif', 'sans', 'legible'] as FontKey[]).includes(parsed.font as FontKey)
+        ? (parsed.font as FontKey)
+        : DEFAULTS.font,
       size: clamp(Number(parsed.size), 0.875, 1.75, DEFAULTS.size),
       leading: clamp(Number(parsed.leading), 1.3, 2.4, DEFAULTS.leading),
       width: clamp(Number(parsed.width), 45, 95, DEFAULTS.width),
-      theme: (['default', 'sepia', 'contrast'] as ThemeKey[]).includes(parsed.theme as ThemeKey) ? parsed.theme as ThemeKey : DEFAULTS.theme,
+      theme: (['default', 'sepia', 'contrast'] as ThemeKey[]).includes(parsed.theme as ThemeKey)
+        ? (parsed.theme as ThemeKey)
+        : DEFAULTS.theme,
     };
   } catch {
     return DEFAULTS;
@@ -119,7 +129,11 @@ export default function ReadingPreferences() {
     setPrefs((prev) => {
       const next = { ...prev, ...patch };
       applyPrefs(next);
-      try { window.localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch { /* storage may be unavailable */ }
+      try {
+        window.localStorage.setItem(LS_KEY, JSON.stringify(next));
+      } catch {
+        /* storage may be unavailable */
+      }
       return next;
     });
   }, []);
@@ -127,7 +141,11 @@ export default function ReadingPreferences() {
   const reset = useCallback(() => {
     applyPrefs(DEFAULTS);
     setPrefs(DEFAULTS);
-    try { window.localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+    try {
+      window.localStorage.removeItem(LS_KEY);
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   return (
@@ -151,22 +169,40 @@ export default function ReadingPreferences() {
           <div className="absolute right-0 mt-2 w-72 z-50 bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Reading preferences</h3>
-              <button type="button" onClick={reset} className="text-[11px] text-gray-500 hover:text-white transition">Reset</button>
+              <button
+                type="button"
+                onClick={reset}
+                className="text-[11px] text-gray-500 hover:text-white transition"
+              >
+                Reset
+              </button>
             </div>
 
             {/* Font */}
             <Field label="Font">
               <div className="grid grid-cols-4 gap-1">
-                {([['default', 'Aa'], ['serif', 'Serif'], ['sans', 'Sans'], ['legible', 'Legible']] as [FontKey, string][]).map(([val, lbl]) => (
-                  <Pill key={val} active={prefs.font === val} onClick={() => update({ font: val })}>{lbl}</Pill>
+                {(
+                  [
+                    ['default', 'Aa'],
+                    ['serif', 'Serif'],
+                    ['sans', 'Sans'],
+                    ['legible', 'Legible'],
+                  ] as [FontKey, string][]
+                ).map(([val, lbl]) => (
+                  <Pill key={val} active={prefs.font === val} onClick={() => update({ font: val })}>
+                    {lbl}
+                  </Pill>
                 ))}
               </div>
             </Field>
 
             {/* Size */}
-            <Field label={`Text size — ${Math.round(prefs.size * 100 / 1.125)}%`}>
+            <Field label={`Text size — ${Math.round((prefs.size * 100) / 1.125)}%`}>
               <input
-                type="range" min={0.875} max={1.75} step={0.0625}
+                type="range"
+                min={0.875}
+                max={1.75}
+                step={0.0625}
                 value={prefs.size}
                 onChange={(e) => update({ size: Number(e.target.value) })}
                 className="w-full accent-red-600"
@@ -177,7 +213,10 @@ export default function ReadingPreferences() {
             {/* Line spacing */}
             <Field label="Line spacing">
               <input
-                type="range" min={1.3} max={2.4} step={0.05}
+                type="range"
+                min={1.3}
+                max={2.4}
+                step={0.05}
                 value={prefs.leading}
                 onChange={(e) => update({ leading: Number(e.target.value) })}
                 className="w-full accent-red-600"
@@ -188,7 +227,10 @@ export default function ReadingPreferences() {
             {/* Width */}
             <Field label="Column width">
               <input
-                type="range" min={45} max={95} step={1}
+                type="range"
+                min={45}
+                max={95}
+                step={1}
                 value={prefs.width}
                 onChange={(e) => update({ width: Number(e.target.value) })}
                 className="w-full accent-red-600"
@@ -199,8 +241,20 @@ export default function ReadingPreferences() {
             {/* Theme */}
             <Field label="Reading theme">
               <div className="grid grid-cols-3 gap-1">
-                {([['default', 'Default'], ['sepia', 'Sepia'], ['contrast', 'Contrast']] as [ThemeKey, string][]).map(([val, lbl]) => (
-                  <Pill key={val} active={prefs.theme === val} onClick={() => update({ theme: val })}>{lbl}</Pill>
+                {(
+                  [
+                    ['default', 'Default'],
+                    ['sepia', 'Sepia'],
+                    ['contrast', 'Contrast'],
+                  ] as [ThemeKey, string][]
+                ).map(([val, lbl]) => (
+                  <Pill
+                    key={val}
+                    active={prefs.theme === val}
+                    onClick={() => update({ theme: val })}
+                  >
+                    {lbl}
+                  </Pill>
                 ))}
               </div>
             </Field>
@@ -220,7 +274,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Pill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"

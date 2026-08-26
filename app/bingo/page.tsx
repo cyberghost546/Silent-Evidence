@@ -18,7 +18,8 @@ export default function BingoPage() {
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-3">Horror Bingo</h1>
           <p className="text-gray-400 text-lg">
-            Check off tropes as you spot them while reading.<br />
+            Check off tropes as you spot them while reading.
+            <br />
             Get five in a row for a <span className="text-red-500 font-bold">BINGO</span>!
           </p>
         </div>

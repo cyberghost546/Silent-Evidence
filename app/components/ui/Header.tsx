@@ -43,23 +43,27 @@ export default async function Header() {
   // Fall back to a generated initial-avatar when the user hasn't uploaded a photo
   const avatar = user
     ? (user.profile?.avatar ??
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=64`)
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=dc2626&color=fff&size=64`)
     : null;
 
   return (
     // sticky top-0 keeps the header pinned while the user scrolls
     <header className="sticky top-0 z-50 bg-gray-900 text-white px-4 md:px-6 py-3 border-b border-gray-800">
       <nav className="max-w-6xl mx-auto flex items-center gap-3 md:gap-6">
-
         {/* Logo — links to homepage */}
-        <Link href="/" className="text-lg md:text-xl font-bold text-red-500 hover:text-red-400 transition">
+        <Link
+          href="/"
+          className="text-lg md:text-xl font-bold text-red-500 hover:text-red-400 transition"
+        >
           Silent Evidence
         </Link>
 
         {/* Desktop nav links — hidden on mobile (MobileNav handles those) */}
         <ul className="hidden md:flex items-center gap-4 text-sm">
           <li>
-            <Link href="/" className="hover:text-gray-300">Home</Link>
+            <Link href="/" className="hover:text-gray-300">
+              Home
+            </Link>
           </li>
           <li>
             {/* Dropdown listing all story categories from the DB */}
@@ -71,7 +75,10 @@ export default async function Header() {
           </li>
           <li>
             {/* Videos gets a red pill to make it stand out */}
-            <Link href="/videos" className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700">
+            <Link
+              href="/videos"
+              className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700"
+            >
               Videos
             </Link>
           </li>
@@ -79,11 +86,15 @@ export default async function Header() {
             <ExploreDropdown />
           </li>
           <li>
-            <Link href="/about" className="hover:text-gray-300">About</Link>
+            <Link href="/about" className="hover:text-gray-300">
+              About
+            </Link>
           </li>
 
           <li>
-            <Link href="/contact" className="hover:text-gray-300">Contact</Link>
+            <Link href="/contact" className="hover:text-gray-300">
+              Contact
+            </Link>
           </li>
         </ul>
 
@@ -102,11 +113,17 @@ export default async function Header() {
         ) : (
           /* Guest state: show Log In and Sign Up buttons */
           <div className="flex items-center gap-1.5">
-            <Link href="/login" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg transition">
+            <Link
+              href="/login"
+              className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-red-700 text-red-400 hover:bg-red-700 hover:text-white rounded-lg transition"
+            >
               Log In
             </Link>
             {/* Sign Up is hidden on very small screens — it appears inside MobileNav instead */}
-            <Link href="/register" className="hidden sm:block px-3 py-1.5 text-sm bg-red-700 text-white hover:bg-red-600 rounded-lg transition">
+            <Link
+              href="/register"
+              className="hidden sm:block px-3 py-1.5 text-sm bg-red-700 text-white hover:bg-red-600 rounded-lg transition"
+            >
               Sign Up
             </Link>
           </div>
@@ -114,7 +131,6 @@ export default async function Header() {
 
         {/* Hamburger menu — shown on mobile, contains the full nav */}
         <MobileNav isLoggedIn={!!user} />
-
       </nav>
     </header>
   );

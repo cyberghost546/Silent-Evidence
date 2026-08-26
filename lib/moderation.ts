@@ -33,12 +33,12 @@ export interface RecordActionInput {
 }
 
 const ACTION_LABEL: Record<ModerationActionType, string> = {
-  CONTENT_REMOVED:   'Your content was removed',
-  CONTENT_HIDDEN:    'Your content was restricted',
-  CONTENT_REJECTED:  'Your content was not published',
-  WARNING:           'You received a warning',
+  CONTENT_REMOVED: 'Your content was removed',
+  CONTENT_HIDDEN: 'Your content was restricted',
+  CONTENT_REJECTED: 'Your content was not published',
+  WARNING: 'You received a warning',
   ACCOUNT_SUSPENDED: 'Your account was suspended',
-  ACCOUNT_BANNED:    'Your account was terminated',
+  ACCOUNT_BANNED: 'Your account was terminated',
 };
 
 /**

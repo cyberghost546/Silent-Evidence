@@ -22,14 +22,13 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { SESSION_COOKIE, SESSION_SIG_COOKIE, SESSION_VER_COOKIE, verifyUserId } from '@/lib/sessionCookie';
 import {
-  edgeRateLimit,
-  edgeClientIp,
-  isExempt,
-  limitFor,
-  WINDOW_MS,
-} from '@/lib/edgeRateLimit';
+  SESSION_COOKIE,
+  SESSION_SIG_COOKIE,
+  SESSION_VER_COOKIE,
+  verifyUserId,
+} from '@/lib/sessionCookie';
+import { edgeRateLimit, edgeClientIp, isExempt, limitFor, WINDOW_MS } from '@/lib/edgeRateLimit';
 
 // HTTP methods that change state. GETs are deliberately not limited here.
 const MUTATING_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
@@ -54,11 +53,7 @@ export async function middleware(request: NextRequest) {
   // This is a second layer, not a replacement: the auth routes keep their
   // Redis-backed limiter from lib/rateLimit.ts, whose counters are shared across
   // instances. This one is per-instance (see the note in lib/edgeRateLimit.ts).
-  if (
-    pathname.startsWith('/api') &&
-    MUTATING_METHODS.has(request.method) &&
-    !isExempt(pathname)
-  ) {
+  if (pathname.startsWith('/api') && MUTATING_METHODS.has(request.method) && !isExempt(pathname)) {
     const ip = edgeClientIp(request.headers);
     const limit = limitFor(pathname);
 
@@ -76,7 +71,7 @@ export async function middleware(request: NextRequest) {
           // Retry-After tells well-behaved clients exactly when to come back,
           // instead of retrying immediately and compounding the problem.
           headers: { 'Retry-After': String(retryAfter) },
-        },
+        }
       );
     }
   }
@@ -118,7 +113,12 @@ export async function middleware(request: NextRequest) {
     // that `cookies().get('userId')` returns undefined inside route handlers.
     const remaining = request.cookies
       .getAll()
-      .filter((c) => c.name !== SESSION_COOKIE && c.name !== SESSION_SIG_COOKIE && c.name !== SESSION_VER_COOKIE);
+      .filter(
+        (c) =>
+          c.name !== SESSION_COOKIE &&
+          c.name !== SESSION_SIG_COOKIE &&
+          c.name !== SESSION_VER_COOKIE
+      );
     const headers = new Headers(request.headers);
     headers.set('cookie', remaining.map((c) => `${c.name}=${c.value}`).join('; '));
 

@@ -25,7 +25,6 @@ import { useEffect } from 'react';
 
 // The component takes only the numeric database ID of the story being read.
 export default function ReadingTracker({ storyId }: { storyId: number }) {
-
   // useEffect runs after the component mounts (i.e. when the story page loads).
   // The dependency array [storyId] means: if the user somehow navigates to a
   // different story without unmounting (e.g. SPA routing), the timer resets.

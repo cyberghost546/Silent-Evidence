@@ -28,7 +28,6 @@ type Params = { params: Promise<{ slug: string }> };
 
 // ── POST handler: Join the group ──────────────────────────────────────────────
 export async function POST(req: Request, { params }: Params) {
-
   // Read the slug from the URL
   const { slug } = await params;
 
@@ -73,16 +72,18 @@ export async function POST(req: Request, { params }: Params) {
     });
 
     // Create the in-app notification — fire and forget (.catch avoids unhandled rejections)
-    prisma.notification.create({
-      data: {
-        // Send to the group owner
-        userId: group.ownerId,
-        // Use the GROUP_INVITE type so the UI can render a relevant icon
-        type: 'GROUP_INVITE',
-        // Human-readable message including the group name
-        message: `${joiner?.username ?? 'Someone'} joined your group "${group.name}".`,
-      },
-    }).catch(() => {});
+    prisma.notification
+      .create({
+        data: {
+          // Send to the group owner
+          userId: group.ownerId,
+          // Use the GROUP_INVITE type so the UI can render a relevant icon
+          type: 'GROUP_INVITE',
+          // Human-readable message including the group name
+          message: `${joiner?.username ?? 'Someone'} joined your group "${group.name}".`,
+        },
+      })
+      .catch(() => {});
   }
 
   // Return success
@@ -91,7 +92,6 @@ export async function POST(req: Request, { params }: Params) {
 
 // ── DELETE handler: Leave the group ──────────────────────────────────────────
 export async function DELETE(req: Request, { params }: Params) {
-
   // Read the slug from the URL
   const { slug } = await params;
 

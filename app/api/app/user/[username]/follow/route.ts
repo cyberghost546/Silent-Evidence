@@ -5,10 +5,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ username: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ username: string }> }) {
   // Get the caller's user ID from the app auth header
   const followerId = Number(req.headers.get('x-user-id') ?? 0);
   if (!followerId) return NextResponse.json({ error: 'Not logged in.' }, { status: 401 });

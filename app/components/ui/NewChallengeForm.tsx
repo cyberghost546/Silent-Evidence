@@ -11,7 +11,7 @@
 //   • End Date    (required) — ISO datetime when the challenge closes
 //   • Active      (toggle)   — whether the challenge is currently visible to users
 
-import { useState } from 'react';           // useState — manages form field values, saving flag, and error
+import { useState } from 'react'; // useState — manages form field values, saving flag, and error
 import { useRouter } from 'next/navigation'; // useRouter — used to navigate to /admin/challenges after creation
 
 export default function NewChallengeForm() {
@@ -27,24 +27,24 @@ export default function NewChallengeForm() {
   // form — a single state object holding all field values.
   // Using one object instead of individual useState calls keeps updates consistent.
   const [form, setForm] = useState({
-    title:       '',      // challenge headline
-    description: '',      // optional longer explanation
-    prompt:      '',      // the writing scenario
-    startDate:   '',      // ISO datetime string from the date-time input
-    endDate:     '',      // ISO datetime string from the date-time input
-    active:      true,    // new challenges default to active/visible
+    title: '', // challenge headline
+    description: '', // optional longer explanation
+    prompt: '', // the writing scenario
+    startDate: '', // ISO datetime string from the date-time input
+    endDate: '', // ISO datetime string from the date-time input
+    active: true, // new challenges default to active/visible
   });
 
   // set — helper that updates a single field in the form object.
   // Accepts a field name and its new value; spreads existing state and overrides the one field.
   const set = (field: string, value: string | boolean) =>
-    setForm(f => ({ ...f, [field]: value }));
+    setForm((f) => ({ ...f, [field]: value }));
 
   // handleSubmit — validates required fields, then POSTs to /api/challenges.
   // On success: redirects to the admin challenges list.
   // On failure: shows the API error message.
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();  // prevent the browser from reloading the page
+    e.preventDefault(); // prevent the browser from reloading the page
 
     setError(''); // clear any previous error before re-validating
 
@@ -82,7 +82,6 @@ export default function NewChallengeForm() {
   return (
     // Column layout with gaps between each field group
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
       {/* Inline error banner — only shown when error state is non-empty */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-3 text-sm">
@@ -99,7 +98,7 @@ export default function NewChallengeForm() {
         <input
           type="text"
           value={form.title}
-          onChange={e => set('title', e.target.value)} // update title field on every keystroke
+          onChange={(e) => set('title', e.target.value)} // update title field on every keystroke
           placeholder="e.g. Write the Scariest Opening Line"
           className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-red-500 transition"
         />
@@ -110,7 +109,7 @@ export default function NewChallengeForm() {
         <label className="block text-sm font-medium text-gray-300 mb-1.5">Description</label>
         <textarea
           value={form.description}
-          onChange={e => set('description', e.target.value)} // update description field
+          onChange={(e) => set('description', e.target.value)} // update description field
           rows={3}
           placeholder="Explain the challenge to participants..."
           className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-red-500 transition resize-none"
@@ -124,7 +123,7 @@ export default function NewChallengeForm() {
         </label>
         <textarea
           value={form.prompt}
-          onChange={e => set('prompt', e.target.value)} // update prompt field
+          onChange={(e) => set('prompt', e.target.value)} // update prompt field
           rows={3}
           placeholder="The specific prompt participants must write to..."
           className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-red-500 transition resize-none"
@@ -141,7 +140,7 @@ export default function NewChallengeForm() {
           <input
             type="datetime-local"
             value={form.startDate}
-            onChange={e => set('startDate', e.target.value)} // update startDate
+            onChange={(e) => set('startDate', e.target.value)} // update startDate
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-red-500 transition"
           />
         </div>
@@ -152,7 +151,7 @@ export default function NewChallengeForm() {
           <input
             type="datetime-local"
             value={form.endDate}
-            onChange={e => set('endDate', e.target.value)} // update endDate
+            onChange={(e) => set('endDate', e.target.value)} // update endDate
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-red-500 transition"
           />
         </div>
@@ -167,7 +166,9 @@ export default function NewChallengeForm() {
           className={`w-10 h-5 rounded-full transition-colors relative ${form.active ? 'bg-red-600' : 'bg-gray-700'}`}
         >
           {/* The sliding white dot — translates to the right when active */}
-          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          <span
+            className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`}
+          />
         </div>
         {/* Label text next to the toggle */}
         <span className="text-sm text-gray-300">Active (visible to users)</span>

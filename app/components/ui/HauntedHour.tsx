@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
 // GoldenHour.tsx — Global ambient horror-themed effect that activates between 3:00 AM and 4:00 AM.
 // Injects a <style> tag, a warm golden vignette overlay div, and a floating banner into the DOM when active.
 // Cleans up all injected elements when the hour ends or the component unmounts.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 // Unique IDs for injected DOM elements so we can find and remove them later
-const STYLE_ID = "golden-hour-styles";
-const OVERLAY_ID = "golden-hour-overlay";
-const BANNER_ID = "golden-hour-banner";
+const STYLE_ID = 'golden-hour-styles';
+const OVERLAY_ID = 'golden-hour-overlay';
+const BANNER_ID = 'golden-hour-banner';
 
 // The CSS injected during golden hour:
 // - @keyframes goldenGlow: a gentle shimmer effect that subtly pulses opacity and brightness
@@ -71,7 +71,7 @@ export default function GoldenHour() {
   function activateGoldenHour() {
     // --- Style tag: inject our custom CSS into the document head if not already present ---
     if (!document.getElementById(STYLE_ID)) {
-      const style = document.createElement("style");
+      const style = document.createElement('style');
       style.id = STYLE_ID;
       style.textContent = GOLDEN_CSS; // All golden-hour keyframes and class rules
       document.head.appendChild(style);
@@ -79,7 +79,7 @@ export default function GoldenHour() {
 
     // --- Vignette overlay: a fixed full-screen div with a warm golden radial gradient ---
     if (!document.getElementById(OVERLAY_ID)) {
-      const overlay = document.createElement("div");
+      const overlay = document.createElement('div');
       overlay.id = OVERLAY_ID;
       // pointer-events: none ensures the overlay never intercepts user clicks
       overlay.style.cssText = `
@@ -98,7 +98,7 @@ export default function GoldenHour() {
 
     // --- Floating banner at the top of the viewport showing golden hour status ---
     if (!document.getElementById(BANNER_ID)) {
-      const banner = document.createElement("div");
+      const banner = document.createElement('div');
       banner.id = BANNER_ID;
       // Deep green-to-gold gradient background with gold text and green border
       banner.style.cssText = `
@@ -119,20 +119,20 @@ export default function GoldenHour() {
         box-shadow: 0 2px 24px rgba(100, 0, 180, 0.5);
         pointer-events: none;
       `;
-      banner.textContent = "Golden Hour — 3AM"; // Sparkle emoji for horror flair
+      banner.textContent = 'Golden Hour — 3AM'; // Sparkle emoji for horror flair
       document.body.appendChild(banner);
     }
 
     // Add class to body to trigger the golden glow animation and text tint
-    document.body.classList.add("golden-hour-active");
+    document.body.classList.add('golden-hour-active');
   }
 
   // Removes all injected elements and restores the body to its normal state.
   function deactivateGoldenHour() {
-    document.getElementById(STYLE_ID)?.remove();   // Remove injected <style> tag
-    document.getElementById(OVERLAY_ID)?.remove();  // Remove vignette overlay div
-    document.getElementById(BANNER_ID)?.remove();   // Remove floating banner div
-    document.body.classList.remove("golden-hour-active"); // Remove animation class from body
+    document.getElementById(STYLE_ID)?.remove(); // Remove injected <style> tag
+    document.getElementById(OVERLAY_ID)?.remove(); // Remove vignette overlay div
+    document.getElementById(BANNER_ID)?.remove(); // Remove floating banner div
+    document.body.classList.remove('golden-hour-active'); // Remove animation class from body
   }
 
   useEffect(() => {

@@ -30,12 +30,10 @@ interface Recipe {
 const TYPES = RECIPE_TYPES;
 
 const DIFFICULTY_COLOR: Record<string, string> = {
-  easy:   'text-green-400 bg-green-900/30',
+  easy: 'text-green-400 bg-green-900/30',
   medium: 'text-yellow-400 bg-yellow-900/30',
-  hard:   'text-red-400 bg-red-900/30',
+  hard: 'text-red-400 bg-red-900/30',
 };
-
-
 
 export default function RecipesFeed() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -53,7 +51,9 @@ export default function RecipesFeed() {
     }
   }, [activeType]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function react(recipeId: number, emoji: string) {
     await fetch('/api/recipes/react', {
@@ -94,17 +94,32 @@ export default function RecipesFeed() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {recipes.map((r) => (
-          <div key={r.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition-colors">
+          <div
+            key={r.id}
+            className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition-colors"
+          >
             {/* Cover */}
             {r.image ? (
               <div className="relative h-44 overflow-hidden">
-                <Image src={r.image} alt={r.title} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
+                <Image
+                  src={r.image}
+                  alt={r.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
               </div>
             ) : (
               <div className="w-full h-32 bg-gray-800 flex items-center justify-center text-5xl text-gray-700">
                 {(() => {
-                  const TypeIcon = RECIPE_TYPES.find(t => t.key === r.type)?.icon ?? Utensils;
-                  return <TypeIcon className="w-4 h-4 inline-block" strokeWidth={1.75} aria-hidden="true" />;
+                  const TypeIcon = RECIPE_TYPES.find((t) => t.key === r.type)?.icon ?? Utensils;
+                  return (
+                    <TypeIcon
+                      className="w-4 h-4 inline-block"
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
+                  );
                 })()}
               </div>
             )}
@@ -114,22 +129,33 @@ export default function RecipesFeed() {
               <div className="flex gap-2 mb-3 flex-wrap">
                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-gray-400 capitalize">
                   {(() => {
-                  const TypeIcon = RECIPE_TYPES.find(t => t.key === r.type)?.icon ?? Utensils;
-                  return <TypeIcon className="w-4 h-4 inline-block" strokeWidth={1.75} aria-hidden="true" />;
-                })()} {r.type}
+                    const TypeIcon = RECIPE_TYPES.find((t) => t.key === r.type)?.icon ?? Utensils;
+                    return (
+                      <TypeIcon
+                        className="w-4 h-4 inline-block"
+                        strokeWidth={1.75}
+                        aria-hidden="true"
+                      />
+                    );
+                  })()}{' '}
+                  {r.type}
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${DIFFICULTY_COLOR[r.difficulty] ?? ''}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${DIFFICULTY_COLOR[r.difficulty] ?? ''}`}
+                >
                   {r.difficulty}
                 </span>
                 {r.prepMins && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-gray-500">
- {r.prepMins} min
+                    {r.prepMins} min
                   </span>
                 )}
               </div>
 
               <Link href={`/recipes/${r.slug}`} className="block">
-                <h3 className="text-white font-bold mb-2 hover:text-red-400 transition-colors">{r.title}</h3>
+                <h3 className="text-white font-bold mb-2 hover:text-red-400 transition-colors">
+                  {r.title}
+                </h3>
               </Link>
               <p className="text-gray-400 text-sm line-clamp-2 mb-4">{r.description}</p>
 

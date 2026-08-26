@@ -45,10 +45,10 @@ import { prisma } from '@/lib/prisma';
 
 /** Retention windows in days. These are the numbers the privacy policy states. */
 const RETENTION_DAYS = {
-  loginLog:      365, // security logs — "no longer than 12 months"
-  funnelEvent:   365, // usage analytics — "no longer than 12 months"
+  loginLog: 365, // security logs — "no longer than 12 months"
+  funnelEvent: 365, // usage analytics — "no longer than 12 months"
   cookieConsent: 365, // proof of consent — "12 months"
-  emailLog:      180, // delivery diagnostics; shorter, nothing depends on them
+  emailLog: 180, // delivery diagnostics; shorter, nothing depends on them
 } as const;
 
 function cutoff(days: number): Date {
@@ -56,7 +56,7 @@ function cutoff(days: number): Date {
 }
 
 export async function GET(req: Request) {
-  const auth   = req.headers.get('authorization') ?? '';
+  const auth = req.headers.get('authorization') ?? '';
   const secret = process.env.CRON_SECRET ?? '';
 
   // Same guard as the other cron routes: a missing secret blocks the endpoint
@@ -69,16 +69,20 @@ export async function GET(req: Request) {
     // Independent deletes, so one failing table does not strand the others.
     const [loginLog, funnelEvent, cookieConsent, emailLog] = await Promise.all([
       prisma.loginLog.deleteMany({ where: { createdAt: { lt: cutoff(RETENTION_DAYS.loginLog) } } }),
-      prisma.funnelEvent.deleteMany({ where: { createdAt: { lt: cutoff(RETENTION_DAYS.funnelEvent) } } }),
-      prisma.cookieConsent.deleteMany({ where: { createdAt: { lt: cutoff(RETENTION_DAYS.cookieConsent) } } }),
+      prisma.funnelEvent.deleteMany({
+        where: { createdAt: { lt: cutoff(RETENTION_DAYS.funnelEvent) } },
+      }),
+      prisma.cookieConsent.deleteMany({
+        where: { createdAt: { lt: cutoff(RETENTION_DAYS.cookieConsent) } },
+      }),
       prisma.emailLog.deleteMany({ where: { createdAt: { lt: cutoff(RETENTION_DAYS.emailLog) } } }),
     ]);
 
     const deleted = {
-      loginLog:      loginLog.count,
-      funnelEvent:   funnelEvent.count,
+      loginLog: loginLog.count,
+      funnelEvent: funnelEvent.count,
       cookieConsent: cookieConsent.count,
-      emailLog:      emailLog.count,
+      emailLog: emailLog.count,
     };
 
     // Logged so there is an operational record that retention actually ran —

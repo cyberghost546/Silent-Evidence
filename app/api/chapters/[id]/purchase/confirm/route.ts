@@ -93,7 +93,7 @@ export async function POST(req: Request, { params }: Ctx) {
       // Check that the chapter recorded in the PaymentIntent matches the URL
       intent.metadata.chapterId !== String(chapterId) ||
       // Check that the user recorded in the PaymentIntent matches the logged-in user
-      intent.metadata.userId    !== String(userId)
+      intent.metadata.userId !== String(userId)
     ) {
       return badRequest('Payment intent does not match this chapter.');
     }
@@ -112,19 +112,18 @@ export async function POST(req: Request, { params }: Ctx) {
 
       // Fields for a brand-new purchase record
       create: {
-        userId,                                   // the user who paid
-        chapterId,                                // which chapter they purchased
-        amount: intent.amount,                    // the amount charged (in cents) from Stripe
-        stripePaymentIntentId: intent.id,         // store the Stripe intent ID for audit/refund purposes
+        userId, // the user who paid
+        chapterId, // which chapter they purchased
+        amount: intent.amount, // the amount charged (in cents) from Stripe
+        stripePaymentIntentId: intent.id, // store the Stripe intent ID for audit/refund purposes
       },
 
       // If the record already exists (duplicate call), don't change anything
-      update: {},  // Already purchased — no update needed
+      update: {}, // Already purchased — no update needed
     });
 
     // Return 200 OK — the purchase was confirmed and access is now granted
     return NextResponse.json({ ok: true });
-
   } catch (err) {
     // Log the error server-side so we can investigate (may be a Stripe API error)
     console.error('[chapter-purchase-confirm]', err);

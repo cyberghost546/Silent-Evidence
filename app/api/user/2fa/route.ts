@@ -32,15 +32,19 @@ export async function PATCH(req: Request) {
     data: { twoFactorEnabled: turnOn },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      adminId: userId,
-      action: turnOn ? 'ENABLE_2FA' : 'DISABLE_2FA',
-      detail: turnOn ? 'Two-factor authentication enabled.' : 'Two-factor authentication disabled.',
-      targetType: 'User',
-      targetId: userId,
-    },
-  }).catch(() => {});
+  await prisma.auditLog
+    .create({
+      data: {
+        adminId: userId,
+        action: turnOn ? 'ENABLE_2FA' : 'DISABLE_2FA',
+        detail: turnOn
+          ? 'Two-factor authentication enabled.'
+          : 'Two-factor authentication disabled.',
+        targetType: 'User',
+        targetId: userId,
+      },
+    })
+    .catch(() => {});
 
   // Issue recovery codes when enabling — but only if the user has none yet, so
   // toggling 2FA off and on again does not silently invalidate codes they have

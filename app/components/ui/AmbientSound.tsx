@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 // AmbientSound.tsx — A fixed floating button in the bottom-right corner that lets readers
 // toggle eerie background audio while reading horror stories.
@@ -11,15 +11,15 @@
 //
 // The chosen mood and playing state are persisted in localStorage under the key 'se-ambient'.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 import { CloudRain, HeartPulse, Radio, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
 
 // Mood names in the order the button cycles through them
-type Mood = "Rain" | "Heartbeat" | "Static";
-const MOODS: Mood[] = ["Rain", "Heartbeat", "Static"];
+type Mood = 'Rain' | 'Heartbeat' | 'Static';
+const MOODS: Mood[] = ['Rain', 'Heartbeat', 'Static'];
 
 // localStorage key for persisting the user's last chosen mood
-const LS_KEY = "se-ambient";
+const LS_KEY = 'se-ambient';
 
 // Icons shown in the panel
 const MOOD_ICONS: Record<Mood, LucideIcon> = {
@@ -54,7 +54,7 @@ function startRain(ctx: AudioContext): () => void {
 
   // Low-pass filter keeps only the low rumble of rain, cutting harsh high frequencies
   const filter = ctx.createBiquadFilter();
-  filter.type = "lowpass";
+  filter.type = 'lowpass';
   filter.frequency.value = 400; // Hz — cut everything above this
 
   const gain = ctx.createGain();
@@ -87,9 +87,9 @@ function startStatic(ctx: AudioContext): () => void {
 
   // Band-pass filter lets through only a narrow frequency band — sounds like old radio hiss
   const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
+  filter.type = 'bandpass';
   filter.frequency.value = 3500; // centre frequency in Hz
-  filter.Q.value = 0.8;          // bandwidth: lower Q = wider band
+  filter.Q.value = 0.8; // bandwidth: lower Q = wider band
 
   const gain = ctx.createGain();
   gain.gain.value = 0.12;
@@ -103,7 +103,9 @@ function startStatic(ctx: AudioContext): () => void {
   return () => {
     try {
       source.stop();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 }
 
@@ -118,7 +120,7 @@ function startHeartbeat(ctx: AudioContext): () => void {
   // Schedule a single "thump" — a short sine-wave burst that fades quickly
   function scheduleThump(startTime: number, frequency: number) {
     const osc = ctx.createOscillator();
-    osc.type = "sine";
+    osc.type = 'sine';
     osc.frequency.value = frequency;
 
     const env = ctx.createGain();
@@ -168,9 +170,9 @@ export default function AmbientSound() {
 
   // The currently selected mood — initialised from localStorage if available
   const [mood, setMood] = useState<Mood>(() => {
-    if (typeof window === "undefined") return "Rain";
+    if (typeof window === 'undefined') return 'Rain';
     const saved = localStorage.getItem(LS_KEY) as Mood | null;
-    return saved && MOODS.includes(saved) ? saved : "Rain";
+    return saved && MOODS.includes(saved) ? saved : 'Rain';
   });
 
   // Whether the floating mood panel is expanded
@@ -206,11 +208,11 @@ export default function AmbientSound() {
   // Lazily creates (or reuses) the shared AudioContext.
   // AudioContext must be created after a user gesture on most browsers.
   function getOrCreateCtx(): AudioContext {
-    if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
+    if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
       audioCtxRef.current = new AudioContext();
     }
     // Resume in case it was suspended (browsers auto-suspend on inactivity)
-    if (audioCtxRef.current.state === "suspended") {
+    if (audioCtxRef.current.state === 'suspended') {
       audioCtxRef.current.resume();
     }
     return audioCtxRef.current;
@@ -231,9 +233,9 @@ export default function AmbientSound() {
 
     // Pick the correct builder based on the mood
     let stopFn: () => void;
-    if (mood === "Rain") {
+    if (mood === 'Rain') {
       stopFn = startRain(ctx);
-    } else if (mood === "Heartbeat") {
+    } else if (mood === 'Heartbeat') {
       stopFn = startHeartbeat(ctx);
     } else {
       stopFn = startStatic(ctx);
@@ -263,13 +265,10 @@ export default function AmbientSound() {
   return (
     // Fixed container in the bottom-right corner, above most other content (z-50)
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
-
       {/* ── Expanded mood panel ── */}
       {panelOpen && (
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 shadow-2xl flex flex-col gap-2 min-w-[160px]">
-          <p className="text-zinc-400 text-xs uppercase tracking-widest mb-1">
-            Ambient Mood
-          </p>
+          <p className="text-zinc-400 text-xs uppercase tracking-widest mb-1">Ambient Mood</p>
 
           {/* One button per available mood */}
           {MOODS.map((m) => (
@@ -285,8 +284,8 @@ export default function AmbientSound() {
               }}
               className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded transition-colors ${
                 mood === m
-                  ? "bg-red-900 text-red-200 font-semibold"
-                  : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                  ? 'bg-red-900 text-red-200 font-semibold'
+                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
               }`}
             >
               {(() => {
@@ -314,7 +313,6 @@ export default function AmbientSound() {
 
       {/* ── Row: panel toggle + main play/stop button ── */}
       <div className="flex items-center gap-2">
-
         {/* Small label button that opens/closes the mood panel */}
         <button
           onClick={() => setPanelOpen((prev) => !prev)}
@@ -323,7 +321,13 @@ export default function AmbientSound() {
         >
           {(() => {
             const MIcon = MOOD_ICONS[mood];
-            return <MIcon className="w-4 h-4 inline-block mr-1 align-[-2px]" strokeWidth={1.75} aria-hidden="true" />;
+            return (
+              <MIcon
+                className="w-4 h-4 inline-block mr-1 align-[-2px]"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
+            );
           })()}
           {mood}
         </button>
@@ -331,16 +335,18 @@ export default function AmbientSound() {
         {/* Main toggle button — shows 🔇 when silent, 🔊 when playing */}
         <button
           onClick={handleToggle}
-          title={playing ? "Stop ambient sound" : "Play ambient sound"}
+          title={playing ? 'Stop ambient sound' : 'Play ambient sound'}
           className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-2xl border transition-all duration-300 ${
             playing
-              ? "bg-red-900 border-red-700 text-white hover:bg-red-800"
-              : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+              ? 'bg-red-900 border-red-700 text-white hover:bg-red-800'
+              : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
           }`}
         >
-          {playing
-            ? <Volume2 className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
-            : <VolumeX className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
+          {playing ? (
+            <Volume2 className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+          ) : (
+            <VolumeX className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+          )}
         </button>
       </div>
     </div>

@@ -6,13 +6,20 @@ import { getTheme, getBorder } from '@/app/lib/themes';
 type Props = {
   src: string;
   username: string;
-  size?: number;       // px, default 128
+  size?: number; // px, default 128
   theme?: string;
   border?: string;
   className?: string;
 };
 
-export default function UserAvatar({ src, username, size = 128, theme = 'default', border = 'none', className = '' }: Props) {
+export default function UserAvatar({
+  src,
+  username,
+  size = 128,
+  theme = 'default',
+  border = 'none',
+  className = '',
+}: Props) {
   const t = getTheme(theme);
   const b = getBorder(border);
 

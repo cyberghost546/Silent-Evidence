@@ -25,14 +25,14 @@ import { BottomTabInset, Spacing } from '@/constants/theme';
 
 // Each mood maps to a Prisma Mood enum value and an emoji for the tile
 const MOODS = [
-  { label: 'CREEPY',         emoji: '🕷️' },
-  { label: 'PARANOID',       emoji: '👁️' },
-  { label: 'DISTURBING',     emoji: '😱' },
-  { label: 'ATMOSPHERIC',    emoji: '🌫️' },
-  { label: 'PSYCHOLOGICAL',  emoji: '🧠' },
-  { label: 'SUPERNATURAL',   emoji: '👻' },
-  { label: 'GORE',           emoji: '🩸' },
-  { label: 'JUMPSCARE',      emoji: '⚡' },
+  { label: 'CREEPY', emoji: '🕷️' },
+  { label: 'PARANOID', emoji: '👁️' },
+  { label: 'DISTURBING', emoji: '😱' },
+  { label: 'ATMOSPHERIC', emoji: '🌫️' },
+  { label: 'PSYCHOLOGICAL', emoji: '🧠' },
+  { label: 'SUPERNATURAL', emoji: '👻' },
+  { label: 'GORE', emoji: '🩸' },
+  { label: 'JUMPSCARE', emoji: '⚡' },
 ] as const;
 
 // ── Screen component ──────────────────────────────────────────────────────────
@@ -92,11 +92,7 @@ export default function ExploreScreen() {
 
           {/* Clear button — only visible when there is text in the input */}
           {query.length > 0 && (
-            <Pressable
-              onPress={() => setQuery('')}
-              hitSlop={10}
-              style={styles.clearBtn}
-            >
+            <Pressable onPress={() => setQuery('')} hitSlop={10} style={styles.clearBtn}>
               <Text style={styles.clearBtnText}>✕</Text>
             </Pressable>
           )}
@@ -112,19 +108,14 @@ export default function ExploreScreen() {
 
         {/* ── Browse by mood section ─────────────────────────────────────── */}
         <Text style={styles.sectionTitle}>Browse by Mood</Text>
-        <Text style={styles.sectionSubtitle}>
-          Tap a mood to see matching stories on the web
-        </Text>
+        <Text style={styles.sectionSubtitle}>Tap a mood to see matching stories on the web</Text>
 
         {/* 2-column grid of mood tiles */}
         <View style={styles.moodGrid}>
           {MOODS.map((mood) => (
             <Pressable
               key={mood.label}
-              style={({ pressed }) => [
-                styles.moodTile,
-                pressed && styles.moodTilePressed,
-              ]}
+              style={({ pressed }) => [styles.moodTile, pressed && styles.moodTilePressed]}
               onPress={() => handleMoodPress(mood.label)}
             >
               {/* Large emoji displayed prominently */}

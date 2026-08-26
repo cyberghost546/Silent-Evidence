@@ -21,24 +21,28 @@ async function requireAdmin() {
 
 async function getList(): Promise<{ ip: string; reason: string; addedAt: string }[]> {
   const row = await prisma.siteSetting.findUnique({ where: { key: SETTING_KEY } });
-  try { return row ? JSON.parse(row.value) : []; } catch { return []; }
+  try {
+    return row ? JSON.parse(row.value) : [];
+  } catch {
+    return [];
+  }
 }
 
 async function saveList(list: { ip: string; reason: string; addedAt: string }[]) {
   await prisma.siteSetting.upsert({
-    where:  { key: SETTING_KEY },
+    where: { key: SETTING_KEY },
     create: { key: SETTING_KEY, value: JSON.stringify(list) },
     update: { value: JSON.stringify(list) },
   });
 }
 
 export async function GET() {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   return NextResponse.json({ blocklist: await getList() });
 }
 
 export async function POST(req: Request) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const { ip, reason = '' } = await req.json();
   if (!ip || typeof ip !== 'string' || ip.trim().length === 0) {
@@ -46,7 +50,7 @@ export async function POST(req: Request) {
   }
 
   const list = await getList();
-  if (list.some(e => e.ip === ip.trim())) {
+  if (list.some((e) => e.ip === ip.trim())) {
     return NextResponse.json({ error: 'This IP is already blocked.' }, { status: 409 });
   }
 
@@ -56,10 +60,10 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const { ip } = await req.json();
   const list = await getList();
-  await saveList(list.filter(e => e.ip !== ip));
+  await saveList(list.filter((e) => e.ip !== ip));
   return NextResponse.json({ ok: true });
 }

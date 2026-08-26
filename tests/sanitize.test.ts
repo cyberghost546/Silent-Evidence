@@ -53,7 +53,7 @@ describe('sanitizeContent — raw-text passthrough (the xmp bypass)', () => {
       expect(out).not.toContain('onerror');
       expect(out).not.toContain('alert');
       expect(out.toLowerCase()).not.toContain(`<${tag}`);
-    },
+    }
   );
 
   it('does not leak a smuggled script through xmp', () => {

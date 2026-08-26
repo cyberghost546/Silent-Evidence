@@ -35,7 +35,7 @@ export async function updateWritingStreak(userId: number) {
   longestStreak = Math.max(longestStreak, currentStreak);
 
   await prisma.writingStreak.upsert({
-    where:  { userId },
+    where: { userId },
     update: { currentStreak, longestStreak, lastPublishedAt: todayUTC },
     create: { userId, currentStreak, longestStreak, lastPublishedAt: todayUTC },
   });

@@ -41,7 +41,10 @@ function generateCode(): string {
 
 /** Normalises user input so formatting differences never cause a false reject. */
 export function normalizeCode(input: string): string {
-  return input.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
 }
 
 /**
@@ -61,7 +64,7 @@ export async function regenerateRecoveryCodes(userId: number): Promise<string[]>
     plaintext.map(async (code) => ({
       userId,
       codeHash: await bcrypt.hash(normalizeCode(code), BCRYPT_ROUNDS),
-    })),
+    }))
   );
 
   await prisma.$transaction([

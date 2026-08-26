@@ -50,7 +50,10 @@ export default function AppealsClient({ actions }: { actions: ModerationActionVi
     return (
       <div className="text-center py-20 text-gray-600">
         <p>No moderation decisions on your account.</p>
-        <p className="mt-2 text-sm">If we ever remove your content or restrict your account, it will appear here with the reason and a way to appeal.</p>
+        <p className="mt-2 text-sm">
+          If we ever remove your content or restrict your account, it will appear here with the
+          reason and a way to appeal.
+        </p>
       </div>
     );
   }
@@ -76,7 +79,10 @@ function ActionCard({ action }: { action: ModerationActionView }) {
 
   const submit = async () => {
     setError('');
-    if (message.trim().length < 10) { setError('Please write at least 10 characters.'); return; }
+    if (message.trim().length < 10) {
+      setError('Please write at least 10 characters.');
+      return;
+    }
     setLoading(true);
     const res = await fetch('/api/appeals', {
       method: 'POST',
@@ -84,12 +90,18 @@ function ActionCard({ action }: { action: ModerationActionView }) {
       body: JSON.stringify({ actionId: action.id, message: message.trim() }),
     });
     setLoading(false);
-    if (res.ok) { router.refresh(); }
-    else { const d = await res.json().catch(() => ({})); setError(d.error ?? 'Could not submit appeal.'); }
+    if (res.ok) {
+      router.refresh();
+    } else {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? 'Could not submit appeal.');
+    }
   };
 
   return (
-    <div className={`border rounded-xl p-5 ${reversed ? 'border-green-900/40 bg-green-950/10' : 'border-gray-800 bg-gray-900'}`}>
+    <div
+      className={`border rounded-xl p-5 ${reversed ? 'border-green-900/40 bg-green-950/10' : 'border-gray-800 bg-gray-900'}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-white">
@@ -97,7 +109,8 @@ function ActionCard({ action }: { action: ModerationActionView }) {
             {reversed && <span className="ml-2 text-xs text-green-400">(reversed)</span>}
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
-            {new Date(action.createdAt).toLocaleDateString()} · {action.targetType.toLowerCase().replace('_', ' ')}
+            {new Date(action.createdAt).toLocaleDateString()} ·{' '}
+            {action.targetType.toLowerCase().replace('_', ' ')}
             {action.automated && <span className="ml-2 text-gray-600">automated decision</span>}
           </p>
         </div>
@@ -105,22 +118,32 @@ function ActionCard({ action }: { action: ModerationActionView }) {
 
       {/* Statement of reasons */}
       <div className="mt-3 text-sm text-gray-300">
-        <p><span className="text-gray-500">Reason:</span> {action.explanation}</p>
-        {action.legalGround && <p className="text-xs text-gray-500 mt-1">Basis: {action.legalGround}</p>}
+        <p>
+          <span className="text-gray-500">Reason:</span> {action.explanation}
+        </p>
+        {action.legalGround && (
+          <p className="text-xs text-gray-500 mt-1">Basis: {action.legalGround}</p>
+        )}
       </div>
 
       {/* Appeal state / action */}
       <div className="mt-4 pt-4 border-t border-gray-800">
         {appeal ? (
           <div>
-            <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${APPEAL_BADGE[appeal.status]}`}>
+            <span
+              className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${APPEAL_BADGE[appeal.status]}`}
+            >
               Appeal {appeal.status.toLowerCase()}
             </span>
             <p className="text-xs text-gray-500 mt-2">Your appeal: {appeal.message}</p>
-            {appeal.decisionNote && <p className="text-xs text-gray-400 mt-1">Reviewer: {appeal.decisionNote}</p>}
+            {appeal.decisionNote && (
+              <p className="text-xs text-gray-400 mt-1">Reviewer: {appeal.decisionNote}</p>
+            )}
           </div>
         ) : reversed ? (
-          <p className="text-xs text-gray-500">This decision has been reversed. No appeal needed.</p>
+          <p className="text-xs text-gray-500">
+            This decision has been reversed. No appeal needed.
+          </p>
         ) : !open ? (
           <button
             type="button"
@@ -131,7 +154,9 @@ function ActionCard({ action }: { action: ModerationActionView }) {
           </button>
         ) : (
           <div className="space-y-2">
-            <label className="text-xs text-gray-500">Explain why you think this was wrong. A person will review it.</label>
+            <label className="text-xs text-gray-500">
+              Explain why you think this was wrong. A person will review it.
+            </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -142,10 +167,24 @@ function ActionCard({ action }: { action: ModerationActionView }) {
             />
             {error && <p className="text-xs text-red-400">{error}</p>}
             <div className="flex gap-2">
-              <button type="button" onClick={submit} disabled={loading} className="px-3 py-1.5 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition disabled:opacity-50">
+              <button
+                type="button"
+                onClick={submit}
+                disabled={loading}
+                className="px-3 py-1.5 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition disabled:opacity-50"
+              >
                 {loading ? 'Submitting…' : 'Submit appeal'}
               </button>
-              <button type="button" onClick={() => { setOpen(false); setError(''); }} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition">Cancel</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setError('');
+                }}
+                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}

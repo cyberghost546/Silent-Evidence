@@ -31,7 +31,10 @@ export default async function EditStoryPage({ params }: Props) {
   if (!story) return notFound();
   if (story.authorId !== userId) redirect('/my-stories');
 
-  const categories = await prisma.category.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } });
+  const categories = await prisma.category.findMany({
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true },
+  });
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">

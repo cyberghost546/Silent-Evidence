@@ -40,7 +40,7 @@ export default async function DashboardPage() {
   // Fetched together — the dashboard needs both and neither depends on the other.
   const [user, authorProgress] = await Promise.all([
     prisma.user.findUnique({
-      where:  { id: userId },
+      where: { id: userId },
       select: { username: true },
     }),
     getAuthorProgress(userId),
@@ -53,7 +53,9 @@ export default async function DashboardPage() {
       {/* Page header */}
       <div className="border-b border-gray-800 bg-gray-950">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-red-500 mb-1">Author Dashboard</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-red-500 mb-1">
+            Author Dashboard
+          </p>
           <h1 className="text-2xl font-bold text-white">
             Welcome back, <span className="text-red-400">{user?.username}</span>
           </h1>

@@ -27,7 +27,7 @@ export default async function AdminLoginLogsPage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Serialise dates to strings so the client component can receive them as props
-  const serialised = logs.map(l => ({
+  const serialised = logs.map((l) => ({
     ...l,
     createdAt: l.createdAt.toISOString(),
   }));

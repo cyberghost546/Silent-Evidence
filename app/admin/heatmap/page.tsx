@@ -73,7 +73,20 @@ function buildGrid(): string[] {
 }
 
 // Abbreviated month names used for the column header labels
-const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 // ---------------------------------------------------------------------------
 // Colour helper
@@ -102,22 +115,22 @@ function cellColor(val: number, max: number, mode: Mode): string {
 
   if (mode === 'users') {
     if (pct > 0.75) return 'bg-blue-500';
-    if (pct > 0.4)  return 'bg-blue-600/70';   // /70 = 70% opacity for a softer mid-tone
+    if (pct > 0.4) return 'bg-blue-600/70'; // /70 = 70% opacity for a softer mid-tone
     return 'bg-blue-900/60';
   }
   if (mode === 'stories') {
     if (pct > 0.75) return 'bg-purple-500';
-    if (pct > 0.4)  return 'bg-purple-600/70';
+    if (pct > 0.4) return 'bg-purple-600/70';
     return 'bg-purple-900/60';
   }
   if (mode === 'comments') {
     if (pct > 0.75) return 'bg-green-500';
-    if (pct > 0.4)  return 'bg-green-600/70';
+    if (pct > 0.4) return 'bg-green-600/70';
     return 'bg-green-900/60';
   }
   // Default: 'total' mode uses red (brand colour)
   if (pct > 0.75) return 'bg-red-500';
-  if (pct > 0.4)  return 'bg-red-600/70';
+  if (pct > 0.4) return 'bg-red-600/70';
   return 'bg-red-900/60';
 }
 
@@ -127,10 +140,12 @@ function cellColor(val: number, max: number, mode: Mode): string {
 
 export default function AdminHeatmapPage() {
   // counts: API response — a map from date string to { users, stories, comments }
-  const [counts, setCounts] = useState<Record<string, { users: number; stories: number; comments: number }>>({});
+  const [counts, setCounts] = useState<
+    Record<string, { users: number; stories: number; comments: number }>
+  >({});
   const [loading, setLoading] = useState(true);
   // mode: which metric to visualise; drives both colour logic and summary cards
-  const [mode, setMode]       = useState<Mode>('total');
+  const [mode, setMode] = useState<Mode>('total');
   // tooltip: the Day object for the currently hovered cell (null = no tooltip shown)
   const [tooltip, setTooltip] = useState<Day | null>(null);
 
@@ -139,9 +154,9 @@ export default function AdminHeatmapPage() {
   // ---------------------------------------------------------------------------
   useEffect(() => {
     fetch('/api/admin/heatmap')
-      .then(r => r.json())
-      .then(d => setCounts(d.counts ?? {})) // fallback to empty object if API fails
-      .finally(() => setLoading(false));    // always hide loading state
+      .then((r) => r.json())
+      .then((d) => setCounts(d.counts ?? {})) // fallback to empty object if API fails
+      .finally(() => setLoading(false)); // always hide loading state
   }, []);
 
   // ---------------------------------------------------------------------------
@@ -152,14 +167,14 @@ export default function AdminHeatmapPage() {
   const grid = buildGrid();
 
   // Merge the API counts into the grid, defaulting missing dates to zero
-  const days: Day[] = grid.map(date => {
+  const days: Day[] = grid.map((date) => {
     const c = counts[date] ?? { users: 0, stories: 0, comments: 0 };
     // Compute the 'total' property as the sum of all three metrics
     return { date, ...c, total: c.users + c.stories + c.comments };
   });
 
   // maxVal: used to normalise intensities; Math.max(1, ...) prevents division by zero
-  const maxVal = Math.max(1, ...days.map(d => d[mode]));
+  const maxVal = Math.max(1, ...days.map((d) => d[mode]));
 
   // Chunk the flat day array into weekly slices (7 days each) to form grid columns
   const weeks: Day[][] = [];
@@ -179,8 +194,8 @@ export default function AdminHeatmapPage() {
   // 52-week totals for the summary stat cards at the top
   const totals = days.reduce(
     (acc, d) => ({
-      users:    acc.users    + d.users,
-      stories:  acc.stories  + d.stories,
+      users: acc.users + d.users,
+      stories: acc.stories + d.stories,
       comments: acc.comments + d.comments,
     }),
     { users: 0, stories: 0, comments: 0 }
@@ -192,16 +207,28 @@ export default function AdminHeatmapPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Activity Heatmap</h1>
-      <p className="text-gray-500 text-sm mb-6">Daily signups, stories, and comments — last 52 weeks</p>
+      <p className="text-gray-500 text-sm mb-6">
+        Daily signups, stories, and comments — last 52 weeks
+      </p>
 
       {/* ── Summary stat cards ── */}
       {/* Clicking a card also switches the active heatmap mode */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'New Users',    value: totals.users,    color: 'text-blue-400',   id: 'users' as Mode },
-          { label: 'New Stories',  value: totals.stories,  color: 'text-purple-400', id: 'stories' as Mode },
-          { label: 'New Comments', value: totals.comments, color: 'text-green-400',  id: 'comments' as Mode },
-        ].map(s => (
+          { label: 'New Users', value: totals.users, color: 'text-blue-400', id: 'users' as Mode },
+          {
+            label: 'New Stories',
+            value: totals.stories,
+            color: 'text-purple-400',
+            id: 'stories' as Mode,
+          },
+          {
+            label: 'New Comments',
+            value: totals.comments,
+            color: 'text-green-400',
+            id: 'comments' as Mode,
+          },
+        ].map((s) => (
           <button
             key={s.id}
             type="button"
@@ -220,14 +247,14 @@ export default function AdminHeatmapPage() {
       {/* ── Mode selector tabs ── */}
       {/* 'total' is an additional tab not shown in the stat cards above */}
       <div className="flex gap-2 mb-4">
-        {(['total','users','stories','comments'] as Mode[]).map(m => (
+        {(['total', 'users', 'stories', 'comments'] as Mode[]).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMode(m)}
             className={`px-3 py-1 text-xs font-semibold rounded-lg border transition capitalize ${
               mode === m
-                ? 'bg-red-600 border-red-600 text-white'       // active tab
+                ? 'bg-red-600 border-red-600 text-white' // active tab
                 : 'border-gray-700 text-gray-400 hover:text-white' // inactive tab
             }`}
           >
@@ -242,13 +269,12 @@ export default function AdminHeatmapPage() {
         <div className="h-32 bg-gray-800 rounded-2xl animate-pulse" />
       ) : (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 overflow-x-auto">
-
           {/* Month header row — one label per column, positioned absolutely by col index */}
           {/* gap-[3px] matches the cell gap below so labels align with their columns */}
           <div className="flex gap-[3px] mb-1 ml-8">
             {weeks.map((_, wi) => {
               // Find a month label entry for this column (undefined if none)
-              const ml = monthLabels.find(m => m.col === wi);
+              const ml = monthLabels.find((m) => m.col === wi);
               return (
                 <div key={wi} className="w-3 text-[9px] text-gray-600 shrink-0">
                   {/* Render the month abbreviation if this column starts a new month */}
@@ -260,12 +286,13 @@ export default function AdminHeatmapPage() {
 
           {/* Main grid: day-of-week labels + weekly columns */}
           <div className="flex gap-[3px]">
-
             {/* Day-of-week labels: only Mon (M), Wed (W), Fri (F) are labelled
                 to match the GitHub contribution graph convention */}
             <div className="flex flex-col gap-[3px] mr-1">
-              {['','M','','W','','F',''].map((d, i) => (
-                <div key={i} className="h-3 text-[9px] text-gray-600 leading-3">{d}</div>
+              {['', 'M', '', 'W', '', 'F', ''].map((d, i) => (
+                <div key={i} className="h-3 text-[9px] text-gray-600 leading-3">
+                  {d}
+                </div>
               ))}
             </div>
 

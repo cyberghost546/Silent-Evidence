@@ -39,8 +39,10 @@ type Conversation = {
 };
 
 function avatarUrl(partner: Conversation['partner']) {
-  return partner.profile?.avatar ??
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.username)}&background=dc2626&color=fff&size=64`;
+  return (
+    partner.profile?.avatar ??
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.username)}&background=dc2626&color=fff&size=64`
+  );
 }
 
 export default function MessagesClient({
@@ -59,15 +61,20 @@ export default function MessagesClient({
         </div>
       ) : (
         <div className="space-y-2">
-          {conversations.map(c => (
+          {conversations.map((c) => (
             <Link
               key={c.partner.id}
               href={`/messages/${c.partner.username}`}
               className="flex items-center gap-4 bg-gray-900 border border-gray-800 hover:border-red-600/50 rounded-xl px-4 py-3.5 transition group"
             >
               <div className="relative flex-shrink-0">
-                <Image src={avatarUrl(c.partner)} alt={c.partner.username}
-                  width={44} height={44} className="rounded-full object-cover" />
+                <Image
+                  src={avatarUrl(c.partner)}
+                  alt={c.partner.username}
+                  width={44}
+                  height={44}
+                  className="rounded-full object-cover"
+                />
                 {c.unread > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full text-white text-[10px] flex items-center justify-center font-bold">
                     {c.unread > 9 ? '9+' : c.unread}
@@ -76,10 +83,14 @@ export default function MessagesClient({
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className={`font-semibold truncate ${c.unread > 0 ? 'text-white' : 'text-gray-300'} group-hover:text-red-400 transition`}>
+                <p
+                  className={`font-semibold truncate ${c.unread > 0 ? 'text-white' : 'text-gray-300'} group-hover:text-red-400 transition`}
+                >
                   {c.partner.username}
                 </p>
-                <p className={`text-xs truncate mt-0.5 ${c.unread > 0 ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p
+                  className={`text-xs truncate mt-0.5 ${c.unread > 0 ? 'text-gray-300' : 'text-gray-600'}`}
+                >
                   {c.lastMessage}
                 </p>
               </div>

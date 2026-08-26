@@ -33,7 +33,7 @@ export async function hasAuthorPro(userId: number | null): Promise<boolean> {
   if (!userId) return false;
 
   const user = await prisma.user.findUnique({
-    where:  { id: userId },
+    where: { id: userId },
     select: {
       role: true,
       authorGrandfathered: true,
@@ -69,7 +69,7 @@ export async function getAuthorProContext(): Promise<{
  *   if (denied) return denied;
  */
 export async function requireAuthorPro(
-  message = 'This is an Author Pro feature. Upgrade at /author-pro to use it.',
+  message = 'This is an Author Pro feature. Upgrade at /author-pro to use it.'
 ) {
   const { userId, isAuthorPro } = await getAuthorProContext();
   if (!userId) return unauthorized();
@@ -102,9 +102,7 @@ export type AuthorProStoryField = (typeof AUTHOR_PRO_STORY_FIELDS)[number];
  * price or unpublish an early-access window rather than being trapped with
  * settings they can no longer edit.
  */
-export function usedAuthorProFields(
-  payload: Record<string, unknown>,
-): AuthorProStoryField[] {
+export function usedAuthorProFields(payload: Record<string, unknown>): AuthorProStoryField[] {
   return AUTHOR_PRO_STORY_FIELDS.filter((field) => {
     const value = payload[field];
     if (value === undefined || value === null) return false;
@@ -125,7 +123,7 @@ export function usedAuthorProFields(
  */
 export async function enforceAuthorProFields<T extends Record<string, unknown>>(
   userId: number | null,
-  payload: T,
+  payload: T
 ): Promise<{ data: T; rejected: AuthorProStoryField[] }> {
   const attempted = usedAuthorProFields(payload);
   if (attempted.length === 0) return { data: payload, rejected: [] };
@@ -139,10 +137,10 @@ export async function enforceAuthorProFields<T extends Record<string, unknown>>(
 
 /** Human-readable names for the gated fields, used in error messages. */
 export const AUTHOR_PRO_FIELD_LABELS: Record<AuthorProStoryField, string> = {
-  price:              'charging for a story',
-  isPremiumOnly:      'premium-only stories',
-  earlyAccessUntil:   'early access windows',
-  audioUrl:           'audio narration',
-  videoUrl:           'video attachments',
+  price: 'charging for a story',
+  isPremiumOnly: 'premium-only stories',
+  earlyAccessUntil: 'early access windows',
+  audioUrl: 'audio narration',
+  videoUrl: 'video attachments',
   spotifyPlaylistUrl: 'Spotify soundtracks',
 };

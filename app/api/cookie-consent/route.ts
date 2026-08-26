@@ -15,8 +15,8 @@ type Choice = (typeof VALID_CHOICES)[number];
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const choice: Choice = VALID_CHOICES.includes(body.choice) ? body.choice : 'essential';
-  const analytics  = choice === 'all';
-  const marketing  = choice === 'all';
+  const analytics = choice === 'all';
+  const marketing = choice === 'all';
 
   // Grab the user id from the session cookie (null for guests)
   const cookieStore = await cookies();
@@ -24,9 +24,10 @@ export async function POST(req: Request) {
 
   // Anonymise IP before storing (last octet removed)
   const headersList = await headers();
-  const rawIp = headersList.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? headersList.get('x-real-ip')
-    ?? 'unknown';
+  const rawIp =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headersList.get('x-real-ip') ??
+    'unknown';
   const ip = anonymizeIp(rawIp);
   const userAgent = headersList.get('user-agent') ?? null;
 
@@ -68,7 +69,7 @@ export async function GET() {
     }),
   ]);
 
-  const counts = Object.fromEntries(byChoice.map(r => [r.choice, r._count.choice]));
+  const counts = Object.fromEntries(byChoice.map((r) => [r.choice, r._count.choice]));
 
   return NextResponse.json({ total, counts, recent });
 }

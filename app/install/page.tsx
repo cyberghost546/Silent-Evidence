@@ -57,20 +57,25 @@ export default function InstallPage() {
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-white mb-2">Install Silent Evidence</h1>
         <p className="text-gray-400 text-sm leading-relaxed max-w-md mx-auto">
-          Add the app to your home screen for faster loading, offline reading,
-          and a daily horror story widget.
+          Add the app to your home screen for faster loading, offline reading, and a daily horror
+          story widget.
         </p>
       </div>
 
       {/* Benefits row */}
       <div className="grid grid-cols-3 gap-3 mb-10">
         {[
-  { icon: Zap,          label: 'Faster loading' },
-  { icon: Download,     label: 'Offline reads' },
-  { icon: CalendarDays, label: 'Daily widget' },
-        ].map(b => (
-          <div key={b.label} className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center">
-            <div className="flex justify-center mb-1"><b.icon className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" /></div>
+          { icon: Zap, label: 'Faster loading' },
+          { icon: Download, label: 'Offline reads' },
+          { icon: CalendarDays, label: 'Daily widget' },
+        ].map((b) => (
+          <div
+            key={b.label}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center"
+          >
+            <div className="flex justify-center mb-1">
+              <b.icon className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+            </div>
             <p className="text-xs text-gray-400">{b.label}</p>
           </div>
         ))}
@@ -78,11 +83,15 @@ export default function InstallPage() {
 
       {/* Platform instructions */}
       <div className="space-y-6">
-        {platforms.map(platform => (
+        {platforms.map((platform) => (
           <div key={platform.name} className="border border-gray-800 rounded-xl p-5 bg-gray-900">
             {/* Platform header */}
             <div className="flex items-center gap-2 mb-4">
-              <platform.icon className="w-6 h-6 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+              <platform.icon
+                className="w-6 h-6 shrink-0 text-gray-400"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
               <h2 className="text-base font-bold text-white">{platform.name}</h2>
             </div>
 
@@ -101,7 +110,7 @@ export default function InstallPage() {
 
             {/* Pro tip */}
             <p className="mt-4 text-xs text-gray-500 bg-gray-800 rounded-lg px-3 py-2 leading-relaxed">
- {platform.tip}
+              {platform.tip}
             </p>
           </div>
         ))}
@@ -111,15 +120,19 @@ export default function InstallPage() {
       <div className="mt-8 border border-yellow-500/20 bg-yellow-500/5 rounded-xl p-5">
         <h3 className="text-sm font-bold text-yellow-400 mb-2">Daily Story Widget</h3>
         <p className="text-xs text-gray-400 leading-relaxed mb-3">
-          Once the app is installed, you can add a web widget to your home screen
-          that shows today&apos;s featured horror story.
+          Once the app is installed, you can add a web widget to your home screen that shows
+          today&apos;s featured horror story.
         </p>
         <p className="text-xs text-gray-500 leading-relaxed">
-          <strong className="text-gray-400">Android:</strong> Long-press your home screen → Widgets → search for your browser → pick a medium widget → set URL to{' '}
-          <code className="text-yellow-400 bg-gray-900 px-1 rounded">silentevidence.com/widget</code>
+          <strong className="text-gray-400">Android:</strong> Long-press your home screen → Widgets
+          → search for your browser → pick a medium widget → set URL to{' '}
+          <code className="text-yellow-400 bg-gray-900 px-1 rounded">
+            silentevidence.com/widget
+          </code>
         </p>
         <p className="text-xs text-gray-500 leading-relaxed mt-1">
-          <strong className="text-gray-400">iOS (Scriptable / WWDC):</strong> Use the Scriptable app with a web widget script pointing to{' '}
+          <strong className="text-gray-400">iOS (Scriptable / WWDC):</strong> Use the Scriptable app
+          with a web widget script pointing to{' '}
           <code className="text-yellow-400 bg-gray-900 px-1 rounded">/api/widget/daily-story</code>{' '}
           (returns JSON) to build a native widget.
         </p>

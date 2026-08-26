@@ -25,7 +25,7 @@ export async function PATCH(_req: Request, { params }: Ctx) {
 
     const updated = await prisma.coauthorRequest.update({
       where: { id: requestId },
-      data:  { isOpen: !existing.isOpen },  // toggle open/closed
+      data: { isOpen: !existing.isOpen }, // toggle open/closed
     });
 
     return NextResponse.json(updated);
@@ -46,7 +46,7 @@ export async function DELETE(_req: Request, { params }: Ctx) {
 
   try {
     const existing = await prisma.coauthorRequest.findUnique({
-      where:  { id: requestId },
+      where: { id: requestId },
       select: { authorId: true },
     });
     if (!existing) return notFound();
