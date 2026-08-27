@@ -16,15 +16,17 @@ import { useState } from 'react'; // useState — manages the currently displaye
 import TranslateStory from './TranslateStory'; // TranslateStory — the language picker + translate/reset controls
 import ReadingPreferences from './ReadingPreferences'; // per-reader font / size / spacing / theme controls
 import StoryNarration from './StoryNarration'; // browser text-to-speech 'Listen' player
+import FocusMode from './FocusMode'; // distraction-free immersive reading overlay
 
 // Props passed in from the story page server component
 type Props = {
   content: string; // raw HTML body of the story (from TipTap / the DB)
   excerpt?: string | null; // optional short description shown above the body
   storyLang?: string; // BCP-47 language code of the original story (default: 'en')
+  title?: string; // story title, shown atop the focus-mode overlay
 };
 
-export default function StoryContent({ content, excerpt, storyLang = 'en' }: Props) {
+export default function StoryContent({ content, excerpt, storyLang = 'en', title = '' }: Props) {
   // displayContent — the story body that is currently shown.
   // Starts as the original content; updated to translated text when the user translates.
   const [displayContent, setDisplayContent] = useState(content);
@@ -77,6 +79,7 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
             theme controls. Pushed to the right to share the toolbar row with the
             translation control. */}
         <div className="ml-auto flex items-center gap-2">
+          <FocusMode title={title} contentHtml={displayContent} />
           <StoryNarration content={content} />
           <ReadingPreferences />
         </div>

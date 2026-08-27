@@ -625,6 +625,7 @@ export default async function StoryPage({ params }: Props) {
                     content={story.content}
                     excerpt={story.excerpt}
                     storyLang={story.language ?? 'en'}
+                    title={story.title}
                   />
                 </StoryWarningModal>
               ) : (
@@ -632,6 +633,7 @@ export default async function StoryPage({ params }: Props) {
                   content={story.content}
                   excerpt={story.excerpt}
                   storyLang={story.language ?? 'en'}
+                  title={story.title}
                 />
               )}
             </AgeGate>
