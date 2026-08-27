@@ -77,7 +77,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
   if (!story) return { title: 'Story Not Found' };
 
-  const description = story.excerpt ?? `A horror story by ${story.author.username} on Silent Evidence.`;
+  const description =
+    story.excerpt ?? `A horror story by ${story.author.username} on Silent Evidence.`;
   // Use the dynamic OG image generator which creates a branded horror-themed card,
   // falling back to the story's cover image or a static default
   const ogImage = `${BASE_URL}/api/og?slug=${encodeURIComponent(slug)}`;
@@ -125,7 +126,14 @@ export default async function StoryPage({ params }: Props) {
   const story = await prisma.story.findUnique({
     where: { slug, status: 'PUBLISHED' },
     include: {
-      author: { select: { id: true, username: true, isVerified: true, profile: { select: { avatar: true } } } },
+      author: {
+        select: {
+          id: true,
+          username: true,
+          isVerified: true,
+          profile: { select: { avatar: true } },
+        },
+      },
       category: { select: { name: true, slug: true } },
       tags: { select: { id: true, name: true, slug: true } },
       _count: { select: { likes: true, comments: true } },
@@ -136,9 +144,14 @@ export default async function StoryPage({ params }: Props) {
 
   // Deduplicated view counter — skip if same IP already counted within the last hour
   const reqHeaders = await headers();
-  const viewerIp = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? reqHeaders.get('x-real-ip') ?? 'unknown';
-  if (!await hasRecentView(story.id, viewerIp)) {
-    prisma.story.update({ where: { id: story.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  const viewerIp =
+    reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    reqHeaders.get('x-real-ip') ??
+    'unknown';
+  if (!(await hasRecentView(story.id, viewerIp))) {
+    prisma.story
+      .update({ where: { id: story.id }, data: { views: { increment: 1 } } })
+      .catch(() => {});
   }
 
   // Fetch accepted co-authors — shown in the byline next to the primary author
@@ -167,8 +180,7 @@ export default async function StoryPage({ params }: Props) {
   // every consumer of story.content agrees — it is not enough to swap the
   // rendered JSX, because any client component handed story.content receives the
   // whole text in the page payload whether or not it is displayed.
-  const contentLocked =
-    earlyAccessLocked || (story.isPremiumOnly && !hasPremium && !isAuthor);
+  const contentLocked = earlyAccessLocked || (story.isPremiumOnly && !hasPremium && !isAuthor);
 
   // Audio narration is a premium perk. Resolve the URL server-side and send it
   // to the browser ONLY for members who may play it. Passing story.audioUrl to a
@@ -177,14 +189,27 @@ export default async function StoryPage({ params }: Props) {
   // and play the file directly.
   const audioUrlForViewer = hasPremium ? story.audioUrl : null;
 
-
   // Run all these database queries in parallel using Promise.all so the page loads faster.
   // Instead of waiting for each query one by one, they all start at the same time.
-  const [userLike, userBookmark, userOfflineSave, comments, currentUser, storyReactions, userReactionsList] = await Promise.all([
-    userId ? prisma.like.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } }) : null,
-    userId ? prisma.bookmark.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } }) : null,
+  const [
+    userLike,
+    userBookmark,
+    userOfflineSave,
+    comments,
+    currentUser,
+    storyReactions,
+    userReactionsList,
+  ] = await Promise.all([
+    userId
+      ? prisma.like.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } })
+      : null,
+    userId
+      ? prisma.bookmark.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } })
+      : null,
     // Check if the user has already saved this story for offline reading
-    userId ? prisma.offlineSave.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } }) : null,
+    userId
+      ? prisma.offlineSave.findUnique({ where: { userId_storyId: { userId, storyId: story.id } } })
+      : null,
     prisma.comment.findMany({
       where: { storyId: story.id, parentId: null },
       orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }], // pinned comment always first
@@ -206,14 +231,21 @@ export default async function StoryPage({ params }: Props) {
       },
     }),
     // Also fetch ageGroup so AgeGate can enforce content rating rules
-    userId ? prisma.user.findUnique({ where: { id: userId }, select: { username: true, ageGroup: true } }) : null,
+    userId
+      ? prisma.user.findUnique({
+          where: { id: userId },
+          select: { username: true, ageGroup: true },
+        })
+      : null,
     prisma.reaction.groupBy({ by: ['type'], where: { storyId: story.id }, _count: { type: true } }),
-    userId ? prisma.reaction.findMany({ where: { storyId: story.id, userId }, select: { type: true } }) : [],
+    userId
+      ? prisma.reaction.findMany({ where: { storyId: story.id, userId }, select: { type: true } })
+      : [],
   ]);
 
   // Convert the grouped reaction results into a simple { SCARED: 5, LOVE: 3, ... } object
   // so the ReactionBar component can easily look up counts by type.
-  const reactionCounts = Object.fromEntries(storyReactions.map(r => [r.type, r._count.type]));
+  const reactionCounts = Object.fromEntries(storyReactions.map((r) => [r.type, r._count.type]));
 
   // Pull out just the reaction type strings the current user has used (e.g. ["SCARED", "LOVE"])
   // so the ReactionBar can show which buttons are already "active" for this user.
@@ -245,14 +277,21 @@ export default async function StoryPage({ params }: Props) {
     image: story.coverImage ?? undefined,
     datePublished: story.createdAt.toISOString(),
     dateModified: story.updatedAt.toISOString(),
-    author: { '@type': 'Person', name: story.author.username, url: `${BASE_URL}/user/${story.author.username}` },
+    author: {
+      '@type': 'Person',
+      name: story.author.username,
+      url: `${BASE_URL}/user/${story.author.username}`,
+    },
     publisher: { '@type': 'Organization', name: 'Silent Evidence', url: BASE_URL },
     url: `${BASE_URL}/story/${story.slug}`,
   };
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ReadingProgress storyId={story.id} />
       <BackToTop />
       {userId && <ReadingTracker storyId={story.id} />}
@@ -275,42 +314,63 @@ export default async function StoryPage({ params }: Props) {
       )}
 
       <div className="max-w-3xl mx-auto px-4 py-10">
-
         {/* Category breadcrumb */}
-        <Link href={`/category/${story.category.slug}`} className="text-xs font-semibold uppercase tracking-widest text-green-500 hover:text-green-400 transition">
+        <Link
+          href={`/category/${story.category.slug}`}
+          className="text-xs font-semibold uppercase tracking-widest text-green-500 hover:text-green-400 transition"
+        >
           {story.category.name}
         </Link>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-bold text-white mt-3 leading-tight">{story.title}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mt-3 leading-tight">
+          {story.title}
+        </h1>
 
         {/* Language badge */}
-        {story.language && story.language !== 'en' && (() => {
-          const lang = getLang(story.language);
-          return (
-            <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400">
-              {lang.flag} Written in {lang.label} ({lang.nativeLabel})
-            </span>
-          );
-        })()}
+        {story.language &&
+          story.language !== 'en' &&
+          (() => {
+            const lang = getLang(story.language);
+            return (
+              <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400">
+                {lang.flag} Written in {lang.label} ({lang.nativeLabel})
+              </span>
+            );
+          })()}
 
         {/* Author + meta row */}
         <div className="flex items-center gap-3 mt-5">
           {authorAvatar ? (
-            <Image src={authorAvatar} alt={story.author.username} width={40} height={40} className="w-10 h-10 rounded-full object-cover border-2 border-gray-700 shrink-0" />
+            <Image
+              src={authorAvatar}
+              alt={story.author.username}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border-2 border-gray-700 shrink-0"
+            />
           ) : (
             <div className="w-10 h-10 rounded-full bg-red-700 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm shrink-0">
               {story.author.username.charAt(0).toUpperCase()}
             </div>
           )}
           <div className="flex-1">
-            <Link href={`/user/${story.author.username}`} className="text-sm font-semibold text-white hover:text-green-400 transition inline-flex items-center gap-1">
+            <Link
+              href={`/user/${story.author.username}`}
+              className="text-sm font-semibold text-white hover:text-green-400 transition inline-flex items-center gap-1"
+            >
               {story.author.username}
               {/* Blue checkmark next to verified author names */}
               {story.author.isVerified && <VerifiedBadge />}
             </Link>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 mt-0.5">
-              <span>{new Date(story.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span>
+                {new Date(story.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
               <span>·</span>
               <span>{readingTime(story.content)}</span>
               <span>·</span>
@@ -318,9 +378,24 @@ export default async function StoryPage({ params }: Props) {
               <WordCountBadge content={story.content} />
               <span>·</span>
               <span className="inline-flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-3 h-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
                 </svg>
                 {story.views.toLocaleString()} views
               </span>
@@ -348,14 +423,20 @@ export default async function StoryPage({ params }: Props) {
         {coAuthors.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="text-xs text-gray-600">with</span>
-            {coAuthors.map(c => (
+            {coAuthors.map((c) => (
               <Link
                 key={c.user.username}
                 href={`/user/${c.user.username}`}
                 className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition"
               >
                 {c.user.profile?.avatar ? (
-                  <Image src={c.user.profile.avatar} alt={c.user.username} width={20} height={20} className="w-5 h-5 rounded-full object-cover" />
+                  <Image
+                    src={c.user.profile.avatar}
+                    alt={c.user.username}
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
                 ) : (
                   <div className="w-5 h-5 rounded-full bg-red-700 flex items-center justify-center text-white font-bold shrink-0 text-[9px]">
                     {c.user.username.charAt(0).toUpperCase()}
@@ -379,24 +460,36 @@ export default async function StoryPage({ params }: Props) {
         )}
 
         {/* Content warnings */}
-        {story.warnings && (() => {
-          try {
-            const w: string[] = JSON.parse(story.warnings);
-            if (w.length > 0) return (
-              <div className="flex flex-wrap gap-2 mt-4">
-                <span className="text-xs text-gray-500 font-medium self-center">Warnings:</span>
-                {w.map(warning => (
-                  <span key={warning} className="text-xs px-2.5 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full">{warning}</span>
-                ))}
-              </div>
-            );
-          } catch { return null; }
-        })()}
+        {story.warnings &&
+          (() => {
+            try {
+              const w: string[] = JSON.parse(story.warnings);
+              if (w.length > 0)
+                return (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <span className="text-xs text-gray-500 font-medium self-center">Warnings:</span>
+                    {w.map((warning) => (
+                      <span
+                        key={warning}
+                        className="text-xs px-2.5 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full"
+                      >
+                        {warning}
+                      </span>
+                    ))}
+                  </div>
+                );
+            } catch {
+              return null;
+            }
+          })()}
 
         {/* Mood badge */}
         {story.mood && (
           <div className="mt-3">
-            <a href={`/mood/${story.mood.toLowerCase()}`} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-gray-500 text-gray-400 rounded-full transition">
+            <a
+              href={`/mood/${story.mood.toLowerCase()}`}
+              className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-gray-800 border border-gray-700 hover:border-gray-500 text-gray-400 rounded-full transition"
+            >
               {(() => {
                 const MoodIcon = moodIcon(story.mood);
                 return <MoodIcon className="w-3.5 h-3.5" strokeWidth={1.75} aria-hidden="true" />;
@@ -428,30 +521,39 @@ export default async function StoryPage({ params }: Props) {
         {earlyAccessLocked && story.earlyAccessUntil ? (
           <div className="mt-10 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8 text-center">
             <h3 className="text-lg font-bold text-white mb-2">Premium Early Access</h3>
-            <p className="text-sm text-gray-400 mb-1">This story is available to premium members now.</p>
+            <p className="text-sm text-gray-400 mb-1">
+              This story is available to premium members now.
+            </p>
             <p className="text-sm text-gray-500 mb-6">
               Free access opens on{' '}
               <span className="text-purple-300 font-medium">
-                {new Date(story.earlyAccessUntil).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                {new Date(story.earlyAccessUntil).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </span>
             </p>
             <a
               href="/premium"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition text-sm"
             >
- Read Now with Premium
+              Read Now with Premium
             </a>
           </div>
         ) : /* Premium paywall — shown when story is premium-only and the viewer is not subscribed */
         story.isPremiumOnly && !hasPremium && !isAuthor ? (
           <div className="mt-10 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
             <h3 className="text-lg font-bold text-white mb-2">Premium Members Only</h3>
-            <p className="text-sm text-gray-400 mb-6">This story is exclusive to premium subscribers. Upgrade to read it and unlock all premium content.</p>
+            <p className="text-sm text-gray-400 mb-6">
+              This story is exclusive to premium subscribers. Upgrade to read it and unlock all
+              premium content.
+            </p>
             <a
               href="/subscribe"
               className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-sm"
             >
- Become a Member
+              Become a Member
             </a>
           </div>
         ) : story.isChaptered && chapters.length > 0 ? (
@@ -470,8 +572,17 @@ export default async function StoryPage({ params }: Props) {
                   className="flex items-center gap-4 px-4 py-3 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl transition group"
                 >
                   <span className="text-sm font-bold text-gray-600 w-6 flex-shrink-0">{i + 1}</span>
-                  <span className="flex-1 text-sm text-white group-hover:text-red-300 transition truncate">{ch.title}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600 group-hover:text-red-400 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <span className="flex-1 text-sm text-white group-hover:text-red-300 transition truncate">
+                    {ch.title}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4 text-gray-600 group-hover:text-red-400 transition flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
@@ -487,25 +598,45 @@ export default async function StoryPage({ params }: Props) {
           </div>
         ) : (
           <>
-          {/* Spotify soundtrack widget — shown above story content when author has set a playlist */}
-          {'spotifyPlaylistUrl' in story && story.spotifyPlaylistUrl && (
-            <StorySoundtrack spotifyPlaylistUrl={story.spotifyPlaylistUrl as string} />
-          )}
-
-          {/* Regular story — wrapped in age gate for content rating enforcement */}
-          <AgeGate
-            contentRating={(story.contentRating ?? 'ALL') as 'ALL' | 'TEEN' | 'MATURE'}
-            ageGroup={(currentUser?.ageGroup ?? null) as 'UNDER_13' | 'TEEN' | 'ADULT' | null}
-            warnings={story.warnings ? (() => { try { return JSON.parse(story.warnings!); } catch { return []; } })() : []}
-          >
-            {story.warnings ? (
-              <StoryWarningModal warnings={story.warnings}>
-                <StoryContent content={story.content} excerpt={story.excerpt} storyLang={story.language ?? 'en'} />
-              </StoryWarningModal>
-            ) : (
-              <StoryContent content={story.content} excerpt={story.excerpt} storyLang={story.language ?? 'en'} />
+            {/* Spotify soundtrack widget — shown above story content when author has set a playlist */}
+            {'spotifyPlaylistUrl' in story && story.spotifyPlaylistUrl && (
+              <StorySoundtrack spotifyPlaylistUrl={story.spotifyPlaylistUrl as string} />
             )}
-          </AgeGate>
+
+            {/* Regular story — wrapped in age gate for content rating enforcement */}
+            <AgeGate
+              contentRating={(story.contentRating ?? 'ALL') as 'ALL' | 'TEEN' | 'MATURE'}
+              ageGroup={(currentUser?.ageGroup ?? null) as 'UNDER_13' | 'TEEN' | 'ADULT' | null}
+              warnings={
+                story.warnings
+                  ? (() => {
+                      try {
+                        return JSON.parse(story.warnings!);
+                      } catch {
+                        return [];
+                      }
+                    })()
+                  : []
+              }
+            >
+              {story.warnings ? (
+                <StoryWarningModal warnings={story.warnings}>
+                  <StoryContent
+                    content={story.content}
+                    excerpt={story.excerpt}
+                    storyLang={story.language ?? 'en'}
+                    title={story.title}
+                  />
+                </StoryWarningModal>
+              ) : (
+                <StoryContent
+                  content={story.content}
+                  excerpt={story.excerpt}
+                  storyLang={story.language ?? 'en'}
+                  title={story.title}
+                />
+              )}
+            </AgeGate>
           </>
         )}
 
@@ -558,7 +689,11 @@ export default async function StoryPage({ params }: Props) {
 
         {/* Reactions */}
         <div className="mt-6 mb-2">
-          <ReactionBar storyId={story.id} initialCounts={reactionCounts} userReactions={userReactionTypes} />
+          <ReactionBar
+            storyId={story.id}
+            initialCounts={reactionCounts}
+            userReactions={userReactionTypes}
+          />
         </div>
 
         <div className="my-10 border-t border-gray-800" />

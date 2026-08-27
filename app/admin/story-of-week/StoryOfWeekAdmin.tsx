@@ -103,7 +103,7 @@ export default function StoryOfWeekAdmin({
     });
     setSaving(false);
     if (res.ok) {
-      setPinnedId(storyId);                        // update the banner immediately
+      setPinnedId(storyId); // update the banner immediately
       setMessage('Story of the Week updated!');
     } else {
       setMessage('Failed to save.');
@@ -119,22 +119,25 @@ export default function StoryOfWeekAdmin({
     const res = await fetch('/api/admin/story-of-week', { method: 'DELETE' });
     setSaving(false);
     if (res.ok) {
-      setPinnedId(null);   // remove the "Currently Pinned" banner
-      setResults([]);      // clear search results too
+      setPinnedId(null); // remove the "Currently Pinned" banner
+      setResults([]); // clear search results too
       setMessage('Story of the Week cleared.');
     }
   };
 
   // Shared CSS class string for the search text input — stored in a variable
   // to avoid repeating the long className string in the JSX below.
-  const inputCls = 'w-full bg-gray-800 border border-gray-700 focus:border-red-600 focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 transition';
+  const inputCls =
+    'w-full bg-gray-800 border border-gray-700 focus:border-red-600 focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 transition';
 
   return (
     <div className="space-y-6">
       {/* Current pick banner */}
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Currently Pinned Story</p>
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">
+            Currently Pinned Story
+          </p>
           <p className="text-sm text-white font-medium">
             {pinnedId ? `Story ID #${pinnedId}` : 'None — auto-selection is active'}
           </p>
@@ -152,11 +155,13 @@ export default function StoryOfWeekAdmin({
 
       {/* Success / error message */}
       {message && (
-        <p className={`text-sm px-4 py-3 rounded-xl border ${
-          message.includes('Failed')
-            ? 'text-red-400 bg-red-400/10 border-red-400/20'
-            : 'text-red-400 bg-red-400/10 border-red-400/20'
-        }`}>
+        <p
+          className={`text-sm px-4 py-3 rounded-xl border ${
+            message.includes('Failed')
+              ? 'text-red-400 bg-red-400/10 border-red-400/20'
+              : 'text-red-400 bg-red-400/10 border-red-400/20'
+          }`}
+        >
           {message}
         </p>
       )}
@@ -169,8 +174,10 @@ export default function StoryOfWeekAdmin({
         <div className="flex gap-2">
           <input
             value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') search(); }}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') search();
+            }}
             placeholder="Story title…"
             className={`${inputCls} flex-1`}
           />
@@ -187,7 +194,7 @@ export default function StoryOfWeekAdmin({
       {/* Search results */}
       {results.length > 0 && (
         <div className="space-y-2">
-          {results.map(s => (
+          {results.map((s) => (
             <div
               key={s.id}
               className={`flex items-center gap-4 bg-gray-800 border rounded-xl p-3 transition ${
@@ -196,7 +203,13 @@ export default function StoryOfWeekAdmin({
             >
               {/* Thumbnail */}
               {s.coverImage ? (
-                <Image src={s.coverImage} alt={s.title} width={64} height={48} className="object-cover rounded-lg shrink-0" />
+                <Image
+                  src={s.coverImage}
+                  alt={s.title}
+                  width={64}
+                  height={48}
+                  className="object-cover rounded-lg shrink-0"
+                />
               ) : (
                 <div className="w-16 h-12 bg-gray-700 rounded-lg flex-shrink-0" />
               )}

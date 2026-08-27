@@ -38,12 +38,18 @@ type Props = {
   userStories: { id: number; title: string }[];
 };
 
-export default function ChallengeActions({ challengeId, isActive, isLoggedIn, userEntry, userStories }: Props) {
+export default function ChallengeActions({
+  challengeId,
+  isActive,
+  isLoggedIn,
+  userEntry,
+  userStories,
+}: Props) {
   // storyId — selected story ID as a string (comes from the <select> value)
   const [storyId, setStoryId] = useState('');
   // loading — disables the submit button while the request is in flight
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
   // submitted — true once the user successfully enters or if they already had an entry
   const [submitted, setSubmitted] = useState(!!userEntry);
   const router = useRouter();
@@ -51,7 +57,8 @@ export default function ChallengeActions({ challengeId, isActive, isLoggedIn, us
   // POSTs the selected story ID to the challenge entries API
   const submit = async () => {
     if (!storyId) return;
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     const res = await fetch(`/api/challenges/${challengeId}/entries`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -59,44 +66,68 @@ export default function ChallengeActions({ challengeId, isActive, isLoggedIn, us
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error ?? 'Something went wrong'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Something went wrong');
+      return;
+    }
     setSubmitted(true);
     router.refresh();
   };
 
   if (!isActive) return null;
-  if (!isLoggedIn) return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-sm text-gray-400">
-      <Link href="/login" className="text-red-400 hover:text-red-300 transition">Log in</Link> to submit your story to this challenge.
-    </div>
-  );
-  if (submitted) return (
-    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5 text-sm text-green-400">
-      ✓ Your entry has been submitted. Good luck!
-    </div>
-  );
-  if (userStories.length === 0) return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-sm text-gray-400">
-      You need a published story to enter. <Link href="/write" className="text-red-400 hover:text-red-300 transition">Write one now →</Link>
-    </div>
-  );
+  if (!isLoggedIn)
+    return (
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-sm text-gray-400">
+        <Link href="/login" className="text-red-400 hover:text-red-300 transition">
+          Log in
+        </Link>{' '}
+        to submit your story to this challenge.
+      </div>
+    );
+  if (submitted)
+    return (
+      <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5 text-sm text-green-400">
+        ✓ Your entry has been submitted. Good luck!
+      </div>
+    );
+  if (userStories.length === 0)
+    return (
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-sm text-gray-400">
+        You need a published story to enter.{' '}
+        <Link href="/write" className="text-red-400 hover:text-red-300 transition">
+          Write one now →
+        </Link>
+      </div>
+    );
 
   return (
     <div className="bg-gray-800 border border-red-600/20 rounded-xl p-5">
       <h3 className="font-semibold text-white mb-3">Submit Your Entry</h3>
       {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
       <div className="flex gap-3">
-        <select value={storyId} onChange={e => setStoryId(e.target.value)}
-          className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition appearance-none">
+        <select
+          value={storyId}
+          onChange={(e) => setStoryId(e.target.value)}
+          className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition appearance-none"
+        >
           <option value="">Select a story to submit…</option>
-          {userStories.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+          {userStories.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.title}
+            </option>
+          ))}
         </select>
-        <button onClick={submit} disabled={loading || !storyId}
-          className="px-5 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition">
+        <button
+          onClick={submit}
+          disabled={loading || !storyId}
+          className="px-5 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition"
+        >
           {loading ? 'Submitting…' : 'Submit'}
         </button>
       </div>
-      <p className="text-xs text-gray-600 mt-2">Only published stories can be submitted. One entry per challenge.</p>
+      <p className="text-xs text-gray-600 mt-2">
+        Only published stories can be submitted. One entry per challenge.
+      </p>
     </div>
   );
 }

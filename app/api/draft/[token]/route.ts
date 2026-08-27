@@ -31,14 +31,14 @@ export async function GET(_req: Request, { params }: Ctx) {
 
     // Load the actual story content
     const story = await prisma.story.findUnique({
-      where:  { id: shareToken.storyId },
+      where: { id: shareToken.storyId },
       select: {
-        id:         true,
-        title:      true,
-        content:    true,
+        id: true,
+        title: true,
+        content: true,
         coverImage: true,
-        mood:       true,
-        createdAt:  true,
+        mood: true,
+        createdAt: true,
         author: { select: { username: true, profile: { select: { avatar: true } } } },
         // Include tag names for the preview page badges
         tags: { select: { name: true } },

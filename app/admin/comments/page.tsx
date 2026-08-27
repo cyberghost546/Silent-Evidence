@@ -33,7 +33,7 @@ export default async function AdminCommentsPage() {
     orderBy: { createdAt: 'desc' },
     take: 100,
     include: {
-      user:  { select: { username: true } },
+      user: { select: { username: true } },
       story: { select: { title: true, slug: true } },
     },
   });

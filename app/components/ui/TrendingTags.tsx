@@ -43,7 +43,7 @@ export default async function TrendingTags() {
 
       {/* Tag cloud — flexbox wraps chips naturally */}
       <div className="flex flex-wrap gap-2">
-        {tags.map(tag => (
+        {tags.map((tag) => (
           <Link
             key={tag.id}
             href={`/tag/${tag.slug}`}

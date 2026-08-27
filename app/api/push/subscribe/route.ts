@@ -72,14 +72,14 @@ export async function POST(req: Request) {
     // This handles key rotation: the endpoint stays the same but keys change.
     update: {
       p256dh: keys.p256dh,
-      auth:   keys.auth,
+      auth: keys.auth,
       userId,
     },
     // If no row exists yet, create a new subscription record
     create: {
       endpoint,
       p256dh: keys.p256dh,
-      auth:   keys.auth,
+      auth: keys.auth,
       userId,
     },
   });

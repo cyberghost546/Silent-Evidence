@@ -13,8 +13,8 @@ export default function CurrentlyReadingBadge({ storyId }: Props) {
 
   useEffect(() => {
     fetch(`/api/stories/presence?storyId=${storyId}`)
-      .then(r => r.json())
-      .then(data => setCount(data.count ?? 0))
+      .then((r) => r.json())
+      .then((data) => setCount(data.count ?? 0))
       .catch(() => {});
   }, [storyId]);
 

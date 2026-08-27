@@ -34,18 +34,20 @@ const prisma = new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
 const dryRun = process.argv.includes('--dry-run');
 
 async function main() {
-  console.log(dryRun ? 'DRY RUN — no changes will be written.\n' : 'Grandfathering existing authors...\n');
+  console.log(
+    dryRun ? 'DRY RUN — no changes will be written.\n' : 'Grandfathering existing authors...\n'
+  );
 
   // Any author with at least one story using a now-gated feature. Mirrors
   // AUTHOR_PRO_STORY_FIELDS in lib/authorPro.ts — keep the two in step.
   const stories = await prisma.story.findMany({
     where: {
       OR: [
-        { price:              { gt: 0 } },
-        { isPremiumOnly:      true } ,
-        { earlyAccessUntil:   { not: null } },
-        { audioUrl:           { not: null } },
-        { videoUrl:           { not: null } },
+        { price: { gt: 0 } },
+        { isPremiumOnly: true },
+        { earlyAccessUntil: { not: null } },
+        { audioUrl: { not: null } },
+        { videoUrl: { not: null } },
         { spotifyPlaylistUrl: { not: null } },
       ],
     },
@@ -56,8 +58,8 @@ async function main() {
   // Authors who already built bundles under the old admin-only flow are counted
   // too, in case any were created on an author's behalf.
   const bundles = await prisma.storyBundle.findMany({
-    where:    { authorId: { not: null } },
-    select:   { authorId: true },
+    where: { authorId: { not: null } },
+    select: { authorId: true },
     distinct: ['authorId'],
   });
 
@@ -71,7 +73,7 @@ async function main() {
   }
 
   const users = await prisma.user.findMany({
-    where:  { id: { in: [...ids] } },
+    where: { id: { in: [...ids] } },
     select: { id: true, username: true, authorGrandfathered: true },
   });
 
@@ -88,15 +90,15 @@ async function main() {
   if (!dryRun && toUpdate.length > 0) {
     await prisma.user.updateMany({
       where: { id: { in: toUpdate.map((u) => u.id) } },
-      data:  { authorGrandfathered: true },
+      data: { authorGrandfathered: true },
     });
   }
 
   console.log(
     `\n${ids.size} author(s) use Author Pro features. ` +
-    (dryRun
-      ? `${toUpdate.length} would be granted access.`
-      : `${toUpdate.length} newly granted, ${users.length - toUpdate.length} already had it.`)
+      (dryRun
+        ? `${toUpdate.length} would be granted access.`
+        : `${toUpdate.length} newly granted, ${users.length - toUpdate.length} already had it.`)
   );
 }
 

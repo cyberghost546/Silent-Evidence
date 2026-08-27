@@ -47,16 +47,16 @@ export default function HomeScreen() {
   // Read the current auth state — null means the user is not signed in
   const auth = getAuth();
 
-  const [stories, setStories]       = useState<Story[]>([]);
-  const [loading, setLoading]       = useState(true);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError]           = useState('');
+  const [error, setError] = useState('');
 
   // Fetch the latest stories from the public API endpoint
   const loadStories = useCallback(async () => {
     setError('');
     try {
-      const res  = await apiFetch('/api/app/stories');
+      const res = await apiFetch('/api/app/stories');
       const json = await res.json();
 
       if (!res.ok) {
@@ -118,11 +118,7 @@ export default function HomeScreen() {
         keyExtractor={(item) => String(item.id)}
         // Pull-to-refresh support — tintColor matches the app's primary red
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#22c55e"
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#22c55e" />
         }
         // Header renders the app title + optional guest sign-in banner
         ListHeaderComponent={
@@ -133,10 +129,7 @@ export default function HomeScreen() {
             {/* Sign-in banner — only shown when the user is not authenticated */}
             {!auth && (
               <Pressable
-                style={({ pressed }) => [
-                  styles.guestBanner,
-                  pressed && { opacity: 0.85 },
-                ]}
+                style={({ pressed }) => [styles.guestBanner, pressed && { opacity: 0.85 }]}
                 onPress={() => router.push('/login')}
               >
                 <Text style={styles.guestBannerText}>
@@ -181,12 +174,11 @@ function StoryCard({ story }: { story: Story }) {
     `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
 
   // Resolve relative cover image paths to the full server URL
-  const coverUri =
-    story.coverImage
-      ? story.coverImage.startsWith('http')
-        ? story.coverImage
-        : `${BASE_URL}${story.coverImage}`
-      : null;
+  const coverUri = story.coverImage
+    ? story.coverImage.startsWith('http')
+      ? story.coverImage
+      : `${BASE_URL}${story.coverImage}`
+    : null;
 
   return (
     // Tapping the card navigates to the native story reader
@@ -195,19 +187,11 @@ function StoryCard({ story }: { story: Story }) {
       onPress={() => router.push(`/story/${story.slug}`)}
     >
       {/* Cover image — only rendered when a URL is available */}
-      {coverUri && (
-        <Image
-          source={{ uri: coverUri }}
-          style={styles.cover}
-          contentFit="cover"
-        />
-      )}
+      {coverUri && <Image source={{ uri: coverUri }} style={styles.cover} contentFit="cover" />}
 
       <View style={styles.cardBody}>
         {/* Category badge — uppercase red label above the title */}
-        <Text style={styles.categoryBadge}>
-          {story.category.name.toUpperCase()}
-        </Text>
+        <Text style={styles.categoryBadge}>{story.category.name.toUpperCase()}</Text>
 
         {/* Story title — up to 2 lines before truncating */}
         <Text style={styles.cardTitle} numberOfLines={2}>
@@ -221,11 +205,7 @@ function StoryCard({ story }: { story: Story }) {
           onPress={() => router.push(`/profile/${story.author.username}`)}
           hitSlop={8}
         >
-          <Image
-            source={{ uri: authorAvatar }}
-            style={styles.authorAvatar}
-            contentFit="cover"
-          />
+          <Image source={{ uri: authorAvatar }} style={styles.authorAvatar} contentFit="cover" />
           <Text style={styles.authorName}>{story.author.username}</Text>
         </Pressable>
 

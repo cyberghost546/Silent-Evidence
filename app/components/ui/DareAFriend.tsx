@@ -10,8 +10,8 @@ import { useState } from 'react';
 
 // ── Props ─────────────────────────────────────────────────────
 type Props = {
-  storyId: number;       // The story being dared
-  storyTitle: string;    // Shown in the modal heading for context
+  storyId: number; // The story being dared
+  storyTitle: string; // Shown in the modal heading for context
   userId: number | null; // The logged-in user's ID; null if not logged in
 };
 

@@ -6,8 +6,8 @@
 // While the request is in-flight the button shows a spinning icon and
 // the label changes to "Finding…" so the user knows something is happening.
 
-import { useState } from 'react';               // useState — tracks the loading state
-import { useRouter } from 'next/navigation';     // useRouter — used to navigate to the random story page
+import { useState } from 'react'; // useState — tracks the loading state
+import { useRouter } from 'next/navigation'; // useRouter — used to navigate to the random story page
 
 // The component takes no props — it is fully self-contained
 export default function RandomStoryButton() {
@@ -56,12 +56,17 @@ export default function RandomStoryButton() {
         stroke="currentColor"
         strokeWidth={2}
       >
-        {loading
+        {loading ? (
           // Spinning arrows path — shown while waiting for the API response
-          ? <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        ) : (
           // Lightning bolt path — shown in the idle state
-          : <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        }
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        )}
       </svg>
 
       {/* Button label swaps between idle and loading states */}

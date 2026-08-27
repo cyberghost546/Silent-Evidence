@@ -18,38 +18,56 @@ import { MOODS as MOOD_VALUES, MOOD_META } from '@/lib/moods';
 const MOODS = MOOD_VALUES.map((value) => ({
   value,
   label: MOOD_META[value].label,
-  icon:  moodIcon(value),
+  icon: moodIcon(value),
 }));
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState(1);       // Step 1 = age, 2 = profile, 3 = moods, 4 = explore
-  const [dob,    setDob]    = useState('');  // date of birth input
-  const [bio, setBio]     = useState('');
+  const [step, setStep] = useState(1); // Step 1 = age, 2 = profile, 3 = moods, 4 = explore
+  const [dob, setDob] = useState(''); // date of birth input
+  const [bio, setBio] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [moods, setMoods]   = useState<string[]>([]);
+  const [moods, setMoods] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [ageError, setAgeError] = useState('');
 
   // Save date of birth then advance to next step
   const handleAgeNext = async () => {
-    if (!dob) { setAgeError('Please enter your date of birth to continue.'); return; }
+    if (!dob) {
+      setAgeError('Please enter your date of birth to continue.');
+      return;
+    }
     setAgeError('');
     setSaving(true);
-    await fetch('/api/user/age', {
-      method:  'PATCH',
+    const res = await fetch('/api/user/age', {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ dateOfBirth: dob }),
+      body: JSON.stringify({ dateOfBirth: dob }),
     });
     setSaving(false);
+
+    // This response used to be discarded, so a rejected date still advanced to
+    // step 2. That now matters: an under-13 date deletes the account and clears
+    // the session, and carrying on would walk a signed-out user through the rest
+    // of onboarding with every later request failing.
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setAgeError(data.error ?? 'We could not save your date of birth.');
+      if (data.ageBlocked) {
+        setTimeout(() => {
+          router.push('/');
+          router.refresh();
+        }, 5000);
+      }
+      return;
+    }
+
     setStep(2);
   };
 
   // Toggle a mood on/off in the selection array
   const toggleMood = (val: string) => {
-    setMoods((prev) =>
-      prev.includes(val) ? prev.filter((m) => m !== val) : [...prev, val]
-    );
+    setMoods((prev) => (prev.includes(val) ? prev.filter((m) => m !== val) : [...prev, val]));
   };
 
   // Called on the final step — save data and redirect to home
@@ -67,7 +85,6 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-
         {/* Progress bar — 4 steps */}
         <div className="flex gap-2 mb-8">
           {[1, 2, 3, 4].map((s) => (
@@ -84,21 +101,25 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
-              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 1 of 4</p>
+              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">
+                Step 1 of 4
+              </p>
               <h1 className="text-2xl font-bold text-white">How old are you?</h1>
               <p className="text-gray-400 text-sm mt-1">
-                We use your age to make sure you only see content that&apos;s right for you.
-                This is kept private and never shared.
+                We use your age to make sure you only see content that&apos;s right for you. This is
+                kept private and never shared.
               </p>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Date of Birth</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Date of Birth
+              </label>
               <input
                 suppressHydrationWarning
                 type="date"
                 value={dob}
-                onChange={e => setDob(e.target.value)}
+                onChange={(e) => setDob(e.target.value)}
                 min="1900-01-01"
                 max={new Date().toISOString().slice(0, 10)}
                 className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
@@ -108,10 +129,10 @@ export default function OnboardingPage() {
             {/* Age group preview */}
             <div className="grid grid-cols-3 gap-2 mb-5 text-center text-xs">
               {[
-                { icon: Circle, tone: 'text-blue-400',   age: 'Under 13', access: 'General only' },
-                { icon: Circle, tone: 'text-yellow-400', age: '13 – 17',  access: 'Teen + General' },
-                { icon: Circle, tone: 'text-green-400',  age: '18+',      access: 'Full access' },
-              ].map(r => (
+                { icon: Circle, tone: 'text-blue-400', age: 'Under 13', access: 'General only' },
+                { icon: Circle, tone: 'text-yellow-400', age: '13 – 17', access: 'Teen + General' },
+                { icon: Circle, tone: 'text-green-400', age: '18+', access: 'Full access' },
+              ].map((r) => (
                 <div key={r.age} className="bg-gray-800 rounded-lg p-2">
                   <div className="flex justify-center mb-1">
                     <r.icon className={`w-4 h-4 ${r.tone}`} strokeWidth={2} aria-hidden="true" />
@@ -150,14 +171,20 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
-              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 2 of 4</p>
+              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">
+                Step 2 of 4
+              </p>
               <h1 className="text-2xl font-bold text-white">Welcome to Silent Evidence</h1>
-              <p className="text-gray-400 text-sm mt-1">Let's set up your profile so other readers can find you.</p>
+              <p className="text-gray-400 text-sm mt-1">
+                Let's set up your profile so other readers can find you.
+              </p>
             </div>
 
             {/* Bio */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Bio (optional)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Bio (optional)
+              </label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -171,7 +198,9 @@ export default function OnboardingPage() {
 
             {/* Avatar URL */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Avatar URL (optional)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Avatar URL (optional)
+              </label>
               <input
                 type="url"
                 value={avatar}
@@ -203,7 +232,9 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
             <div className="mb-6">
-              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 3 of 4</p>
+              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">
+                Step 3 of 4
+              </p>
               <h1 className="text-2xl font-bold text-white">What scares you?</h1>
               <p className="text-gray-400 text-sm mt-1">
                 Pick your favorite horror types so we can recommend stories you'll love.
@@ -253,7 +284,9 @@ export default function OnboardingPage() {
         {step === 4 && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
             <div className="mb-6">
-              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">Step 4 of 4</p>
+              <p className="text-xs text-red-500 font-semibold uppercase tracking-widest mb-1">
+                Step 4 of 4
+              </p>
               <h1 className="text-2xl font-bold text-white">You're all set!</h1>
               <p className="text-gray-400 text-sm mt-1">Where would you like to go first?</p>
             </div>
@@ -261,10 +294,30 @@ export default function OnboardingPage() {
             {/* Quick-start options */}
             <div className="grid grid-cols-1 gap-3 mb-8">
               {[
-                { href: '/write',      icon: PenLine, label: 'Write my first story',   desc: 'Share something that haunts you' },
-                { href: '/',           icon: Library, label: 'Browse stories',         desc: 'Read what others have written' },
-                { href: '/trending',   icon: Flame,   label: "See what's trending",    desc: 'Discover the most popular stories' },
-                { href: '/explore',    icon: Users,   label: 'Find authors to follow', desc: 'Build your reading feed' },
+                {
+                  href: '/write',
+                  icon: PenLine,
+                  label: 'Write my first story',
+                  desc: 'Share something that haunts you',
+                },
+                {
+                  href: '/',
+                  icon: Library,
+                  label: 'Browse stories',
+                  desc: 'Read what others have written',
+                },
+                {
+                  href: '/trending',
+                  icon: Flame,
+                  label: "See what's trending",
+                  desc: 'Discover the most popular stories',
+                },
+                {
+                  href: '/explore',
+                  icon: Users,
+                  label: 'Find authors to follow',
+                  desc: 'Build your reading feed',
+                },
               ].map(({ href, icon: Icon, label, desc }) => (
                 <Link
                   key={href}
@@ -272,7 +325,11 @@ export default function OnboardingPage() {
                   onClick={finish}
                   className="flex items-center gap-4 px-4 py-3 bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-red-600/40 rounded-xl transition text-left"
                 >
-                  <Icon className="w-6 h-6 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+                  <Icon
+                    className="w-6 h-6 shrink-0 text-gray-400"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
                   <div>
                     <p className="text-sm font-semibold text-white">{label}</p>
                     <p className="text-xs text-gray-500">{desc}</p>

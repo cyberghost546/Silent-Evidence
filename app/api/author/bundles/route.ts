@@ -17,13 +17,16 @@ import { badRequest, forbidden, notFound, unauthorized, serverError } from '@/li
 import { z } from 'zod';
 
 const CreateBundleSchema = z.object({
-  title:       z.string().min(1, 'Title is required.').max(200),
+  title: z.string().min(1, 'Title is required.').max(200),
   description: z.string().max(2000).nullable().optional(),
-  coverImage:  z.string().max(500).nullable().optional(),
+  coverImage: z.string().max(500).nullable().optional(),
   // Price in cents. Bundles are a paid product — a free bundle is just a list,
   // which the StoryList feature already covers.
-  price:       z.number().int().min(100, 'Minimum bundle price is $1.00.').max(100_000),
-  storyIds:    z.array(z.number().int().positive()).min(2, 'A bundle needs at least 2 stories.').max(50),
+  price: z.number().int().min(100, 'Minimum bundle price is $1.00.').max(100_000),
+  storyIds: z
+    .array(z.number().int().positive())
+    .min(2, 'A bundle needs at least 2 stories.')
+    .max(50),
 });
 
 async function currentUserId(): Promise<number | null> {
@@ -33,11 +36,12 @@ async function currentUserId(): Promise<number | null> {
 
 /** Builds a URL-safe slug and guarantees uniqueness against existing bundles. */
 async function uniqueSlug(title: string): Promise<string> {
-  const base = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60) || 'bundle';
+  const base =
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'bundle';
 
   let slug = base;
   let n = 2;
@@ -56,10 +60,10 @@ export async function GET() {
 
   try {
     const bundles = await prisma.storyBundle.findMany({
-      where:   { authorId: userId },
+      where: { authorId: userId },
       orderBy: { createdAt: 'desc' },
       include: {
-        items:  { include: { story: { select: { id: true, title: true, slug: true } } } },
+        items: { include: { story: { select: { id: true, title: true, slug: true } } } },
         _count: { select: { purchases: true } },
       },
     });
@@ -90,7 +94,7 @@ export async function POST(req: Request) {
     // bundle and sell someone else's stories by passing arbitrary IDs.
     const uniqueIds = [...new Set(storyIds)];
     const owned = await prisma.story.findMany({
-      where:  { id: { in: uniqueIds }, authorId: userId },
+      where: { id: { in: uniqueIds }, authorId: userId },
       select: { id: true },
     });
 
@@ -101,11 +105,11 @@ export async function POST(req: Request) {
     const bundle = await prisma.storyBundle.create({
       data: {
         title,
-        slug:        await uniqueSlug(title),
+        slug: await uniqueSlug(title),
         description: description || null,
-        coverImage:  coverImage || null,
+        coverImage: coverImage || null,
         price,
-        authorId:    userId,
+        authorId: userId,
         items: { create: uniqueIds.map((storyId) => ({ storyId })) },
       },
       include: { items: true },
@@ -130,7 +134,7 @@ export async function DELETE(req: Request) {
     if (!bundleId || isNaN(bundleId)) return badRequest('bundleId is required.');
 
     const bundle = await prisma.storyBundle.findUnique({
-      where:  { id: bundleId },
+      where: { id: bundleId },
       select: { authorId: true, _count: { select: { purchases: true } } },
     });
     if (!bundle) return notFound('Bundle not found.');
@@ -147,12 +151,13 @@ export async function DELETE(req: Request) {
     if (bundle._count.purchases > 0) {
       await prisma.storyBundle.update({
         where: { id: bundleId },
-        data:  { active: false },
+        data: { active: false },
       });
       return NextResponse.json({
         ok: true,
         deactivated: true,
-        message: 'This bundle has been sold, so it was hidden from the store rather than deleted. Existing buyers keep access.',
+        message:
+          'This bundle has been sold, so it was hidden from the store rather than deleted. Existing buyers keep access.',
       });
     }
 

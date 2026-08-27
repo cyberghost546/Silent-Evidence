@@ -12,17 +12,21 @@
 //   2. Translation bar — always shown, lets readers pick a language
 //   3. Story body — split on double-newline to create paragraph elements
 
-import { useState } from 'react';            // useState — manages the currently displayed content / excerpt
+import { useState } from 'react'; // useState — manages the currently displayed content / excerpt
 import TranslateStory from './TranslateStory'; // TranslateStory — the language picker + translate/reset controls
+import ReadingPreferences from './ReadingPreferences'; // per-reader font / size / spacing / theme controls
+import StoryNarration from './StoryNarration'; // browser text-to-speech 'Listen' player
+import FocusMode from './FocusMode'; // distraction-free immersive reading overlay
 
 // Props passed in from the story page server component
 type Props = {
-  content: string;          // raw HTML body of the story (from TipTap / the DB)
-  excerpt?: string | null;  // optional short description shown above the body
-  storyLang?: string;       // BCP-47 language code of the original story (default: 'en')
+  content: string; // raw HTML body of the story (from TipTap / the DB)
+  excerpt?: string | null; // optional short description shown above the body
+  storyLang?: string; // BCP-47 language code of the original story (default: 'en')
+  title?: string; // story title, shown atop the focus-mode overlay
 };
 
-export default function StoryContent({ content, excerpt, storyLang = 'en' }: Props) {
+export default function StoryContent({ content, excerpt, storyLang = 'en', title = '' }: Props) {
   // displayContent — the story body that is currently shown.
   // Starts as the original content; updated to translated text when the user translates.
   const [displayContent, setDisplayContent] = useState(content);
@@ -34,14 +38,14 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
   // handleTranslated — called by TranslateStory when a translation succeeds.
   // Swaps both the body content and (if available) the excerpt with translated versions.
   const handleTranslated = (newContent: string, newExcerpt: string | null) => {
-    setDisplayContent(newContent);                 // swap the body text to the translation
+    setDisplayContent(newContent); // swap the body text to the translation
     if (newExcerpt) setDisplayExcerpt(newExcerpt); // also swap the excerpt if one was translated
   };
 
   // handleReset — called by TranslateStory when the user clicks "Show original".
   // Restores both the body and excerpt back to the values that came from the server.
   const handleReset = () => {
-    setDisplayContent(content);       // revert body to the original prop value
+    setDisplayContent(content); // revert body to the original prop value
     setDisplayExcerpt(excerpt ?? null); // revert excerpt to the original prop value (or null)
   };
 
@@ -65,12 +69,20 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
           separate it from the excerpt above and the story body below.         */}
       <div className="my-6 flex items-center gap-3 py-3 border-y border-gray-800">
         <TranslateStory
-          originalContent={content}           // pass the ORIGINAL prop (not the translated state)
-          originalExcerpt={excerpt}           // pass the ORIGINAL excerpt so we can always re-translate
-          storyLang={storyLang}               // tells the picker which language to exclude from the dropdown
-          onTranslated={handleTranslated}     // called with translated strings on success
-          onReset={handleReset}               // called when user reverts to the original
+          originalContent={content} // pass the ORIGINAL prop (not the translated state)
+          originalExcerpt={excerpt} // pass the ORIGINAL excerpt so we can always re-translate
+          storyLang={storyLang} // tells the picker which language to exclude from the dropdown
+          onTranslated={handleTranslated} // called with translated strings on success
+          onReset={handleReset} // called when user reverts to the original
         />
+        {/* Listen (browser text-to-speech) and per-reader font / size / spacing /
+            theme controls. Pushed to the right to share the toolbar row with the
+            translation control. */}
+        <div className="ml-auto flex items-center gap-2">
+          <FocusMode title={title} contentHtml={displayContent} />
+          <StoryNarration content={content} />
+          <ReadingPreferences />
+        </div>
       </div>
 
       {/* ── 3. Story body ───────────────────────────────────────────────────
@@ -80,10 +92,34 @@ export default function StoryContent({ content, excerpt, storyLang = 'en' }: Pro
           (author-submitted or admin-seeded) so XSS risk is controlled at write time.
           prose prose-invert applies the Tailwind Typography stylesheet with
           white text suitable for dark backgrounds.                             */}
+      {/* Reading surface. The CSS custom properties are set by ReadingPreferences;
+          each has a fallback equal to the current styling, so with no preferences
+          saved this renders exactly as before. The sepia/contrast themes paint a
+          background, so we pad and round it only when a background is actually set. */}
       <div
-        className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: displayContent }}
-      />
+        className="reading-surface rounded-lg transition-colors"
+        style={{
+          background: 'var(--reading-bg, transparent)',
+          color: 'var(--reading-fg, inherit)',
+          // --reading-pad is 0 in the default theme (so the layout is pixel-identical
+          // to before) and non-zero when a themed background needs breathing room.
+          padding: 'var(--reading-pad, 0)',
+          maxWidth: 'var(--reading-width, none)',
+          marginInline: 'auto',
+        }}
+      >
+        <div
+          className="prose prose-invert prose-lg max-w-none text-gray-200 leading-relaxed reading-body"
+          style={{
+            fontFamily: 'var(--reading-font, inherit)',
+            fontSize: 'var(--reading-size, inherit)',
+            lineHeight: 'var(--reading-leading, inherit)',
+            // Let the themed foreground colour win over the prose text colour when set.
+            color: 'var(--reading-fg, inherit)',
+          }}
+          dangerouslySetInnerHTML={{ __html: displayContent }}
+        />
+      </div>
     </>
   );
 }

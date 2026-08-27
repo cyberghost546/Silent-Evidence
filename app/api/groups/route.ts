@@ -42,18 +42,19 @@ import { prisma } from '@/lib/prisma';
 //   2. replace non-alphanumeric with "-"  → "paranormal-fans"
 //   3. replace leading/trailing hyphens  → removes edge dashes
 function slugify(name: string) {
-  return name
-    .toLowerCase()
-    // Replace any sequence of non-letter/non-digit characters with a single hyphen
-    .replace(/[^a-z0-9]+/g, '-')
-    // Remove any hyphen at the very start or very end of the string
-    .replace(/^-|-$/g, '');
+  return (
+    name
+      .toLowerCase()
+      // Replace any sequence of non-letter/non-digit characters with a single hyphen
+      .replace(/[^a-z0-9]+/g, '-')
+      // Remove any hyphen at the very start or very end of the string
+      .replace(/^-|-$/g, '')
+  );
 }
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // Returns a list of groups, with optional filtering by subgenre or membership.
 export async function GET(req: Request) {
-
   // Read cookies to find out if there's a logged-in user
   const cookieStore = await cookies();
 
@@ -110,7 +111,6 @@ export async function GET(req: Request) {
 // ── POST handler ──────────────────────────────────────────────────────────────
 // Creates a new group and automatically adds the creator as an OWNER member.
 export async function POST(req: Request) {
-
   // Only logged-in users can create groups
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);

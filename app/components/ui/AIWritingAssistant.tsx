@@ -29,8 +29,8 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
 
     const modePrompts: Record<string, string> = {
       continue: content,
-      prompt:   `Generate a horror story opening paragraph for a story titled "${title || 'Untitled'}"`,
-      title:    content,
+      prompt: `Generate a horror story opening paragraph for a story titled "${title || 'Untitled'}"`,
+      title: content,
     };
 
     try {
@@ -62,7 +62,7 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
       {/* Toggle button */}
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 px-4 py-2 bg-purple-900/40 hover:bg-purple-900/60 border border-purple-700/40 rounded-xl text-sm font-medium text-purple-300 transition"
       >
         AI Writing Assistant
@@ -73,33 +73,47 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
         <div className="mt-3 bg-gray-900 border border-purple-800/30 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-white flex items-center gap-2">
-               AI Writing Assistant
+              AI Writing Assistant
             </p>
-            <span className="text-[10px] text-purple-400 bg-purple-900/30 px-2 py-0.5 rounded-full">Powered by Claude</span>
+            <span className="text-[10px] text-purple-400 bg-purple-900/30 px-2 py-0.5 rounded-full">
+              Powered by Claude
+            </span>
           </div>
 
           {/* Mode tabs */}
           <div className="flex gap-2">
-            {([
-              ['continue', '➤ Continue'],
-              ['prompt',   'Starter'],
-              ['title',    'Suggest Title'],
-            ] as const).map(([val, label]) => (
-              <button key={val} type="button" onClick={() => { setMode(val); setSuggestion(''); setError(''); }}
+            {(
+              [
+                ['continue', '➤ Continue'],
+                ['prompt', 'Starter'],
+                ['title', 'Suggest Title'],
+              ] as const
+            ).map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => {
+                  setMode(val);
+                  setSuggestion('');
+                  setError('');
+                }}
                 className={`px-3 py-1.5 text-xs rounded-lg border transition ${
                   mode === val
                     ? 'bg-purple-700 border-purple-600 text-white'
                     : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
-                }`}>
+                }`}
+              >
                 {label}
               </button>
             ))}
           </div>
 
           <p className="text-xs text-gray-500">
-            {mode === 'continue' && 'Claude will suggest what happens next based on your story so far.'}
-            {mode === 'prompt'   && 'Claude will write an atmospheric opening paragraph for your story.'}
-            {mode === 'title'    && 'Claude will suggest a haunting title based on your content.'}
+            {mode === 'continue' &&
+              'Claude will suggest what happens next based on your story so far.'}
+            {mode === 'prompt' &&
+              'Claude will write an atmospheric opening paragraph for your story.'}
+            {mode === 'title' && 'Claude will suggest a haunting title based on your content.'}
           </p>
 
           <button
@@ -111,12 +125,25 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 Thinking…
               </span>
-            ) : 'Generate'}
+            ) : (
+              'Generate'
+            )}
           </button>
 
           {error && (
@@ -128,7 +155,9 @@ export default function AIWritingAssistant({ title, content, onInsert }: Props) 
           {suggestion && (
             <div className="space-y-3">
               <div className="bg-gray-800 border border-purple-800/20 rounded-xl p-4">
-                <p className="text-sm text-gray-200 leading-relaxed italic">&ldquo;{suggestion}&rdquo;</p>
+                <p className="text-sm text-gray-200 leading-relaxed italic">
+                  &ldquo;{suggestion}&rdquo;
+                </p>
               </div>
               <div className="flex gap-2">
                 <button

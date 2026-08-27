@@ -82,8 +82,7 @@ export default function PWAInstallPrompt() {
     // the instructions if the user has already added the app to their home screen.
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isInStandaloneMode =
-      ('standalone' in navigator) &&
-      (navigator as { standalone?: boolean }).standalone;
+      'standalone' in navigator && (navigator as { standalone?: boolean }).standalone;
     if (isIOS && !isInStandaloneMode) {
       setShowIOSInstructions(true);
     }
@@ -152,10 +151,8 @@ export default function PWAInstallPrompt() {
     <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
       <div className="bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-2xl">
         <div className="flex items-start gap-3">
-
           {/* App icon — red skull emoji on a red background to match the horror theme */}
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-          </div>
+          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0"></div>
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-white">Add to Home Screen</p>
@@ -166,7 +163,8 @@ export default function PWAInstallPrompt() {
               // Safari's native Share sheet manually. The steps are written inline.
               <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
                 Tap the <strong className="text-white">Share</strong> button in Safari, then{' '}
-                <strong className="text-white">Add to Home Screen</strong> for the full app experience.
+                <strong className="text-white">Add to Home Screen</strong> for the full app
+                experience.
               </p>
             ) : (
               // Android/Chrome: one-tap install possible via the deferred prompt

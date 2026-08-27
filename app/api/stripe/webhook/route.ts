@@ -50,16 +50,16 @@ function readPeriodEnd(subscription: Stripe.Subscription): Date {
   return new Date(seconds * 1000);
 }
 
-async function findSubscriptionByStripeId(
-  stripeSubscriptionId: string,
-): Promise<SubKind | null> {
+async function findSubscriptionByStripeId(stripeSubscriptionId: string): Promise<SubKind | null> {
   const reader = await prisma.subscription.findUnique({
-    where: { stripeSubscriptionId }, select: { id: true },
+    where: { stripeSubscriptionId },
+    select: { id: true },
   });
   if (reader) return 'reader';
 
   const author = await prisma.authorSubscription.findUnique({
-    where: { stripeSubscriptionId }, select: { id: true },
+    where: { stripeSubscriptionId },
+    select: { id: true },
   });
   if (author) return 'author';
 
@@ -70,7 +70,7 @@ async function findSubscriptionByStripeId(
 async function updateSubscriptionByStripeId(
   stripeSubscriptionId: string,
   kind: SubKind,
-  data: { status?: string; currentPeriodEnd?: Date },
+  data: { status?: string; currentPeriodEnd?: Date }
 ) {
   if (kind === 'reader') {
     await prisma.subscription.update({ where: { stripeSubscriptionId }, data });
@@ -101,11 +101,7 @@ export async function POST(request: NextRequest) {
     // constructEvent verifies the HMAC signature using our webhook secret.
     // It throws if the signature is invalid, the timestamp is too old (replay attack),
     // or the body has been modified in transit.
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    event = stripe.webhooks.constructEvent(rawBody, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
     // Log the error but don't expose details to the caller — just return 400
     console.error('[webhook] Signature verification failed:', err);
@@ -118,7 +114,6 @@ export async function POST(request: NextRequest) {
   // which could cause duplicate records if not handled carefully.
   try {
     switch (event.type) {
-
       // ---------------------------------------------------------------
       // checkout.session.completed
       // Fires when a user successfully completes the Stripe checkout flow.
@@ -134,8 +129,8 @@ export async function POST(request: NextRequest) {
           // A reader sent a tip to an author.  Create the Tip record now that
           // Stripe has confirmed the payment went through.
           const fromUserId = parseInt(meta.fromUserId, 10);
-          const toUserId   = parseInt(meta.toUserId, 10);
-          const amount     = parseInt(meta.amount, 10);
+          const toUserId = parseInt(meta.toUserId, 10);
+          const amount = parseInt(meta.amount, 10);
 
           await prisma.tip.create({
             data: {
@@ -144,15 +139,16 @@ export async function POST(request: NextRequest) {
               amount,
               message: meta.message || null,
               // payment_intent is set on one-time payments; link it for audit trails
-              stripePaymentIntentId: session.payment_intent as string ?? null,
+              stripePaymentIntentId: (session.payment_intent as string) ?? null,
             },
           });
 
-          console.log(`[webhook] Tip recorded: $${amount / 100} from user ${fromUserId} to user ${toUserId}`);
-
+          console.log(
+            `[webhook] Tip recorded: $${amount / 100} from user ${fromUserId} to user ${toUserId}`
+          );
         } else if (meta.bundleId) {
           // ---- BUNDLE PURCHASE ----
-          const userId   = parseInt(meta.userId, 10);
+          const userId = parseInt(meta.userId, 10);
           const bundleId = parseInt(meta.bundleId, 10);
           const paidCents = session.amount_total ?? 0;
 
@@ -162,17 +158,18 @@ export async function POST(request: NextRequest) {
             update: {},
           });
 
-          console.log(`[webhook] Bundle purchase recorded: user ${userId} bought bundle ${bundleId}`);
-
+          console.log(
+            `[webhook] Bundle purchase recorded: user ${userId} bought bundle ${bundleId}`
+          );
         } else if (meta.type === 'story_purchase') {
           // ---- STORY PURCHASE ----
           // A reader bought access to a paid story.  Create the StoryPurchase row
           // so the story page can check it and unlock the full content.
           // The unique constraint on (userId, storyId) prevents double-recording
           // if Stripe delivers the event more than once (idempotency).
-          const userId  = parseInt(meta.userId, 10);
+          const userId = parseInt(meta.userId, 10);
           const storyId = parseInt(meta.storyId, 10);
-          const amount  = parseInt(meta.amount, 10);
+          const amount = parseInt(meta.amount, 10);
 
           // upsert instead of create so duplicate webhook deliveries don't throw
           await prisma.storyPurchase.upsert({
@@ -181,21 +178,20 @@ export async function POST(request: NextRequest) {
               userId,
               storyId,
               amount,
-              stripePaymentIntentId: session.payment_intent as string ?? null,
+              stripePaymentIntentId: (session.payment_intent as string) ?? null,
             },
             // If the row already exists (duplicate webhook), just leave it alone
             update: {},
           });
 
           console.log(`[webhook] Story purchase recorded: user ${userId} bought story ${storyId}`);
-
         } else if (meta.type === 'chapter_purchase') {
           // ---- CHAPTER PURCHASE ----
           // A reader bought access to a paid chapter within a chaptered story.
           // Creates a ChapterPurchase record so the chapter page can unlock content.
-          const userId    = parseInt(meta.userId, 10);
+          const userId = parseInt(meta.userId, 10);
           const chapterId = parseInt(meta.chapterId, 10);
-          const amount    = parseInt(meta.amount, 10);
+          const amount = parseInt(meta.amount, 10);
 
           await prisma.chapterPurchase.upsert({
             where: { userId_chapterId: { userId, chapterId } },
@@ -203,22 +199,23 @@ export async function POST(request: NextRequest) {
               userId,
               chapterId,
               amount,
-              stripePaymentIntentId: session.payment_intent as string ?? null,
+              stripePaymentIntentId: (session.payment_intent as string) ?? null,
             },
             update: {},
           });
 
-          console.log(`[webhook] Chapter purchase recorded: user ${userId} bought chapter ${chapterId}`);
-
+          console.log(
+            `[webhook] Chapter purchase recorded: user ${userId} bought chapter ${chapterId}`
+          );
         } else if (meta.type === 'author_subscription') {
           // ---- AUTHOR PRO SUBSCRIPTION ----
           // A writer bought the Author Pro plan. This writes AuthorSubscription,
           // NOT Subscription — they are separate products and a user may hold
           // both. This branch must stay ABOVE the catch-all `else` below, which
           // assumes any unlabelled subscription session is a reader membership.
-          const userId               = parseInt(meta.userId, 10);
-          const plan                 = meta.plan ?? 'monthly';
-          const stripeCustomerId     = session.customer as string;
+          const userId = parseInt(meta.userId, 10);
+          const plan = meta.plan ?? 'monthly';
+          const stripeCustomerId = session.customer as string;
           const stripeSubscriptionId = session.subscription as string;
 
           const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
@@ -244,14 +241,13 @@ export async function POST(request: NextRequest) {
           });
 
           console.log(`[webhook] Author Pro activated for user ${userId}, plan: ${plan}`);
-
         } else {
           // ---- SUBSCRIPTION CHECKOUT ----
           // No metadata.type means this was a subscription checkout (premium membership).
           // We need to link the Stripe customer/subscription IDs to the user's
           // Subscription row in our DB and mark it active.
-          const userId           = parseInt(meta.userId, 10);
-          const plan             = meta.plan ?? 'monthly';
+          const userId = parseInt(meta.userId, 10);
+          const plan = meta.plan ?? 'monthly';
           const stripeCustomerId = session.customer as string;
 
           // The subscription object isn't embedded in the session — we retrieve
@@ -265,7 +261,9 @@ export async function POST(request: NextRequest) {
           // existing one (e.g. the user is re-subscribing after canceling)
           // Cast to any because current_period_end moved in newer Stripe SDK versions
           const subAny = stripeSubscription as any;
-          const periodEnd = new Date((subAny.current_period_end ?? subAny.items?.data?.[0]?.current_period_end ?? 0) * 1000);
+          const periodEnd = new Date(
+            (subAny.current_period_end ?? subAny.items?.data?.[0]?.current_period_end ?? 0) * 1000
+          );
 
           await prisma.subscription.upsert({
             where: { userId },
@@ -320,14 +318,18 @@ export async function POST(request: NextRequest) {
         // Stripe statuses: active, past_due, canceled, unpaid, trialing, paused, incomplete
         // Cast to any for current_period_end — moved in newer Stripe SDK versions
         const subAny2 = stripeSubscription as any;
-        const periodEnd2 = new Date((subAny2.current_period_end ?? subAny2.items?.data?.[0]?.current_period_end ?? 0) * 1000);
+        const periodEnd2 = new Date(
+          (subAny2.current_period_end ?? subAny2.items?.data?.[0]?.current_period_end ?? 0) * 1000
+        );
 
         await updateSubscriptionByStripeId(stripeSubscription.id, kind, {
           status: stripeSubscription.status,
           currentPeriodEnd: periodEnd2,
         });
 
-        console.log(`[webhook] ${kind} subscription updated: ${stripeSubscription.id} → ${stripeSubscription.status}`);
+        console.log(
+          `[webhook] ${kind} subscription updated: ${stripeSubscription.id} → ${stripeSubscription.status}`
+        );
         break;
       }
 
@@ -380,7 +382,9 @@ export async function POST(request: NextRequest) {
         const kind = await findSubscriptionByStripeId(stripeSubscriptionId);
 
         if (!kind) {
-          console.warn(`[webhook] invoice.payment_failed — no DB row for subscription ${stripeSubscriptionId}`);
+          console.warn(
+            `[webhook] invoice.payment_failed — no DB row for subscription ${stripeSubscriptionId}`
+          );
           break;
         }
 

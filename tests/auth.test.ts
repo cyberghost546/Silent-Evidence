@@ -47,11 +47,11 @@ vi.mock('next/headers', () => ({
 }));
 
 // ── Import after mocks are set up ─────────────────────────────────────────────
-import { POST as loginPost }    from '@/app/api/auth/login/route';
+import { POST as loginPost } from '@/app/api/auth/login/route';
 import { POST as registerPost } from '@/app/api/auth/register/route';
-import { prisma }               from '@/lib/prisma';
-import bcrypt                   from 'bcryptjs';
-import { checkRateLimit }       from '@/lib/rateLimit';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function makeRequest(body: unknown): Request {
@@ -90,39 +90,54 @@ describe('POST /api/auth/login', () => {
 
   it('returns 429 when rate limit is exceeded', async () => {
     // checkRateLimit is async — resolve the result rather than returning it raw.
-    vi.mocked(checkRateLimit).mockResolvedValueOnce({ blocked: true, remaining: 0, resetAt: Date.now() });
+    vi.mocked(checkRateLimit).mockResolvedValueOnce({
+      blocked: true,
+      remaining: 0,
+      resetAt: Date.now(),
+    });
     const res = await loginPost(makeRequest({ email: 'test@example.com', password: 'secret123' }));
     expect(res.status).toBe(429);
   });
 
   it('returns 401 when user does not exist', async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
-    const res = await loginPost(makeRequest({ email: 'nobody@example.com', password: 'secret123' }));
+    const res = await loginPost(
+      makeRequest({ email: 'nobody@example.com', password: 'secret123' })
+    );
     expect(res.status).toBe(401);
   });
 
   it('returns 401 when password is wrong', async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(MOCK_USER as any);
     vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as never);
-    const res = await loginPost(makeRequest({ email: 'test@example.com', password: 'wrongpassword' }));
+    const res = await loginPost(
+      makeRequest({ email: 'test@example.com', password: 'wrongpassword' })
+    );
     expect(res.status).toBe(401);
   });
 
   it('returns 200 and sets cookie on valid credentials', async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(MOCK_USER as any);
     vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as never);
-    const res = await loginPost(makeRequest({ email: 'test@example.com', password: 'correctpassword' }));
+    const res = await loginPost(
+      makeRequest({ email: 'test@example.com', password: 'correctpassword' })
+    );
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ok).toBe(true);
   });
 
   it('returns 202 and requires2fa when 2FA is enabled', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ ...MOCK_USER, twoFactorEnabled: true } as any);
+    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+      ...MOCK_USER,
+      twoFactorEnabled: true,
+    } as any);
     vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as never);
     vi.mocked(prisma.twoFactorCode.deleteMany).mockResolvedValueOnce({ count: 0 });
     vi.mocked(prisma.twoFactorCode.create).mockResolvedValueOnce({} as any);
-    const res = await loginPost(makeRequest({ email: 'test@example.com', password: 'correctpassword' }));
+    const res = await loginPost(
+      makeRequest({ email: 'test@example.com', password: 'correctpassword' })
+    );
     expect(res.status).toBe(202);
     const body = await res.json();
     expect(body.requires2fa).toBe(true);
@@ -139,39 +154,59 @@ describe('POST /api/auth/register', () => {
   });
 
   it('returns 400 when username is too short', async () => {
-    const res = await registerPost(makeRequest({ username: 'ab', email: 'test@example.com', password: 'password123' }));
+    const res = await registerPost(
+      makeRequest({ username: 'ab', email: 'test@example.com', password: 'password123' })
+    );
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when username contains invalid characters', async () => {
-    const res = await registerPost(makeRequest({ username: 'bad user!', email: 'test@example.com', password: 'password123' }));
+    const res = await registerPost(
+      makeRequest({ username: 'bad user!', email: 'test@example.com', password: 'password123' })
+    );
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when email is invalid', async () => {
-    const res = await registerPost(makeRequest({ username: 'validuser', email: 'bademail', password: 'password123' }));
+    const res = await registerPost(
+      makeRequest({ username: 'validuser', email: 'bademail', password: 'password123' })
+    );
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when password is too short', async () => {
-    const res = await registerPost(makeRequest({ username: 'validuser', email: 'test@example.com', password: 'short' }));
+    const res = await registerPost(
+      makeRequest({ username: 'validuser', email: 'test@example.com', password: 'short' })
+    );
     expect(res.status).toBe(400);
   });
 
   it('returns 409 when email is already taken', async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({ email: 'test@example.com', username: 'other' } as any);
-    const res = await registerPost(makeRequest({ username: 'newuser', email: 'test@example.com', password: 'password123' }));
+    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      email: 'test@example.com',
+      username: 'other',
+    } as any);
+    const res = await registerPost(
+      makeRequest({ username: 'newuser', email: 'test@example.com', password: 'password123' })
+    );
     expect(res.status).toBe(409);
   });
 
   it('returns 409 when username is already taken', async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({ email: 'other@example.com', username: 'testuser' } as any);
-    const res = await registerPost(makeRequest({ username: 'testuser', email: 'new@example.com', password: 'password123' }));
+    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      email: 'other@example.com',
+      username: 'testuser',
+    } as any);
+    const res = await registerPost(
+      makeRequest({ username: 'testuser', email: 'new@example.com', password: 'password123' })
+    );
     expect(res.status).toBe(409);
   });
 
   it('returns 201 on valid registration', async () => {
-    const res = await registerPost(makeRequest({ username: 'brandnew', email: 'new@example.com', password: 'password123' }));
+    const res = await registerPost(
+      makeRequest({ username: 'brandnew', email: 'new@example.com', password: 'password123' })
+    );
     expect(res.status).toBe(201);
     const body = await res.json();
     expect(body.ok).toBe(true);

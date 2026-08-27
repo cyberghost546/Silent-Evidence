@@ -42,8 +42,8 @@ export default function BookmarksScreen() {
   const router = useRouter();
   const auth = getAuth();
 
-  const [stories, setStories]       = useState<BookmarkedStory[]>([]);
-  const [loading, setLoading]       = useState(true);
+  const [stories, setStories] = useState<BookmarkedStory[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   // Load bookmarks whenever the screen comes into focus
@@ -136,18 +136,17 @@ export default function BookmarksScreen() {
             : null;
 
           return (
-            <Pressable
-              style={styles.card}
-              onPress={() => router.push(`/story/${item.slug}`)}
-            >
-              {cover && (
-                <Image source={{ uri: cover }} style={styles.cover} contentFit="cover" />
-              )}
+            <Pressable style={styles.card} onPress={() => router.push(`/story/${item.slug}`)}>
+              {cover && <Image source={{ uri: cover }} style={styles.cover} contentFit="cover" />}
               <View style={styles.cardBody}>
                 <Text style={styles.category}>{item.category.name}</Text>
-                <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+                <Text style={styles.title} numberOfLines={2}>
+                  {item.title}
+                </Text>
                 {item.excerpt && (
-                  <Text style={styles.excerpt} numberOfLines={2}>{item.excerpt}</Text>
+                  <Text style={styles.excerpt} numberOfLines={2}>
+                    {item.excerpt}
+                  </Text>
                 )}
                 <Text style={styles.author}>by {item.author.username}</Text>
               </View>

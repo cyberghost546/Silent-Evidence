@@ -23,9 +23,11 @@ export async function POST(req: NextRequest) {
   });
 
   // Clean up stale sessions (older than 2 minutes) to keep the table tidy
-  prisma.storyPresence.deleteMany({
-    where: { lastSeenAt: { lt: new Date(Date.now() - ACTIVE_WINDOW_MS) } },
-  }).catch(() => {});
+  prisma.storyPresence
+    .deleteMany({
+      where: { lastSeenAt: { lt: new Date(Date.now() - ACTIVE_WINDOW_MS) } },
+    })
+    .catch(() => {});
 
   return NextResponse.json({ ok: true });
 }

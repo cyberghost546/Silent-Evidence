@@ -48,13 +48,17 @@ export default async function GroupPage({ params }: Props) {
     where: { slug },
     include: {
       members: {
-        include: { user: { select: { id: true, username: true, profile: { select: { avatar: true } } } } },
+        include: {
+          user: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
+        },
         orderBy: { joinedAt: 'asc' },
       },
       posts: {
         orderBy: { createdAt: 'desc' },
         take: 20,
-        include: { author: { select: { id: true, username: true, profile: { select: { avatar: true } } } } },
+        include: {
+          author: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
+        },
       },
       polls: {
         where: { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
@@ -65,7 +69,8 @@ export default async function GroupPage({ params }: Props) {
           _count: { select: { votes: true } },
           options: {
             select: {
-              id: true, text: true,
+              id: true,
+              text: true,
               _count: { select: { votes: true } },
               votes: userId ? { where: { userId }, select: { id: true } } : false,
             },
@@ -78,7 +83,7 @@ export default async function GroupPage({ params }: Props) {
 
   if (!group) return notFound();
 
-  const membership = group.members.find(m => m.userId === userId);
+  const membership = group.members.find((m) => m.userId === userId);
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">

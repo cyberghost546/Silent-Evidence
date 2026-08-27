@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
@@ -7,19 +7,40 @@
 
 /* ── Avatar border animations ───────────────────────────────── */
 @keyframes avatar-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 @keyframes avatar-flicker {
-  0%, 100% { opacity: 1; }
-  20%       { opacity: 0.4; }
-  40%       { opacity: 0.9; }
-  60%       { opacity: 0.3; }
-  80%       { opacity: 0.8; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.4;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.3;
+  }
+  80% {
+    opacity: 0.8;
+  }
 }
-.avatar-border-spin    { animation: avatar-spin    4s linear infinite; }
-.avatar-border-flicker { animation: avatar-flicker 2s ease-in-out infinite; }
-.avatar-border-pulse   { animation: pulse          2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.avatar-border-spin {
+  animation: avatar-spin 4s linear infinite;
+}
+.avatar-border-flicker {
+  animation: avatar-flicker 2s ease-in-out infinite;
+}
+.avatar-border-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    PWA / APP MODE — safe area insets + standalone tweaks
@@ -74,7 +95,8 @@ html {
 }
 
 /* Prevent tap highlight flash on interactive elements (feels more native) */
-a, button {
+a,
+button {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -82,15 +104,20 @@ a, button {
    Overrides the browser's default selection color with the site's horror red theme.
    This affects the highlight shown when a user clicks and drags to select text. */
 ::selection {
-  background-color: rgba(220, 38, 38, 0.40); /* blood red, semi-transparent */
+  background-color: rgba(220, 38, 38, 0.4); /* blood red, semi-transparent */
   color: #ffffff;
 }
 
-
 /* Notification toast slide-in animation */
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(110%); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .animate-slide-in {
   animation: slide-in 0.3s ease-out forwards;
@@ -98,28 +125,67 @@ a, button {
 
 /* ── Horror page animations ── */
 @keyframes flicker {
-  0%, 100% { opacity: 1; }
-  8%  { opacity: 0.9; }
-  9%  { opacity: 0.3; }
-  10% { opacity: 1; }
-  50% { opacity: 1; }
-  51% { opacity: 0.5; }
-  52% { opacity: 1; }
-  78% { opacity: 1; }
-  79% { opacity: 0.2; }
-  80% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  8% {
+    opacity: 0.9;
+  }
+  9% {
+    opacity: 0.3;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  51% {
+    opacity: 0.5;
+  }
+  52% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  79% {
+    opacity: 0.2;
+  }
+  80% {
+    opacity: 1;
+  }
 }
 .animate-flicker {
   animation: flicker 4s infinite;
 }
 
 @keyframes glitch {
-  0%   { clip-path: inset(0 0 95% 0); transform: translate(-4px, 0); }
-  5%   { clip-path: inset(60% 0 20% 0); transform: translate(4px, 0); }
-  10%  { clip-path: inset(30% 0 50% 0); transform: translate(-2px, 0); }
-  15%  { clip-path: inset(80% 0 5% 0);  transform: translate(3px, 0); }
-  20%  { clip-path: inset(0 0 0 0);     transform: translate(0, 0); }
-  100% { clip-path: inset(0 0 0 0);     transform: translate(0, 0); }
+  0% {
+    clip-path: inset(0 0 95% 0);
+    transform: translate(-4px, 0);
+  }
+  5% {
+    clip-path: inset(60% 0 20% 0);
+    transform: translate(4px, 0);
+  }
+  10% {
+    clip-path: inset(30% 0 50% 0);
+    transform: translate(-2px, 0);
+  }
+  15% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(3px, 0);
+  }
+  20% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(0, 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(0, 0);
+  }
 }
 .animate-glitch-1 {
   animation: glitch 3s infinite steps(1);
@@ -133,25 +199,48 @@ a, button {
 }
 
 @keyframes fog-drift {
-  0%   { transform: translateX(-10%) scaleX(1.1); opacity: 0.4; }
-  50%  { transform: translateX(5%)  scaleX(0.95); opacity: 0.6; }
-  100% { transform: translateX(-10%) scaleX(1.1); opacity: 0.4; }
+  0% {
+    transform: translateX(-10%) scaleX(1.1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(5%) scaleX(0.95);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(-10%) scaleX(1.1);
+    opacity: 0.4;
+  }
 }
 .animate-fog {
   animation: fog-drift 12s ease-in-out infinite;
 }
 
 @keyframes float-up {
-  0%   { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-float-up {
   animation: float-up 0.8s ease-out forwards;
 }
-.animate-float-up-delay-1 { animation: float-up 0.8s ease-out 0.15s both; }
-.animate-float-up-delay-2 { animation: float-up 0.8s ease-out 0.30s both; }
-.animate-float-up-delay-3 { animation: float-up 0.8s ease-out 0.45s both; }
-.animate-float-up-delay-4 { animation: float-up 0.8s ease-out 0.60s both; }
+.animate-float-up-delay-1 {
+  animation: float-up 0.8s ease-out 0.15s both;
+}
+.animate-float-up-delay-2 {
+  animation: float-up 0.8s ease-out 0.3s both;
+}
+.animate-float-up-delay-3 {
+  animation: float-up 0.8s ease-out 0.45s both;
+}
+.animate-float-up-delay-4 {
+  animation: float-up 0.8s ease-out 0.6s both;
+}
 
 .animate-fog-delayed {
   animation: fog-drift 12s ease-in-out 4s infinite;
@@ -168,8 +257,7 @@ a, button {
 
 .profile-banner-grid {
   background-image:
-    linear-gradient(#fff 1px, transparent 1px),
-    linear-gradient(90deg, #fff 1px, transparent 1px);
+    linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -204,21 +292,43 @@ a, button {
 }
 
 /* ── Admin bar chart fill (dynamic width via CSS variable) ─── */
-.bar-fill { width: var(--fill, 0%); }
+.bar-fill {
+  width: var(--fill, 0%);
+}
 
 /* ── Login page animations ──────────────────────────────────── */
 @keyframes ember-rise {
-  0%   { transform: translateY(0)      translateX(0)    scale(1);   opacity: 0.8; }
-  50%  { transform: translateY(-45vh)  translateX(12px) scale(0.7); opacity: 0.5; }
-  100% { transform: translateY(-95vh)  translateX(-6px) scale(0.2); opacity: 0;   }
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-45vh) translateX(12px) scale(0.7);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-95vh) translateX(-6px) scale(0.2);
+    opacity: 0;
+  }
 }
 @keyframes login-card-in {
-  from { opacity: 0; transform: translateY(28px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes glow-breathe {
-  0%, 100% { opacity: 0.55; }
-  50%       { opacity: 1;    }
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 .login-card-enter {
   animation: login-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -240,17 +350,65 @@ a, button {
   will-change: transform, opacity;
   pointer-events: none;
 }
-.ember-1  { left: 8%;  animation-duration: 6s;    animation-delay: 0s;    }
-.ember-2  { left: 18%; animation-duration: 8.5s;  animation-delay: 1.2s;  }
-.ember-3  { left: 28%; animation-duration: 7s;    animation-delay: 2.5s;  }
-.ember-4  { left: 40%; animation-duration: 9s;    animation-delay: 0.5s;  }
-.ember-5  { left: 52%; animation-duration: 6.5s;  animation-delay: 3.1s;  }
-.ember-6  { left: 62%; animation-duration: 8s;    animation-delay: 1.8s;  }
-.ember-7  { left: 74%; animation-duration: 7.5s;  animation-delay: 0.9s;  }
-.ember-8  { left: 83%; animation-duration: 6.8s;  animation-delay: 2.2s;  }
-.ember-9  { left: 92%; animation-duration: 9.5s;  animation-delay: 1.5s;  }
-.ember-10 { left: 33%; animation-duration: 11s;   animation-delay: 4s;    width: 5px; height: 5px; }
-.ember-11 { left: 70%; animation-duration: 10s;   animation-delay: 2.8s;  width: 4px; height: 4px; }
+.ember-1 {
+  left: 8%;
+  animation-duration: 6s;
+  animation-delay: 0s;
+}
+.ember-2 {
+  left: 18%;
+  animation-duration: 8.5s;
+  animation-delay: 1.2s;
+}
+.ember-3 {
+  left: 28%;
+  animation-duration: 7s;
+  animation-delay: 2.5s;
+}
+.ember-4 {
+  left: 40%;
+  animation-duration: 9s;
+  animation-delay: 0.5s;
+}
+.ember-5 {
+  left: 52%;
+  animation-duration: 6.5s;
+  animation-delay: 3.1s;
+}
+.ember-6 {
+  left: 62%;
+  animation-duration: 8s;
+  animation-delay: 1.8s;
+}
+.ember-7 {
+  left: 74%;
+  animation-duration: 7.5s;
+  animation-delay: 0.9s;
+}
+.ember-8 {
+  left: 83%;
+  animation-duration: 6.8s;
+  animation-delay: 2.2s;
+}
+.ember-9 {
+  left: 92%;
+  animation-duration: 9.5s;
+  animation-delay: 1.5s;
+}
+.ember-10 {
+  left: 33%;
+  animation-duration: 11s;
+  animation-delay: 4s;
+  width: 5px;
+  height: 5px;
+}
+.ember-11 {
+  left: 70%;
+  animation-duration: 10s;
+  animation-delay: 2.8s;
+  width: 4px;
+  height: 4px;
+}
 
 /* Firefox — dark mode (wrapped in @supports so unsupporting browsers skip it) */
 @supports (scrollbar-color: auto) {
@@ -261,33 +419,72 @@ a, button {
 }
 
 /* Global dark-theme red override for legacy green utility classes */
-[class*="bg-green-600"] { background-color: #dc2626 !important; }
-[class*="hover:bg-green-700"]:hover { background-color: #b91c1c !important; }
-[class*="bg-green-700"] { background-color: #b91c1c !important; }
-[class*="bg-green-500"]:not(.status-ok) { background-color: #ef4444 !important; }
-[class*="bg-green-400"] { background-color: #f87171 !important; }
-[class*="bg-green-900"] { background-color: #7f1d1d !important; }
-[class*="bg-green-800"] { background-color: #991b1b !important; }
-[class*="bg-green-950"] { background-color: #581c1c !important; }
+[class*='bg-green-600'] {
+  background-color: #dc2626 !important;
+}
+[class*='hover:bg-green-700']:hover {
+  background-color: #b91c1c !important;
+}
+[class*='bg-green-700'] {
+  background-color: #b91c1c !important;
+}
+[class*='bg-green-500']:not(.status-ok) {
+  background-color: #ef4444 !important;
+}
+[class*='bg-green-400'] {
+  background-color: #f87171 !important;
+}
+[class*='bg-green-900'] {
+  background-color: #7f1d1d !important;
+}
+[class*='bg-green-800'] {
+  background-color: #991b1b !important;
+}
+[class*='bg-green-950'] {
+  background-color: #581c1c !important;
+}
 
-[class*="text-green-400"] { color: #f87171 !important; }
-[class*="text-green-300"] { color: #fca5a5 !important; }
-[class*="text-green-500"] { color: #ef4444 !important; }
-[class*="text-green-600"] { color: #dc2626 !important; }
+[class*='text-green-400'] {
+  color: #f87171 !important;
+}
+[class*='text-green-300'] {
+  color: #fca5a5 !important;
+}
+[class*='text-green-500'] {
+  color: #ef4444 !important;
+}
+[class*='text-green-600'] {
+  color: #dc2626 !important;
+}
 
-[class*="border-green-500"] { border-color: #ef4444 !important; }
-[class*="border-green-600"] { border-color: #dc2626 !important; }
-[class*="border-green-700"] { border-color: #b91c1c !important; }
-[class*="border-green-900"] { border-color: #7f1d1d !important; }
+[class*='border-green-500'] {
+  border-color: #ef4444 !important;
+}
+[class*='border-green-600'] {
+  border-color: #dc2626 !important;
+}
+[class*='border-green-700'] {
+  border-color: #b91c1c !important;
+}
+[class*='border-green-900'] {
+  border-color: #7f1d1d !important;
+}
 
-[class*="hover:border-green-600"]:hover { border-color: #dc2626 !important; }
-[class*="hover:text-green-400"]:hover { color: #f87171 !important; }
-[class*="hover:text-green-300"]:hover { color: #fca5a5 !important; }
-
+[class*='hover:border-green-600']:hover {
+  border-color: #dc2626 !important;
+}
+[class*='hover:text-green-400']:hover {
+  color: #f87171 !important;
+}
+[class*='hover:text-green-300']:hover {
+  color: #fca5a5 !important;
+}
 
 /* ── Shimmer loading animation (Facebook-style sweep) ── */
 @keyframes shimmer {
-  to { transform: translateX(200%); }
+  to {
+    transform: translateX(200%);
+  }
 }
 .skeleton-shimmer {
   position: relative;
@@ -300,12 +497,7 @@ a, button {
   position: absolute;
   inset: 0;
   will-change: transform;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(75, 85, 99, 0.6) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(75, 85, 99, 0.6) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: shimmer 1.6s infinite linear;
 }
@@ -315,7 +507,9 @@ a, button {
   --reader-font-size: 18px;
   --reader-line-height: 1.75;
 }
-.prose p, .prose li, .prose blockquote {
+.prose p,
+.prose li,
+.prose blockquote {
   font-size: var(--reader-font-size) !important;
   line-height: var(--reader-line-height) !important;
 }
@@ -324,7 +518,9 @@ a, button {
 .img-lazy {
   filter: blur(8px);
   transform: scale(1.04);
-  transition: filter 0.4s ease, transform 0.4s ease;
+  transition:
+    filter 0.4s ease,
+    transform 0.4s ease;
 }
 .img-lazy.img-loaded {
   filter: blur(0);

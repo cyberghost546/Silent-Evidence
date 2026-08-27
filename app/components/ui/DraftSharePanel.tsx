@@ -7,8 +7,8 @@
 import { useEffect, useState } from 'react';
 
 interface Token {
-  id:        number;
-  token:     string;
+  id: number;
+  token: string;
   expiresAt: string | null;
   createdAt: string;
 }
@@ -17,21 +17,20 @@ interface Props {
   storyId: number;
 }
 
-const BASE_URL = typeof window !== 'undefined'
-  ? window.location.origin
-  : process.env.NEXT_PUBLIC_BASE_URL ?? '';
+const BASE_URL =
+  typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_BASE_URL ?? '');
 
 export default function DraftSharePanel({ storyId }: Props) {
-  const [tokens,    setTokens]    = useState<Token[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [creating,  setCreating]  = useState(false);
-  const [expires,   setExpires]   = useState<'never' | '7d' | '30d'>('7d');
-  const [copied,    setCopied]    = useState<string | null>(null); // which token was just copied
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [expires, setExpires] = useState<'never' | '7d' | '30d'>('7d');
+  const [copied, setCopied] = useState<string | null>(null); // which token was just copied
 
   // Load existing tokens on mount
   useEffect(() => {
     fetch(`/api/stories/${storyId}/share-token`)
-      .then(r => r.ok ? r.json() : [])
+      .then((r) => (r.ok ? r.json() : []))
       .then(setTokens)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -41,13 +40,13 @@ export default function DraftSharePanel({ storyId }: Props) {
   const handleCreate = async () => {
     setCreating(true);
     const res = await fetch(`/api/stories/${storyId}/share-token`, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ expires: expires === 'never' ? null : expires }),
+      body: JSON.stringify({ expires: expires === 'never' ? null : expires }),
     });
     if (res.ok) {
       const token: Token = await res.json();
-      setTokens(prev => [token, ...prev]);
+      setTokens((prev) => [token, ...prev]);
     }
     setCreating(false);
   };
@@ -82,7 +81,7 @@ export default function DraftSharePanel({ storyId }: Props) {
         <select
           suppressHydrationWarning
           value={expires}
-          onChange={e => setExpires(e.target.value as typeof expires)}
+          onChange={(e) => setExpires(e.target.value as typeof expires)}
           className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition"
         >
           <option value="7d">Expires in 7 days</option>
@@ -109,12 +108,15 @@ export default function DraftSharePanel({ storyId }: Props) {
         <p className="text-xs text-gray-600 text-center py-2">No share links yet.</p>
       ) : (
         <div className="space-y-2">
-          {tokens.map(t => {
-            const url      = `${BASE_URL}/draft/${t.token}`;
+          {tokens.map((t) => {
+            const url = `${BASE_URL}/draft/${t.token}`;
             const isExpired = t.expiresAt ? new Date(t.expiresAt) < new Date() : false;
 
             return (
-              <div key={t.id} className={`flex items-center gap-2 ${isExpired ? 'opacity-40' : ''}`}>
+              <div
+                key={t.id}
+                className={`flex items-center gap-2 ${isExpired ? 'opacity-40' : ''}`}
+              >
                 {/* Truncated URL display */}
                 <code className="flex-1 text-xs text-gray-400 bg-gray-800 rounded-lg px-3 py-2 truncate">
                   /draft/{t.token}
@@ -126,8 +128,7 @@ export default function DraftSharePanel({ storyId }: Props) {
                     ? 'Expired'
                     : t.expiresAt
                       ? `Exp. ${new Date(t.expiresAt).toLocaleDateString()}`
-                      : 'No expiry'
-                  }
+                      : 'No expiry'}
                 </span>
 
                 {/* Copy button */}

@@ -40,8 +40,13 @@ export default async function MapPage() {
   const stories = await prisma.story.findMany({
     where: { status: 'PUBLISHED', latitude: { not: null }, longitude: { not: null } },
     select: {
-      id: true, title: true, slug: true, excerpt: true,
-      locationName: true, latitude: true, longitude: true,
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      locationName: true,
+      latitude: true,
+      longitude: true,
       author: { select: { username: true } },
     },
   });
@@ -70,12 +75,19 @@ export default async function MapPage() {
 
         {stories.length > 0 && (
           <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stories.map(story => (
-              <a key={story.id} href={`/story/${story.slug}`}
-                className="group flex items-center gap-3 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 transition">
+            {stories.map((story) => (
+              <a
+                key={story.id}
+                href={`/story/${story.slug}`}
+                className="group flex items-center gap-3 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 transition"
+              >
                 <div className="min-w-0">
-                  <p className="text-xs text-red-400 font-semibold truncate">{story.locationName}</p>
-                  <p className="text-sm text-white group-hover:text-red-300 transition truncate">{story.title}</p>
+                  <p className="text-xs text-red-400 font-semibold truncate">
+                    {story.locationName}
+                  </p>
+                  <p className="text-sm text-white group-hover:text-red-300 transition truncate">
+                    {story.title}
+                  </p>
                   <p className="text-xs text-gray-500">by {story.author.username}</p>
                 </div>
               </a>

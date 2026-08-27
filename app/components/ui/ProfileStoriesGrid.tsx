@@ -8,23 +8,23 @@ import Link from 'next/link';
 import PinStoryButton from './PinStoryButton';
 
 type Story = {
-  id:         number;
-  title:      string;
-  slug:       string;
+  id: number;
+  title: string;
+  slug: string;
   coverImage: string | null;
-  excerpt:    string | null;
-  views:      number;
-  createdAt:  string;        // ISO string from JSON serialisation
-  readTime:   string;        // pre-computed on the server, e.g. "3 min read"
-  category:   { name: string; slug: string };
-  _count:     { likes: number; comments: number };
+  excerpt: string | null;
+  views: number;
+  createdAt: string; // ISO string from JSON serialisation
+  readTime: string; // pre-computed on the server, e.g. "3 min read"
+  category: { name: string; slug: string };
+  _count: { likes: number; comments: number };
 };
 
 type Props = {
-  stories:       Story[];
-  isOwner:       boolean;
+  stories: Story[];
+  isOwner: boolean;
   pinnedStoryId: number | null;
-  username:      string;
+  username: string;
 };
 
 export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, username }: Props) {
@@ -48,7 +48,14 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
           }`}
         >
           {/* Horizontal lines icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -64,8 +71,19 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
           }`}
         >
           {/* 2×2 grid icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+            />
           </svg>
         </button>
       </div>
@@ -87,8 +105,7 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                   className="w-32 h-24 object-cover rounded-xl flex-shrink-0"
                 />
               ) : (
-                <div className="w-32 h-24 bg-gray-700/50 rounded-xl flex-shrink-0 flex items-center justify-center border border-gray-700">
-                </div>
+                <div className="w-32 h-24 bg-gray-700/50 rounded-xl flex-shrink-0 flex items-center justify-center border border-gray-700"></div>
               )}
 
               <div className="flex flex-col justify-between flex-1 min-w-0">
@@ -100,13 +117,21 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                     {story.title}
                   </h3>
                   {story.excerpt && (
-                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">{story.excerpt}</p>
+                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">
+                      {story.excerpt}
+                    </p>
                   )}
                 </div>
 
                 {/* Meta row */}
                 <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600 mt-2">
-                  <span>{new Date(story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span>
+                    {new Date(story.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </span>
                   <span className="text-gray-700">·</span>
                   <span>{story.readTime}</span>
                   <span className="text-gray-700">·</span>
@@ -142,8 +167,7 @@ export default function ProfileStoriesGrid({ stories, isOwner, pinnedStoryId, us
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-700/60 to-gray-900 flex items-center justify-center">
-                  </div>
+                  <div className="w-full h-full bg-gradient-to-br from-gray-700/60 to-gray-900 flex items-center justify-center"></div>
                 )}
               </div>
 

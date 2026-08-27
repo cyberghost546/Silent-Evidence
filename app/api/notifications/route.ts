@@ -59,7 +59,7 @@ export async function GET() {
   // Count how many of the fetched notifications haven't been read yet.
   // This drives the red badge number on the bell icon.
   // We count in JavaScript from the already-fetched array to avoid an extra DB query.
-  const unread = notifications.filter(n => !n.read).length;
+  const unread = notifications.filter((n) => !n.read).length;
 
   // Return both the notification list and the unread count together
   return NextResponse.json({ notifications, unread });

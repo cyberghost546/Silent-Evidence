@@ -38,7 +38,7 @@ export const MOODS: MoodOption[] = [
 ];
 
 type Props = {
-  activeMood: string;              // the currently selected mood value (controlled by parent)
+  activeMood: string; // the currently selected mood value (controlled by parent)
   onChange: (mood: string) => void; // callback fired when the user picks a different mood
 };
 
@@ -49,7 +49,7 @@ export default function MoodFilter({ activeMood, onChange }: Props) {
     // keeping the scroll behaviour — keeps the UI clean on desktop.
     // flex-shrink-0 on each button prevents pills from being squashed when there's no room.
     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-      {MOODS.map(m => (
+      {MOODS.map((m) => (
         <button
           key={m.value}
           onClick={() => onChange(m.value)}

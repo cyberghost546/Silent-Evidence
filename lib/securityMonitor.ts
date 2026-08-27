@@ -152,7 +152,9 @@ export async function onFailedLogin(email: string, anonymisedIp: string): Promis
 
     const [perAccount, ipAttempts, ipTargets, targetUser] = await Promise.all([
       prisma.loginLog.count({ where: { email, success: false, createdAt: { gte: from } } }),
-      prisma.loginLog.count({ where: { ip: anonymisedIp, success: false, createdAt: { gte: from } } }),
+      prisma.loginLog.count({
+        where: { ip: anonymisedIp, success: false, createdAt: { gte: from } },
+      }),
       prisma.loginLog.findMany({
         where: { ip: anonymisedIp, success: false, createdAt: { gte: from } },
         select: { email: true },
@@ -170,7 +172,12 @@ export async function onFailedLogin(email: string, anonymisedIp: string): Promis
         kind: 'admin_account_targeted',
         severity: 'critical',
         summary: `Admin account "${email}" has ${perAccount} failed logins in the last ${RULES.windowMinutes} minutes.`,
-        detail: { email, failedAttempts: perAccount, ip: anonymisedIp, windowMinutes: RULES.windowMinutes },
+        detail: {
+          email,
+          failedAttempts: perAccount,
+          ip: anonymisedIp,
+          windowMinutes: RULES.windowMinutes,
+        },
         ip: anonymisedIp,
         userId: targetUser.id,
       });
@@ -221,7 +228,7 @@ export async function onFailedLogin(email: string, anonymisedIp: string): Promis
 export async function onSuccessfulLogin(
   userId: number,
   email: string,
-  anonymisedIp: string,
+  anonymisedIp: string
 ): Promise<void> {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });

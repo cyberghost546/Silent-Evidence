@@ -8,7 +8,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',
@@ -22,7 +24,8 @@ export async function POST(req: NextRequest) {
     if (!session.userId) return NextResponse.json({ error: 'Login required' }, { status: 401 });
 
     const { nominationId } = await req.json();
-    if (!nominationId) return NextResponse.json({ error: 'nominationId required' }, { status: 400 });
+    if (!nominationId)
+      return NextResponse.json({ error: 'nominationId required' }, { status: 400 });
 
     // Load nomination to get its category
     const nomination = await prisma.screamNomination.findUnique({

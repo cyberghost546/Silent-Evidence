@@ -14,18 +14,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Eye, Heart, MessageSquare, Bookmark, type LucideIcon } from 'lucide-react';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 type ChartDay = { date: string; reads: number };
 
 type AnalyticsData = {
-  views:         number;
-  likes:         number;
-  comments:      number;
-  bookmarks:     number;
-  weeklyChart:   ChartDay[];
+  views: number;
+  likes: number;
+  comments: number;
+  bookmarks: number;
+  weeklyChart: ChartDay[];
   avgCompletion: number | null; // 0–100; null = no tracking data yet
 };
 
@@ -71,14 +69,14 @@ export default function StoryAnalytics({ storyId }: Props) {
   }, [data]);
 
   // Format chart data for Recharts
-  const chartData = data?.weeklyChart.map((d) => ({
-    day:   dayLabel(d.date),
-    reads: d.reads,
-  })) ?? [];
+  const chartData =
+    data?.weeklyChart.map((d) => ({
+      day: dayLabel(d.date),
+      reads: d.reads,
+    })) ?? [];
 
   return (
     <div className="mt-6 border border-dashed border-gray-700 rounded-2xl overflow-hidden">
-
       {/* Toggle header */}
       <button
         type="button"
@@ -88,7 +86,10 @@ export default function StoryAnalytics({ storyId }: Props) {
         <span className="text-sm font-semibold text-gray-400">Your story analytics</span>
         <svg
           className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
@@ -111,10 +112,10 @@ export default function StoryAnalytics({ storyId }: Props) {
             <>
               {/* Stat pills */}
               <div className="grid grid-cols-4 gap-3 mt-4">
-                <Pill icon={Eye}          label="Views"     value={data.views} />
-                <Pill icon={Heart}        label="Likes"     value={data.likes} />
-                <Pill icon={MessageSquare} label="Comments"  value={data.comments} />
-                <Pill icon={Bookmark}     label="Bookmarks" value={data.bookmarks} />
+                <Pill icon={Eye} label="Views" value={data.views} />
+                <Pill icon={Heart} label="Likes" value={data.likes} />
+                <Pill icon={MessageSquare} label="Comments" value={data.comments} />
+                <Pill icon={Bookmark} label="Bookmarks" value={data.bookmarks} />
               </div>
 
               {/* Avg read-through rate */}
@@ -157,10 +158,7 @@ export default function StoryAnalytics({ storyId }: Props) {
                     />
                     <Bar dataKey="reads" radius={[4, 4, 0, 0]}>
                       {chartData.map((entry, i) => (
-                        <Cell
-                          key={i}
-                          fill={entry.reads > 0 ? '#dc2626' : '#374151'}
-                        />
+                        <Cell key={i} fill={entry.reads > 0 ? '#dc2626' : '#374151'} />
                       ))}
                     </Bar>
                   </BarChart>

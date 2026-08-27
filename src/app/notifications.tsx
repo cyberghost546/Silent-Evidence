@@ -26,7 +26,7 @@ import { BottomTabInset } from '@/constants/theme';
 
 type Notification = {
   id: number;
-  type: string;   // COMMENT, REPLY, LIKE, FOLLOW, MENTION, COLLABORATE, DIRECT_MESSAGE, GROUP_INVITE
+  type: string; // COMMENT, REPLY, LIKE, FOLLOW, MENTION, COLLABORATE, DIRECT_MESSAGE, GROUP_INVITE
   message: string;
   read: boolean;
   createdAt: string;
@@ -52,8 +52,8 @@ export default function NotificationsScreen() {
   const router = useRouter();
   const auth = getAuth();
 
-  const [items, setItems]           = useState<Notification[]>([]);
-  const [loading, setLoading]       = useState(true);
+  const [items, setItems] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   // Load notifications and mark them as read on the server
@@ -160,7 +160,9 @@ export default function NotificationsScreen() {
             <Text style={styles.icon}>{TYPE_ICONS[item.type] ?? '🔔'}</Text>
 
             <View style={styles.rowBody}>
-              <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
+              <Text style={styles.message} numberOfLines={2}>
+                {item.message}
+              </Text>
               <Text style={styles.time}>{timeAgo(item.createdAt)}</Text>
             </View>
 

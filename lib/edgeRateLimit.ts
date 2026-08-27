@@ -63,11 +63,7 @@ export interface EdgeRateLimitResult {
  * per key, which multiplies the memory this must be careful about. The tradeoff
  * is burstiness at a window boundary, which does not matter at these limits.
  */
-export function edgeRateLimit(
-  key: string,
-  limit: number,
-  windowMs: number,
-): EdgeRateLimitResult {
+export function edgeRateLimit(key: string, limit: number, windowMs: number): EdgeRateLimitResult {
   const now = Date.now();
   const existing = buckets.get(key);
 
@@ -107,19 +103,19 @@ export function edgeClientIp(headers: Headers): string {
 const LIMITS: { prefix: string; limit: number }[] = [
   // Content creation is expensive (sanitising, AI moderation, notification
   // fan-out) and no human publishes faster than this.
-  { prefix: '/api/stories',   limit: 10 },
-  { prefix: '/api/chapters',  limit: 10 },
-  { prefix: '/api/comments',  limit: 20 },
+  { prefix: '/api/stories', limit: 10 },
+  { prefix: '/api/chapters', limit: 10 },
+  { prefix: '/api/comments', limit: 20 },
   // Social actions are cheap individually but are the classic spam/harassment
   // vector, and the volumes here are far above genuine use.
-  { prefix: '/api/follows',   limit: 30 },
-  { prefix: '/api/likes',     limit: 60 },
+  { prefix: '/api/follows', limit: 30 },
+  { prefix: '/api/likes', limit: 60 },
   { prefix: '/api/reactions', limit: 60 },
-  { prefix: '/api/messages',  limit: 20 },
-  { prefix: '/api/reports',   limit: 10 },
+  { prefix: '/api/messages', limit: 20 },
+  { prefix: '/api/reports', limit: 10 },
   // Anything that costs money or an outbound email.
-  { prefix: '/api/stripe',    limit: 10 },
-  { prefix: '/api/upload',    limit: 20 },
+  { prefix: '/api/stripe', limit: 10 },
+  { prefix: '/api/upload', limit: 20 },
 ];
 
 /** Default for any mutating API route not listed above. */

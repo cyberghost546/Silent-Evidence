@@ -30,7 +30,9 @@ export default async function AdminAnnouncementPage() {
   // `.catch(() => null)` is a safety net: if the database is unreachable or
   // the table doesn't exist yet, the page still renders (with an empty form)
   // instead of crashing with a 500 error.
-  const row = await prisma.siteSetting.findUnique({ where: { key: 'announcement' } }).catch(() => null);
+  const row = await prisma.siteSetting
+    .findUnique({ where: { key: 'announcement' } })
+    .catch(() => null);
 
   // Pass the saved message text down to the Client Component as a prop.
   // The `??` (nullish coalescing) operator covers two cases:

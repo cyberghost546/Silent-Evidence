@@ -55,12 +55,10 @@ export default async function ForYouPage() {
 
         {/* Sign-in prompt */}
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-          <h1 className="text-3xl font-extrabold text-white mb-3">
-            Your Personalised Feed Awaits
-          </h1>
+          <h1 className="text-3xl font-extrabold text-white mb-3">Your Personalised Feed Awaits</h1>
           <p className="text-gray-400 max-w-md mb-8">
-            Sign in to get horror stories tailored to your fear profile — based
-            on the authors you follow and the moods that haunt you.
+            Sign in to get horror stories tailored to your fear profile — based on the authors you
+            follow and the moods that haunt you.
           </p>
           <div className="flex gap-4">
             <Link
@@ -121,8 +119,8 @@ export default async function ForYouPage() {
             <h1 className="text-4xl font-extrabold text-white">For You</h1>
           </div>
           <p className="text-gray-400 text-sm">
-            Personalised for your fear profile — stories by authors you follow
-            and moods that match your taste.
+            Personalised for your fear profile — stories by authors you follow and moods that match
+            your taste.
           </p>
         </div>
       </div>
@@ -159,8 +157,7 @@ export default async function ForYouPage() {
                     />
                   ) : (
                     // Gradient placeholder when no cover image is set
-                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                    </div>
+                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center"></div>
                   )}
                 </div>
 
@@ -187,7 +184,9 @@ export default async function ForYouPage() {
                       <span className="inline-flex items-center gap-1 text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded-full">
                         {(() => {
                           const MoodIcon = moodIcon(story.mood);
-                          return <MoodIcon className="w-3 h-3" strokeWidth={1.75} aria-hidden="true" />;
+                          return (
+                            <MoodIcon className="w-3 h-3" strokeWidth={1.75} aria-hidden="true" />
+                          );
                         })()}
                         {story.mood.charAt(0) + story.mood.slice(1).toLowerCase()}
                       </span>
@@ -201,9 +200,7 @@ export default async function ForYouPage() {
 
                   {/* Excerpt — shown when available */}
                   {story.excerpt && (
-                    <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">
-                      {story.excerpt}
-                    </p>
+                    <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">{story.excerpt}</p>
                   )}
 
                   {/* Author + stats row */}
@@ -221,7 +218,11 @@ export default async function ForYouPage() {
                       <span className="text-xs text-gray-400">{story.author.username}</span>
                       {/* Blue verified checkmark for verified authors */}
                       {story.author.isVerified && (
-                        <svg className="w-3 h-3 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg
+                          className="w-3 h-3 text-blue-400"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
                           <path
                             fillRule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

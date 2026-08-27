@@ -10,13 +10,18 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import Image from 'next/image';
 
-interface Props { params: Promise<{ slug: string }> }
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const monster = await prisma.monster.findUnique({ where: { slug } });
   if (!monster) return { title: 'Not Found' };
-  return { title: `${monster.name} | Monster Encyclopedia | Silent Evidence`, description: monster.description };
+  return {
+    title: `${monster.name} | Monster Encyclopedia | Silent Evidence`,
+    description: monster.description,
+  };
 }
 
 export default async function MonsterDetailPage({ params }: Props) {
@@ -28,17 +33,27 @@ export default async function MonsterDetailPage({ params }: Props) {
   if (!monster) notFound();
 
   // Load linked stories
-  const linkedStories = monster.storyLinks.length > 0
-    ? await prisma.story.findMany({
-        where: { id: { in: monster.storyLinks.map((l) => l.storyId) }, status: 'PUBLISHED' },
-        select: { id: true, title: true, slug: true, coverImage: true, author: { select: { username: true } } },
-      })
-    : [];
+  const linkedStories =
+    monster.storyLinks.length > 0
+      ? await prisma.story.findMany({
+          where: { id: { in: monster.storyLinks.map((l) => l.storyId) }, status: 'PUBLISHED' },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            coverImage: true,
+            author: { select: { username: true } },
+          },
+        })
+      : [];
 
   return (
     <main className="min-h-screen bg-gray-950 py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/monsters" className="text-gray-500 hover:text-gray-300 text-sm mb-8 inline-block transition-colors">
+        <Link
+          href="/monsters"
+          className="text-gray-500 hover:text-gray-300 text-sm mb-8 inline-block transition-colors"
+        >
           ← Back to Encyclopedia
         </Link>
 
@@ -46,7 +61,13 @@ export default async function MonsterDetailPage({ params }: Props) {
           {/* Hero image */}
           {monster.image && (
             <div className="relative w-full h-64 overflow-hidden">
-              <Image src={monster.image} alt={monster.name} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" />
+              <Image
+                src={monster.image}
+                alt={monster.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
             </div>
           )}
           {!monster.image && (
@@ -64,7 +85,9 @@ export default async function MonsterDetailPage({ params }: Props) {
             </div>
 
             {monster.origin && (
-              <p className="text-gray-500 text-sm mb-4">Origin: <span className="text-gray-400">{monster.origin}</span></p>
+              <p className="text-gray-500 text-sm mb-4">
+                Origin: <span className="text-gray-400">{monster.origin}</span>
+              </p>
             )}
 
             {/* Scare factor */}
@@ -83,7 +106,9 @@ export default async function MonsterDetailPage({ params }: Props) {
               <span className="text-gray-500 text-sm ml-1">{monster.scareFactor}/10</span>
             </div>
 
-            <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{monster.description}</p>
+            <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+              {monster.description}
+            </p>
 
             {/* Linked stories */}
             {linkedStories.length > 0 && (
@@ -97,7 +122,13 @@ export default async function MonsterDetailPage({ params }: Props) {
                       className="flex items-center gap-3 p-3 bg-gray-800 rounded-xl hover:bg-gray-750 border border-gray-700 hover:border-gray-600 transition-colors"
                     >
                       {s.coverImage && (
-                        <Image src={s.coverImage} alt={s.title} width={48} height={48} className="rounded-lg object-cover shrink-0" />
+                        <Image
+                          src={s.coverImage}
+                          alt={s.title}
+                          width={48}
+                          height={48}
+                          className="rounded-lg object-cover shrink-0"
+                        />
                       )}
                       <div>
                         <p className="text-white text-sm font-medium line-clamp-1">{s.title}</p>

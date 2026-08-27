@@ -21,24 +21,25 @@ export const revalidate = 3600;
 
 export default async function StoryOfDayPage() {
   // Deterministic daily pick using day-of-year offset
-  const now       = new Date();
+  const now = new Date();
   const dayOfYear = Math.floor(
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000
   );
 
   const total = await prisma.story.count({ where: { status: 'PUBLISHED' } });
-  const story = total > 0
-    ? await prisma.story.findFirst({
-        where:   { status: 'PUBLISHED', contentRating: 'ALL' },
-        orderBy: { createdAt: 'asc' },
-        skip:    dayOfYear % total,
-        include: {
-          author:   { select: { username: true, profile: { select: { avatar: true } } } },
-          category: { select: { name: true, slug: true } },
-          _count:   { select: { likes: true, comments: true } },
-        },
-      })
-    : null;
+  const story =
+    total > 0
+      ? await prisma.story.findFirst({
+          where: { status: 'PUBLISHED', contentRating: 'ALL' },
+          orderBy: { createdAt: 'asc' },
+          skip: dayOfYear % total,
+          include: {
+            author: { select: { username: true, profile: { select: { avatar: true } } } },
+            category: { select: { name: true, slug: true } },
+            _count: { select: { likes: true, comments: true } },
+          },
+        })
+      : null;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
@@ -47,7 +48,9 @@ export default async function StoryOfDayPage() {
       <div className="max-w-2xl mx-auto px-4 py-10">
         {/* Page header */}
         <div className="text-center mb-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-1">Daily Pick</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-1">
+            Daily Pick
+          </p>
           <h1 className="text-3xl font-bold text-white">Story of the Day</h1>
           <p className="text-sm text-gray-500 mt-1">
             {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -67,10 +70,17 @@ export default async function StoryOfDayPage() {
             <div className="p-6">
               {/* Mood + category */}
               <div className="flex items-center gap-2 mb-3">
-                {story.mood && (() => {
-                  const MoodIcon = moodIcon(story.mood);
-                  return <MoodIcon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
-                })()}
+                {story.mood &&
+                  (() => {
+                    const MoodIcon = moodIcon(story.mood);
+                    return (
+                      <MoodIcon
+                        className="w-5 h-5 text-gray-400"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
+                    );
+                  })()}
                 <span className="text-xs text-gray-500">{story.category.name}</span>
               </div>
 
@@ -83,12 +93,15 @@ export default async function StoryOfDayPage() {
                   <Image
                     src={story.author.profile.avatar}
                     alt={story.author.username}
-                    width={24} height={24}
+                    width={24}
+                    height={24}
                     className="rounded-full object-cover"
                   />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
-                    <span className="text-xs text-gray-400">{story.author.username[0].toUpperCase()}</span>
+                    <span className="text-xs text-gray-400">
+                      {story.author.username[0].toUpperCase()}
+                    </span>
                   </div>
                 )}
                 <span className="text-sm text-gray-400">by {story.author.username}</span>
@@ -123,8 +136,12 @@ export default async function StoryOfDayPage() {
 
         {/* Navigation */}
         <div className="mt-8 flex justify-center gap-6 text-sm text-gray-500">
-          <Link href="/" className="hover:text-white transition">← Browse All</Link>
-          <Link href="/discover" className="hover:text-white transition">Discover More →</Link>
+          <Link href="/" className="hover:text-white transition">
+            ← Browse All
+          </Link>
+          <Link href="/discover" className="hover:text-white transition">
+            Discover More →
+          </Link>
         </div>
       </div>
 

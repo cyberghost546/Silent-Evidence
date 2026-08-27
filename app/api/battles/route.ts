@@ -68,10 +68,10 @@ export async function GET() {
       // Story A — the left-side story in the VS card UI
       storyA: {
         select: {
-          id: true,          // needed to match votes to this story
-          title: true,       // displayed as the story name
-          slug: true,        // used to build the link to the story page
-          coverImage: true,  // displayed as the story's thumbnail image
+          id: true, // needed to match votes to this story
+          title: true, // displayed as the story name
+          slug: true, // used to build the link to the story page
+          coverImage: true, // displayed as the story's thumbnail image
           author: { select: { username: true } }, // show the author's name below the title
         },
       },
@@ -91,7 +91,7 @@ export async function GET() {
       votes: {
         select: {
           votedFor: true, // the storyId the user voted for (A or B)
-          userId: true,   // used by the client to highlight the current user's pick
+          userId: true, // used by the client to highlight the current user's pick
         },
       },
     },
@@ -109,14 +109,14 @@ export async function GET() {
     const totalVotes = votesForA + votesForB;
 
     return {
-      id: battle.id,               // unique battle ID
-      active: battle.active,       // whether the battle is still running
-      endsAt: battle.endsAt,       // when the battle closes (ISO date string)
+      id: battle.id, // unique battle ID
+      active: battle.active, // whether the battle is still running
+      endsAt: battle.endsAt, // when the battle closes (ISO date string)
       createdAt: battle.createdAt, // when the battle was created
 
       storyA: {
-        ...battle.storyA,          // spread all the story fields (id, title, slug, etc.)
-        votes: votesForA,          // total votes received by story A
+        ...battle.storyA, // spread all the story fields (id, title, slug, etc.)
+        votes: votesForA, // total votes received by story A
 
         // Percentage share of total votes, rounded to one decimal place.
         // If no votes yet, default to 50% so both bars appear equal.
@@ -125,12 +125,12 @@ export async function GET() {
       },
 
       storyB: {
-        ...battle.storyB,          // spread all story B fields
-        votes: votesForB,          // total votes received by story B
+        ...battle.storyB, // spread all story B fields
+        votes: votesForB, // total votes received by story B
         pct: totalVotes > 0 ? Math.round((votesForB / totalVotes) * 1000) / 10 : 50,
       },
 
-      totalVotes,   // total votes across both stories combined
+      totalVotes, // total votes across both stories combined
 
       // Include the raw vote list so the client can check if the current user has voted
       votes: battle.votes,
@@ -178,10 +178,7 @@ export async function POST(req: NextRequest) {
   // Validate the date is a real date (isNaN catches malformed strings like "not-a-date")
   // and that it's actually in the future (no point creating an already-expired battle)
   if (isNaN(endsAtDate.getTime()) || endsAtDate <= new Date()) {
-    return NextResponse.json(
-      { error: 'endsAt must be a valid future date' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'endsAt must be a valid future date' }, { status: 400 });
   }
 
   // Create the battle record in the database.
@@ -190,7 +187,7 @@ export async function POST(req: NextRequest) {
     data: {
       storyAId: Number(storyAId), // cast to number to ensure correct DB type
       storyBId: Number(storyBId),
-      endsAt: endsAtDate,         // the parsed Date object
+      endsAt: endsAtDate, // the parsed Date object
     },
   });
 

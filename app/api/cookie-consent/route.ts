@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server';
 import { cookies, headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { anonymizeIp } from '@/lib/rateLimit';
+import { requireAdmin } from '@/lib/session';
+import { forbidden } from '@/lib/apiError';
 
 const VALID_CHOICES = ['all', 'essential', 'rejected'] as const;
 type Choice = (typeof VALID_CHOICES)[number];
@@ -13,8 +15,8 @@ type Choice = (typeof VALID_CHOICES)[number];
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const choice: Choice = VALID_CHOICES.includes(body.choice) ? body.choice : 'essential';
-  const analytics  = choice === 'all';
-  const marketing  = choice === 'all';
+  const analytics = choice === 'all';
+  const marketing = choice === 'all';
 
   // Grab the user id from the session cookie (null for guests)
   const cookieStore = await cookies();
@@ -22,9 +24,10 @@ export async function POST(req: Request) {
 
   // Anonymise IP before storing (last octet removed)
   const headersList = await headers();
-  const rawIp = headersList.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? headersList.get('x-real-ip')
-    ?? 'unknown';
+  const rawIp =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headersList.get('x-real-ip') ??
+    'unknown';
   const ip = anonymizeIp(rawIp);
   const userAgent = headersList.get('user-agent') ?? null;
 
@@ -35,8 +38,16 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-// GET /api/cookie-consent — admin endpoint: returns aggregated stats
+// GET /api/cookie-consent — admin endpoint: returns aggregated stats.
+//
+// This handler was documented as admin-only but never actually checked, so any
+// anonymous visitor could read the last 100 consent records — each one carrying a
+// userId, an IP address and a user-agent string. That is personal data under
+// GDPR Art. 4, and an unauthenticated route handing it out is a reportable
+// breach, not just an authorisation slip. The role check is now enforced.
 export async function GET() {
+  if (!(await requireAdmin())) return forbidden();
+
   const [total, byChoice, recent] = await Promise.all([
     prisma.cookieConsent.count(),
     prisma.cookieConsent.groupBy({
@@ -58,7 +69,7 @@ export async function GET() {
     }),
   ]);
 
-  const counts = Object.fromEntries(byChoice.map(r => [r.choice, r._count.choice]));
+  const counts = Object.fromEntries(byChoice.map((r) => [r.choice, r._count.choice]));
 
   return NextResponse.json({ total, counts, recent });
 }

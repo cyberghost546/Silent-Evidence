@@ -38,15 +38,16 @@ export default function ContactPage() {
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-14 grid md:grid-cols-5 gap-12">
-
         {/* Left — info */}
         <div className="md:col-span-2 space-y-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-2">Get in touch</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-2">
+              Get in touch
+            </p>
             <h1 className="text-4xl font-bold text-white leading-tight">Contact Us</h1>
             <p className="text-gray-400 text-sm mt-3 leading-relaxed">
-              Have a question, a report, or just want to say hello? Fill in the form and we will
-              get back to you as soon as we can.
+              Have a question, a report, or just want to say hello? Fill in the form and we will get
+              back to you as soon as we can.
             </p>
           </div>
 
@@ -54,8 +55,19 @@ export default function ContactPage() {
             {[
               {
                 icon: (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"
+                    />
                   </svg>
                 ),
                 label: 'Email',
@@ -63,8 +75,19 @@ export default function ContactPage() {
               },
               {
                 icon: (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"
+                    />
                     <circle cx="12" cy="10" r="3" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
@@ -73,15 +96,29 @@ export default function ContactPage() {
               },
               {
                 icon: (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
+                    />
                   </svg>
                 ),
                 label: 'Response time',
                 value: 'Usually within 24–48 hours.',
               },
             ].map(({ icon, label, value }) => (
-              <div key={label} className="flex items-start gap-4 bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <div
+                key={label}
+                className="flex items-start gap-4 bg-gray-900 border border-gray-800 rounded-xl p-4"
+              >
                 <div className="w-9 h-9 flex-shrink-0 bg-red-600/10 border border-red-600/20 rounded-lg flex items-center justify-center text-red-500">
                   {icon}
                 </div>
@@ -98,7 +135,6 @@ export default function ContactPage() {
         <div className="md:col-span-3 bg-gray-900 border border-gray-800 rounded-2xl p-8">
           <ContactForm />
         </div>
-
       </div>
       <Footer />
     </main>

@@ -5,10 +5,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ username: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
 
   // Optional: the logged-in app user's ID to determine follow state

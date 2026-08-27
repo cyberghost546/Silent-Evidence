@@ -30,8 +30,12 @@ import VerificationClient from './VerificationClient';
 export default async function AdminVerificationPage() {
   const setting = await prisma.siteSetting.findUnique({ where: { key: 'verification_requests' } });
   const requests: {
-    userId: number; username: string; reason: string; links: string;
-    submittedAt: string; status: string;
+    userId: number;
+    username: string;
+    reason: string;
+    links: string;
+    submittedAt: string;
+    status: string;
   }[] = setting?.value ? JSON.parse(setting.value) : [];
 
   return (

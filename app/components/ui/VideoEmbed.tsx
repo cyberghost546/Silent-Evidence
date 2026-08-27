@@ -63,11 +63,13 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
     return (
       // Outer wrapper adds vertical spacing above and below the video
       <div className="my-6">
-
         {/* Responsive 16:9 container — uses padding-top trick to maintain aspect ratio */}
-        <div className="relative w-full" style={{ paddingTop: '56.25%' /* 16:9 = 9/16 = 56.25% */ }}>
+        <div
+          className="relative w-full"
+          style={{ paddingTop: '56.25%' /* 16:9 = 9/16 = 56.25% */ }}
+        >
           <iframe
-            src={embedUrl}                    // the privacy-enhanced youtube-nocookie.com embed URL
+            src={embedUrl} // the privacy-enhanced youtube-nocookie.com embed URL
             title="Story video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -78,12 +80,12 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
 
         {/* External link fallback — gives users an easy way to open YouTube directly */}
         <a
-          href={videoUrl}                   // links to the original YouTube page, not the embed URL
-          target="_blank"                   // open in a new tab
-          rel="noopener noreferrer"         // security: prevent the new tab accessing window.opener
+          href={videoUrl} // links to the original YouTube page, not the embed URL
+          target="_blank" // open in a new tab
+          rel="noopener noreferrer" // security: prevent the new tab accessing window.opener
           className="mt-2 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-400 transition"
         >
- Watch on YouTube
+          Watch on YouTube
         </a>
       </div>
     );
@@ -97,7 +99,7 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
         {/* Native HTML5 video player with browser-default controls */}
         <video
           src={videoUrl}
-          controls                          // show play/pause, volume, seek bar, etc.
+          controls // show play/pause, volume, seek bar, etc.
           className="w-full rounded-xl border border-gray-700 max-h-[500px]"
         />
       </div>
@@ -116,7 +118,7 @@ export default function VideoEmbed({ videoUrl }: { videoUrl: string }) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition underline"
       >
- Watch video
+        Watch video
       </a>
     </div>
   );

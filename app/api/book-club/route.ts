@@ -27,8 +27,13 @@ export async function GET() {
         owner: { select: { username: true, profile: { select: { avatar: true } } } },
         _count: { select: { members: true } },
         story: {
-          select: { id: true, title: true, slug: true, coverImage: true,
-            author: { select: { username: true } } },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            coverImage: true,
+            author: { select: { username: true } },
+          },
         },
       },
     });
@@ -50,8 +55,11 @@ export async function POST(req: Request) {
     if (!name?.trim()) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
 
     // Premium clubs can only be created by admins or premium subscribers
-    if (isPremium && !await hasPremiumAccess(userId)) {
-      return NextResponse.json({ error: 'Premium subscription required to create a premium club.' }, { status: 403 });
+    if (isPremium && !(await hasPremiumAccess(userId))) {
+      return NextResponse.json(
+        { error: 'Premium subscription required to create a premium club.' },
+        { status: 403 }
+      );
     }
 
     const club = await prisma.bookClub.create({
@@ -59,7 +67,7 @@ export async function POST(req: Request) {
         name: name.trim(),
         description: description?.trim() || null,
         isPrivate: isPrivate !== false,
-        isPremium:  isPremium === true,
+        isPremium: isPremium === true,
         inviteCode: nanoid(8).toUpperCase(),
         ownerId: userId,
         storyId: storyId ? Number(storyId) : null,

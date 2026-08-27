@@ -13,13 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // Block private/admin/API paths from being indexed
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/settings',
-          '/messages',
-          '/dashboard',
-        ],
+        disallow: ['/admin/', '/api/', '/settings', '/messages', '/dashboard'],
       },
     ],
     // Point crawlers to the sitemap

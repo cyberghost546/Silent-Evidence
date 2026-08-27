@@ -53,7 +53,7 @@ export async function GET() {
       where: { followerId: userId },
       select: { followingId: true },
     });
-    const followedIds = new Set(alreadyFollowing.map(f => f.followingId));
+    const followedIds = new Set(alreadyFollowing.map((f) => f.followingId));
     followedIds.add(userId); // exclude self
 
     // ── Step 3: candidate authors writing in those categories/moods ──────────
@@ -74,7 +74,7 @@ export async function GET() {
           _count: { select: { stories: true, followers: true } },
         },
       });
-      return NextResponse.json(popular.map(u => ({ ...u, matchScore: 0 })));
+      return NextResponse.json(popular.map((u) => ({ ...u, matchScore: 0 })));
     }
 
     // Fetch authors with at least one published story in matching categories/moods
@@ -138,7 +138,7 @@ export async function GET() {
     // Reattach scores and sort back to score order
     const scoreMap = new Map(authorScores);
     const result = authors
-      .map(a => ({ ...a, matchScore: scoreMap.get(a.id) ?? 0 }))
+      .map((a) => ({ ...a, matchScore: scoreMap.get(a.id) ?? 0 }))
       .sort((a, b) => b.matchScore - a.matchScore);
 
     return NextResponse.json(result);

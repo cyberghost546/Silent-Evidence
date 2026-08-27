@@ -17,13 +17,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Import the Prisma database client to look up or create user records
 import { prisma } from '@/lib/prisma';
-import { setSessionCookies } from '@/lib/sessionCookie';
+import { createSession } from '@/lib/session';
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // This function runs when Google redirects the browser back to our callback URL.
 // "req" contains the URL with the authorization code in the query string.
 export async function GET(req: NextRequest) {
-  const code  = req.nextUrl.searchParams.get('code');
+  const code = req.nextUrl.searchParams.get('code');
   const state = req.nextUrl.searchParams.get('state');
 
   if (!code) return NextResponse.redirect(new URL('/login?error=google', req.url));
@@ -48,11 +48,11 @@ export async function GET(req: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      code,                                               // the one-time code from the URL
-      client_id: process.env.GOOGLE_CLIENT_ID!,          // our Google app's public ID
-      client_secret: process.env.GOOGLE_CLIENT_SECRET!,  // our Google app's private secret
+      code, // the one-time code from the URL
+      client_id: process.env.GOOGLE_CLIENT_ID!, // our Google app's public ID
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!, // our Google app's private secret
       redirect_uri: `${baseUrl}/api/auth/google/callback`, // must match what we registered
-      grant_type: 'authorization_code',                  // tells Google what kind of exchange this is
+      grant_type: 'authorization_code', // tells Google what kind of exchange this is
     }),
   });
 
@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
   // path: '/'      — cookie is sent on every request to the site.
   // maxAge: 7 days — session lasts 1 week.
   // sameSite: 'lax' — CSRF protection while still allowing normal navigation.
-  await setSessionCookies(res, user.id);
+  await createSession(res, user.id);
 
   return res;
 }

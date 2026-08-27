@@ -1,0 +1,74 @@
+# .github/workflows/bot-crons.yml
+#
+# Triggers the automation bots by calling their CRON_SECRET-protected endpoints.
+# These run from GitHub Actions (free, unlimited schedules) rather than Vercel
+# Cron, because the Hobby plan's two cron slots are used by publish-scheduled and
+# data-retention (see vercel.json).
+#
+# SETUP (one time) — add two repository secrets under
+# Settings → Secrets and variables → Actions:
+#   CRON_SECRET  — same value as the app's CRON_SECRET env var on Vercel.
+#   SITE_URL     — deployed base URL, e.g. https://silent-evidence.vercel.app
+#
+# The house-author bot also needs HOUSE_AUTHOR_EMAIL set in the app's Vercel env,
+# pointing at the labelled bot account; without it that endpoint no-ops.
+#
+# Scheduled workflows only run from the repository's default branch, so this
+# activates once the branch is merged to main.
+
+name: Automation bots
+
+on:
+  schedule:
+    # Moderation scan — every 6 hours.
+    - cron: '0 */6 * * *'
+    # House author — weekly, Wednesday 13:00 UTC.
+    - cron: '0 13 * * 3'
+  workflow_dispatch:
+    inputs:
+      bot:
+        description: 'Which bot to run manually'
+        type: choice
+        options: [moderation-scan, house-author]
+        default: moderation-scan
+
+jobs:
+  moderation-scan:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.bot == 'moderation-scan') ||
+      github.event.schedule == '0 */6 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run moderation scan
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$SITE_URL" ]; then
+            echo "::error::CRON_SECRET and SITE_URL secrets must be set."; exit 1
+          fi
+          code=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${SITE_URL%/}/api/cron/moderation-scan")
+          echo "HTTP $code"; cat /tmp/out.txt
+          case "$code" in 2*) : ;; *) echo "::error::endpoint returned $code"; exit 1 ;; esac
+
+  house-author:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.bot == 'house-author') ||
+      github.event.schedule == '0 13 * * 3'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run house author
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$SITE_URL" ]; then
+            echo "::error::CRON_SECRET and SITE_URL secrets must be set."; exit 1
+          fi
+          code=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${SITE_URL%/}/api/cron/house-author")
+          echo "HTTP $code"; cat /tmp/out.txt
+          case "$code" in 2*) : ;; *) echo "::error::endpoint returned $code"; exit 1 ;; esac

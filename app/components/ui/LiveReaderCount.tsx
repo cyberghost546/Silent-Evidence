@@ -49,7 +49,6 @@ function getSessionId(): string {
 }
 
 export default function LiveReaderCount({ storyId }: { storyId: number }) {
-
   // ── State ─────────────────────────────────────────────────────────────────
 
   // The current reader count. Starts as null (not yet fetched) so we can
@@ -87,8 +86,8 @@ export default function LiveReaderCount({ storyId }: { storyId: number }) {
     // .catch(() => {}) — if this fails, keep showing the last known count.
     const fetchCount = () => {
       fetch(`/api/stories/presence?storyId=${storyId}`)
-        .then(r => r.json())
-        .then(d => setCount(d.count))
+        .then((r) => r.json())
+        .then((d) => setCount(d.count))
         .catch(() => {});
     };
 
@@ -101,7 +100,7 @@ export default function LiveReaderCount({ storyId }: { storyId: number }) {
     // 30 seconds balances freshness against request volume. With 1000 concurrent
     // readers, this generates ~33 requests/second — manageable for a simple API.
     const heartbeatInterval = setInterval(sendHeartbeat, 30_000);
-    const pollInterval      = setInterval(fetchCount,     30_000);
+    const pollInterval = setInterval(fetchCount, 30_000);
 
     // Cleanup: clear both intervals when the component unmounts (user navigates
     // away from the story page). Without this, the intervals would keep firing
@@ -124,7 +123,6 @@ export default function LiveReaderCount({ storyId }: { storyId: number }) {
     // inline-flex keeps this from taking up a full block line — it sits inline
     // with surrounding metadata text (author, date, etc.)
     <span className="inline-flex items-center gap-1.5 text-xs text-green-400 font-medium">
-
       {/* ── Pulsing green "live" dot ──────────────────────────────────────── */}
       {/*
         Two layered spans create the pulsing halo effect:
@@ -140,7 +138,6 @@ export default function LiveReaderCount({ storyId }: { storyId: number }) {
         {/* Solid dot — always fully visible */}
         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
       </span>
-
       {/* Reader count label */}
       {count} reading now
     </span>

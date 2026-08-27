@@ -43,8 +43,8 @@ import { useState } from 'react';
 
 // Shape of a single banned-word row as returned by the API / Prisma
 type Word = {
-  id: number;       // database primary key — used to identify which row to delete
-  word: string;     // the banned phrase (stored lowercase by the server)
+  id: number; // database primary key — used to identify which row to delete
+  word: string; // the banned phrase (stored lowercase by the server)
   createdAt: string; // ISO date string — when the word was added (not currently displayed)
 };
 
@@ -95,8 +95,8 @@ export default function BannedWordsClient({ words: initial }: { words: Word[] })
       const created = await res.json(); // { id, word, createdAt }
       // Append the new word and re-sort the array alphabetically so the tag cloud
       // remains in order regardless of insertion position.
-      setWords(w => [...w, created].sort((a, b) => a.word.localeCompare(b.word)));
-      setInput('');      // clear the input ready for the next word
+      setWords((w) => [...w, created].sort((a, b) => a.word.localeCompare(b.word)));
+      setInput(''); // clear the input ready for the next word
       flash('Word added.');
     }
 
@@ -116,7 +116,7 @@ export default function BannedWordsClient({ words: initial }: { words: Word[] })
       body: JSON.stringify({ id }),
     });
     // Filter the deleted word out of the local array — O(n) but the list is small
-    setWords(w => w.filter(x => x.id !== id));
+    setWords((w) => w.filter((x) => x.id !== id));
     flash('Word removed.');
   };
 
@@ -141,9 +141,9 @@ export default function BannedWordsClient({ words: initial }: { words: Word[] })
         <div className="flex gap-3">
           <input
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             // Allow keyboard submission — calls the same `add` function as the button
-            onKeyDown={e => e.key === 'Enter' && add()}
+            onKeyDown={(e) => e.key === 'Enter' && add()}
             placeholder="e.g. badword"
             className="flex-1 bg-gray-800 border border-gray-700 focus:border-red-600 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 text-sm outline-none transition"
           />
@@ -176,7 +176,7 @@ export default function BannedWordsClient({ words: initial }: { words: Word[] })
           <p className="text-gray-600 text-sm">No banned words yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {words.map(w => (
+            {words.map((w) => (
               <div
                 key={w.id} // use the stable DB id, not the word string, as the React key
                 className="flex items-center gap-1.5 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5"

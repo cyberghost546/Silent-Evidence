@@ -28,7 +28,6 @@ type Params = { params: Promise<{ slug: string }> };
 // Returns up to 20 posts for the group, newest first.
 // Supports cursor-based pagination for infinite scroll.
 export async function GET(req: Request, { params }: Params) {
-
   // Read the group slug from the URL
   const { slug } = await params;
 
@@ -83,7 +82,6 @@ export async function GET(req: Request, { params }: Params) {
 // Creates a new text post in the group.
 // Only members of the group are allowed to post.
 export async function POST(req: Request, { params }: Params) {
-
   // Read the group slug from the URL
   const { slug } = await params;
 
@@ -114,10 +112,7 @@ export async function POST(req: Request, { params }: Params) {
 
   // If no membership row exists, the user is not a member — reject
   if (!membership) {
-    return NextResponse.json(
-      { error: 'You must join this group to post.' },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: 'You must join this group to post.' }, { status: 403 });
   }
 
   // Parse the JSON body to get the post content

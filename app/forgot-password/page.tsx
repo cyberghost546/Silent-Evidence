@@ -84,7 +84,10 @@ export default function ForgotPasswordPage() {
     // If the server returned a non-2xx status, extract the error message.
     // The `?? 'Something went wrong.'` fallback handles cases where the
     // server response body doesn't include an `error` field.
-    if (!res.ok) { setError(data.error ?? 'Something went wrong.'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Something went wrong.');
+      return;
+    }
 
     // Success — flip to the confirmation view
     setSent(true);
@@ -96,10 +99,8 @@ export default function ForgotPasswordPage() {
     // `flex items-center justify-center` centers the card both axes
     // `px-4` adds horizontal padding so the card doesn't touch screen edges on mobile
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-
       {/* Card container — max-w-md caps width on wide screens */}
       <div className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 p-8 shadow-xl">
-
         {/* Page heading */}
         <div className="mb-7">
           <h1 className="text-2xl font-bold text-white">Forgot Password</h1>
@@ -124,9 +125,13 @@ export default function ForgotPasswordPage() {
               {/* Display the email they submitted so they know which inbox to check.
                   The deliberate "If an account exists for …" wording prevents
                   user enumeration — attackers cannot tell which emails are real. */}
-              If an account exists for <span className="text-white">{email}</span>, you&apos;ll receive a reset link shortly.
+              If an account exists for <span className="text-white">{email}</span>, you&apos;ll
+              receive a reset link shortly.
             </p>
-            <Link href="/login" className="inline-block mt-6 text-sm text-red-400 hover:text-red-300 transition">
+            <Link
+              href="/login"
+              className="inline-block mt-6 text-sm text-red-400 hover:text-red-300 transition"
+            >
               ← Back to Sign In
             </Link>
           </div>
@@ -134,7 +139,6 @@ export default function ForgotPasswordPage() {
           // --- FORM STATE ---
           // Standard controlled form: value ↔ state, submit → async handler
           <form onSubmit={handleSubmit} className="space-y-4">
-
             {/* Error alert — only rendered when `error` is a non-empty string.
                 `bg-red-500/10` is Tailwind's opacity modifier: red-500 at 10% opacity
                 for a subtle tinted background without a solid red block. */}
@@ -147,13 +151,15 @@ export default function ForgotPasswordPage() {
             {/* Email input */}
             <div>
               {/* htmlFor must match the input's id for screen-reader label association */}
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Email address
+              </label>
               <input
                 id="email"
-                type="email"       // triggers the browser's built-in email format validation
-                value={email}      // controlled: React state drives the displayed value
-                onChange={e => setEmail(e.target.value)} // update state on every keystroke
-                required           // HTML5 validation — prevents submit if empty
+                type="email" // triggers the browser's built-in email format validation
+                value={email} // controlled: React state drives the displayed value
+                onChange={(e) => setEmail(e.target.value)} // update state on every keystroke
+                required // HTML5 validation — prevents submit if empty
                 placeholder="you@example.com"
                 autoComplete="email" // browser autofill hint for password managers
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
@@ -177,7 +183,9 @@ export default function ForgotPasswordPage() {
 
             {/* "Back to Sign In" — secondary navigation link below the button */}
             <p className="text-center text-sm text-gray-500">
-              <Link href="/login" className="text-red-400 hover:text-red-300 transition">Back to Sign In</Link>
+              <Link href="/login" className="text-red-400 hover:text-red-300 transition">
+                Back to Sign In
+              </Link>
             </p>
           </form>
         )}

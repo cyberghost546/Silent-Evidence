@@ -31,15 +31,16 @@ export async function GET() {
   // same id — and the portal then lists every subscription on that customer.
   const [readerSub, authorSub] = await Promise.all([
     prisma.subscription.findUnique({
-      where: { userId }, select: { stripeCustomerId: true },
+      where: { userId },
+      select: { stripeCustomerId: true },
     }),
     prisma.authorSubscription.findUnique({
-      where: { userId }, select: { stripeCustomerId: true },
+      where: { userId },
+      select: { stripeCustomerId: true },
     }),
   ]);
 
-  const stripeCustomerId =
-    readerSub?.stripeCustomerId ?? authorSub?.stripeCustomerId ?? null;
+  const stripeCustomerId = readerSub?.stripeCustomerId ?? authorSub?.stripeCustomerId ?? null;
 
   if (!stripeCustomerId) {
     // No billing relationship at all — send them to the reader pricing page

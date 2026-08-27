@@ -63,9 +63,7 @@ export const zodError = (err: ZodError) => {
  *     // your handler logic
  *   });
  */
-export function withErrorHandling(
-  handler: (req: Request, ctx?: unknown) => Promise<NextResponse>
-) {
+export function withErrorHandling(handler: (req: Request, ctx?: unknown) => Promise<NextResponse>) {
   return async (req: Request, ctx?: unknown): Promise<NextResponse> => {
     try {
       return await handler(req, ctx);

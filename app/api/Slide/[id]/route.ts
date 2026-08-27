@@ -84,12 +84,13 @@ export async function PUT(req: Request, { params }: Params) {
   // This allows partial updates: sending just { active: false } only changes
   // the active flag and leaves title, image, etc. unchanged.
   const data: Record<string, unknown> = {};
-  if (title !== undefined)    data.title    = String(title).trim().slice(0, 200);   // max 200 chars
-  if (subtitle !== undefined) data.subtitle = subtitle ? String(subtitle).trim().slice(0, 300) : null;
-  if (image !== undefined)    data.image    = String(image).trim().slice(0, 500);   // URL max 500 chars
-  if (linkUrl !== undefined)  data.linkUrl  = linkUrl ? String(linkUrl).trim().slice(0, 500) : null;
-  if (order !== undefined)    data.order    = Number(order) || 0;  // coerce to number, default 0
-  if (active !== undefined)   data.active   = Boolean(active);     // coerce to boolean
+  if (title !== undefined) data.title = String(title).trim().slice(0, 200); // max 200 chars
+  if (subtitle !== undefined)
+    data.subtitle = subtitle ? String(subtitle).trim().slice(0, 300) : null;
+  if (image !== undefined) data.image = String(image).trim().slice(0, 500); // URL max 500 chars
+  if (linkUrl !== undefined) data.linkUrl = linkUrl ? String(linkUrl).trim().slice(0, 500) : null;
+  if (order !== undefined) data.order = Number(order) || 0; // coerce to number, default 0
+  if (active !== undefined) data.active = Boolean(active); // coerce to boolean
 
   const slide = await prisma.slide.update({ where: { id: Number(id) }, data });
   return NextResponse.json(slide);

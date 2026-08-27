@@ -11,7 +11,16 @@
 //   - No server interaction — everything is stored in localStorage.
 
 import { useState, useEffect } from 'react';
-import { Skull, BookOpen, Search, PenLine, Bell, MessageSquare, SunMoon, Swords } from 'lucide-react';
+import {
+  Skull,
+  BookOpen,
+  Search,
+  PenLine,
+  Bell,
+  MessageSquare,
+  SunMoon,
+  Swords,
+} from 'lucide-react';
 
 // ── Tutorial step data ────────────────────────────────────────────────────────
 // Each step has an icon, title, description, and an optional tip.
@@ -39,7 +48,7 @@ const STEPS = [
     icon: PenLine,
     title: 'Share Your Story',
     desc: 'Have something that happened to you? Click "Write a Story" in the navigation. Pick a template to get started quickly, or start from a blank page.',
-    tip: 'Your story is saved as a Draft automatically — you can publish it whenever you\'re ready.',
+    tip: "Your story is saved as a Draft automatically — you can publish it whenever you're ready.",
   },
   {
     icon: Bell,
@@ -97,14 +106,14 @@ export default function Tutorial() {
   // Advance to the next step, or close if on the last step
   const next = () => {
     if (step < STEPS.length - 1) {
-      setStep(s => s + 1);
+      setStep((s) => s + 1);
     } else {
       close();
     }
   };
 
   // Go back one step
-  const prev = () => setStep(s => Math.max(0, s - 1));
+  const prev = () => setStep((s) => Math.max(0, s - 1));
 
   // Reopen the tutorial from the help button
   const reopen = () => {
@@ -113,7 +122,7 @@ export default function Tutorial() {
   };
 
   const current = STEPS[step];
-  const isLast  = step === STEPS.length - 1;
+  const isLast = step === STEPS.length - 1;
 
   return (
     <>
@@ -122,13 +131,11 @@ export default function Tutorial() {
         // Full-screen backdrop — clicking it does nothing (user must use buttons)
         // so they don't accidentally dismiss mid-tutorial
         <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
-
           {/* Semi-transparent dark backdrop */}
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
           {/* Tutorial card */}
           <div className="relative w-full max-w-md bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
-
             {/* Red top accent bar */}
             <div className="h-1 bg-linear-to-r from-red-700 via-red-500 to-red-700" />
 
@@ -164,15 +171,19 @@ export default function Tutorial() {
             {/* Step content */}
             <div className="px-6 py-8 text-center">
               {/* Large emoji icon for the step */}
-              <div className="flex justify-center mb-5"><current.icon className="w-14 h-14 text-gray-400" strokeWidth={1} aria-hidden="true" /></div>
+              <div className="flex justify-center mb-5">
+                <current.icon
+                  className="w-14 h-14 text-gray-400"
+                  strokeWidth={1}
+                  aria-hidden="true"
+                />
+              </div>
 
               {/* Step title */}
               <h2 className="text-xl font-bold text-white mb-3">{current.title}</h2>
 
               {/* Step description */}
-              <p className="text-gray-400 text-sm leading-relaxed mb-5">
-                {current.desc}
-              </p>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">{current.desc}</p>
 
               {/* Tip box — highlighted hint shown below the description */}
               {current.tip && (
@@ -187,7 +198,6 @@ export default function Tutorial() {
 
             {/* Navigation buttons — Previous / Next (or Finish on last step) */}
             <div className="px-6 pb-6 flex items-center justify-between gap-3">
-
               {/* Previous button — hidden on first step */}
               <button
                 type="button"
@@ -207,8 +217,8 @@ export default function Tutorial() {
                     onClick={() => setStep(i)}
                     className={`rounded-full transition-all duration-200 ${
                       i === step
-                        ? 'w-4 h-2 bg-red-500'   // active step — wider pill
-                        : 'w-2 h-2 bg-gray-700 hover:bg-gray-500'  // inactive
+                        ? 'w-4 h-2 bg-red-500' // active step — wider pill
+                        : 'w-2 h-2 bg-gray-700 hover:bg-gray-500' // inactive
                     }`}
                     aria-label={`Go to step ${i + 1}`}
                   />
@@ -221,9 +231,8 @@ export default function Tutorial() {
                 onClick={next}
                 className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition"
               >
-                {isLast ? 'Let\'s go!' : 'Next →'}
+                {isLast ? "Let's go!" : 'Next →'}
               </button>
-
             </div>
           </div>
         </div>

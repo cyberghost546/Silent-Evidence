@@ -8,10 +8,7 @@ import { prisma } from '@/lib/prisma';
 
 // GET /api/squads/[code]/posts
 // Returns all squad posts ordered newest-first, with the author's username
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
 
   // First resolve the squad by code to get its numeric id
@@ -51,10 +48,7 @@ export async function GET(
 // Body: { userId, content?, storyUrl? }
 // Creates a new post inside the squad.
 // At least one of content or storyUrl must be provided.
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const body = await req.json();
   const { userId, content, storyUrl } = body;

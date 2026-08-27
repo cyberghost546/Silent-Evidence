@@ -7,12 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import Anthropic from '@anthropic-ai/sdk';
 import { prisma } from '@/lib/prisma';
-import {
-  unauthorized,
-  notFound,
-  serverError,
-  badRequest,
-} from '@/lib/apiError';
+import { unauthorized, notFound, serverError, badRequest } from '@/lib/apiError';
 
 // Route params shape for App Router dynamic segments
 type Params = { params: Promise<{ id: string }> };
@@ -27,7 +22,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
   // Only fetch the two fields we need — avoids loading the full story
   const story = await prisma.story.findUnique({
-    where:  { id: storyId },
+    where: { id: storyId },
     select: { scareScore: true, scareReason: true },
   });
 
@@ -35,7 +30,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
   // Return the current hype score and reason to the client
   return NextResponse.json({
-    score:  story.scareScore  ?? null,
+    score: story.scareScore ?? null,
     reason: story.scareReason ?? null,
   });
 }
@@ -55,11 +50,11 @@ export async function POST(_req: NextRequest, { params }: Params) {
   // Fetch the story — we need authorId, content, and the user's role
   const [story, caller] = await Promise.all([
     prisma.story.findUnique({
-      where:  { id: storyId },
+      where: { id: storyId },
       select: { authorId: true, content: true, title: true },
     }),
     prisma.user.findUnique({
-      where:  { id: userId },
+      where: { id: userId },
       select: { role: true },
     }),
   ]);
@@ -68,17 +63,21 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   // Only the story author or a site ADMIN may request an AI hype score
   const isAuthor = story.authorId === userId;
-  const isAdmin  = caller?.role === 'ADMIN';
+  const isAdmin = caller?.role === 'ADMIN';
   if (!isAuthor && !isAdmin) {
-    return NextResponse.json({ error: 'Only the author can request a hype score.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Only the author can request a hype score.' },
+      { status: 403 }
+    );
   }
 
   // Strip HTML tags so we send clean text to the AI
-  const plainText = story.content
-    ?.replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim() ?? '';
+  const plainText =
+    story.content
+      ?.replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim() ?? '';
 
   if (!plainText) return badRequest('Story has no readable content.');
 
@@ -93,11 +92,11 @@ export async function POST(_req: NextRequest, { params }: Params) {
     // Ask Claude Haiku to rate the hype/excitement level on a 1-10 scale.
     // We use a strict output format so we can parse it reliably.
     const message = await client.messages.create({
-      model:      'claude-haiku-4-5-20251001',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 120,
       messages: [
         {
-          role:    'user',
+          role: 'user',
           content: `You are a horror story critic. Rate the following story excerpt on a SCARE SCORE from 1 (mildly unsettling) to 10 (absolutely terrifying and unforgettable).
 
 Respond with ONLY this JSON format (no markdown, no explanation outside the JSON):
@@ -128,13 +127,13 @@ ${excerpt}`,
     }
 
     // Clamp the hype score to the valid range just in case the model drifts
-    const score  = Math.min(10, Math.max(1, Math.round(Number(parsed.score))));
+    const score = Math.min(10, Math.max(1, Math.round(Number(parsed.score))));
     const reason = String(parsed.reason ?? '').trim();
 
     // Persist both hype score fields to the story record
     await prisma.story.update({
       where: { id: storyId },
-      data:  { scareScore: score, scareReason: reason },
+      data: { scareScore: score, scareReason: reason },
     });
 
     // Return the hype score and reason to the client

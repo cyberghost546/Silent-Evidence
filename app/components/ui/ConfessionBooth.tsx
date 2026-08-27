@@ -43,10 +43,15 @@ export default function ConfessionBooth() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function submit() {
-    if (draft.trim().length < 5) { setError('Too short — bare your soul a little more.'); return; }
+    if (draft.trim().length < 5) {
+      setError('Too short — bare your soul a little more.');
+      return;
+    }
     setError('');
     setSubmitting(true);
     try {
@@ -110,7 +115,9 @@ export default function ConfessionBooth() {
             </label>
 
             <div className="flex items-center gap-3">
-              <span className={`text-xs ${draft.length > MAX_CHARS * 0.9 ? 'text-red-400' : 'text-gray-600'}`}>
+              <span
+                className={`text-xs ${draft.length > MAX_CHARS * 0.9 ? 'text-red-400' : 'text-gray-600'}`}
+              >
                 {draft.length}/{MAX_CHARS}
               </span>
               <button
@@ -129,9 +136,7 @@ export default function ConfessionBooth() {
       </div>
 
       {/* Feed */}
-      {loading && (
-        <div className="text-center py-12 text-gray-600">Loading confessions…</div>
-      )}
+      {loading && <div className="text-center py-12 text-gray-600">Loading confessions…</div>}
 
       {!loading && confessions.length === 0 && (
         <div className="text-center py-16 text-gray-600">
@@ -148,9 +153,11 @@ export default function ConfessionBooth() {
             {/* Author line */}
             <div className="flex items-center gap-2 mb-3">
               <div className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-sm">
-                {c.isAnonymous
-                ? <UserRound className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
-                : <Droplet className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />}
+                {c.isAnonymous ? (
+                  <UserRound className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+                ) : (
+                  <Droplet className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
+                )}
               </div>
               <span className="text-gray-500 text-sm">
                 {c.isAnonymous || !c.author ? 'Anonymous' : c.author.username}

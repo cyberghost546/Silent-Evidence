@@ -63,14 +63,12 @@ function ForgotPasswordForm() {
       <input
         type="email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email address"
         required
         className="w-full bg-gray-900 border border-gray-700 text-gray-200 placeholder-gray-600 text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-red-700"
       />
-      {status === 'error' && (
-        <p className="text-xs text-red-400">{errorMsg}</p>
-      )}
+      {status === 'error' && <p className="text-xs text-red-400">{errorMsg}</p>}
       <button
         type="submit"
         disabled={status === 'loading' || !email.trim()}
@@ -126,7 +124,8 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "I am The Watcher... I have observed every shadow on this site. Ask me anything — stories, features, or what lurks in the dark.",
+      content:
+        'I am The Watcher... I have observed every shadow on this site. Ask me anything — stories, features, or what lurks in the dark.',
     },
   ]);
 
@@ -179,7 +178,7 @@ export default function ChatBot() {
     setLoading(true);
 
     // Add an empty assistant message placeholder — we'll stream content into it below
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
     try {
       const endpoint = provider === 'ollama' ? '/api/ollama/chat' : '/api/chat';
@@ -188,7 +187,7 @@ export default function ChatBot() {
         headers: { 'Content-Type': 'application/json' },
         // Send only role + content — the showForgotPassword flag is UI-only, not sent to AI
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -206,7 +205,7 @@ export default function ChatBot() {
         const chunk = decoder.decode(value, { stream: true });
 
         // Append the chunk to the last message's content and check for [FORGOT_PASSWORD]
-        setMessages(prev => {
+        setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
           const newContent = last.content + chunk;
@@ -222,7 +221,7 @@ export default function ChatBot() {
       }
     } catch {
       // Replace the empty placeholder with an error message if the stream fails
-      setMessages(prev => {
+      setMessages((prev) => {
         const updated = [...prev];
         updated[updated.length - 1] = {
           ...updated[updated.length - 1],
@@ -308,7 +307,9 @@ export default function ChatBot() {
                 }}
                 className="text-gray-600 hover:text-gray-400 transition text-xl leading-none"
                 aria-label="Close chat"
-              >×</button>
+              >
+                ×
+              </button>
             </div>
           </div>
 
@@ -354,7 +355,7 @@ export default function ChatBot() {
               ref={inputRef}
               type="text"
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
               placeholder="Ask The Watcher..."
               disabled={loading}

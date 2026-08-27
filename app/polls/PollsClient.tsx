@@ -22,12 +22,18 @@ type Poll = {
   options: PollOption[];
 };
 
-export default function PollsClient({ polls: initial, userId }: { polls: Poll[]; userId: number | null }) {
-  const [polls, setPolls]           = useState(initial);
+export default function PollsClient({
+  polls: initial,
+  userId,
+}: {
+  polls: Poll[];
+  userId: number | null;
+}) {
+  const [polls, setPolls] = useState(initial);
   const [showCreate, setShowCreate] = useState(false);
 
   // Prepend the newly created poll to the list without a page reload
-  const handleCreated = (poll: Poll) => setPolls(prev => [poll, ...prev]);
+  const handleCreated = (poll: Poll) => setPolls((prev) => [poll, ...prev]);
 
   return (
     <div>
@@ -54,7 +60,7 @@ export default function PollsClient({ polls: initial, userId }: { polls: Poll[];
         </div>
       ) : (
         <div className="space-y-5">
-          {polls.map(poll => (
+          {polls.map((poll) => (
             <PollCard key={poll.id} poll={poll} userId={userId} />
           ))}
         </div>
@@ -62,10 +68,7 @@ export default function PollsClient({ polls: initial, userId }: { polls: Poll[];
 
       {/* Create modal */}
       {showCreate && (
-        <CreatePollModal
-          onClose={() => setShowCreate(false)}
-          onCreated={handleCreated}
-        />
+        <CreatePollModal onClose={() => setShowCreate(false)} onCreated={handleCreated} />
       )}
     </div>
   );

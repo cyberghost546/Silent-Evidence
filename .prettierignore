@@ -4,3 +4,4 @@ node_modules/
 public/sw.js
 prisma/migrations/
 package-lock.json
+.claude/settings.local.json

@@ -11,10 +11,7 @@ import { prisma } from '@/lib/prisma';
 //   - Squad metadata (name, description, host)
 //   - All current members with their usernames
 //   - The last 20 posts with the posting user's username
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ code: string }> }) {
   // Await the dynamic route param (Next.js 15 requires params to be awaited)
   const { code } = await params;
 
@@ -76,10 +73,7 @@ export async function GET(
 // PATCH /api/squads/[code]
 // Body: { userId, action: 'join' }
 // Adds a user to the squad as a SquadMember if not already a member
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const body = await req.json();
   const { userId, action } = body;

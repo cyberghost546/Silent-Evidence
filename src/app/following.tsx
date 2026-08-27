@@ -36,19 +36,19 @@ type Story = {
 };
 
 export default function FollowingScreen() {
-  const router   = useRouter();
-  const auth     = getAuth();
+  const router = useRouter();
+  const auth = getAuth();
 
-  const [stories, setStories]     = useState<Story[]>([]);
-  const [loading, setLoading]     = useState(true);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError]         = useState('');
+  const [error, setError] = useState('');
 
   // Fetch the following feed from the API
   const loadFeed = useCallback(async () => {
     setError('');
     try {
-      const res  = await apiFetch('/api/app/following/feed');
+      const res = await apiFetch('/api/app/following/feed');
       const json = await res.json();
 
       if (!res.ok) {
@@ -120,7 +120,9 @@ export default function FollowingScreen() {
       <FlatList
         data={stories}
         keyExtractor={(item) => String(item.id)}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#22c55e" />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#22c55e" />
+        }
         ListHeaderComponent={<Text style={styles.feedTitle}>Following</Text>}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -182,11 +184,15 @@ function StoryCard({ story }: { story: Story }) {
 
         {/* Category + title */}
         <Text style={styles.category}>{story.category.name.toUpperCase()}</Text>
-        <Text style={styles.cardTitle} numberOfLines={2}>{story.title}</Text>
+        <Text style={styles.cardTitle} numberOfLines={2}>
+          {story.title}
+        </Text>
 
         {/* Excerpt */}
         {story.excerpt ? (
-          <Text style={styles.excerpt} numberOfLines={2}>{story.excerpt}</Text>
+          <Text style={styles.excerpt} numberOfLines={2}>
+            {story.excerpt}
+          </Text>
         ) : null}
 
         {/* Meta */}
@@ -203,14 +209,34 @@ function StoryCard({ story }: { story: Story }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#0a0a0a' },
-  centered: { flex: 1, backgroundColor: '#0a0a0a', justifyContent: 'center', alignItems: 'center', padding: 32, gap: 16 },
+  centered: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 16,
+  },
   list: { paddingBottom: 40 },
 
   // Feed header
-  feedTitle: { fontSize: 26, fontWeight: '700', color: '#fff', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
+  feedTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#fff',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
 
   // Cards
-  card: { marginHorizontal: 16, marginBottom: 14, backgroundColor: '#1a1a1a', borderRadius: 14, overflow: 'hidden' },
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 14,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
   cover: { width: '100%', height: 160 },
   cardBody: { padding: 14, gap: 5 },
   authorRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
@@ -225,7 +251,13 @@ const styles = StyleSheet.create({
   // Guest / empty states
   guestTitle: { fontSize: 22, fontWeight: '700', color: '#fff', textAlign: 'center' },
   guestSub: { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 20 },
-  signInBtn: { backgroundColor: '#22c55e', paddingHorizontal: 36, paddingVertical: 12, borderRadius: 24, marginTop: 8 },
+  signInBtn: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 36,
+    paddingVertical: 12,
+    borderRadius: 24,
+    marginTop: 8,
+  },
   signInBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   emptyContainer: { padding: 32, alignItems: 'center', gap: 10 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#fff' },
@@ -233,6 +265,11 @@ const styles = StyleSheet.create({
 
   // Error state
   errorText: { color: '#22c55e', fontSize: 16, textAlign: 'center' },
-  retryBtn: { backgroundColor: '#22c55e', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20 },
+  retryBtn: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
   retryBtnText: { color: '#fff', fontWeight: '600' },
 });

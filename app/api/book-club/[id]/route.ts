@@ -7,7 +7,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { unauthorized, serverError } from '@/lib/apiError';
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export async function GET(_req: Request, { params }: Props) {
   try {
@@ -26,7 +28,11 @@ export async function GET(_req: Request, { params }: Props) {
         },
         story: {
           select: {
-            id: true, title: true, slug: true, coverImage: true, excerpt: true,
+            id: true,
+            title: true,
+            slug: true,
+            coverImage: true,
+            excerpt: true,
             author: { select: { username: true } },
             _count: { select: { likes: true, comments: true } },
           },

@@ -59,10 +59,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     where: { id: commentId }, // target this specific comment by its primary key
 
     select: {
-      id: true,                                          // the comment's own ID (used in the update below)
-      pinned: true,                                      // the current pinned state (used for toggle logic)
-      storyId: true,                                     // which story this comment belongs to
-      story: { select: { authorId: true } },             // the story's author ID for the permission check
+      id: true, // the comment's own ID (used in the update below)
+      pinned: true, // the current pinned state (used for toggle logic)
+      storyId: true, // which story this comment belongs to
+      story: { select: { authorId: true } }, // the story's author ID for the permission check
     },
   });
 
@@ -85,10 +85,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     await prisma.comment.updateMany({
       where: {
         storyId: comment.storyId, // only affect comments on this specific story
-        pinned: true,             // only target comments that are currently pinned
+        pinned: true, // only target comments that are currently pinned
       },
       data: {
-        pinned: false,            // unpin them all (should only ever be one, but updateMany is safe)
+        pinned: false, // unpin them all (should only ever be one, but updateMany is safe)
       },
     });
   }
@@ -98,11 +98,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   // If comment.pinned was false → !comment.pinned = true  → we're pinning it
   // Toggle this comment's pinned state
   const updated = await prisma.comment.update({
-    where: { id: commentId },           // target this specific comment
-    data: { pinned: !comment.pinned },  // flip the boolean — toggle the pinned state
+    where: { id: commentId }, // target this specific comment
+    data: { pinned: !comment.pinned }, // flip the boolean — toggle the pinned state
 
     select: {
-      id: true,     // return the comment's ID so the client can match the response
+      id: true, // return the comment's ID so the client can match the response
       pinned: true, // return the NEW pinned state so the UI can update the pin button
     },
   });

@@ -18,16 +18,24 @@ export async function POST(req: Request) {
 
     let club;
     if (inviteCode) {
-      club = await prisma.bookClub.findUnique({ where: { inviteCode: inviteCode.trim().toUpperCase() } });
+      club = await prisma.bookClub.findUnique({
+        where: { inviteCode: inviteCode.trim().toUpperCase() },
+      });
     } else if (rawClubId) {
-      club = await prisma.bookClub.findUnique({ where: { id: Number(rawClubId), isPrivate: false } });
+      club = await prisma.bookClub.findUnique({
+        where: { id: Number(rawClubId), isPrivate: false },
+      });
     }
 
-    if (!club) return NextResponse.json({ error: 'Club not found or invalid invite code' }, { status: 404 });
+    if (!club)
+      return NextResponse.json({ error: 'Club not found or invalid invite code' }, { status: 404 });
 
     // Premium clubs require admin or active subscription
-    if (club.isPremium && !await hasPremiumAccess(userId)) {
-      return NextResponse.json({ error: 'This is a premium-only club. Upgrade to join.' }, { status: 403 });
+    if (club.isPremium && !(await hasPremiumAccess(userId))) {
+      return NextResponse.json(
+        { error: 'This is a premium-only club. Upgrade to join.' },
+        { status: 403 }
+      );
     }
 
     // Upsert — safe if they're already a member
@@ -54,7 +62,10 @@ export async function DELETE(req: Request) {
     const club = await prisma.bookClub.findUnique({ where: { id: Number(clubId) } });
     if (!club) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     if (club.ownerId === userId) {
-      return NextResponse.json({ error: 'Owner cannot leave — transfer ownership or delete the club' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Owner cannot leave — transfer ownership or delete the club' },
+        { status: 400 }
+      );
     }
 
     await prisma.bookClubMember.delete({

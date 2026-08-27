@@ -25,7 +25,7 @@ import { useRouter } from 'next/navigation';
 
 type Props = {
   slug: string;
-  price: number;       // in cents
+  price: number; // in cents
   isLoggedIn: boolean;
 };
 
@@ -34,9 +34,12 @@ export default function BundlePurchaseButton({ slug, price, isLoggedIn }: Props)
   const router = useRouter();
 
   const buy = async () => {
-    if (!isLoggedIn) { router.push('/login'); return; }
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
     setLoading(true);
-    const res  = await fetch(`/api/bundles/${slug}/purchase`, { method: 'POST' });
+    const res = await fetch(`/api/bundles/${slug}/purchase`, { method: 'POST' });
     const data = await res.json();
     setLoading(false);
     if (data.url) window.location.href = data.url;
@@ -48,7 +51,11 @@ export default function BundlePurchaseButton({ slug, price, isLoggedIn }: Props)
       disabled={loading}
       className="inline-flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold rounded-xl transition text-sm"
     >
-      {loading ? 'Redirecting…' : price === 0 ? 'Get for Free' : `Buy for $${(price / 100).toFixed(2)}`}
+      {loading
+        ? 'Redirecting…'
+        : price === 0
+          ? 'Get for Free'
+          : `Buy for $${(price / 100).toFixed(2)}`}
     </button>
   );
 }

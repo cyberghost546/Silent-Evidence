@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   try {
     const [requests, total] = await Promise.all([
       prisma.coauthorRequest.findMany({
-        where:   { isOpen: true },
+        where: { isOpen: true },
         orderBy: { createdAt: 'desc' },
         skip,
         take,
@@ -44,9 +44,9 @@ export async function GET(req: NextRequest) {
 
 // Validation for creating a request
 const CreateSchema = z.object({
-  title:       z.string().min(5).max(150),
+  title: z.string().min(5).max(150),
   description: z.string().min(20).max(2000),
-  genres:      z.string().max(200).optional(), // comma-separated
+  genres: z.string().max(200).optional(), // comma-separated
 });
 
 // POST — create a new co-author request
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
   if (!userId) return unauthorized();
 
   try {
-    const body   = await req.json();
+    const body = await req.json();
     const parsed = CreateSchema.safeParse(body);
     if (!parsed.success) return zodError(parsed.error);
 

@@ -1,12 +1,12 @@
 {
   "crons": [
     {
-      "path": "/api/cron/newsletter",
-      "schedule": "0 9 * * 1"
+      "path": "/api/cron/publish-scheduled",
+      "schedule": "0 8 * * *"
     },
     {
-      "path": "/api/cron/publish-scheduled",
-      "schedule": "*/15 * * * *"
+      "path": "/api/cron/data-retention",
+      "schedule": "0 3 * * *"
     }
   ],
   "functions": {

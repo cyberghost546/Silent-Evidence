@@ -37,9 +37,9 @@ import { Bot, Pencil } from 'lucide-react';
 // Shape of a single writing prompt record
 type Prompt = {
   id: number;
-  title: string;         // short headline shown to users (e.g. "Weekend Prompt #5")
-  prompt: string;        // the full creative writing challenge text
-  active: boolean;       // only the active prompt is shown on the site homepage
+  title: string; // short headline shown to users (e.g. "Weekend Prompt #5")
+  prompt: string; // the full creative writing challenge text
+  active: boolean; // only the active prompt is shown on the site homepage
   expiresAt: string | null; // optional ISO date — shown as a deadline to users
   createdAt: string;
   _count: { entries: number }; // how many stories have been submitted for this prompt
@@ -49,13 +49,13 @@ type Prompt = {
 
 export default function AdminPromptsClient({ initialPrompts }: { initialPrompts: Prompt[] }) {
   // Local prompt list — prepended when a new prompt is created
-  const [prompts, setPrompts]       = useState<Prompt[]>(initialPrompts);
+  const [prompts, setPrompts] = useState<Prompt[]>(initialPrompts);
 
   // True while the API call is in flight (AI generation or manual save)
   const [generating, setGenerating] = useState(false);
 
   // Controlled inputs for the Manual mode form
-  const [manualTitle, setManualTitle]   = useState('');
+  const [manualTitle, setManualTitle] = useState('');
   const [manualPrompt, setManualPrompt] = useState('');
 
   // Which creation mode is active — 'ai' uses Claude; 'manual' uses the text inputs
@@ -75,9 +75,7 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
     setError('');
 
     // Build the request body based on the selected mode
-    const body = mode === 'manual'
-      ? { title: manualTitle, prompt: manualPrompt }
-      : {}; // empty body signals the server to use AI generation
+    const body = mode === 'manual' ? { title: manualTitle, prompt: manualPrompt } : {}; // empty body signals the server to use AI generation
 
     const res = await fetch('/api/writing-prompts', {
       method: 'POST',
@@ -87,14 +85,17 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
     const data = await res.json();
     setGenerating(false);
 
-    if (!res.ok) { setError(data.error ?? 'Failed'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Failed');
+      return;
+    }
 
     // Optimistically update the UI:
     // 1. Prepend the new prompt (with 0 entries since it's brand new)
     // 2. Mark all existing prompts as inactive (only one is active at a time)
-    setPrompts(prev => [
+    setPrompts((prev) => [
       { ...data, _count: { entries: 0 } },
-      ...prev.map(p => ({ ...p, active: false })),
+      ...prev.map((p) => ({ ...p, active: false })),
     ]);
 
     // Clear the manual form inputs ready for next time
@@ -110,13 +111,26 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
           Two buttons styled as a segmented control to switch between AI and Manual.
           The active mode gets a filled red background; the inactive one is outlined. */}
       <div className="flex gap-2 mb-5">
-        {(['ai', 'manual'] as const).map(m => (
-          <button key={m} onClick={() => setMode(m)}
+        {(['ai', 'manual'] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition border ${
-              mode === m ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white'
-            }`}>
+              mode === m
+                ? 'bg-red-600 border-red-600 text-white'
+                : 'border-gray-700 text-gray-400 hover:text-white'
+            }`}
+          >
             {/* Show a Bot icon for AI mode and a Pencil icon for Manual mode */}
-            {m === 'ai' ? <span className="inline-flex items-center gap-1.5"><Bot className="w-4 h-4" /> AI Generate</span> : <span className="inline-flex items-center gap-1.5"><Pencil className="w-4 h-4" /> Manual</span>}
+            {m === 'ai' ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Bot className="w-4 h-4" /> AI Generate
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <Pencil className="w-4 h-4" /> Manual
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -127,12 +141,14 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
       {mode === 'manual' && (
         <div className="space-y-3 mb-4">
           <input
-            value={manualTitle} onChange={e => setManualTitle(e.target.value)}
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
             placeholder="Prompt title (e.g. Weekend Prompt #5)"
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600"
           />
           <textarea
-            value={manualPrompt} onChange={e => setManualPrompt(e.target.value)}
+            value={manualPrompt}
+            onChange={(e) => setManualPrompt(e.target.value)}
             placeholder="Write the full prompt text here…"
             rows={3}
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white resize-none focus:outline-none focus:ring-2 focus:ring-red-600"
@@ -146,23 +162,39 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
       {/* ── Action button ────────────────────────────────────────────────────
           Disabled while generating or if required Manual fields are empty.
           Label changes depending on mode and loading state. */}
-      <button onClick={generate} disabled={generating || (mode === 'manual' && (!manualTitle || !manualPrompt))}
-        className="mb-8 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition">
-        {generating ? (mode === 'ai' ? 'Generating…' : 'Saving…') : (mode === 'ai' ? 'Generate New Prompt' : 'Save Prompt')}
+      <button
+        onClick={generate}
+        disabled={generating || (mode === 'manual' && (!manualTitle || !manualPrompt))}
+        className="mb-8 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition"
+      >
+        {generating
+          ? mode === 'ai'
+            ? 'Generating…'
+            : 'Saving…'
+          : mode === 'ai'
+            ? 'Generate New Prompt'
+            : 'Save Prompt'}
       </button>
 
       {/* ── Prompt history ───────────────────────────────────────────────────
           Shows the most recent prompts so the admin can see entry counts and
           which one is currently active (red border + "Active" badge). */}
       <div className="space-y-4">
-        {prompts.map(p => (
+        {prompts.map((p) => (
           // Active prompt gets a red border to stand out in the list
-          <div key={p.id} className={`bg-gray-900 border rounded-xl p-5 ${p.active ? 'border-red-600/50' : 'border-gray-800'}`}>
+          <div
+            key={p.id}
+            className={`bg-gray-900 border rounded-xl p-5 ${p.active ? 'border-red-600/50' : 'border-gray-800'}`}
+          >
             <div className="flex items-start justify-between gap-2 mb-2">
               <p className="text-sm font-semibold text-white">{p.title}</p>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {/* "Active" badge — only on the currently live prompt */}
-                {p.active && <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full">Active</span>}
+                {p.active && (
+                  <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                )}
                 {/* Entry count — how many stories have been submitted for this prompt */}
                 <span className="text-xs text-gray-500">{p._count.entries} entries</span>
               </div>
@@ -171,7 +203,9 @@ export default function AdminPromptsClient({ initialPrompts }: { initialPrompts:
             <p className="text-sm text-gray-400">{p.prompt}</p>
             {/* Expiry date — only shown if one was set */}
             {p.expiresAt && (
-              <p className="text-xs text-gray-600 mt-2">Expires: {new Date(p.expiresAt).toLocaleDateString()}</p>
+              <p className="text-xs text-gray-600 mt-2">
+                Expires: {new Date(p.expiresAt).toLocaleDateString()}
+              </p>
             )}
           </div>
         ))}

@@ -19,9 +19,9 @@ const globalForPusher = globalThis as typeof globalThis & { __pusher?: Pusher | 
 
 function createPusher(): Pusher | null {
   // All four env vars are required — skip initialization if any are missing
-  const appId   = process.env.PUSHER_APP_ID;
-  const key     = process.env.PUSHER_KEY;
-  const secret  = process.env.PUSHER_SECRET;
+  const appId = process.env.PUSHER_APP_ID;
+  const key = process.env.PUSHER_KEY;
+  const secret = process.env.PUSHER_SECRET;
   const cluster = process.env.PUSHER_CLUSTER;
 
   if (!appId || !key || !secret || !cluster) {
@@ -57,13 +57,16 @@ function getPusher(): Pusher | null {
  * Trigger a new direct message event to the receiver's private channel.
  * Called from POST /api/messages when a message is sent.
  */
-export async function pushNewMessage(receiverId: number, message: {
-  id: number;
-  content: string;
-  senderId: number;
-  senderUsername: string;
-  createdAt: string;
-}) {
+export async function pushNewMessage(
+  receiverId: number,
+  message: {
+    id: number;
+    content: string;
+    senderId: number;
+    senderUsername: string;
+    createdAt: string;
+  }
+) {
   const pusher = getPusher();
   if (!pusher) return;
 
@@ -78,11 +81,14 @@ export async function pushNewMessage(receiverId: number, message: {
  * Trigger a reading room member update (join, leave, or progress change).
  * Called from PATCH /api/reading-rooms/[code] when a member updates.
  */
-export async function pushRoomUpdate(roomCode: string, members: {
-  userId: number;
-  username: string;
-  progress: number;
-}[]) {
+export async function pushRoomUpdate(
+  roomCode: string,
+  members: {
+    userId: number;
+    username: string;
+    progress: number;
+  }[]
+) {
   const pusher = getPusher();
   if (!pusher) return;
 
@@ -97,11 +103,14 @@ export async function pushRoomUpdate(roomCode: string, members: {
  * Trigger a notification event to a user's private channel.
  * Called when a new notification is created (like, comment, follow, etc.)
  */
-export async function pushNotification(userId: number, notification: {
-  id: number;
-  type: string;
-  message: string;
-}) {
+export async function pushNotification(
+  userId: number,
+  notification: {
+    id: number;
+    type: string;
+    message: string;
+  }
+) {
   const pusher = getPusher();
   if (!pusher) return;
 

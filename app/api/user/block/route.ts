@@ -19,11 +19,13 @@ export async function GET() {
 
   const blocked = await prisma.blockedUser.findMany({
     where: { blockerId: callerId },
-    include: { blocked: { select: { id: true, username: true, profile: { select: { avatar: true } } } } },
+    include: {
+      blocked: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
+    },
     orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json(blocked.map(b => b.blocked));
+  return NextResponse.json(blocked.map((b) => b.blocked));
 }
 
 // POST /api/user/block — body: { username }
@@ -37,7 +39,8 @@ export async function POST(req: NextRequest) {
   // Look up the user to block
   const target = await prisma.user.findUnique({ where: { username }, select: { id: true } });
   if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  if (target.id === callerId) return NextResponse.json({ error: 'Cannot block yourself' }, { status: 400 });
+  if (target.id === callerId)
+    return NextResponse.json({ error: 'Cannot block yourself' }, { status: 400 });
 
   // Use upsert to be idempotent — blocking an already-blocked user is a no-op
   await prisma.blockedUser.upsert({

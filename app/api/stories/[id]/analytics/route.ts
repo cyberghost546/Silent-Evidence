@@ -29,7 +29,8 @@ export async function GET(req: NextRequest, { params }: Params) {
       },
     });
     if (!story) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    if (story.authorId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (story.authorId !== userId)
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     // Build the 7-day reads chart from ReadingHistory records and compute avg completion
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -58,15 +59,16 @@ export async function GET(req: NextRequest, { params }: Params) {
     const weeklyChart = Object.entries(dayCounts).map(([date, reads]) => ({ date, reads }));
 
     // Average completion rate across all readers who scrolled past 0%
-    const avgCompletion = allProgress.length > 0
-      ? Math.round(allProgress.reduce((sum, r) => sum + r.progress, 0) / allProgress.length)
-      : null;
+    const avgCompletion =
+      allProgress.length > 0
+        ? Math.round(allProgress.reduce((sum, r) => sum + r.progress, 0) / allProgress.length)
+        : null;
 
     return NextResponse.json({
-      views:         story.views,
-      likes:         story._count.likes,
-      comments:      story._count.comments,
-      bookmarks:     story._count.bookmarks,
+      views: story.views,
+      likes: story._count.likes,
+      comments: story._count.comments,
+      bookmarks: story._count.bookmarks,
       weeklyChart,
       avgCompletion,
     });

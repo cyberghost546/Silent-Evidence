@@ -67,10 +67,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!invitee) {
-      return NextResponse.json(
-        { error: `User "${inviteeUsername}" not found.` },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: `User "${inviteeUsername}" not found.` }, { status: 404 });
     }
 
     // Prevent self-invitation — the author can't invite themselves
@@ -108,16 +105,24 @@ export async function POST(req: NextRequest) {
     });
 
     // Notify the invitee so they can accept or decline from /my-invites
-    const story = await prisma.story.findUnique({ where: { id: Number(storyId) }, select: { title: true } });
-    const inviter = await prisma.user.findUnique({ where: { id: inviterId }, select: { username: true } });
-    prisma.notification.create({
-      data: {
-        userId: invitee.id,
-        type: 'COLLABORATE',
-        message: `${inviter?.username ?? 'Someone'} invited you to co-author "${story?.title ?? 'a story'}". Visit My Invites to accept.`,
-        storyId: Number(storyId),
-      },
-    }).catch(() => {});
+    const story = await prisma.story.findUnique({
+      where: { id: Number(storyId) },
+      select: { title: true },
+    });
+    const inviter = await prisma.user.findUnique({
+      where: { id: inviterId },
+      select: { username: true },
+    });
+    prisma.notification
+      .create({
+        data: {
+          userId: invitee.id,
+          type: 'COLLABORATE',
+          message: `${inviter?.username ?? 'Someone'} invited you to co-author "${story?.title ?? 'a story'}". Visit My Invites to accept.`,
+          storyId: Number(storyId),
+        },
+      })
+      .catch(() => {});
 
     return NextResponse.json(collaborator, { status: 201 });
   } catch (err) {

@@ -13,8 +13,12 @@ export async function GET() {
 
   // IDs of authors the user already follows (skip them in suggestions)
   const alreadyFollowing = userId
-    ? (await prisma.follow.findMany({ where: { followerId: userId }, select: { followingId: true } }))
-        .map((f) => f.followingId)
+    ? (
+        await prisma.follow.findMany({
+          where: { followerId: userId },
+          select: { followingId: true },
+        })
+      ).map((f) => f.followingId)
     : [];
 
   // Include the user themselves in the exclusion list

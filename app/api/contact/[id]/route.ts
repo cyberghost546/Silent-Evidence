@@ -75,7 +75,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   // Only include the 'read' field if it was provided AND is a boolean.
   // typeof check prevents accidentally accepting "true" as a string or 1 as a number.
-  if (typeof body.read     === 'boolean') data.read     = body.read;
+  if (typeof body.read === 'boolean') data.read = body.read;
 
   // Only include the 'resolved' field if it was provided AND is a boolean.
   if (typeof body.resolved === 'boolean') data.resolved = body.resolved;
@@ -85,7 +85,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   // Only the fields present in `data` will be changed — other fields are left alone.
   const updated = await prisma.contactMessage.update({
     where: { id: Number(id) }, // Number() converts the URL string to an integer
-    data,                      // the partial update — may contain 'read', 'resolved', or both
+    data, // the partial update — may contain 'read', 'resolved', or both
   });
 
   // Return the full updated message record so the admin UI can reflect the new state

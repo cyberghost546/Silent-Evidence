@@ -12,7 +12,10 @@ function chunkText(text: string): string[] {
   const paragraphs = text.split(/\n\n+/);
   const chunks: string[] = [];
   for (const para of paragraphs) {
-    if (para.length <= MAX_CHARS) { chunks.push(para); continue; }
+    if (para.length <= MAX_CHARS) {
+      chunks.push(para);
+      continue;
+    }
     const sentences = para.match(/[^.!?]+[.!?]+/g) ?? [para];
     let current = '';
     for (const sentence of sentences) {
@@ -44,12 +47,16 @@ async function translateChunk(text: string, from: string, to: string): Promise<s
   const data = await res.json();
   if (!Array.isArray(data) || !Array.isArray(data[0])) throw new Error('TRANSLATE_FAILED');
 
-  return (data[0] as [string, string][]).map(pair => pair[0] ?? '').join('');
+  return (data[0] as [string, string][]).map((pair) => pair[0] ?? '').join('');
 }
 
-async function translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
-  const sourceDef = LANGUAGES.find(l => l.code === sourceLang);
-  const targetDef = LANGUAGES.find(l => l.code === targetLang);
+async function translateText(
+  text: string,
+  sourceLang: string,
+  targetLang: string
+): Promise<string> {
+  const sourceDef = LANGUAGES.find((l) => l.code === sourceLang);
+  const targetDef = LANGUAGES.find((l) => l.code === targetLang);
   const chunks = chunkText(text);
   const translated: string[] = [];
 

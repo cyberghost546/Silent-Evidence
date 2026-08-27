@@ -29,8 +29,8 @@ import PollsClient from './PollsClient';
 
 export default async function AdminPollsPage() {
   const polls = await prisma.poll.findMany({
-    where: { groupId: null },          // site-wide polls only
-    orderBy: { createdAt: 'desc' },    // newest first
+    where: { groupId: null }, // site-wide polls only
+    orderBy: { createdAt: 'desc' }, // newest first
     include: {
       // For each poll, include its options and each option's vote count
       options: { include: { _count: { select: { votes: true } } } },
@@ -43,7 +43,9 @@ export default async function AdminPollsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Poll Manager</h1>
-      <p className="text-gray-500 text-sm mb-8">Create and close site-wide polls. Group polls are managed within each group.</p>
+      <p className="text-gray-500 text-sm mb-8">
+        Create and close site-wide polls. Group polls are managed within each group.
+      </p>
       {/* JSON serialisation strips Date objects before crossing server→client boundary */}
       <PollsClient polls={JSON.parse(JSON.stringify(polls))} />
     </div>

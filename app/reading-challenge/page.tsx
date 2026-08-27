@@ -32,7 +32,11 @@ export default async function ReadingChallengePage() {
       include: {
         story: {
           select: {
-            id: true, title: true, slug: true, coverImage: true, mood: true,
+            id: true,
+            title: true,
+            slug: true,
+            coverImage: true,
+            mood: true,
             author: { select: { username: true } },
           },
         },
@@ -73,21 +77,27 @@ export default async function ReadingChallengePage() {
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-extrabold text-white">Reading Challenge</h1>
           </div>
-          <p className="text-gray-400 text-sm">Track your horror reading streak and hit your goals.</p>
+          <p className="text-gray-400 text-sm">
+            Track your horror reading streak and hit your goals.
+          </p>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
-
         {/* Streak + all-time stats */}
         <div className="grid grid-cols-3 gap-4">
           {[
             { label: 'Current Streak', value: `${streak?.currentStreak ?? 0}d`, icon: Flame },
-            { label: 'Best Streak',    value: `${streak?.longestStreak ?? 0}d`, icon: Trophy },
-            { label: 'Stories Read',   value: fmt(allTimeCount),                icon: BookOpen },
+            { label: 'Best Streak', value: `${streak?.longestStreak ?? 0}d`, icon: Trophy },
+            { label: 'Stories Read', value: fmt(allTimeCount), icon: BookOpen },
           ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
-              <div className="flex justify-center mb-2"><Icon className="w-7 h-7 text-gray-400" strokeWidth={1.5} aria-hidden="true" /></div>
+            <div
+              key={label}
+              className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center"
+            >
+              <div className="flex justify-center mb-2">
+                <Icon className="w-7 h-7 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+              </div>
               <p className="text-2xl font-extrabold text-white">{value}</p>
               <p className="text-xs text-gray-500 mt-1">{label}</p>
             </div>
@@ -96,26 +106,40 @@ export default async function ReadingChallengePage() {
 
         {/* Reading goal */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">Your Goal</h2>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">
+            Your Goal
+          </h2>
           <ReadingGoalWidget />
         </div>
 
         {/* 30-day activity heatmap */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">Last 30 Days</h2>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">
+            Last 30 Days
+          </h2>
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
             <div className="flex gap-1 flex-wrap">
               {days.map(({ date, count }) => {
-                const intensity = count === 0 ? 'bg-gray-800' : count === 1 ? 'bg-green-900' : count <= 3 ? 'bg-green-700' : 'bg-green-500';
+                const intensity =
+                  count === 0
+                    ? 'bg-gray-800'
+                    : count === 1
+                      ? 'bg-green-900'
+                      : count <= 3
+                        ? 'bg-green-700'
+                        : 'bg-green-500';
                 return (
-                  <div key={date} title={`${date}: ${count} read`}
-                    className={`w-6 h-6 rounded-sm ${intensity} transition-colors`} />
+                  <div
+                    key={date}
+                    title={`${date}: ${count} read`}
+                    className={`w-6 h-6 rounded-sm ${intensity} transition-colors`}
+                  />
                 );
               })}
             </div>
             <div className="flex items-center gap-2 mt-3 text-xs text-gray-600">
               <span>Less</span>
-              {['bg-gray-800','bg-green-900','bg-green-700','bg-green-500'].map(c => (
+              {['bg-gray-800', 'bg-green-900', 'bg-green-700', 'bg-green-500'].map((c) => (
                 <div key={c} className={`w-3 h-3 rounded-sm ${c}`} />
               ))}
               <span>More</span>
@@ -125,25 +149,42 @@ export default async function ReadingChallengePage() {
 
         {/* Recent reads */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">Recently Read</h2>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3">
+            Recently Read
+          </h2>
           {history.length === 0 ? (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-500">
               <p>You haven&apos;t read any stories yet.</p>
-              <Link href="/discover" className="inline-block mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold text-white transition">
+              <Link
+                href="/discover"
+                className="inline-block mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold text-white transition"
+              >
                 Explore Stories
               </Link>
             </div>
           ) : (
             <div className="space-y-3">
-              {history.map(h => (
-                <Link key={h.id} href={`/story/${h.story.slug}`}
-                  className="flex items-center gap-4 bg-gray-900 border border-gray-800 hover:border-red-600/30 rounded-2xl p-4 transition group">
+              {history.map((h) => (
+                <Link
+                  key={h.id}
+                  href={`/story/${h.story.slug}`}
+                  className="flex items-center gap-4 bg-gray-900 border border-gray-800 hover:border-red-600/30 rounded-2xl p-4 transition group"
+                >
                   {h.story.coverImage ? (
-                    <Image src={h.story.coverImage} alt={h.story.title}
-                      width={56} height={56} className="object-cover rounded-xl shrink-0" />
+                    <Image
+                      src={h.story.coverImage}
+                      alt={h.story.title}
+                      width={56}
+                      height={56}
+                      className="object-cover rounded-xl shrink-0"
+                    />
                   ) : (
                     <div className="w-14 h-14 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                      <BookOpen
+                        className="w-5 h-5 text-gray-600"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
@@ -152,11 +193,16 @@ export default async function ReadingChallengePage() {
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">by {h.story.author.username}</p>
                     {h.story.mood && (
-                      <span className="text-[10px] text-gray-600 uppercase tracking-wider">{h.story.mood}</span>
+                      <span className="text-[10px] text-gray-600 uppercase tracking-wider">
+                        {h.story.mood}
+                      </span>
                     )}
                   </div>
                   <p className="text-xs text-gray-600 shrink-0">
-                    {new Date(h.readAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(h.readAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </p>
                 </Link>
               ))}

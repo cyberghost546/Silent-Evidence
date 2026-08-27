@@ -57,18 +57,18 @@ export async function GET() {
     if (!user) return unauthorized();
 
     // ── Step 1: followed author IDs ───────────────────────────────────────────
-    const followedAuthorIds = user.following.map(f => f.followingId);
+    const followedAuthorIds = user.following.map((f) => f.followingId);
 
     // ── Step 2: parse fear moods from the profile ─────────────────────────────
     // fearMoods is stored as "CREEPY,SUPERNATURAL,GORE" — split and cast to Mood[]
     const rawMoods = user.profile?.fearMoods ?? '';
     const fearMoods: Mood[] = rawMoods
       .split(',')
-      .map(s => s.trim())
+      .map((s) => s.trim())
       .filter(Boolean) as Mood[];
 
     // ── Step 3: already-read story IDs to exclude ─────────────────────────────
-    const readStoryIds = user.readingHistory.map(h => h.storyId);
+    const readStoryIds = user.readingHistory.map((h) => h.storyId);
 
     // ── Step 4 & 5: build the personalised WHERE clause ───────────────────────
     // Stories must be published, not already read, and match at least one signal
@@ -88,31 +88,33 @@ export async function GET() {
     }
 
     // If the user follows nobody and has no fear moods, fall back to latest stories only
-    const personalised = orConditions.length > 0
-      ? await prisma.story.findMany({
-          where: {
-            status: 'PUBLISHED',
-            contentRating: { in: allowedRatings },            // age-appropriate content only
-            id: readStoryIds.length > 0
-              ? { notIn: readStoryIds }                       // exclude already-read
-              : undefined,
-            OR: orConditions,                                  // author OR mood match
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 20,
-          include: {
-            author: {
-              select: {
-                username: true,
-                isVerified: true,
-                profile: { select: { avatar: true } },
-              },
+    const personalised =
+      orConditions.length > 0
+        ? await prisma.story.findMany({
+            where: {
+              status: 'PUBLISHED',
+              contentRating: { in: allowedRatings }, // age-appropriate content only
+              id:
+                readStoryIds.length > 0
+                  ? { notIn: readStoryIds } // exclude already-read
+                  : undefined,
+              OR: orConditions, // author OR mood match
             },
-            category: { select: { name: true, slug: true } },
-            _count: { select: { likes: true, comments: true } },
-          },
-        })
-      : [];
+            orderBy: { createdAt: 'desc' },
+            take: 20,
+            include: {
+              author: {
+                select: {
+                  username: true,
+                  isVerified: true,
+                  profile: { select: { avatar: true } },
+                },
+              },
+              category: { select: { name: true, slug: true } },
+              _count: { select: { likes: true, comments: true } },
+            },
+          })
+        : [];
 
     // ── Step 8: pad with latest stories if personalised feed is thin ─────────
     // Fewer than 10 results? Top up with the most recent published stories.
@@ -120,12 +122,9 @@ export async function GET() {
 
     if (personalised.length < 10) {
       // IDs we already have — so we don't show duplicates in the padding
-      const existingIds = new Set(personalised.map(s => s.id));
+      const existingIds = new Set(personalised.map((s) => s.id));
       // Also exclude stories already read, and stories authored by the user themselves
-      const excludeIds = [
-        ...readStoryIds,
-        ...existingIds,
-      ];
+      const excludeIds = [...readStoryIds, ...existingIds];
 
       const padding = await prisma.story.findMany({
         where: {

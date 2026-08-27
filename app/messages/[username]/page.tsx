@@ -30,8 +30,12 @@ export default async function ConversationPage({ params }: Props) {
     },
     orderBy: { createdAt: 'asc' },
     select: {
-      id: true, content: true, read: true, createdAt: true,
-      senderId: true, receiverId: true,
+      id: true,
+      content: true,
+      read: true,
+      createdAt: true,
+      senderId: true,
+      receiverId: true,
       sender: { select: { username: true, profile: { select: { avatar: true } } } },
     },
   });

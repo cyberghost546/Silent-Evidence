@@ -19,7 +19,11 @@ export async function GET() {
       orderBy: { views: 'desc' },
       take: 20,
       select: {
-        id: true, title: true, slug: true, views: true, createdAt: true,
+        id: true,
+        title: true,
+        slug: true,
+        views: true,
+        createdAt: true,
         _count: { select: { likes: true, comments: true } },
         author: { select: { username: true } },
         category: { select: { name: true } },
@@ -28,7 +32,8 @@ export async function GET() {
     // Category breakdown by story count + total views
     prisma.category.findMany({
       select: {
-        name: true, slug: true,
+        name: true,
+        slug: true,
         stories: {
           where: { status: 'PUBLISHED' },
           select: { views: true },
@@ -46,7 +51,7 @@ export async function GET() {
   ]);
 
   const categories = topCategories
-    .map(c => ({
+    .map((c) => ({
       name: c.name,
       slug: c.slug,
       count: c.stories.length,
@@ -55,7 +60,13 @@ export async function GET() {
     .sort((a, b) => b.views - a.views);
 
   const notFounds: { path: string; count: number; lastSeen: string }[] = notFoundLog?.value
-    ? (() => { try { return JSON.parse(notFoundLog.value); } catch { return []; } })()
+    ? (() => {
+        try {
+          return JSON.parse(notFoundLog.value);
+        } catch {
+          return [];
+        }
+      })()
     : [];
 
   return NextResponse.json({ topStories, categories, topTags, notFounds });

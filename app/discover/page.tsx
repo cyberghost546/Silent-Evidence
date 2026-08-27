@@ -32,9 +32,9 @@ type Props = {
 };
 
 export default async function DiscoverPage({ searchParams }: Props) {
-  const sp       = await searchParams;
-  const mood     = sp.mood     ?? '';
-  const catSlug  = sp.category ?? '';
+  const sp = await searchParams;
+  const mood = sp.mood ?? '';
+  const catSlug = sp.category ?? '';
 
   // Fetch categories for the filter pills
   const categories = await prisma.category.findMany({
@@ -45,8 +45,8 @@ export default async function DiscoverPage({ searchParams }: Props) {
   // Build the where clause — only add filters that are actually set
   const where = {
     status: 'PUBLISHED' as const,
-    ...(mood    ? { mood: mood as never }              : {}),
-    ...(catSlug ? { category: { slug: catSlug } }      : {}),
+    ...(mood ? { mood: mood as never } : {}),
+    ...(catSlug ? { category: { slug: catSlug } } : {}),
   };
 
   const stories = await prisma.story.findMany({
@@ -54,12 +54,12 @@ export default async function DiscoverPage({ searchParams }: Props) {
     orderBy: { createdAt: 'desc' },
     take: 30,
     select: {
-      id:         true,
-      title:      true,
-      slug:       true,
-      excerpt:    true,
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
       coverImage: true,
-      mood:       true,
+      mood: true,
       author: { select: { username: true } },
       _count: { select: { likes: true, comments: true } },
     },
@@ -74,10 +74,11 @@ export default async function DiscoverPage({ searchParams }: Props) {
   // Passing '' as a value removes that param from the URL.
   function filterHref(overrides: Record<string, string>) {
     const p = new URLSearchParams();
-    if (mood)    p.set('mood',     mood);
+    if (mood) p.set('mood', mood);
     if (catSlug) p.set('category', catSlug);
     for (const [k, v] of Object.entries(overrides)) {
-      if (v) p.set(k, v); else p.delete(k);
+      if (v) p.set(k, v);
+      else p.delete(k);
     }
     const qs = p.toString();
     return `/discover${qs ? `?${qs}` : ''}`;
@@ -104,7 +105,6 @@ export default async function DiscoverPage({ searchParams }: Props) {
 
         {/* ── Filters ─────────────────────────────────────────────────────── */}
         <div className="max-w-2xl mx-auto px-4 mt-6 space-y-3">
-
           {/* Mood pills */}
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Mood</p>
@@ -128,7 +128,10 @@ export default async function DiscoverPage({ searchParams }: Props) {
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Category</p>
             <div className="flex flex-wrap gap-1.5">
-              <Link href={filterHref({ category: '' })} className={!catSlug ? activePill : inactivePill}>
+              <Link
+                href={filterHref({ category: '' })}
+                className={!catSlug ? activePill : inactivePill}
+              >
                 All
               </Link>
               {categories.map((c) => (
@@ -146,7 +149,9 @@ export default async function DiscoverPage({ searchParams }: Props) {
           {/* Active filter summary + story count */}
           {(mood || catSlug) && (
             <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
-              <span>{serialised.length} {serialised.length === 1 ? 'story' : 'stories'} match</span>
+              <span>
+                {serialised.length} {serialised.length === 1 ? 'story' : 'stories'} match
+              </span>
               <Link href="/discover" className="text-red-400 hover:text-red-300 transition">
                 Clear filters ✕
               </Link>

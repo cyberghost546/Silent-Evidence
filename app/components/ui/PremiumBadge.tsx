@@ -11,7 +11,7 @@ type Props = {
 export default function PremiumBadge({ size = 'md' }: Props) {
   // Build class strings based on the requested size
   const paddingClass = size === 'sm' ? 'px-2 py-0.5' : 'px-3 py-1';
-  const textClass    = size === 'sm' ? 'text-[10px]' : 'text-xs';
+  const textClass = size === 'sm' ? 'text-[10px]' : 'text-xs';
 
   return (
     <span

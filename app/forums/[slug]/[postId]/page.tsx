@@ -108,7 +108,8 @@ export default async function ForumPostPage({ params }: Props) {
   // `encodeURIComponent` ensures special characters in usernames don't break the URL.
   // `background=dc2626` matches the site's red-600 Tailwind color.
   const avatar = (username: string, av?: string | null) =>
-    av ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=40`;
+    av ??
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=40`;
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -116,16 +117,19 @@ export default async function ForumPostPage({ params }: Props) {
 
       {/* Main content container — max-w-3xl keeps the thread readable-width */}
       <div className="max-w-3xl mx-auto px-4 py-10">
-
         {/* ── Breadcrumb ──────────────────────────────────────────────── */}
         {/* Shows: Forums / Board Name / Post Title
             The post title uses line-clamp-1 to truncate if it's very long.
             Each segment is a link except the last (current page). */}
         <div className="flex items-center gap-2 mb-6 text-xs text-gray-500">
-          <Link href="/forums" className="hover:text-gray-300 transition">Forums</Link>
+          <Link href="/forums" className="hover:text-gray-300 transition">
+            Forums
+          </Link>
           <span>/</span>
           {/* Link back to the board index page using the forum's slug */}
-          <Link href={`/forums/${slug}`} className="hover:text-gray-300 transition">{post.forum.icon} {post.forum.name}</Link>
+          <Link href={`/forums/${slug}`} className="hover:text-gray-300 transition">
+            {post.forum.icon} {post.forum.name}
+          </Link>
           <span>/</span>
           {/* Current page — not a link; truncated with line-clamp-1 if very long */}
           <span className="text-gray-400 line-clamp-1">{post.title}</span>
@@ -152,7 +156,11 @@ export default async function ForumPostPage({ params }: Props) {
               </Link>
               {/* Long-form date: "January 1, 2025" */}
               <p className="text-xs text-gray-500">
-                {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date(post.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </p>
             </div>
           </div>
@@ -206,14 +214,19 @@ export default async function ForumPostPage({ params }: Props) {
                     </Link>
                     {/* Short date: "Jan 1" — space-efficient in the reply header */}
                     <span className="text-xs text-gray-600">
-                      {new Date(reply.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(reply.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </span>
                     {/* Reply number (#1, #2 …) — ml-auto pushes it to the far right */}
                     <span className="ml-auto text-xs text-gray-700">#{i + 1}</span>
                   </div>
 
                   {/* Reply content — whitespace-pre-wrap preserves newlines */}
-                  <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                  <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {reply.content}
+                  </p>
 
                   {/* Report button for this individual reply */}
                   <div className="mt-2 flex justify-end">
@@ -239,7 +252,10 @@ export default async function ForumPostPage({ params }: Props) {
         ) : (
           // Guest prompt — simple text link, no full redirect
           <div className="text-center py-8 text-gray-500 text-sm">
-            <Link href="/login" className="text-red-400 hover:text-red-300 transition">Log in</Link> to reply
+            <Link href="/login" className="text-red-400 hover:text-red-300 transition">
+              Log in
+            </Link>{' '}
+            to reply
           </div>
         )}
       </div>

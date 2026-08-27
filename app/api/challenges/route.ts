@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
   // Create the challenge record in the database with the validated data
   const challenge = await prisma.challenge.create({
     data: {
-      title: title.trim(),                 // strip whitespace from title
+      title: title.trim(), // strip whitespace from title
       description: description?.trim() || '', // description is optional; default to empty string
-      prompt: prompt.trim(),              // strip whitespace from the writing prompt
-      startDate: new Date(startDate),     // convert the ISO date string to a Date object
-      endDate: new Date(endDate),         // convert the ISO date string to a Date object
+      prompt: prompt.trim(), // strip whitespace from the writing prompt
+      startDate: new Date(startDate), // convert the ISO date string to a Date object
+      endDate: new Date(endDate), // convert the ISO date string to a Date object
       // Default active to true unless the caller explicitly passes false.
       // active !== false means: if active is undefined or true, it becomes true.
       active: active !== false,

@@ -27,9 +27,9 @@ const TYPES = ['All', 'Supernatural', 'Creature', 'Psychological', 'Paranormal']
 
 const TYPE_COLORS: Record<string, string> = {
   Supernatural: 'text-purple-400 bg-purple-900/30 border-purple-800',
-  Creature:     'text-green-400 bg-green-900/30 border-green-800',
-  Psychological:'text-yellow-400 bg-yellow-900/30 border-yellow-800',
-  Paranormal:   'text-blue-400 bg-blue-900/30 border-blue-800',
+  Creature: 'text-green-400 bg-green-900/30 border-green-800',
+  Psychological: 'text-yellow-400 bg-yellow-900/30 border-yellow-800',
+  Paranormal: 'text-blue-400 bg-blue-900/30 border-blue-800',
 };
 
 function ScullsRating({ score }: { score: number }) {
@@ -119,19 +119,28 @@ export default function MonsterEncyclopedia() {
             {/* Cover image or placeholder */}
             <div className="h-36 bg-gray-800 relative overflow-hidden">
               {m.image ? (
-                <Image src={m.image} alt={m.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image
+                  src={m.image}
+                  alt={m.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-5xl text-gray-700">
-                </div>
+                <div className="w-full h-full flex items-center justify-center text-5xl text-gray-700"></div>
               )}
               {/* Type badge */}
-              <span className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full border font-medium ${TYPE_COLORS[m.type] ?? 'text-gray-400 bg-gray-800 border-gray-700'}`}>
+              <span
+                className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full border font-medium ${TYPE_COLORS[m.type] ?? 'text-gray-400 bg-gray-800 border-gray-700'}`}
+              >
                 {m.type}
               </span>
             </div>
 
             <div className="p-4">
-              <h3 className="text-white font-bold mb-1 group-hover:text-red-400 transition-colors">{m.name}</h3>
+              <h3 className="text-white font-bold mb-1 group-hover:text-red-400 transition-colors">
+                {m.name}
+              </h3>
               {m.origin && <p className="text-gray-600 text-xs mb-2">{m.origin}</p>}
               <p className="text-gray-400 text-sm line-clamp-2 mb-3">{m.description}</p>
 
@@ -139,7 +148,8 @@ export default function MonsterEncyclopedia() {
 
               {m._count.storyLinks > 0 && (
                 <p className="text-gray-600 text-xs mt-2">
-                  Featured in {m._count.storyLinks} {m._count.storyLinks === 1 ? 'story' : 'stories'}
+                  Featured in {m._count.storyLinks}{' '}
+                  {m._count.storyLinks === 1 ? 'story' : 'stories'}
                 </p>
               )}
             </div>

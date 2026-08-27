@@ -31,14 +31,14 @@ export default async function AdminUsersPage() {
   const rawUsers = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      _count:        { select: { stories: true, comments: true } },
-      subscription:  { select: { status: true } },
+      _count: { select: { stories: true, comments: true } },
+      subscription: { select: { status: true } },
     },
   });
 
   // Compute isPremium server-side and add it to each user object.
   // AdminUsersClient shows a "Premium" badge based on this flag.
-  const users = rawUsers.map(u => ({
+  const users = rawUsers.map((u) => ({
     ...u,
     isPremium: u.role === 'ADMIN' || u.subscription?.status === 'active',
   }));

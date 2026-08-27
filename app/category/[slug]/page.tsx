@@ -37,6 +37,7 @@ import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import Pagination from '@/app/components/ui/Pagination';
 import CategoryStories from './CategoryStories';
+import { viewerRatings, ratingFilter } from '@/lib/ageGate';
 import type { Metadata } from 'next';
 import { Ghost } from 'lucide-react';
 
@@ -150,11 +151,25 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   // status code — important for SEO (bots should know the page doesn't exist).
   if (!category) return notFound();
 
+  // ── Age gate ──────────────────────────────────────────────────────────────
+  // Restrict to the ratings this viewer is old enough to see. Without it a minor
+  // browsing a category saw MATURE stories listed — title, excerpt and cover —
+  // even though opening one is blocked. Shared with /search and /tag: the
+  // mapping lives in lib/ageGate.ts.
+  const allowedRatings = await viewerRatings();
+
+  // One filter object shared by the count and the page query below. Keeping it
+  // in a single constant is what stops the two from drifting apart and reporting
+  // a total that disagrees with the stories actually listed.
+  const storyWhere = {
+    status: 'PUBLISHED' as const,
+    categoryId: category.id,
+    ...ratingFilter(allowedRatings),
+  };
+
   // ── Pagination maths ──────────────────────────────────────────────────────
   // Count only PUBLISHED stories — drafts and moderated content are excluded.
-  const total = await prisma.story.count({
-    where: { status: 'PUBLISHED', categoryId: category.id },
-  });
+  const total = await prisma.story.count({ where: storyWhere });
 
   // How many pages exist? Math.ceil rounds up: 13 stories / 12 per page = 2 pages
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -169,16 +184,14 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   // `as const` narrows the type from string to the literal 'desc' | 'asc'
   // which Prisma's TypeScript types require.
   const orderBy =
-    sort === 'popular'
-      ? { likes: { _count: 'desc' as const } }
-      : { createdAt: 'desc' as const };
+    sort === 'popular' ? { likes: { _count: 'desc' as const } } : { createdAt: 'desc' as const };
 
   // ── Fetch one page of stories ─────────────────────────────────────────────
   // skip: offset (skip pages we've already seen)
   // take: limit (only load PAGE_SIZE records)
   // This is server-side pagination — no client state is needed.
   const stories = await prisma.story.findMany({
-    where: { status: 'PUBLISHED', categoryId: category.id },
+    where: storyWhere,
     orderBy,
     skip: (currentPage - 1) * PAGE_SIZE, // e.g. page 3 → skip 24
     take: PAGE_SIZE,
@@ -194,8 +207,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     },
   });
 
-
-
   return (
     <main className="min-h-screen bg-gray-900 text-white">
       <Header />
@@ -209,11 +220,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_80%,rgba(220,38,38,0.06)_0%,transparent_70%)]" />
 
         <div className="max-w-6xl mx-auto px-4 pt-12 pb-14 relative">
-
           {/* ── Breadcrumb ─────────────────────────────────────────────── */}
           {/* Shows "Home / Ghost Stories" to orient the user in the site hierarchy */}
           <div className="flex items-center gap-2 text-xs text-gray-600 mb-8">
-            <Link href="/" className="hover:text-gray-400 transition">Home</Link>
+            <Link href="/" className="hover:text-gray-400 transition">
+              Home
+            </Link>
             <span>/</span>
             <span className="text-gray-400">{category.name}</span>
           </div>
@@ -223,9 +235,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             {/* Icon box — icon resolved from the shared category map */}
             <div className="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center shrink-0">
               {createElement(categoryIcon(slug), {
-                className: "w-7 h-7 text-red-400",
+                className: 'w-7 h-7 text-red-400',
                 strokeWidth: 1.5,
-                "aria-hidden": "true",
+                'aria-hidden': 'true',
               })}
             </div>
             <div>
@@ -262,9 +274,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 href={`/category/${slug}?sort=newest`}
                 // Active style: green background when 'newest' is selected
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
-                  sort !== 'popular'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                  sort !== 'popular' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Newest
@@ -272,9 +282,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <Link
                 href={`/category/${slug}?sort=popular`}
                 className={`px-3 py-1 text-xs rounded-md font-medium transition ${
-                  sort === 'popular'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                  sort === 'popular' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Popular

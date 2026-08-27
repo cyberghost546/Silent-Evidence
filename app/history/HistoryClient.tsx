@@ -65,8 +65,13 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
     return (
       <div className="text-center py-24">
         <h2 className="text-xl font-semibold text-white mb-2">No history yet</h2>
-        <p className="text-gray-500 mb-6">Stories you read will appear here after 10 seconds of reading.</p>
-        <Link href="/" className="inline-block bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">
+        <p className="text-gray-500 mb-6">
+          Stories you read will appear here after 10 seconds of reading.
+        </p>
+        <Link
+          href="/"
+          className="inline-block bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition"
+        >
           Explore Stories
         </Link>
       </div>
@@ -77,7 +82,9 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
     <div>
       {/* ── Header row with count + view toggle ─────────────────── */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-gray-500">{history.length} {history.length === 1 ? 'story' : 'stories'} read</p>
+        <p className="text-sm text-gray-500">
+          {history.length} {history.length === 1 ? 'story' : 'stories'} read
+        </p>
 
         {/* List / Grid toggle buttons */}
         <div className="flex items-center gap-1 bg-gray-800 border border-gray-700 rounded-lg p-1">
@@ -87,7 +94,14 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
             title="List view"
             className={`p-1.5 rounded-md transition ${view === 'list' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -97,8 +111,19 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
             title="Grid view"
             className={`p-1.5 rounded-md transition ${view === 'grid' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5zM4 15a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5zM4 15a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4z"
+              />
             </svg>
           </button>
         </div>
@@ -123,8 +148,19 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-8 h-8 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
                     </svg>
                   </div>
                 )}
@@ -133,7 +169,9 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
               {/* Info */}
               <div className="flex-1 py-3 pr-4 flex flex-col justify-center gap-1.5 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-green-400">{story.category.name}</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-green-400">
+                    {story.category.name}
+                  </span>
                   <span className="text-xs text-green-400 font-semibold">✓ Read</span>
                 </div>
                 <h3 className="text-sm font-semibold text-white group-hover:text-green-300 transition-colors leading-snug line-clamp-2">
@@ -147,7 +185,12 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
                   <span>·</span>
                   <span>{readingTime(story.content)}</span>
                   <span className="ml-auto text-gray-500">
-                    Read {new Date(readAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    Read{' '}
+                    {new Date(readAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
                   </span>
                 </div>
               </div>
@@ -175,8 +218,19 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-10 h-10 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
                     </svg>
                   </div>
                 )}
@@ -199,8 +253,15 @@ export default function HistoryClient({ history }: { history: HistoryEntry[] }) 
                 )}
                 {/* Footer row */}
                 <div className="flex items-center justify-between text-xs text-gray-600 mt-3 pt-3 border-t border-gray-700/60">
-                  <span>{story.author.username} · {readingTime(story.content)}</span>
-                  <span>{new Date(readAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  <span>
+                    {story.author.username} · {readingTime(story.content)}
+                  </span>
+                  <span>
+                    {new Date(readAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
                 </div>
               </div>
             </Link>

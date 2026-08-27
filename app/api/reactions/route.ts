@@ -116,7 +116,7 @@ export async function POST(req: Request) {
   // Convert the array of grouped results into a plain object.
   // e.g. { LOVE: 3, FIRE: 1, HYPE: 0 }
   // Object.fromEntries turns [["LOVE", 3], ["FIRE", 1]] into { LOVE: 3, FIRE: 1 }
-  const result = Object.fromEntries(counts.map(c => [c.type, c._count.type]));
+  const result = Object.fromEntries(counts.map((c) => [c.type, c._count.type]));
 
   // Return:
   //   reacted — !existing is true when we ADDED the reaction (existing was null),

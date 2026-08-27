@@ -79,9 +79,8 @@ export default async function AdminFunnelPage({ searchParams }: Props) {
           <div className="rounded-2xl border border-gray-800 bg-gray-900 p-10 text-center">
             <p className="text-sm text-gray-400 mb-2">No funnel data yet.</p>
             <p className="text-xs text-gray-600">
-              Events start recording as soon as a logged-in non-subscriber opens
-              the pricing page. Nothing is backfilled — this only covers activity
-              from now on.
+              Events start recording as soon as a logged-in non-subscriber opens the pricing page.
+              Nothing is backfilled — this only covers activity from now on.
             </p>
           </div>
         ) : (
@@ -101,7 +100,9 @@ export default async function AdminFunnelPage({ searchParams }: Props) {
                       <div className="flex items-baseline gap-3 shrink-0">
                         <span className="text-lg font-bold">{s.users.toLocaleString()}</span>
                         {s.ofPrevious !== null && (
-                          <span className={`text-xs font-semibold ${isDrop ? 'text-red-400' : 'text-emerald-400'}`}>
+                          <span
+                            className={`text-xs font-semibold ${isDrop ? 'text-red-400' : 'text-emerald-400'}`}
+                          >
                             {s.ofPrevious}% of previous
                           </span>
                         )}
@@ -132,8 +133,8 @@ export default async function AdminFunnelPage({ searchParams }: Props) {
                   Biggest drop-off
                 </p>
                 <p className="text-sm text-white">
-                  <span className="font-bold">{Math.round(worst.lost)}%</span> of readers
-                  are lost between &ldquo;{worst.from}&rdquo; and &ldquo;{worst.to}&rdquo;.
+                  <span className="font-bold">{Math.round(worst.lost)}%</span> of readers are lost
+                  between &ldquo;{worst.from}&rdquo; and &ldquo;{worst.to}&rdquo;.
                 </p>
                 <p className="text-xs text-gray-500 mt-1.5">
                   This is the step worth fixing before adding anything new.
@@ -144,9 +145,9 @@ export default async function AdminFunnelPage({ searchParams }: Props) {
         )}
 
         <p className="text-xs text-gray-700 mt-8">
-          Counts are distinct users, not events — someone who opens the pricing
-          page five times in a day counts once. Logged-in readers only: guests
-          cannot subscribe, so they are not part of this funnel.
+          Counts are distinct users, not events — someone who opens the pricing page five times in a
+          day counts once. Logged-in readers only: guests cannot subscribe, so they are not part of
+          this funnel.
         </p>
       </div>
     </main>

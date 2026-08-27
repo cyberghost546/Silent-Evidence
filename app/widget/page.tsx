@@ -16,26 +16,27 @@ export const revalidate = 3600;
 
 export default async function WidgetPage() {
   // Pick today's story using a day-of-year offset
-  const now       = new Date();
+  const now = new Date();
   const dayOfYear = Math.floor(
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000
   );
 
   const total = await prisma.story.count({ where: { status: 'PUBLISHED' } });
-  const story = total > 0
-    ? await prisma.story.findFirst({
-        where:   { status: 'PUBLISHED', contentRating: 'ALL' },
-        orderBy: { createdAt: 'asc' },
-        skip:    dayOfYear % total,
-        select: {
-          title:   true,
-          slug:    true,
-          excerpt: true,
-          mood:    true,
-          author:  { select: { username: true } },
-        },
-      })
-    : null;
+  const story =
+    total > 0
+      ? await prisma.story.findFirst({
+          where: { status: 'PUBLISHED', contentRating: 'ALL' },
+          orderBy: { createdAt: 'asc' },
+          skip: dayOfYear % total,
+          select: {
+            title: true,
+            slug: true,
+            excerpt: true,
+            mood: true,
+            author: { select: { username: true } },
+          },
+        })
+      : null;
 
   return (
     // Minimal layout — no header/footer, dark background to match phone wallpapers
@@ -49,16 +50,23 @@ export default async function WidgetPage() {
           {/* Widget header */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-red-500 text-xs font-bold uppercase tracking-widest">
- Story of the Day
+              Story of the Day
             </span>
           </div>
 
           {/* Mood icon + title */}
           <div className="flex items-start gap-2 mb-2">
-            {story.mood && (() => {
-              const MoodIcon = moodIcon(story.mood);
-              return <MoodIcon className="w-6 h-6 shrink-0 mt-0.5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
-            })()}
+            {story.mood &&
+              (() => {
+                const MoodIcon = moodIcon(story.mood);
+                return (
+                  <MoodIcon
+                    className="w-6 h-6 shrink-0 mt-0.5 text-gray-400"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                );
+              })()}
             <h2 className="text-base font-bold leading-snug">{story.title}</h2>
           </div>
 

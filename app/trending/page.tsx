@@ -64,7 +64,9 @@ export default async function TrendingPage({ searchParams }: Props) {
     orderBy: { createdAt: 'desc' },
     take: 100, // fetch enough to sort by velocity
     include: {
-      author: { select: { username: true, isVerified: true, profile: { select: { avatar: true } } } },
+      author: {
+        select: { username: true, isVerified: true, profile: { select: { avatar: true } } },
+      },
       category: { select: { name: true, slug: true } },
       // _count asks Prisma to return the total row count for each relation
       _count: { select: { likes: true, comments: true } },
@@ -79,16 +81,16 @@ export default async function TrendingPage({ searchParams }: Props) {
   //
   // Result shape: [{ storyId: 42, _count: { storyId: 7 } }, …]
   // ---------------------------------------------------------------------------
-  const storyIds = stories.map(s => s.id);
+  const storyIds = stories.map((s) => s.id);
   const recentLikes = await prisma.like.groupBy({
-    by: ['storyId'],                                  // group one row per story
+    by: ['storyId'], // group one row per story
     where: { storyId: { in: storyIds }, createdAt: { gte: cutoff } },
-    _count: { storyId: true },                        // count matching likes
+    _count: { storyId: true }, // count matching likes
   });
 
   // Convert the groupBy array to a plain lookup object { storyId → likeCount }
   // so we can access each story's recent likes in O(1) during the sort below.
-  const likesMap = Object.fromEntries(recentLikes.map(r => [r.storyId, r._count.storyId]));
+  const likesMap = Object.fromEntries(recentLikes.map((r) => [r.storyId, r._count.storyId]));
 
   // ---------------------------------------------------------------------------
   // Velocity scoring formula:
@@ -99,12 +101,12 @@ export default async function TrendingPage({ searchParams }: Props) {
   // Dividing views by 100 keeps the units roughly comparable.
   // ---------------------------------------------------------------------------
   const scored = stories
-    .map(s => ({
+    .map((s) => ({
       ...s,
       score: (likesMap[s.id] ?? 0) * 3 + Math.floor(s.views / 100),
     }))
     .sort((a, b) => b.score - a.score) // descending — highest score first
-    .slice(0, 30);                      // keep only the top 30
+    .slice(0, 30); // keep only the top 30
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -137,13 +139,17 @@ export default async function TrendingPage({ searchParams }: Props) {
               the active vs inactive Tailwind class set.
           ─────────────────────────────────────────────────────────────────── */}
           <div className="flex gap-2 mt-6">
-            {[['24h', 'Today'], ['7d', 'This Week'], ['30d', 'This Month']].map(([val, label]) => (
+            {[
+              ['24h', 'Today'],
+              ['7d', 'This Week'],
+              ['30d', 'This Month'],
+            ].map(([val, label]) => (
               <Link
                 key={val}
                 href={`/trending?window=${val}`}
                 className={`px-4 py-1.5 text-sm rounded-full font-medium transition border ${
                   win === val
-                    ? 'bg-red-600 border-red-600 text-white'        // active tab
+                    ? 'bg-red-600 border-red-600 text-white' // active tab
                     : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500' // inactive tab
                 }`}
               >

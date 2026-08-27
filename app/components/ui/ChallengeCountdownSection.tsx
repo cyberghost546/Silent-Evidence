@@ -33,7 +33,7 @@ export default async function ChallengeCountdownSection() {
       challenge={{
         ...challenge,
         startDate: challenge.startDate.toISOString(),
-        endDate:   challenge.endDate.toISOString(),
+        endDate: challenge.endDate.toISOString(),
       }}
     />
   );

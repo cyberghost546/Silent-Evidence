@@ -10,7 +10,13 @@ import { MessagesSquare } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 // Each forum needs a name, URL slug, optional emoji icon, and optional description
-type Forum = { id: number; name: string; slug: string; icon: string | null; description: string | null };
+type Forum = {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  description: string | null;
+};
 
 export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
   // Controls whether the dropdown panel is visible
@@ -34,12 +40,18 @@ export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
       {/* "Forums" button in the nav bar — chevron rotates when open */}
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1 hover:text-gray-300 transition text-sm"
       >
         Forums
         {/* Chevron rotates 180° when the dropdown is open */}
-        <svg className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -60,7 +72,7 @@ export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
           </Link>
 
           {/* Individual forum categories — dynamically rendered from the forums prop */}
-          {forums.map(forum => (
+          {forums.map((forum) => (
             <Link
               key={forum.id}
               href={`/forums/${forum.slug}`}
@@ -68,7 +80,11 @@ export default function ForumsDropdown({ forums }: { forums: Forum[] }) {
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition"
             >
               {/* Use the forum's custom icon, or fall back to a pin emoji */}
-              <MessagesSquare className="w-4 h-4 shrink-0 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
+              <MessagesSquare
+                className="w-4 h-4 shrink-0 text-gray-400"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <div>
                 <p className="text-sm font-medium text-white">{forum.name}</p>
                 {/* Only show description if one has been set in the database */}

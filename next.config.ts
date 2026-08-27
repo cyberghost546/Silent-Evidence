@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import bundleAnalyzer from '@next/bundle-analyzer';
 
 // Run `ANALYZE=true npm run build` to open the interactive bundle treemap.
@@ -23,7 +23,17 @@ const securityHeaders = [
   ...(isProd
     ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]
     : []),
-  // Content Security Policy
+  // Content Security Policy.
+  //
+  // script-src still carries 'unsafe-inline' because a strict nonce-based policy
+  // is currently INCOMPATIBLE with this stack: Next.js 16 + Turbopack emits inline
+  // bootstrap/hydration scripts WITHOUT a nonce, so an enforcing nonce CSP (which,
+  // with 'strict-dynamic', ignores 'unsafe-inline') would block Next's own scripts
+  // and render a blank page. This was verified empirically against a production
+  // build before deciding not to ship it. Revisit when Next/Turbopack propagate
+  // the request nonce to their inline scripts, at which point script-src can drop
+  // 'unsafe-inline' in favour of 'nonce-… strict-dynamic' (see lib/csp.ts, kept
+  // ready for that switch).
   {
     key: 'Content-Security-Policy',
     value: [
@@ -37,10 +47,14 @@ const securityHeaders = [
       "font-src 'self'",
       // api.anthropic.com is called server-side only — kept here for browser fetch fallback
       "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
-      "frame-src https://js.stripe.com https://hooks.stripe.com",
+      'frame-src https://js.stripe.com https://hooks.stripe.com',
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
+      // Block this site from being framed by anyone (backs up X-Frame-Options,
+      // which older browsers use). This is a real hardening win independent of
+      // the script-src question above.
+      "frame-ancestors 'self'",
     ].join('; '),
   },
 ];

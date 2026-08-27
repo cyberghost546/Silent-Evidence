@@ -38,9 +38,7 @@ export async function GET() {
     state,
   });
 
-  const res = NextResponse.redirect(
-    `https://accounts.google.com/o/oauth2/v2/auth?${params}`
-  );
+  const res = NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 
   // Store state in a short-lived cookie so the callback can verify it.
   res.cookies.set('oauth_state_google', state, {

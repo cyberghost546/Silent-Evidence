@@ -22,17 +22,21 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { SESSION_COOKIE, SESSION_SIG_COOKIE, verifyUserId } from '@/lib/sessionCookie';
 import {
-  edgeRateLimit,
-  edgeClientIp,
-  isExempt,
-  limitFor,
-  WINDOW_MS,
-} from '@/lib/edgeRateLimit';
+  SESSION_COOKIE,
+  SESSION_SIG_COOKIE,
+  SESSION_VER_COOKIE,
+  verifyUserId,
+} from '@/lib/sessionCookie';
+import { edgeRateLimit, edgeClientIp, isExempt, limitFor, WINDOW_MS } from '@/lib/edgeRateLimit';
 
 // HTTP methods that change state. GETs are deliberately not limited here.
 const MUTATING_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
+
+// NOTE: Content-Security-Policy is set statically in next.config.ts, not here.
+// A per-request nonce CSP was prototyped (lib/csp.ts) but not shipped: Next.js 16
+// + Turbopack does not nonce its own inline bootstrap scripts, so an enforcing
+// nonce policy blanks the page. See the CSP comment in next.config.ts.
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -49,11 +53,7 @@ export async function middleware(request: NextRequest) {
   // This is a second layer, not a replacement: the auth routes keep their
   // Redis-backed limiter from lib/rateLimit.ts, whose counters are shared across
   // instances. This one is per-instance (see the note in lib/edgeRateLimit.ts).
-  if (
-    pathname.startsWith('/api') &&
-    MUTATING_METHODS.has(request.method) &&
-    !isExempt(pathname)
-  ) {
+  if (pathname.startsWith('/api') && MUTATING_METHODS.has(request.method) && !isExempt(pathname)) {
     const ip = edgeClientIp(request.headers);
     const limit = limitFor(pathname);
 
@@ -71,16 +71,21 @@ export async function middleware(request: NextRequest) {
           // Retry-After tells well-behaved clients exactly when to come back,
           // instead of retrying immediately and compounding the problem.
           headers: { 'Retry-After': String(retryAfter) },
-        },
+        }
       );
     }
   }
 
   const rawId = request.cookies.get(SESSION_COOKIE)?.value;
   const sig = request.cookies.get(SESSION_SIG_COOKIE)?.value;
+  const ver = request.cookies.get(SESSION_VER_COOKIE)?.value;
 
-  // A session is authentic only if the signature matches the id we signed.
-  const authenticated = rawId ? await verifyUserId(rawId, sig) : false;
+  // A session is authentic only if the signature matches the (id, version) we
+  // signed. Middleware checks integrity only — whether the version is still
+  // current is a database question, enforced in getSessionUser. A session that
+  // predates this change has no version cookie, so it fails here and the user is
+  // asked to log in again once; that is the expected one-time cost of the upgrade.
+  const authenticated = rawId ? await verifyUserId(rawId, sig, ver) : false;
 
   // A `userId` cookie that fails verification is forged or stale — clear it.
   const forged = !!rawId && !authenticated;
@@ -96,6 +101,7 @@ export async function middleware(request: NextRequest) {
       if (forged) {
         redirect.cookies.delete(SESSION_COOKIE);
         redirect.cookies.delete(SESSION_SIG_COOKIE);
+        redirect.cookies.delete(SESSION_VER_COOKIE);
       }
       return redirect;
     }
@@ -107,7 +113,12 @@ export async function middleware(request: NextRequest) {
     // that `cookies().get('userId')` returns undefined inside route handlers.
     const remaining = request.cookies
       .getAll()
-      .filter((c) => c.name !== SESSION_COOKIE && c.name !== SESSION_SIG_COOKIE);
+      .filter(
+        (c) =>
+          c.name !== SESSION_COOKIE &&
+          c.name !== SESSION_SIG_COOKIE &&
+          c.name !== SESSION_VER_COOKIE
+      );
     const headers = new Headers(request.headers);
     headers.set('cookie', remaining.map((c) => `${c.name}=${c.value}`).join('; '));
 
@@ -115,6 +126,7 @@ export async function middleware(request: NextRequest) {
     // Also tell the browser to drop the bad cookies.
     res.cookies.delete(SESSION_COOKIE);
     res.cookies.delete(SESSION_SIG_COOKIE);
+    res.cookies.delete(SESSION_VER_COOKIE);
     return res;
   }
 

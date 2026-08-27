@@ -95,7 +95,7 @@ export async function POST(req: Request) {
   // where: finds the row by key; update: sets the new value; create: inserts a new row
   // message.trim() removes surrounding whitespace before saving
   await prisma.siteSetting.upsert({
-    where:  { key: KEY },
+    where: { key: KEY },
     update: { value: message.trim() },
     create: { key: KEY, value: message.trim() },
   });

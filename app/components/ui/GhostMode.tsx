@@ -61,10 +61,12 @@ export default function GhostModeToggle() {
     // so users can clearly see their current state at a glance.
     <button
       onClick={toggle}
-      title={ghost ? 'Ghost Mode ON — reading anonymously' : 'Ghost Mode OFF — click to read anonymously'}
+      title={
+        ghost ? 'Ghost Mode ON — reading anonymously' : 'Ghost Mode OFF — click to read anonymously'
+      }
       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
         ghost
-          ? 'bg-purple-600/20 border-purple-500/40 text-purple-300'  // active: purple
+          ? 'bg-purple-600/20 border-purple-500/40 text-purple-300' // active: purple
           : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600' // inactive: grey
       }`}
     >

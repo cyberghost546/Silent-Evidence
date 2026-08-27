@@ -52,7 +52,6 @@ export async function POST(req: Request) {
     // or NONE of them are saved if any one of them throws an error.
     // This guarantees we never end up with two users flagged as Writer of the Month.
     await prisma.$transaction([
-
       // Step 1: Clear the writerOfMonth flag from ALL users in the database.
       // updateMany runs a single SQL UPDATE with no where clause — affects every user row.
       // data: { writerOfMonth: false } sets the column to false for everyone.
@@ -67,7 +66,6 @@ export async function POST(req: Request) {
 
     // Return a simple success acknowledgement if both operations succeeded
     return NextResponse.json({ ok: true });
-
   } catch (e) {
     // Catch any error from JSON parsing or the database transaction.
     // Return 500 Internal Server Error with a generic message.

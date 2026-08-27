@@ -51,8 +51,14 @@ function ResetPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.password !== form.confirm) { setError('Passwords do not match.'); return; }
-    if (form.password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (form.password !== form.confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -65,7 +71,10 @@ function ResetPasswordForm() {
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) { setError(data.error ?? 'Reset failed. The link may have expired.'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Reset failed. The link may have expired.');
+      return;
+    }
     setDone(true);
   };
 
@@ -94,30 +103,63 @@ function ResetPasswordForm() {
 
       {/* New password field */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">New Password</label>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
+          New Password
+        </label>
         <div className="relative">
           <input
             id="password"
             type={showPassword ? 'text' : 'password'}
             value={form.password}
-            onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setError(''); }}
+            onChange={(e) => {
+              setForm((f) => ({ ...f, password: e.target.value }));
+              setError('');
+            }}
             required
             placeholder="Min. 8 characters"
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 pr-11 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
           />
           {/* Eye toggle */}
-          <button type="button" onClick={() => setShowPassword(v => !v)}
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 4.02-5.307M9.88 9.88a3 3 0 1 0 4.243 4.243M3 3l18 18" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 4.02-5.307M9.88 9.88a3 3 0 1 0 4.243 4.243M3 3l18 18"
+                />
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
               </svg>
             )}
           </button>
@@ -126,12 +168,17 @@ function ResetPasswordForm() {
 
       {/* Confirm password field */}
       <div>
-        <label htmlFor="confirm" className="block text-sm font-medium text-gray-300 mb-1.5">Confirm New Password</label>
+        <label htmlFor="confirm" className="block text-sm font-medium text-gray-300 mb-1.5">
+          Confirm New Password
+        </label>
         <input
           id="confirm"
           type="password"
           value={form.confirm}
-          onChange={e => { setForm(f => ({ ...f, confirm: e.target.value })); setError(''); }}
+          onChange={(e) => {
+            setForm((f) => ({ ...f, confirm: e.target.value }));
+            setError('');
+          }}
           required
           placeholder="Repeat your new password"
           className={`w-full bg-gray-800 border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition ${

@@ -13,10 +13,12 @@ import { moodMeta } from '@/lib/moods';
 // missed the map and this banner rendered "Unknown".
 
 export default async function MoodOfDay() {
-  const row = await prisma.moodOfDay.findFirst({
-    orderBy: { setAt: 'desc' },
-    select: { mood: true, message: true },
-  }).catch(() => null);
+  const row = await prisma.moodOfDay
+    .findFirst({
+      orderBy: { setAt: 'desc' },
+      select: { mood: true, message: true },
+    })
+    .catch(() => null);
 
   if (!row) return null;
 
@@ -28,16 +30,14 @@ export default async function MoodOfDay() {
         {createElement(moodIcon(row.mood), {
           className: `w-5 h-5 shrink-0 ${cfg.text}`,
           strokeWidth: 1.5,
-          "aria-hidden": "true",
+          'aria-hidden': 'true',
         })}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs text-gray-500 uppercase tracking-widest font-medium shrink-0">
             Today&apos;s mood:
           </span>
           <span className={`text-sm font-bold ${cfg.text}`}>{cfg.label}</span>
-          {row.message && (
-            <span className="text-sm text-gray-400 italic">— {row.message}</span>
-          )}
+          {row.message && <span className="text-sm text-gray-400 italic">— {row.message}</span>}
         </div>
       </div>
     </div>

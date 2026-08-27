@@ -39,40 +39,45 @@ import type { LoginMarker } from '@/app/components/ui/LoginMap';
 // Load the Leaflet map component without SSR — window must exist before Leaflet initialises
 const LoginMap = dynamic(() => import('@/app/components/ui/LoginMap'), { ssr: false });
 
-interface CountryRow { country: string; count: number }
+interface CountryRow {
+  country: string;
+  count: number;
+}
 interface MapData {
-  markers:        LoginMarker[];
+  markers: LoginMarker[];
   countrySummary: CountryRow[];
-  total:          number;
+  total: number;
 }
 
 export default function LoginMapPage() {
-  const [data,    setData]    = useState<MapData | null>(null);
+  const [data, setData] = useState<MapData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter,  setFilter]  = useState<'all' | 'success' | 'failed'>('all');
+  const [filter, setFilter] = useState<'all' | 'success' | 'failed'>('all');
 
   useEffect(() => {
     fetch('/api/admin/login-map')
-      .then(r => r.json())
-      .then((d: MapData) => { setData(d?.markers ? d : null); setLoading(false); })
+      .then((r) => r.json())
+      .then((d: MapData) => {
+        setData(d?.markers ? d : null);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
-  const filtered = data?.markers?.filter(m =>
-    filter === 'all'     ? true :
-    filter === 'success' ? m.success :
-    !m.success
-  ) ?? [];
+  const filtered =
+    data?.markers?.filter((m) =>
+      filter === 'all' ? true : filter === 'success' ? m.success : !m.success
+    ) ?? [];
 
-  const successCount = data?.markers?.filter(m => m.success).length  ?? 0;
-  const failedCount  = data?.markers?.filter(m => !m.success).length ?? 0;
+  const successCount = data?.markers?.filter((m) => m.success).length ?? 0;
+  const failedCount = data?.markers?.filter((m) => !m.success).length ?? 0;
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Login Origin Map</h1>
       <p className="text-gray-500 text-sm mb-6">
-        Geographic distribution of login attempts based on IP geolocation.
-        New logins are mapped automatically going forward.
+        Geographic distribution of login attempts based on IP geolocation. New logins are mapped
+        automatically going forward.
       </p>
 
       {/* Stats row */}
@@ -93,7 +98,7 @@ export default function LoginMapPage() {
 
       {/* Filter pills */}
       <div className="flex gap-2 mb-4">
-        {(['all', 'success', 'failed'] as const).map(f => (
+        {(['all', 'success', 'failed'] as const).map((f) => (
           <button
             key={f}
             type="button"
@@ -108,8 +113,10 @@ export default function LoginMapPage() {
           </button>
         ))}
         <span className="ml-auto text-xs text-gray-600 self-center">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600 mr-1" />successful
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-400 ml-3 mr-1" />failed
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600 mr-1" />
+          successful
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-400 ml-3 mr-1" />
+          failed
         </span>
       </div>
 
@@ -121,7 +128,9 @@ export default function LoginMapPage() {
           </div>
         ) : data?.total === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-            <p className="text-gray-400 text-sm">No geo data yet. It will appear after new logins.</p>
+            <p className="text-gray-400 text-sm">
+              No geo data yet. It will appear after new logins.
+            </p>
           </div>
         ) : (
           <LoginMap markers={filtered} />
@@ -130,7 +139,6 @@ export default function LoginMapPage() {
 
       {/* Two-column layout: country summary + recent logins */}
       <div className="grid lg:grid-cols-2 gap-6">
-
         {/* Top countries */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
           <h2 className="font-semibold text-white mb-4">Top Countries</h2>
@@ -142,10 +150,15 @@ export default function LoginMapPage() {
                   <div key={country}>
                     <div className="flex justify-between text-xs text-gray-300 mb-1">
                       <span>{country}</span>
-                      <span className="text-gray-500">{count} ({pct}%)</span>
+                      <span className="text-gray-500">
+                        {count} ({pct}%)
+                      </span>
                     </div>
                     <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-red-600 rounded-full bar-fill" style={{ '--fill': `${pct}%` } as React.CSSProperties} />
+                      <div
+                        className="h-full bg-red-600 rounded-full bar-fill"
+                        style={{ '--fill': `${pct}%` } as React.CSSProperties}
+                      />
                     </div>
                   </div>
                 );
@@ -160,13 +173,25 @@ export default function LoginMapPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
           <h2 className="font-semibold text-white mb-4">Recent Mapped Logins</h2>
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {filtered.slice(0, 20).map(m => (
-              <div key={m.id} className="flex items-center gap-3 text-xs py-1.5 border-b border-gray-800/60 last:border-0">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${m.success ? 'bg-red-500' : 'bg-orange-400'}`} />
-                <span className="text-gray-300 font-medium w-28 truncate">{m.username ?? 'unknown'}</span>
-                <span className="text-gray-500 flex-1 truncate">{m.city ?? '—'}, {m.country ?? '—'}</span>
+            {filtered.slice(0, 20).map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center gap-3 text-xs py-1.5 border-b border-gray-800/60 last:border-0"
+              >
+                <span
+                  className={`w-2 h-2 rounded-full shrink-0 ${m.success ? 'bg-red-500' : 'bg-orange-400'}`}
+                />
+                <span className="text-gray-300 font-medium w-28 truncate">
+                  {m.username ?? 'unknown'}
+                </span>
+                <span className="text-gray-500 flex-1 truncate">
+                  {m.city ?? '—'}, {m.country ?? '—'}
+                </span>
                 <span className="text-gray-600 shrink-0">
-                  {new Date(m.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {new Date(m.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </span>
               </div>
             ))}

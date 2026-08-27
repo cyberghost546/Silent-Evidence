@@ -65,7 +65,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
   // If the user record doesn't exist or their role isn't ADMIN, return 403 Forbidden
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   // ── Parse URL params and request body ────────────────────────────────────────
 
@@ -84,18 +85,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   // Only include each field if the client sent it (not undefined).
   // This is the standard pattern for PATCH: partial updates, not full replacements.
-  if (body.title       !== undefined) data.title       = body.title;
+  if (body.title !== undefined) data.title = body.title;
   if (body.description !== undefined) data.description = body.description;
-  if (body.prompt      !== undefined) data.prompt      = body.prompt;
+  if (body.prompt !== undefined) data.prompt = body.prompt;
 
   // Date fields arrive from the client as ISO 8601 strings (e.g. "2025-01-15T00:00:00.000Z").
   // Prisma expects JavaScript Date objects for DateTime columns, so we convert them here.
   // new Date("2025-01-15T00:00:00.000Z") parses the string into a Date object.
-  if (body.startDate   !== undefined) data.startDate   = new Date(body.startDate);
-  if (body.endDate     !== undefined) data.endDate     = new Date(body.endDate);
+  if (body.startDate !== undefined) data.startDate = new Date(body.startDate);
+  if (body.endDate !== undefined) data.endDate = new Date(body.endDate);
 
   // active is a boolean — true means the challenge is currently accepting entries
-  if (body.active      !== undefined) data.active      = body.active;
+  if (body.active !== undefined) data.active = body.active;
 
   // ── Write to database ─────────────────────────────────────────────────────────
 
@@ -135,7 +136,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
   // Not an admin — return 403
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   // ── Delete the challenge ──────────────────────────────────────────────────────
 
@@ -174,7 +176,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
   // Not an admin — return 403
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   // ── Parse URL params and request body ────────────────────────────────────────
 
@@ -191,7 +194,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   // Require the explicit action flag to prevent accidental resets from empty POSTs.
   // If the body doesn't have { action: 'reset' }, return 400 Bad Request.
-  if (body.action !== 'reset') return NextResponse.json({ error: 'Unknown action.' }, { status: 400 });
+  if (body.action !== 'reset')
+    return NextResponse.json({ error: 'Unknown action.' }, { status: 400 });
 
   // ── Delete all entries for this challenge ──────────────────────────────────────
 

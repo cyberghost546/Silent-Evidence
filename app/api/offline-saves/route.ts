@@ -11,8 +11,8 @@
 // built and remove things from it. Only *adding* new downloads is restricted.
 
 import { NextResponse } from 'next/server';
-import { cookies }       from 'next/headers';
-import { prisma }        from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
 import { requirePremium } from '@/lib/premiumCheck';
 import { unauthorized, notFound, serverError } from '@/lib/apiError';
 
@@ -29,18 +29,18 @@ export async function GET() {
     // Fetch all OfflineSave rows for this user and include the related story data
     // we need to render the offline library page (title, slug, excerpt, cover, author).
     const saves = await prisma.offlineSave.findMany({
-      where:   { userId },
+      where: { userId },
       orderBy: { savedAt: 'desc' }, // most recently saved first
       include: {
         story: {
           select: {
-            id:          true,
-            title:       true,
-            slug:        true,
-            excerpt:     true,
-            coverImage:  true,
-            mood:        true,
-            author:      { select: { username: true } },
+            id: true,
+            title: true,
+            slug: true,
+            excerpt: true,
+            coverImage: true,
+            mood: true,
+            author: { select: { username: true } },
           },
         },
       },
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
   if (denied) return denied;
 
   try {
-    const body    = await req.json();
+    const body = await req.json();
     const storyId = Number(body?.storyId);
 
     // Validate that storyId is a real number before querying
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     // upsert: create the save if it doesn't exist; if it does, no-op (update: {})
     // The @@unique([userId, storyId]) constraint prevents duplicates at the DB level too.
     await prisma.offlineSave.upsert({
-      where:  { userId_storyId: { userId, storyId } },
+      where: { userId_storyId: { userId, storyId } },
       create: { userId, storyId },
       update: {}, // nothing to update — the record's existence is all that matters
     });
@@ -108,7 +108,7 @@ export async function DELETE(req: Request) {
   if (!userId) return unauthorized();
 
   try {
-    const body    = await req.json();
+    const body = await req.json();
     const storyId = Number(body?.storyId);
 
     if (!storyId || isNaN(storyId)) {
