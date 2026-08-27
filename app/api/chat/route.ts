@@ -7,6 +7,50 @@
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { prisma } from '@/lib/prisma';
+
+// Builds a compact catalogue of real published stories to ground the chatbot, so
+// it can recommend ACTUAL stories with working links instead of inventing titles.
+// Kept small (a mix of recent and most-read) to bound the token cost per chat.
+// Cached briefly in module memory so we do not hit the DB on every message.
+let catalogueCache: { text: string; at: number } | null = null;
+const CATALOGUE_TTL_MS = 5 * 60 * 1000;
+
+async function storyCatalogue(): Promise<string> {
+  if (catalogueCache && Date.now() - catalogueCache.at < CATALOGUE_TTL_MS) {
+    return catalogueCache.text;
+  }
+  try {
+    const [recent, popular] = await Promise.all([
+      prisma.story.findMany({
+        where: { status: 'PUBLISHED', contentRating: { in: ['ALL', 'TEEN'] } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: { title: true, slug: true, mood: true, category: { select: { name: true } } },
+      }),
+      prisma.story.findMany({
+        where: { status: 'PUBLISHED', contentRating: { in: ['ALL', 'TEEN'] } },
+        orderBy: { views: 'desc' },
+        take: 10,
+        select: { title: true, slug: true, mood: true, category: { select: { name: true } } },
+      }),
+    ]);
+    // De-duplicate by slug (a story can be both recent and popular).
+    const seen = new Set<string>();
+    const rows = [...recent, ...popular].filter((s) => !seen.has(s.slug) && seen.add(s.slug));
+    const lines = rows.map(
+      (s) =>
+        `- "${s.title}" [${s.category?.name ?? 'Story'}${s.mood ? ', ' + s.mood.toLowerCase() : ''}] → /story/${s.slug}`
+    );
+    const text = lines.length
+      ? `\n\nREAL STORIES YOU CAN RECOMMEND (only recommend from this list, always give the /story/... link):\n${lines.join('\n')}`
+      : '';
+    catalogueCache = { text, at: Date.now() };
+    return text;
+  } catch {
+    return '';
+  }
+}
 
 // Create one Anthropic client instance — reused for every request.
 // The API key is stored in .env as ANTHROPIC_API_KEY (never hardcoded).
@@ -55,6 +99,10 @@ export async function POST(req: NextRequest) {
   if (firstUserIdx === -1) return new Response('No user message', { status: 400 });
   const apiMessages = messages.slice(firstUserIdx);
 
+  // Ground the reply in the real catalogue so recommendations link to stories
+  // that actually exist.
+  const systemWithCatalogue = SYSTEM_PROMPT + (await storyCatalogue());
+
   // TextEncoder converts JavaScript strings into bytes so they can be streamed
   const encoder = new TextEncoder();
 
@@ -68,7 +116,7 @@ export async function POST(req: NextRequest) {
         const claudeStream = client.messages.stream({
           model: 'claude-opus-4-6',
           max_tokens: 1024, // Maximum reply length in tokens (roughly ~750 words)
-          system: SYSTEM_PROMPT,
+          system: systemWithCatalogue,
           messages: apiMessages,
         });
 

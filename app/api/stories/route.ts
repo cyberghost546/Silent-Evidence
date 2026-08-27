@@ -15,6 +15,7 @@ import { detectMood } from '@/lib/moodDetect';
 import { verifyCsrfToken } from '@/lib/csrf';
 import { enforceAuthorProFields, AUTHOR_PRO_FIELD_LABELS } from '@/lib/authorPro';
 import { sendPushToUser } from '@/lib/webpush';
+import { announceNewStory } from '@/lib/discord';
 import { z } from 'zod';
 
 const CreateStorySchema = z.object({
@@ -282,6 +283,11 @@ export async function POST(req: Request) {
     checkAndAwardBadges(userId).catch(() => {});
     // Bust the stories listing cache so the new story appears immediately
     invalidatePattern('stories:list:*').catch(() => {});
+
+    // Announce the new story to Discord if a webhook is configured (no-op otherwise).
+    announceNewStory({ title: story.title, slug: story.slug, excerpt: story.excerpt }).catch(
+      () => {}
+    );
 
     // Notify all followers — fire-and-forget so publish isn't delayed
     prisma.follow
