@@ -77,7 +77,9 @@ export async function POST(req: Request) {
 
   // Create the new category row in the database
   // description || null converts an empty string to null (stored as NULL in the DB)
-  const category = await prisma.category.create({ data: { name, slug, description: description || null } });
+  const category = await prisma.category.create({
+    data: { name, slug, description: description || null },
+  });
 
   // Return the newly created category with status 201 Created
   return NextResponse.json(category, { status: 201 });

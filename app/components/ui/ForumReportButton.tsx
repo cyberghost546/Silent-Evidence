@@ -10,7 +10,7 @@ import { useState } from 'react';
 type ReportType = 'FORUM_POST' | 'FORUM_REPLY';
 
 type Props = {
-  targetId: number;      // ID of the post or reply being reported
+  targetId: number; // ID of the post or reply being reported
   type: ReportType;
   authorUsername: string; // Username of the content author
   currentUsername: string | null; // Logged-in user's username (null = not logged in)
@@ -18,12 +18,17 @@ type Props = {
 
 // List of reasons the user can choose from
 const REASONS = [
-  { value: 'HARASSMENT',    label: 'Harassment or bullying' },
-  { value: 'HATE_SPEECH',   label: 'Hate speech' },
-  { value: 'SPAM',          label: 'Spam' },
+  { value: 'HARASSMENT', label: 'Harassment or bullying' },
+  { value: 'HATE_SPEECH', label: 'Hate speech' },
+  { value: 'SPAM', label: 'Spam' },
   { value: 'INAPPROPRIATE', label: 'Inappropriate content' },
-  { value: 'THREATS',       label: 'Threats or violence' },
-  { value: 'OTHER',         label: 'Other' },
+  { value: 'THREATS', label: 'Threats or violence' },
+  // Legally-mandated notice routes, kept as explicit options rather than folded
+  // into "Other": DMCA §512(c) for copyright, EU DSA Art. 16 for illegal
+  // content. Both carry obligations that ordinary house-rule reports do not.
+  { value: 'COPYRIGHT', label: 'Copyright infringement' },
+  { value: 'ILLEGAL_CONTENT', label: 'Illegal content' },
+  { value: 'OTHER', label: 'Other' },
 ];
 
 export default function ForumReportButton({

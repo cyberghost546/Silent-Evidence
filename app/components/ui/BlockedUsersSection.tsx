@@ -35,8 +35,8 @@ export default function BlockedUsersSection() {
   // Load the current block list on mount
   useEffect(() => {
     fetch('/api/user/block')
-      .then(r => r.json())
-      .then(data => setBlockedList(Array.isArray(data) ? data : []))
+      .then((r) => r.json())
+      .then((data) => setBlockedList(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
 
@@ -55,11 +55,16 @@ export default function BlockedUsersSection() {
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) { setError(data.error ?? 'Failed to block user'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Failed to block user');
+      return;
+    }
     setInput('');
     setSuccess(`@${username} has been blocked.`);
     // Refresh list
-    fetch('/api/user/block').then(r => r.json()).then(d => setBlockedList(Array.isArray(d) ? d : []));
+    fetch('/api/user/block')
+      .then((r) => r.json())
+      .then((d) => setBlockedList(Array.isArray(d) ? d : []));
   };
 
   const unblock = async (username: string) => {
@@ -68,7 +73,7 @@ export default function BlockedUsersSection() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username }),
     });
-    setBlockedList(prev => prev.filter(u => u.username !== username));
+    setBlockedList((prev) => prev.filter((u) => u.username !== username));
     router.refresh();
   };
 
@@ -79,7 +84,11 @@ export default function BlockedUsersSection() {
         <input
           type="text"
           value={input}
-          onChange={e => { setInput(e.target.value); setError(''); setSuccess(''); }}
+          onChange={(e) => {
+            setInput(e.target.value);
+            setError('');
+            setSuccess('');
+          }}
           placeholder="Enter username to block…"
           suppressHydrationWarning
           className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
@@ -101,11 +110,17 @@ export default function BlockedUsersSection() {
         <p className="text-sm text-gray-500">You haven&apos;t blocked anyone.</p>
       ) : (
         <ul className="space-y-2">
-          {blockedList.map(u => (
-            <li key={u.id} className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
+          {blockedList.map((u) => (
+            <li
+              key={u.id}
+              className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg px-4 py-3"
+            >
               <div className="flex items-center gap-3">
                 <img
-                  src={u.profile?.avatar ?? `https://ui-avatars.com/api/?name=${u.username}&background=dc2626&color=fff&size=32`}
+                  src={
+                    u.profile?.avatar ??
+                    `https://ui-avatars.com/api/?name=${u.username}&background=dc2626&color=fff&size=32`
+                  }
                   alt={u.username}
                   className="w-7 h-7 rounded-full object-cover"
                 />

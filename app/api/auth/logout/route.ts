@@ -18,7 +18,9 @@ export async function GET() {
   // process.env.NEXT_PUBLIC_BASE_URL is read from the .env file (e.g. "https://mysite.com").
   // The ?? fallback 'http://localhost:3000' is used in local development when
   // the environment variable hasn't been set yet.
-  const res = NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'));
+  const res = NextResponse.redirect(
+    new URL('/', process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000')
+  );
 
   // Overwrite the 'userId' cookie with an empty string and set maxAge to 0.
   // maxAge: 0 tells the browser to delete this cookie immediately.

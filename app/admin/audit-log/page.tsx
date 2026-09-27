@@ -33,21 +33,21 @@ const PAGE_SIZE = 50;
 // Using `Record<string, string>` makes TypeScript happy with dynamic key access
 // while keeping the map exhaustive at a glance.
 const ACTION_STYLES: Record<string, string> = {
-  BAN_USER:               'text-red-400',
-  UNBAN_USER:             'text-green-400',
-  WARN_USER:              'text-yellow-400',
-  SUSPEND_USER:           'text-orange-400',
-  VERIFY_USER:            'text-blue-400',
-  DELETE_STORY:           'text-red-400',
-  DELETE_TAG:             'text-gray-400',
-  ADD_BANNED_WORD:        'text-orange-400',
-  REMOVE_BANNED_WORD:     'text-gray-400',
-  SET_MOOD:               'text-purple-400',
-  CREATE_POLL:            'text-blue-400',
-  DELETE_POLL:            'text-red-400',
-  SET_SPOTLIGHT:          'text-yellow-400',
-  CLEAR_SPOTLIGHT:        'text-gray-400',
-  UPDATE_FEATURED_AUTHORS:'text-blue-400',
+  BAN_USER: 'text-red-400',
+  UNBAN_USER: 'text-green-400',
+  WARN_USER: 'text-yellow-400',
+  SUSPEND_USER: 'text-orange-400',
+  VERIFY_USER: 'text-blue-400',
+  DELETE_STORY: 'text-red-400',
+  DELETE_TAG: 'text-gray-400',
+  ADD_BANNED_WORD: 'text-orange-400',
+  REMOVE_BANNED_WORD: 'text-gray-400',
+  SET_MOOD: 'text-purple-400',
+  CREATE_POLL: 'text-blue-400',
+  DELETE_POLL: 'text-red-400',
+  SET_SPOTLIGHT: 'text-yellow-400',
+  CLEAR_SPOTLIGHT: 'text-gray-400',
+  UPDATE_FEATURED_AUTHORS: 'text-blue-400',
 };
 
 // `searchParams` is a Promise in Next.js 14 App Router server components —
@@ -129,11 +129,11 @@ export default async function AdminAuditLogPage({
       <div className="flex gap-2 flex-wrap mb-4">
         {[
           { label: 'All', value: 'all' },
-          ...actions.map(a => ({
+          ...actions.map((a) => ({
             label: `${a.action} (${a._count.action})`,
             value: a.action,
           })),
-        ].map(opt => (
+        ].map((opt) => (
           <a
             key={opt.value}
             href={`/admin/audit-log?action=${opt.value}`}
@@ -174,22 +174,27 @@ export default async function AdminAuditLogPage({
               </tr>
             )}
 
-            {logs.map(l => (
+            {logs.map((l) => (
               // `hover:bg-gray-800/40` — `/40` is Tailwind's opacity modifier,
               // giving a subtle hover highlight without a fully opaque background.
               <tr key={l.id} className="hover:bg-gray-800/40 transition">
                 {/* Date formatted as "12 Apr 2025, 14:32" for readability */}
                 <td className="px-5 py-3 text-xs text-gray-500 whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleString('en-GB', {
-                    day: '2-digit', month: 'short', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </td>
                 <td className="px-5 py-3 text-gray-300 font-medium">{l.admin.username}</td>
                 <td className="px-5 py-3">
                   {/* Look up the colour for this action, defaulting to gray for unknown types.
                       `font-mono` makes the all-caps action strings easier to scan. */}
-                  <span className={`text-xs font-bold font-mono ${ACTION_STYLES[l.action] ?? 'text-gray-400'}`}>
+                  <span
+                    className={`text-xs font-bold font-mono ${ACTION_STYLES[l.action] ?? 'text-gray-400'}`}
+                  >
                     {l.action}
                   </span>
                 </td>

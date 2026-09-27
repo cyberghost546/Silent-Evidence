@@ -113,9 +113,11 @@ export default function CoAuthorInvite({ storyId, authorId }: Props) {
 
   // Map the accepted boolean (or null) to a human-readable label and colour class
   function statusLabel(accepted: boolean | null): { text: string; cls: string } {
-    if (accepted === null) return { text: 'Pending',  cls: 'text-yellow-400 bg-yellow-900/30 border-yellow-700/40' };
-    if (accepted === true)  return { text: 'Accepted', cls: 'text-green-400 bg-green-900/30 border-green-700/40'  };
-    return                         { text: 'Declined', cls: 'text-red-400 bg-red-900/30 border-red-700/40'         };
+    if (accepted === null)
+      return { text: 'Pending', cls: 'text-yellow-400 bg-yellow-900/30 border-yellow-700/40' };
+    if (accepted === true)
+      return { text: 'Accepted', cls: 'text-green-400 bg-green-900/30 border-green-700/40' };
+    return { text: 'Declined', cls: 'text-red-400 bg-red-900/30 border-red-700/40' };
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -124,9 +126,7 @@ export default function CoAuthorInvite({ storyId, authorId }: Props) {
     <div className="rounded-xl border border-gray-800 bg-gray-900 p-6 space-y-5">
       {/* Header */}
       <div>
-        <h3 className="text-white font-bold text-lg flex items-center gap-2">
- Co-Author Mode
-        </h3>
+        <h3 className="text-white font-bold text-lg flex items-center gap-2">Co-Author Mode</h3>
         {/* Informational note about what co-authorship means */}
         <p className="text-xs text-gray-500 mt-1">
           Co-authors can edit this story. Invitees will need to accept the invite.
@@ -211,14 +211,10 @@ export default function CoAuthorInvite({ storyId, authorId }: Props) {
                   />
 
                   {/* Username */}
-                  <span className="text-sm text-white font-medium flex-1">
-                    @{c.user.username}
-                  </span>
+                  <span className="text-sm text-white font-medium flex-1">@{c.user.username}</span>
 
                   {/* Status badge — colour-coded by accepted value */}
-                  <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${cls}`}
-                  >
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${cls}`}>
                     {text}
                   </span>
                 </li>

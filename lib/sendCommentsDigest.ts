@@ -19,7 +19,7 @@ export async function sendCommentsDigest(): Promise<DigestResult> {
   const authors = await prisma.user.findMany({
     where: {
       stories: { some: { status: 'PUBLISHED' } },
-      email:   { not: '' },
+      email: { not: '' },
     },
     select: {
       id: true,
@@ -34,29 +34,32 @@ export async function sendCommentsDigest(): Promise<DigestResult> {
   });
 
   let authorsNotified = 0;
-  let totalComments   = 0;
-  let skipped         = 0;
+  let totalComments = 0;
+  let skipped = 0;
 
   for (const author of authors) {
     // Cutoff: last digest time, or 7 days ago if never sent
     const since = author.lastCommentDigestAt ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const storyIds = author.stories.map(s => s.id);
+    const storyIds = author.stories.map((s) => s.id);
 
     // All comments on this author's stories since the cutoff, excluding self-comments
     const comments = await prisma.comment.findMany({
       where: {
         storyId: { in: storyIds },
-        userId:  { not: author.id },       // exclude the author's own comments
+        userId: { not: author.id }, // exclude the author's own comments
         createdAt: { gt: since },
       },
       include: {
-        user:  { select: { username: true } },
+        user: { select: { username: true } },
         story: { select: { title: true, slug: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
 
-    if (comments.length === 0) { skipped++; continue; }
+    if (comments.length === 0) {
+      skipped++;
+      continue;
+    }
 
     // Group comments by story for a cleaner email layout
     const byStory = new Map<string, typeof comments>();
@@ -72,7 +75,8 @@ export async function sendCommentsDigest(): Promise<DigestResult> {
         const storyTitle = cs[0].story.title;
         const rows = cs
           .slice(0, 5) // cap at 5 comments per story to keep email concise
-          .map(c => `
+          .map(
+            (c) => `
             <tr>
               <td style="padding:8px 0;border-bottom:1px solid #2d2d2d;">
                 <p style="margin:0;font-size:13px;color:#fff;font-weight:600;">${c.user.username}</p>
@@ -80,7 +84,8 @@ export async function sendCommentsDigest(): Promise<DigestResult> {
                   "${c.content.slice(0, 120)}${c.content.length > 120 ? '…' : ''}"
                 </p>
               </td>
-            </tr>`)
+            </tr>`
+          )
           .join('');
         const moreCount = cs.length > 5 ? cs.length - 5 : 0;
 

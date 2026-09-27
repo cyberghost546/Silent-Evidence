@@ -52,14 +52,11 @@ export default function MonstersPage() {
     // `main` is the correct semantic landmark for the primary page content.
     // bg-gray-950 is one step darker than bg-gray-900, giving a deep-space feel.
     <main className="min-h-screen bg-gray-950 py-12 px-4">
-
       {/* Centered content wrapper — max-w-5xl limits line length on ultrawide screens */}
       <div className="max-w-5xl mx-auto">
-
         {/* ── Hero header ───────────────────────────────────────────────────── */}
         {/* text-center aligns the emoji, heading, and sub-copy as a block */}
         <div className="text-center mb-10">
-
           {/* Large emoji serves as the page's visual icon — no extra image needed */}
 
           {/* Primary heading — text-4xl is intentionally large for impact */}

@@ -34,7 +34,10 @@ export default function ContinueReading() {
         entries.push({ id, progress: pct });
       }
     }
-    if (entries.length === 0) { setReady(true); return; }
+    if (entries.length === 0) {
+      setReady(true);
+      return;
+    }
 
     // Sort by most-recently-read — use the raw % as a proxy (higher = further = newer)
     // Actually sort by id descending as a simple heuristic (larger IDs = newer stories)
@@ -45,14 +48,20 @@ export default function ContinueReading() {
     Promise.all(
       top.map(({ id, progress }) =>
         fetch(`/api/stories/${id}`)
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data) => {
             if (!data) return null;
-            return { id, slug: data.slug, title: data.title, coverImage: data.coverImage ?? null, progress } as ResumeStory;
+            return {
+              id,
+              slug: data.slug,
+              title: data.title,
+              coverImage: data.coverImage ?? null,
+              progress,
+            } as ResumeStory;
           })
           .catch(() => null)
       )
-    ).then(results => {
+    ).then((results) => {
       setStories(results.filter((s): s is ResumeStory => s !== null));
       setReady(true);
     });
@@ -67,7 +76,7 @@ export default function ContinueReading() {
         <h2 className="text-lg font-bold text-white">Continue Reading</h2>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stories.map(story => (
+        {stories.map((story) => (
           <Link
             key={story.id}
             href={`/story/${story.slug}`}
@@ -76,11 +85,28 @@ export default function ContinueReading() {
             {/* Thumbnail */}
             <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-700">
               {story.coverImage ? (
-                <Image src={story.coverImage} alt={story.title} width={64} height={64} className="rounded-lg object-cover" />
+                <Image
+                  src={story.coverImage}
+                  alt={story.title}
+                  width={64}
+                  height={64}
+                  className="rounded-lg object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
                   </svg>
                 </div>
               )}
@@ -99,7 +125,9 @@ export default function ContinueReading() {
                     style={{ width: `${Math.round(story.progress)}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 shrink-0">{Math.round(story.progress)}%</span>
+                <span className="text-xs text-gray-500 shrink-0">
+                  {Math.round(story.progress)}%
+                </span>
               </div>
             </div>
           </Link>

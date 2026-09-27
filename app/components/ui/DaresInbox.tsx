@@ -17,8 +17,8 @@ type Props = {
 // ── Shape of a single dare returned by the API ────────────────
 type Dare = {
   id: number;
-  message: string | null;    // Optional scary message from the sender
-  accepted: boolean | null;  // null = pending, true = accepted, false = declined
+  message: string | null; // Optional scary message from the sender
+  accepted: boolean | null; // null = pending, true = accepted, false = declined
   createdAt: string;
   story: { id: number; title: string; slug: string };
   sender: { id: number; username: string };
@@ -34,7 +34,11 @@ function timeAgo(dateStr: string): string {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 export default function DaresInbox({ userId }: Props) {
@@ -108,7 +112,10 @@ export default function DaresInbox({ userId }: Props) {
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           // Pulsing placeholder cards while data loads
-          <div key={i} className="h-24 bg-gray-900 rounded-xl animate-pulse border border-gray-800" />
+          <div
+            key={i}
+            className="h-24 bg-gray-900 rounded-xl animate-pulse border border-gray-800"
+          />
         ))}
       </div>
     );
@@ -141,9 +148,7 @@ export default function DaresInbox({ userId }: Props) {
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex items-center gap-2">
             {/* Ghost icon decorates the sender name */}
-            <span className="text-sm font-semibold text-white">
-              {dare.sender.username}
-            </span>
+            <span className="text-sm font-semibold text-white">{dare.sender.username}</span>
             <span className="text-xs text-gray-600">dared you</span>
           </div>
           {/* Relative timestamp */}
@@ -158,7 +163,7 @@ export default function DaresInbox({ userId }: Props) {
           href={`/story/${dare.story.slug}`}
           className="block text-red-400 hover:text-red-300 font-medium text-sm mb-3 transition underline underline-offset-2"
         >
- {dare.story.title}
+          {dare.story.title}
         </Link>
 
         {/* ── Optional personal message ────────────────────── */}
@@ -196,9 +201,7 @@ export default function DaresInbox({ userId }: Props) {
           <div className="mt-2">
             <span
               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                dare.accepted
-                  ? 'bg-red-900/40 text-red-400'
-                  : 'bg-gray-800 text-gray-500'
+                dare.accepted ? 'bg-red-900/40 text-red-400' : 'bg-gray-800 text-gray-500'
               }`}
             >
               {dare.accepted ? 'You accepted this dare' : 'Declined'}

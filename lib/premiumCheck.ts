@@ -17,7 +17,7 @@ import { forbidden, unauthorized } from '@/lib/apiError';
 export async function hasPremiumAccess(userId: number | null): Promise<boolean> {
   if (!userId) return false;
   const user = await prisma.user.findUnique({
-    where:  { id: userId },
+    where: { id: userId },
     select: { role: true, subscription: { select: { status: true } } },
   });
   return user?.role === 'ADMIN' || user?.subscription?.status === 'active';
@@ -71,7 +71,7 @@ export async function requirePremium(message = 'This feature is for premium memb
 export function isEarlyAccessLocked(
   earlyAccessUntil: Date | string | null | undefined,
   hasPremium: boolean,
-  isAuthor: boolean,
+  isAuthor: boolean
 ): boolean {
   if (!earlyAccessUntil) return false;
   if (hasPremium || isAuthor) return false;

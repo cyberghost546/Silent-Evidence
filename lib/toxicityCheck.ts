@@ -8,7 +8,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL;
-const OLLAMA_MODEL    = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
 
 async function runOllamaToxicityCheck(
   prompt: string

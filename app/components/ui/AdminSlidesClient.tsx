@@ -33,11 +33,11 @@ import Image from 'next/image';
 type Slide = {
   id: number;
   title: string;
-  subtitle: string | null;   // optional tagline shown under the title
-  image: string;             // public URL of the slide image
-  linkUrl: string | null;    // optional URL the slide links to when clicked
-  order: number;             // lower numbers appear first
-  active: boolean;           // false = hidden from the public slideshow
+  subtitle: string | null; // optional tagline shown under the title
+  image: string; // public URL of the slide image
+  linkUrl: string | null; // optional URL the slide links to when clicked
+  order: number; // lower numbers appear first
+  active: boolean; // false = hidden from the public slideshow
 };
 
 export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
@@ -135,7 +135,6 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
 
   return (
     <div className="space-y-6">
-
       {/* ── Add slide button ──────────────────────────────────────────── */}
       <div className="flex justify-end">
         <button
@@ -148,12 +147,26 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
 
       {/* ── Add slide form ────────────────────────────────────────────── */}
       {showForm && (
-        <form onSubmit={addSlide} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+        <form
+          onSubmit={addSlide}
+          className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4"
+        >
           <h2 className="font-semibold text-white">New Slide</h2>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Title *" value={form.title} onChange={(v) => setForm({ ...form, title: v })} placeholder="Slide title" required />
-            <Field label="Subtitle" value={form.subtitle} onChange={(v) => setForm({ ...form, subtitle: v })} placeholder="Optional tagline" />
+            <Field
+              label="Title *"
+              value={form.title}
+              onChange={(v) => setForm({ ...form, title: v })}
+              placeholder="Slide title"
+              required
+            />
+            <Field
+              label="Subtitle"
+              value={form.subtitle}
+              onChange={(v) => setForm({ ...form, subtitle: v })}
+              placeholder="Optional tagline"
+            />
             {/* Image picker — hidden file input triggered by a styled button */}
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Image *</label>
@@ -177,15 +190,26 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
                 {uploading
                   ? 'Uploading…'
                   : form.image
-                  ? '✓ Image chosen — click to change'
-                  : 'Choose image from device…'}
+                    ? '✓ Image chosen — click to change'
+                    : 'Choose image from device…'}
               </button>
 
               {/* Upload error message */}
               {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
             </div>
-            <Field label="Link URL" value={form.linkUrl} onChange={(v) => setForm({ ...form, linkUrl: v })} placeholder="https://..." />
-            <Field label="Order" value={form.order} onChange={(v) => setForm({ ...form, order: v })} placeholder="0" type="number" />
+            <Field
+              label="Link URL"
+              value={form.linkUrl}
+              onChange={(v) => setForm({ ...form, linkUrl: v })}
+              placeholder="https://..."
+            />
+            <Field
+              label="Order"
+              value={form.order}
+              onChange={(v) => setForm({ ...form, order: v })}
+              placeholder="0"
+              type="number"
+            />
           </div>
 
           {/* Image preview */}
@@ -195,7 +219,11 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
             </div>
           )}
 
-          <button type="submit" disabled={adding} className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
+          <button
+            type="submit"
+            disabled={adding}
+            className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
+          >
             {adding ? 'Adding...' : 'Add Slide'}
           </button>
         </form>
@@ -222,16 +250,20 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <p className="text-white font-medium truncate">{slide.title}</p>
-              {slide.subtitle && <p className="text-gray-500 text-xs mt-0.5 truncate">{slide.subtitle}</p>}
+              {slide.subtitle && (
+                <p className="text-gray-500 text-xs mt-0.5 truncate">{slide.subtitle}</p>
+              )}
               <p className="text-gray-600 text-xs mt-1">Order: {slide.order}</p>
             </div>
 
             {/* Active badge */}
-            <span className={`text-xs px-2 py-0.5 rounded-full border font-medium flex-shrink-0 ${
-              slide.active
-                ? 'bg-red-500/10 text-red-400 border-red-500/30'
-                : 'bg-gray-500/10 text-gray-500 border-gray-600/30'
-            }`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full border font-medium flex-shrink-0 ${
+                slide.active
+                  ? 'bg-red-500/10 text-red-400 border-red-500/30'
+                  : 'bg-gray-500/10 text-gray-500 border-gray-600/30'
+              }`}
+            >
               {slide.active ? 'Active' : 'Hidden'}
             </span>
 
@@ -260,9 +292,20 @@ export default function AdminSlidesClient({ slides }: { slides: Slide[] }) {
 }
 
 // Simple reusable input field
-function Field({ label, value, onChange, placeholder, required, type = 'text' }: {
-  label: string; value: string; onChange: (v: string) => void;
-  placeholder?: string; required?: boolean; type?: string;
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  required,
+  type = 'text',
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
 }) {
   return (
     <div>

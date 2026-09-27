@@ -40,7 +40,6 @@ import { useRouter } from 'next/navigation';
 // initial HTML, which is faster and avoids a loading flash.
 // If no announcement is active, `current` will be an empty string "".
 export default function AnnouncementAdmin({ current }: { current: string }) {
-
   // ── Router ────────────────────────────────────────────────────────────────
   // `router.refresh()` tells Next.js to re-run the parent Server Component on
   // the server and stream the updated HTML to the browser without a full page
@@ -116,9 +115,9 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
     setSaving(false);
 
     if (res.ok) {
-      setMessage('');       // empty the textarea so the live preview disappears
+      setMessage(''); // empty the textarea so the live preview disappears
       setStatus('cleared');
-      router.refresh();     // re-sync the server component (banner is now gone)
+      router.refresh(); // re-sync the server component (banner is now gone)
     } else {
       setStatus('error');
     }
@@ -131,7 +130,8 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Announcement Banner</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Set a site-wide message that appears at the top of every page. Leave blank and clear to hide it.
+          Set a site-wide message that appears at the top of every page. Leave blank and clear to
+          hide it.
         </p>
       </div>
 
@@ -144,7 +144,9 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
       {message.trim() && (
         <div className="mb-6 rounded-xl overflow-hidden border border-gray-700">
           {/* "Preview" label above the mock banner */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 px-4 py-2 border-b border-gray-800">Preview</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 px-4 py-2 border-b border-gray-800">
+            Preview
+          </p>
           {/* Styled to look identical to the real site banner */}
           <div className="bg-red-700 text-white text-sm px-4 py-2.5 flex items-center justify-between gap-4">
             <div className="flex-1 text-center font-medium">{message}</div>
@@ -158,14 +160,13 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
           `space-y-4` adds vertical gap between the textarea, status line,
           and button row without needing margin on individual elements. */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-
         {/* Controlled textarea — every keystroke updates `message` state,
             which immediately updates the live preview above */}
         <div>
           <label className="block text-xs text-gray-400 mb-1">Message</label>
           <textarea
             value={message}
-            onChange={e => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder="e.g. Site maintenance scheduled for Sunday 2am–4am UTC."
             rows={3}
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -176,9 +177,11 @@ export default function AnnouncementAdmin({ current }: { current: string }) {
             Exactly one of these three lines is shown at a time, depending on
             the `status` string set by save() or clear(). All three are
             hidden when status is '' (initial state or after a reset). */}
-        {status === 'saved'   && <p className="text-xs text-red-400">Announcement updated.</p>}
+        {status === 'saved' && <p className="text-xs text-red-400">Announcement updated.</p>}
         {status === 'cleared' && <p className="text-xs text-gray-400">Announcement cleared.</p>}
-        {status === 'error'   && <p className="text-xs text-red-400">Something went wrong. Try again.</p>}
+        {status === 'error' && (
+          <p className="text-xs text-red-400">Something went wrong. Try again.</p>
+        )}
 
         {/* ── Button row ──────────────────────────────────────────────────
             "Clear banner" only appears if there is already a saved announcement

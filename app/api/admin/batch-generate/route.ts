@@ -63,24 +63,44 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // Record<string, string[]> means "an object whose keys are strings and values are arrays of strings"
 const CATEGORY_IMAGES: Record<string, string[]> = {
   // Each slug maps to several related keywords so images vary between stories
-  'true-stories':        ['dark true crime','dark street night','urban dark moody','shadowy alley'],
-  'paranormal':          ['paranormal fog','dark mist forest','ghost light','mysterious light dark'],
-  'urban-legends':       ['dark urban night','abandoned city','night street fog','urban grunge dark'],
-  'short-nightmares':    ['dark bedroom horror','nightmare shadow','dark corner shadow','creepy night'],
-  'haunted-places':      ['haunted house','abandoned mansion','old house night','creepy building'],
-  'ghost-encounters':    ['cemetery fog','graveyard dark','misty cemetery','spooky fog night'],
-  'crime-and-mystery':   ['crime scene dark','dark detective','mystery fog','crime night'],
-  'missing-persons':     ['missing person','dark empty road','abandoned belongings','dark corridor'],
-  'sleep-paralysis':     ['dark bedroom','night terror','shadow bedroom','dark ceiling bedroom'],
-  'fantasy':             ['dark forest','misty forest fog','deep forest dark','creepy woods'],
-  'night-shift-stories': ['empty office night','night shift security','dark hospital corridor','empty building night'],
-  'strange-phone-calls': ['old phone dark','telephone dark','dark phone cord','vintage phone dark'],
-  'creature-sightings':  ['creature shadow dark','monster dark','beast shadow','dark forest creature'],
-  'abandoned-places':    ['abandoned building','derelict interior','decay dark','ruined building'],
-  'psychological':       ['mind shadow dark','mirror dark','psychological dark','shadow face'],
-  'supernatural-events': ['lightning dark','supernatural glow','dark sky storm','mystic dark'],
-  'creepy-folklore':     ['folklore dark','ancient ritual','dark mythology','creepy tradition'],
-  'unsolved-mysteries':  ['mystery dark','unsolved crime','evidence board dark','detective dark'],
+  'true-stories': ['dark true crime', 'dark street night', 'urban dark moody', 'shadowy alley'],
+  paranormal: ['paranormal fog', 'dark mist forest', 'ghost light', 'mysterious light dark'],
+  'urban-legends': ['dark urban night', 'abandoned city', 'night street fog', 'urban grunge dark'],
+  'short-nightmares': [
+    'dark bedroom horror',
+    'nightmare shadow',
+    'dark corner shadow',
+    'creepy night',
+  ],
+  'haunted-places': ['haunted house', 'abandoned mansion', 'old house night', 'creepy building'],
+  'ghost-encounters': ['cemetery fog', 'graveyard dark', 'misty cemetery', 'spooky fog night'],
+  'crime-and-mystery': ['crime scene dark', 'dark detective', 'mystery fog', 'crime night'],
+  'missing-persons': ['missing person', 'dark empty road', 'abandoned belongings', 'dark corridor'],
+  'sleep-paralysis': ['dark bedroom', 'night terror', 'shadow bedroom', 'dark ceiling bedroom'],
+  fantasy: ['dark forest', 'misty forest fog', 'deep forest dark', 'creepy woods'],
+  'night-shift-stories': [
+    'empty office night',
+    'night shift security',
+    'dark hospital corridor',
+    'empty building night',
+  ],
+  'strange-phone-calls': [
+    'old phone dark',
+    'telephone dark',
+    'dark phone cord',
+    'vintage phone dark',
+  ],
+  'creature-sightings': [
+    'creature shadow dark',
+    'monster dark',
+    'beast shadow',
+    'dark forest creature',
+  ],
+  'abandoned-places': ['abandoned building', 'derelict interior', 'decay dark', 'ruined building'],
+  psychological: ['mind shadow dark', 'mirror dark', 'psychological dark', 'shadow face'],
+  'supernatural-events': ['lightning dark', 'supernatural glow', 'dark sky storm', 'mystic dark'],
+  'creepy-folklore': ['folklore dark', 'ancient ritual', 'dark mythology', 'creepy tradition'],
+  'unsolved-mysteries': ['mystery dark', 'unsolved crime', 'evidence board dark', 'detective dark'],
 };
 
 // All available mood values, imported so they cannot drift from the Mood enum.
@@ -148,8 +168,15 @@ async function fetchUnsplashImage(categorySlug: string): Promise<string> {
 // "category" — the full category object from the database (id, name, slug)
 // "index" — the loop counter; used to vary mood and word-count across stories
 // The return type is a Promise resolving to an object with five string fields
-async function generateStory(category: { id: number; name: string; slug: string }, index: number): Promise<{
-  title: string; excerpt: string; content: string; mood: string; coverImage: string;
+async function generateStory(
+  category: { id: number; name: string; slug: string },
+  index: number
+): Promise<{
+  title: string;
+  excerpt: string;
+  content: string;
+  mood: string;
+  coverImage: string;
 }> {
   // Determine the mood for this story by cycling through the MOODS array
   const mood = pickMood(index);
@@ -182,8 +209,8 @@ Respond ONLY with valid JSON (no markdown):
   // Call the Claude API using the Anthropic SDK
   // "await" pauses this function until Claude responds
   const message = await client.messages.create({
-    model: 'claude-haiku-4-5',    // fastest/cheapest model — good for bulk generation
-    max_tokens: 2048,             // maximum number of tokens Claude can return
+    model: 'claude-haiku-4-5', // fastest/cheapest model — good for bulk generation
+    max_tokens: 2048, // maximum number of tokens Claude can return
     messages: [{ role: 'user', content: prompt }], // the conversation: one user message with our prompt
   });
 
@@ -235,7 +262,8 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
   // If the user doesn't exist or isn't an ADMIN, return 403 Forbidden
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   // ── Parse request body ───────────────────────────────────────────────────────
 
@@ -271,7 +299,7 @@ export async function POST(req: Request) {
 
       // Running totals updated as each story succeeds or fails
       let generated = 0; // number of stories successfully saved to the database
-      let failed = 0;    // number of stories that threw an error
+      let failed = 0; // number of stories that threw an error
 
       // Notify the client that we're starting — the UI uses this to initialise its progress bar
       send({ type: 'start', category: category.name, total: count });
@@ -297,7 +325,10 @@ export async function POST(req: Request) {
           // 3. .replace(/^-|-$/g, '') — strip any leading or trailing hyphens
           // 4. Append a timestamp (Date.now()) and the loop index to guarantee uniqueness
           //    even if two stories have identical titles
-          const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          const baseSlug = title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
           const slug = `${baseSlug}-${Date.now()}-${i}`;
 
           // ── Save to database ───────────────────────────────────────────────────
@@ -327,18 +358,24 @@ export async function POST(req: Request) {
 
           // Notify the client that this story is done — the UI shows a checkmark with the title
           send({ type: 'done', index: i + 1, total: count, title, generated, failed });
-
         } catch (err: any) {
           // One story failed — increment the failure counter but keep going with the rest
           // err.message contains a human-readable description of what went wrong
           failed++;
-          send({ type: 'error', index: i + 1, total: count, message: err.message, generated, failed });
+          send({
+            type: 'error',
+            index: i + 1,
+            total: count,
+            message: err.message,
+            generated,
+            failed,
+          });
         }
 
         // Wait 500 milliseconds between each story to avoid hitting the Anthropic rate limit.
         // "new Promise(r => setTimeout(r, 500))" creates a promise that resolves after 500ms —
         // "await"-ing it pauses the loop for that duration before the next iteration.
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500));
       }
 
       // ── Close the stream ──────────────────────────────────────────────────────
@@ -360,7 +397,7 @@ export async function POST(req: Request) {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 }

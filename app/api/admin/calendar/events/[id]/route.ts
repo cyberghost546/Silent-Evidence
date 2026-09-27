@@ -14,20 +14,22 @@ async function requireAdmin() {
   return user?.role === 'ADMIN';
 }
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export async function PATCH(req: Request, { params }: Props) {
   try {
-    if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const { id } = await params;
     const { title, icon, note, linkUrl } = await req.json();
     const event = await prisma.calendarEvent.update({
       where: { id: Number(id) },
       data: {
-        ...(title    ? { title: title.trim() }       : {}),
-        ...(icon     ? { icon: icon.trim() }         : {}),
-        ...(note     !== undefined ? { note: note?.trim() || null } : {}),
-        ...(linkUrl  !== undefined ? { linkUrl: linkUrl?.trim() || null } : {}),
+        ...(title ? { title: title.trim() } : {}),
+        ...(icon ? { icon: icon.trim() } : {}),
+        ...(note !== undefined ? { note: note?.trim() || null } : {}),
+        ...(linkUrl !== undefined ? { linkUrl: linkUrl?.trim() || null } : {}),
       },
     });
     return NextResponse.json(event);
@@ -39,7 +41,7 @@ export async function PATCH(req: Request, { params }: Props) {
 
 export async function DELETE(_req: Request, { params }: Props) {
   try {
-    if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const { id } = await params;
     await prisma.calendarEvent.delete({ where: { id: Number(id) } });
     return NextResponse.json({ ok: true });

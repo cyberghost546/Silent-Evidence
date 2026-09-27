@@ -18,8 +18,8 @@ type Status = 'loading' | 'unsupported' | 'denied' | 'subscribed' | 'unsubscribe
 
 export default function PushNotificationToggle() {
   const [status, setStatus] = useState<Status>('loading');
-  const [busy, setBusy]     = useState(false);
-  const [saved, setSaved]   = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     // Push is only available over HTTPS with a registered SW and VAPID keys configured
@@ -62,7 +62,8 @@ export default function PushNotificationToggle() {
       // Subscribe to the push service using the server's VAPID public key
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!).buffer as ArrayBuffer,
+        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
+          .buffer as ArrayBuffer,
       });
 
       // Save the subscription object on the server
@@ -130,7 +131,9 @@ export default function PushNotificationToggle() {
           <button
             onClick={status === 'subscribed' ? unsubscribe : subscribe}
             disabled={busy}
-            aria-label={status === 'subscribed' ? 'Disable push notifications' : 'Enable push notifications'}
+            aria-label={
+              status === 'subscribed' ? 'Disable push notifications' : 'Enable push notifications'
+            }
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none disabled:opacity-50 ${
               status === 'subscribed' ? 'bg-red-600' : 'bg-gray-700'
             }`}

@@ -67,7 +67,7 @@ export async function GET() {
       senderId: true,
       receiverId: true,
       // Full sender profile for displaying the partner's info
-      sender:   { select: { id: true, username: true, profile: { select: { avatar: true } } } },
+      sender: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
       // Full receiver profile — we need both because either could be the "partner"
       receiver: { select: { id: true, username: true, profile: { select: { avatar: true } } } },
     },
@@ -103,7 +103,7 @@ export async function GET() {
     // We filter the already-fetched messages array instead of making another DB call.
     // Criteria: sent BY the partner, addressed TO me, and not yet marked as read.
     const unread = messages.filter(
-      m => m.senderId === partner.id && m.receiverId === userId && !m.read
+      (m) => m.senderId === partner.id && m.receiverId === userId && !m.read
     ).length;
 
     // Push the conversation summary into our result list

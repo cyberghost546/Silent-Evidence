@@ -35,6 +35,7 @@ import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import TagStories from './TagStories';
 import TagFollowButton from '@/app/components/ui/TagFollowButton';
+import { viewerRatings, ratingFilter } from '@/lib/ageGate';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -56,8 +57,18 @@ export default async function TagPage({ params }: Props) {
     ? await prisma.tagFollow.findUnique({ where: { userId_tagId: { userId, tagId: tag.id } } })
     : null;
 
+  // Restrict to the ratings this viewer is old enough to see. Without it a minor
+  // browsing a tag saw MATURE stories listed — title, excerpt and cover — even
+  // though opening one is blocked. Shared with /search and /category: the
+  // mapping lives in lib/ageGate.ts.
+  const allowedRatings = await viewerRatings();
+
   const stories = await prisma.story.findMany({
-    where: { status: 'PUBLISHED', tags: { some: { slug } } },
+    where: {
+      status: 'PUBLISHED',
+      tags: { some: { slug } },
+      ...ratingFilter(allowedRatings),
+    },
     orderBy: { createdAt: 'desc' },
     include: {
       author: { select: { username: true, profile: { select: { avatar: true } } } },
@@ -73,7 +84,9 @@ export default async function TagPage({ params }: Props) {
       <div className="relative bg-gray-950 border-b border-gray-800 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-xs text-gray-500 mb-4">
-            <Link href="/" className="hover:text-gray-300 transition">Home</Link>
+            <Link href="/" className="hover:text-gray-300 transition">
+              Home
+            </Link>
             <span className="mx-2 text-gray-700">/</span>
             <span className="text-gray-400">#{tag.name}</span>
           </div>
@@ -90,7 +103,12 @@ export default async function TagPage({ params }: Props) {
               />
             )}
           </div>
-          <p className="text-sm text-gray-600 mt-2">{tag._count.stories} {tag._count.stories === 1 ? 'story' : 'stories'}</p>
+          {/* Count the stories actually listed below, not tag._count.stories —
+              that relation count includes drafts and stories this viewer is not
+              old enough to see, so it read higher than the list it labelled. */}
+          <p className="text-sm text-gray-600 mt-2">
+            {stories.length} {stories.length === 1 ? 'story' : 'stories'}
+          </p>
         </div>
       </div>
 

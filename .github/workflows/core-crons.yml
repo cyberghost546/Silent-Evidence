@@ -1,0 +1,49 @@
+# .github/workflows/core-crons.yml
+#
+# Triggers the core scheduled jobs (publish-scheduled, data-retention) for hosts
+# that have no built-in cron, e.g. Railway. On Vercel these already run from
+# vercel.json, so this workflow stays OFF unless you opt in.
+#
+# SETUP (Railway) — under Settings → Secrets and variables → Actions:
+#   Variables: CORE_CRONS_ENABLED = true
+#   Secrets:   CRON_SECRET, SITE_URL (same ones bot-crons.yml uses)
+#
+# Both endpoints are idempotent, so an occasional double run is harmless.
+
+name: Core scheduled jobs
+
+on:
+  schedule:
+    # Publish scheduled stories — hourly (Railway has no Hobby-plan limit).
+    - cron: '5 * * * *'
+    # Data retention — daily 03:00 UTC, matching vercel.json.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Which job to run manually'
+        type: choice
+        options: [publish-scheduled, data-retention]
+        default: publish-scheduled
+
+jobs:
+  run:
+    if: vars.CORE_CRONS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call cron endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          JOB: >-
+            ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.job ||
+                (github.event.schedule == '0 3 * * *' && 'data-retention' || 'publish-scheduled') }}
+        run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$SITE_URL" ]; then
+            echo "::error::CRON_SECRET and SITE_URL secrets must be set."; exit 1
+          fi
+          code=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${SITE_URL%/}/api/cron/$JOB")
+          echo "$JOB → HTTP $code"; cat /tmp/out.txt
+          case "$code" in 2*) : ;; *) echo "::error::endpoint returned $code"; exit 1 ;; esac

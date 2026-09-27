@@ -14,7 +14,7 @@ export default async function AdminContactPage() {
   if (!user || user.role !== 'ADMIN') redirect('/');
 
   const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
-  const unread = messages.filter(m => !m.read).length;
+  const unread = messages.filter((m) => !m.read).length;
 
   return (
     <>

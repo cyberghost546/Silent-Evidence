@@ -17,27 +17,13 @@ jobs:
     name: Type Check, Lint, Format, Test & Build
     runs-on: ubuntu-latest
 
-    # A throwaway database for the build step.
-    #
-    # `next build` prerenders pages that query the database (/admin/stories is
-    # one), so a placeholder connection string is not enough — the build fails
-    # with a connection-pool timeout. This gives it a real server to talk to.
-    # Image version matches the 10.4 series running in development.
-    services:
-      mariadb:
-        image: mariadb:10.4
-        env:
-          MARIADB_ROOT_PASSWORD: ci
-          MARIADB_DATABASE: silent_evidence
-        ports:
-          - 3306:3306
-        # Steps must not start until the server is actually accepting
-        # connections, or the migrate step races it and fails intermittently.
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+    # NOTE: MariaDB is started manually in a step below rather than via the
+    # `services:` block. It must run with `--lower-case-table-names=1` so table
+    # names are case-INSENSITIVE, matching the development and production
+    # databases. Without it, Linux MariaDB is case-sensitive and migrations fail:
+    # existing tables were created lowercase (e.g. `user`) while Prisma-generated
+    # foreign keys reference the model casing (`User`). `services:` cannot pass a
+    # server command-line flag to the container, so a plain `docker run` is used.
 
     env:
       # Shared by every step that needs them. These are throwaway CI values: the
@@ -51,6 +37,22 @@ jobs:
       # 1. Check out the code
       - name: Checkout
         uses: actions/checkout@v4
+
+      # 1b. Start MariaDB with case-insensitive table names (see the note above).
+      - name: Start MariaDB
+        run: |
+          docker run -d --name mariadb \
+            -e MARIADB_ROOT_PASSWORD=ci \
+            -e MARIADB_DATABASE=silent_evidence \
+            -p 3306:3306 \
+            mariadb:10.4 --lower-case-table-names=1
+          # Wait until the server accepts connections before any DB step runs.
+          for i in $(seq 1 30); do
+            if docker exec mariadb mysqladmin ping -h 127.0.0.1 -uroot -pci --silent; then
+              echo "MariaDB ready"; break
+            fi
+            echo "waiting for MariaDB ($i)..."; sleep 3
+          done
 
       # 2. Set up Node.js — matches the version used locally
       - name: Setup Node.js
@@ -79,7 +81,13 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      # 7. Vitest — runs the unit tests in tests/ (auth, stories, Stripe webhook)
+      # 7. Apply migrations BEFORE the tests. Several suites are integration tests
+      #    that talk to the MariaDB service above (search, appeals, earnings, etc.),
+      #    so the tables must exist first. (The build in step 9 relies on this too.)
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      # 8. Vitest — unit + DB-backed integration tests in tests/
       - name: Test
         run: npm test
 
@@ -94,11 +102,9 @@ jobs:
       #    production build once sat in this repo while CI stayed green.
       #
       #    Runs last because it is the slowest step, so the cheap checks fail
-      #    fast and this only runs when they have all passed.
-      #    Create the schema first — the prerendered pages query real tables, so
-      #    an empty database fails just as surely as a missing one.
-      - name: Apply migrations
-        run: npx prisma migrate deploy
-
+      #    fast and this only runs when they have all passed. Migrations were
+      #    already applied before the test step, so the prerendered pages that
+      #    query real tables have a populated schema to talk to.
+      # 9. Production build — the only check that compiles the app as it ships.
       - name: Production build
         run: npm run build

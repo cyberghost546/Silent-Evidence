@@ -5,16 +5,16 @@
 // the OfflineSave model, then renders them in a grid.
 // Auth required: redirects to /login if the user is not logged in.
 
-import { redirect }   from 'next/navigation';
-import { cookies }    from 'next/headers';
-import { prisma }     from '@/lib/prisma';
-import Link           from 'next/link';
-import Image          from 'next/image';
-import Header         from '@/app/components/ui/Header';
-import Footer         from '@/app/components/ui/Footer';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+import Image from 'next/image';
+import Header from '@/app/components/ui/Header';
+import Footer from '@/app/components/ui/Footer';
 
 export const metadata = {
-  title:       'Offline Library — Silent Evidence',
+  title: 'Offline Library — Silent Evidence',
   description: 'Stories you have saved for offline reading.',
 };
 
@@ -29,18 +29,18 @@ export default async function OfflineReadsPage() {
   // Get all OfflineSave rows for this user, newest first, with the story fields
   // we need to render each card.
   const saves = await prisma.offlineSave.findMany({
-    where:   { userId },
+    where: { userId },
     orderBy: { savedAt: 'desc' },
     include: {
       story: {
         select: {
-          id:         true,
-          title:      true,
-          slug:       true,
-          excerpt:    true,
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
           coverImage: true,
-          mood:       true,
-          author:     { select: { username: true } },
+          mood: true,
+          author: { select: { username: true } },
         },
       },
     },
@@ -55,11 +55,10 @@ export default async function OfflineReadsPage() {
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-12">
-
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div className="mb-2">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
- Your Offline Library
+            Your Offline Library
           </h1>
           <p className="mt-2 text-gray-400 text-sm">
             These stories are cached on your device so you can read them without internet.
@@ -73,9 +72,7 @@ export default async function OfflineReadsPage() {
         {stories.length === 0 && (
           <div className="text-center py-20 text-gray-500">
             <p className="text-lg font-medium text-gray-400">No stories saved yet.</p>
-            <p className="text-sm mt-2">
-              Tap on any story to save it for offline reading.
-            </p>
+            <p className="text-sm mt-2">Tap on any story to save it for offline reading.</p>
           </div>
         )}
 
@@ -101,13 +98,14 @@ export default async function OfflineReadsPage() {
                     />
                   ) : (
                     // Fallback placeholder when no cover is set
-                    <div className="flex items-center justify-center h-full text-gray-600 text-5xl">
-                    </div>
+                    <div className="flex items-center justify-center h-full text-gray-600 text-5xl"></div>
                   )}
 
                   {/* Offline badge overlaid on the cover so it's clear at a glance */}
-                  <span className="absolute top-2 right-2 bg-black/70 text-green-400 text-xs
-                                   font-semibold px-2 py-0.5 rounded-full">
+                  <span
+                    className="absolute top-2 right-2 bg-black/70 text-green-400 text-xs
+                                   font-semibold px-2 py-0.5 rounded-full"
+                  >
                     ✓ Offline
                   </span>
                 </div>
@@ -115,17 +113,16 @@ export default async function OfflineReadsPage() {
                 {/* ── Card body ────────────────────────────────────────────── */}
                 <div className="p-4">
                   {/* Story title — clamps to 2 lines */}
-                  <h2 className="font-bold text-white text-base leading-snug line-clamp-2
-                                 group-hover:text-red-400 transition-colors">
+                  <h2
+                    className="font-bold text-white text-base leading-snug line-clamp-2
+                                 group-hover:text-red-400 transition-colors"
+                  >
                     {story.title}
                   </h2>
 
                   {/* Author attribution */}
                   <p className="text-xs text-gray-400 mt-1">
-                    by{' '}
-                    <span className="text-gray-300 font-medium">
-                      {story.author.username}
-                    </span>
+                    by <span className="text-gray-300 font-medium">{story.author.username}</span>
                   </p>
 
                   {/* Excerpt — clamp to 3 lines so cards stay uniform height */}
@@ -137,8 +134,10 @@ export default async function OfflineReadsPage() {
 
                   {/* Mood tag — small pill at the bottom of the card */}
                   {story.mood && (
-                    <span className="mt-3 inline-block text-xs bg-gray-700 text-gray-300
-                                     px-2 py-0.5 rounded-full capitalize">
+                    <span
+                      className="mt-3 inline-block text-xs bg-gray-700 text-gray-300
+                                     px-2 py-0.5 rounded-full capitalize"
+                    >
                       {story.mood.toLowerCase().replace(/_/g, ' ')}
                     </span>
                   )}

@@ -23,10 +23,14 @@ export default function ReadingStreakBadge({ currentStreak, longestStreak }: Pro
       className="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/30 text-orange-400 rounded-full px-3 py-1 text-xs font-semibold cursor-default"
     >
       {/* Show two flames for streaks of 30+ days — a milestone reward for very committed readers */}
-      {currentStreak >= 30
-        ? <><Flame className="w-4 h-4" /><Flame className="w-4 h-4" /></>
-        : <Flame className="w-4 h-4" />
-      }
+      {currentStreak >= 30 ? (
+        <>
+          <Flame className="w-4 h-4" />
+          <Flame className="w-4 h-4" />
+        </>
+      ) : (
+        <Flame className="w-4 h-4" />
+      )}
       <span>{currentStreak} day streak</span>
       {/* Only show the "best" record if they're not currently at their personal best */}
       {longestStreak > currentStreak && (

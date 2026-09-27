@@ -42,9 +42,9 @@ export async function GET(_req: Request, { params }: Ctx) {
     include: {
       story: {
         select: {
-          slug: true,        // the URL-friendly identifier for the story (e.g. "the-dark-descent")
-          title: true,       // the story's display title
-          authorId: true,    // the author's user ID — used by the reading page to show edit controls
+          slug: true, // the URL-friendly identifier for the story (e.g. "the-dark-descent")
+          title: true, // the story's display title
+          authorId: true, // the author's user ID — used by the reading page to show edit controls
           isChaptered: true, // whether this story has multiple chapters (drives the chapter nav UI)
         },
       },
@@ -121,19 +121,19 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const data: Record<string, unknown> = {};
 
   // Only include title if it was provided and is a string (trim whitespace)
-  if (typeof body.title   === 'string') data.title   = body.title.trim();
+  if (typeof body.title === 'string') data.title = body.title.trim();
 
   // Only include content if it was provided and is a string (trim whitespace)
   if (typeof body.content === 'string') data.content = body.content.trim();
 
   // Only include order if it was provided and is a number (skip strings/undefined)
-  if (typeof body.order   === 'number') data.order   = body.order;
+  if (typeof body.order === 'number') data.order = body.order;
 
   // ── Apply the update ──────────────────────────────────────────────────────
   // Update the chapter in the database with only the fields that were provided
   const updated = await prisma.storyChapter.update({
     where: { id: Number(id) }, // target this specific chapter by its primary key
-    data,                      // the partial update object built above
+    data, // the partial update object built above
   });
 
   // Return the updated chapter record as JSON

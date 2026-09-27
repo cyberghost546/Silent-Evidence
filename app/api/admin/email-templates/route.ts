@@ -25,7 +25,7 @@ export async function GET() {
 
   const templates: Record<string, string> = {};
   for (const key of TEMPLATE_KEYS) {
-    templates[key] = rows.find(r => r.key === key)?.value ?? defaultTemplate(key);
+    templates[key] = rows.find((r) => r.key === key)?.value ?? defaultTemplate(key);
   }
 
   return NextResponse.json({ templates });
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   }
 
   await prisma.siteSetting.upsert({
-    where:  { key },
+    where: { key },
     create: { key, value },
     update: { value },
   });
@@ -63,10 +63,14 @@ function defaultTemplate(key: string): string {
 </div>`;
 
   const content: Record<string, string> = {
-    email_welcome:        '<h2 style="color:#f87171;">Welcome to Silent Evidence!</h2><p>Thanks for joining, {{USERNAME}}. Start reading the latest horror stories now.</p><a href="{{SITE_URL}}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;">Browse Stories</a>',
-    email_newsletter:     '<h2 style="color:#f87171;">This Week on Silent Evidence</h2><p>Here are the top stories from this week:</p>{{STORIES}}',
-    email_digest:         '<h2 style="color:#f87171;">Recent Comments Digest</h2><p>Here\'s what people are saying:</p>{{COMMENTS}}',
-    email_follow_notify:  '<h2 style="color:#f87171;">{{AUTHOR}} published a new story</h2><p>{{STORY_TITLE}}</p><a href="{{STORY_URL}}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;">Read Now</a>',
+    email_welcome:
+      '<h2 style="color:#f87171;">Welcome to Silent Evidence!</h2><p>Thanks for joining, {{USERNAME}}. Start reading the latest horror stories now.</p><a href="{{SITE_URL}}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;">Browse Stories</a>',
+    email_newsletter:
+      '<h2 style="color:#f87171;">This Week on Silent Evidence</h2><p>Here are the top stories from this week:</p>{{STORIES}}',
+    email_digest:
+      '<h2 style="color:#f87171;">Recent Comments Digest</h2><p>Here\'s what people are saying:</p>{{COMMENTS}}',
+    email_follow_notify:
+      '<h2 style="color:#f87171;">{{AUTHOR}} published a new story</h2><p>{{STORY_TITLE}}</p><a href="{{STORY_URL}}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;">Read Now</a>',
   };
 
   return base.replace('{{CONTENT}}', content[key] ?? '<p>{{CONTENT}}</p>');

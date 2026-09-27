@@ -27,11 +27,11 @@ type Challenge = {
   id: number;
   title: string;
   description: string;
-  prompt: string;       // The creative prompt writers must respond to
-  startDate: string;   // ISO string — when the challenge opens
-  endDate: string;     // ISO string — when the challenge closes
-  active: boolean;     // If false, the challenge is hidden from users
-  entries: number;     // How many story submissions have been made
+  prompt: string; // The creative prompt writers must respond to
+  startDate: string; // ISO string — when the challenge opens
+  endDate: string; // ISO string — when the challenge closes
+  active: boolean; // If false, the challenge is hidden from users
+  entries: number; // How many story submissions have been made
 };
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -45,7 +45,11 @@ function toDatetimeLocal(iso: string) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function AdminChallengesClient({ challenges: initial }: { challenges: Challenge[] }) {
+export default function AdminChallengesClient({
+  challenges: initial,
+}: {
+  challenges: Challenge[];
+}) {
   // useRouter lets us call router.refresh() after a save to re-run the
   // server component and sync the table with the latest database values.
   const router = useRouter();
@@ -59,11 +63,11 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
   const [editing, setEditing] = useState<Challenge | null>(null);
 
   // Loading flags — disable buttons while async operations are in progress
-  const [saving, setSaving]   = useState(false);
+  const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   // Error string shown inside the modal when an API call fails
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
 
   // Capture the current time once so status calculations are consistent
   // across all rows in the table render pass.
@@ -80,7 +84,10 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
   };
 
   // Close the modal and clear any error state
-  const closeEdit = () => { setEditing(null); setError(''); };
+  const closeEdit = () => {
+    setEditing(null);
+    setError('');
+  };
 
   // ── Save edits ─────────────────────────────────────────────────────────────
 
@@ -94,15 +101,15 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title:       editing.title,
+          title: editing.title,
           description: editing.description,
-          prompt:      editing.prompt,
+          prompt: editing.prompt,
           // Convert the local datetime string back to a proper ISO string.
           // new Date("2024-11-01T09:00").toISOString() adds the timezone info
           // the server expects.
-          startDate:   new Date(editing.startDate).toISOString(),
-          endDate:     new Date(editing.endDate).toISOString(),
-          active:      editing.active,
+          startDate: new Date(editing.startDate).toISOString(),
+          endDate: new Date(editing.endDate).toISOString(),
+          active: editing.active,
         }),
       });
       if (!res.ok) {
@@ -110,7 +117,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
         setError(d.error ?? 'Save failed.');
       } else {
         // Replace the old challenge in the local list with the updated values
-        setChallenges(prev => prev.map(c => c.id === editing.id ? { ...editing } : c));
+        setChallenges((prev) => prev.map((c) => (c.id === editing.id ? { ...editing } : c)));
         closeEdit();
         // Refresh the server component so server-side data (e.g. entry counts) is up-to-date
         router.refresh();
@@ -143,8 +150,8 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
         setError(d.error ?? 'Reset failed.');
       } else {
         // Update local entry count to 0 so the badge reflects the reset immediately
-        setChallenges(prev => prev.map(c => c.id === editing.id ? { ...c, entries: 0 } : c));
-        setEditing(prev => prev ? { ...prev, entries: 0 } : prev);
+        setChallenges((prev) => prev.map((c) => (c.id === editing.id ? { ...c, entries: 0 } : c)));
+        setEditing((prev) => (prev ? { ...prev, entries: 0 } : prev));
       }
     } catch {
       setError('Network error.');
@@ -159,7 +166,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
     if (!confirm('Delete this challenge and all its entries?')) return;
     await fetch(`/api/admin/challenges/${id}`, { method: 'DELETE' });
     // Remove the deleted challenge from local state so the row disappears immediately
-    setChallenges(prev => prev.filter(c => c.id !== id));
+    setChallenges((prev) => prev.filter((c) => c.id !== id));
   };
 
   // ── Status badge ───────────────────────────────────────────────────────────
@@ -168,9 +175,9 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
   // Priority: Inactive > Ended > Active > Upcoming
   const getStatus = (c: Challenge) => {
     const start = new Date(c.startDate);
-    const end   = new Date(c.endDate);
+    const end = new Date(c.endDate);
     if (!c.active) return { label: 'Inactive', color: 'text-gray-500' };
-    if (now > end)  return { label: 'Ended',    color: 'text-gray-500' };
+    if (now > end) return { label: 'Ended', color: 'text-gray-500' };
     if (now >= start) return { label: 'Active', color: 'text-red-400' };
     // Challenge exists but hasn't started yet
     return { label: 'Upcoming', color: 'text-yellow-400' };
@@ -219,14 +226,23 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                 const { label, color } = getStatus(c);
                 return (
                   // Add a bottom border between rows but not after the last one
-                  <tr key={c.id} className={`${i < challenges.length - 1 ? 'border-b border-gray-800' : ''} hover:bg-gray-800/40`}>
+                  <tr
+                    key={c.id}
+                    className={`${i < challenges.length - 1 ? 'border-b border-gray-800' : ''} hover:bg-gray-800/40`}
+                  >
                     {/* Title — truncated if too long */}
-                    <td className="px-5 py-4 font-medium text-white max-w-[200px] truncate">{c.title}</td>
+                    <td className="px-5 py-4 font-medium text-white max-w-[200px] truncate">
+                      {c.title}
+                    </td>
                     {/* Status badge — colour comes from getStatus() */}
                     <td className={`px-5 py-4 font-semibold text-xs ${color}`}>{label}</td>
                     {/* Dates formatted with the browser's locale */}
-                    <td className="px-5 py-4 text-gray-400 text-xs">{new Date(c.startDate).toLocaleString()}</td>
-                    <td className="px-5 py-4 text-gray-400 text-xs">{new Date(c.endDate).toLocaleString()}</td>
+                    <td className="px-5 py-4 text-gray-400 text-xs">
+                      {new Date(c.startDate).toLocaleString()}
+                    </td>
+                    <td className="px-5 py-4 text-gray-400 text-xs">
+                      {new Date(c.endDate).toLocaleString()}
+                    </td>
                     {/* Entry count */}
                     <td className="px-5 py-4 text-gray-300">{c.entries}</td>
                     {/* Row action buttons */}
@@ -272,24 +288,27 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl">
-
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
               <h2 className="text-lg font-bold text-white">Edit Challenge</h2>
               {/* × button to close without saving */}
-              <button onClick={closeEdit} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+              <button
+                onClick={closeEdit}
+                className="text-gray-500 hover:text-white text-xl leading-none"
+              >
+                ×
+              </button>
             </div>
 
             {/* Form fields */}
             <div className="p-6 space-y-4">
-
               {/* Title field — short name displayed in the challenge list and on the page */}
               <div>
                 <label className="block text-xs text-gray-400 mb-1">Title</label>
                 <input
                   value={editing.title}
                   // Spread the existing editing state and overwrite only `title`
-                  onChange={e => setEditing({ ...editing, title: e.target.value })}
+                  onChange={(e) => setEditing({ ...editing, title: e.target.value })}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               </div>
@@ -299,7 +318,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                 <label className="block text-xs text-gray-400 mb-1">Description</label>
                 <textarea
                   value={editing.description}
-                  onChange={e => setEditing({ ...editing, description: e.target.value })}
+                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
                   rows={2}
                   // suppressHydrationWarning prevents React from warning about
                   // server/client text mismatch when dates are serialised differently
@@ -313,7 +332,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                 <label className="block text-xs text-gray-400 mb-1">Prompt</label>
                 <textarea
                   value={editing.prompt}
-                  onChange={e => setEditing({ ...editing, prompt: e.target.value })}
+                  onChange={(e) => setEditing({ ...editing, prompt: e.target.value })}
                   rows={3}
                   suppressHydrationWarning
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -328,7 +347,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                   <input
                     type="datetime-local"
                     value={toDatetimeLocal(editing.startDate)}
-                    onChange={e => setEditing({ ...editing, startDate: e.target.value })}
+                    onChange={(e) => setEditing({ ...editing, startDate: e.target.value })}
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
@@ -337,7 +356,7 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                   <input
                     type="datetime-local"
                     value={toDatetimeLocal(editing.endDate)}
-                    onChange={e => setEditing({ ...editing, endDate: e.target.value })}
+                    onChange={(e) => setEditing({ ...editing, endDate: e.target.value })}
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
@@ -352,7 +371,9 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                   className={`relative w-10 h-5 rounded-full transition ${editing.active ? 'bg-red-500' : 'bg-gray-700'}`}
                 >
                   {/* The sliding white dot — moves right when active */}
-                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${editing.active ? 'left-5' : 'left-0.5'}`} />
+                  <span
+                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${editing.active ? 'left-5' : 'left-0.5'}`}
+                  />
                 </button>
                 <span className="text-sm text-gray-300">
                   {editing.active ? 'Active (visible to users)' : 'Inactive (hidden)'}
@@ -372,7 +393,14 @@ export default function AdminChallengesClient({ challenges: initial }: { challen
                 disabled={resetting || editing.entries === 0}
                 className="w-full py-2 bg-gray-800 hover:bg-orange-900/50 border border-gray-700 hover:border-orange-600/50 disabled:opacity-40 text-orange-400 text-xs font-semibold rounded-xl transition"
               >
-                {resetting ? 'Resetting…' : <span className="inline-flex items-center gap-1.5"><RefreshCw className="w-3 h-3" /> Reset entries ({editing.entries} will be deleted)</span>}
+                {resetting ? (
+                  'Resetting…'
+                ) : (
+                  <span className="inline-flex items-center gap-1.5">
+                    <RefreshCw className="w-3 h-3" /> Reset entries ({editing.entries} will be
+                    deleted)
+                  </span>
+                )}
               </button>
             </div>
 

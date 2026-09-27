@@ -31,8 +31,15 @@
 // ============================================================
 
 import {
-  AreaChart, Area, BarChart, Bar,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts';
 
 // One entry per day — used by SignupsChart and StoriesChart
@@ -54,8 +61,22 @@ export function SignupsChart({ data }: { data: DayData[] }) {
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis dataKey="date" stroke="#6b7280" tick={{ fontSize: 11 }} />
         <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} allowDecimals={false} />
-        <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }} />
-        <Area type="monotone" dataKey="users" stroke="#ef4444" fill="url(#users)" strokeWidth={2} name="New users" />
+        <Tooltip
+          contentStyle={{
+            background: '#1f2937',
+            border: '1px solid #374151',
+            borderRadius: 8,
+            fontSize: 12,
+          }}
+        />
+        <Area
+          type="monotone"
+          dataKey="users"
+          stroke="#ef4444"
+          fill="url(#users)"
+          strokeWidth={2}
+          name="New users"
+        />
       </AreaChart>
     </ResponsiveContainer>
   );
@@ -75,8 +96,22 @@ export function StoriesChart({ data }: { data: DayData[] }) {
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis dataKey="date" stroke="#6b7280" tick={{ fontSize: 11 }} />
         <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} allowDecimals={false} />
-        <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }} />
-        <Area type="monotone" dataKey="stories" stroke="#f97316" fill="url(#stories)" strokeWidth={2} name="New stories" />
+        <Tooltip
+          contentStyle={{
+            background: '#1f2937',
+            border: '1px solid #374151',
+            borderRadius: 8,
+            fontSize: 12,
+          }}
+        />
+        <Area
+          type="monotone"
+          dataKey="stories"
+          stroke="#f97316"
+          fill="url(#stories)"
+          strokeWidth={2}
+          name="New stories"
+        />
       </AreaChart>
     </ResponsiveContainer>
   );
@@ -89,8 +124,21 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
       <BarChart data={data} layout="vertical">
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis type="number" stroke="#6b7280" tick={{ fontSize: 11 }} allowDecimals={false} />
-        <YAxis type="category" dataKey="name" stroke="#6b7280" tick={{ fontSize: 11 }} width={120} />
-        <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }} />
+        <YAxis
+          type="category"
+          dataKey="name"
+          stroke="#6b7280"
+          tick={{ fontSize: 11 }}
+          width={120}
+        />
+        <Tooltip
+          contentStyle={{
+            background: '#1f2937',
+            border: '1px solid #374151',
+            borderRadius: 8,
+            fontSize: 12,
+          }}
+        />
         <Bar dataKey="count" fill="#ef4444" radius={[0, 4, 4, 0]} name="Stories" />
       </BarChart>
     </ResponsiveContainer>

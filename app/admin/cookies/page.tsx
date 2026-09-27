@@ -68,22 +68,27 @@ export default async function AdminCookiesPage() {
   const acceptanceRate = total > 0 ? Math.round((acceptedAll / total) * 100) : 0;
 
   const CHOICE_STYLES: Record<string, { label: string; badge: string }> = {
-    all:      { label: 'Accept All',     badge: 'bg-green-500/10 text-green-400 border-green-500/30' },
-    essential:{ label: 'Essential Only', badge: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
-    rejected: { label: 'Rejected',       badge: 'bg-red-500/10 text-red-400 border-red-500/30' },
+    all: { label: 'Accept All', badge: 'bg-green-500/10 text-green-400 border-green-500/30' },
+    essential: {
+      label: 'Essential Only',
+      badge: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    },
+    rejected: { label: 'Rejected', badge: 'bg-red-500/10 text-red-400 border-red-500/30' },
   };
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Cookie Consent</h1>
-      <p className="text-gray-500 text-sm mb-8">GDPR consent records — what visitors chose when they saw the cookie banner.</p>
+      <p className="text-gray-500 text-sm mb-8">
+        GDPR consent records — what visitors chose when they saw the cookie banner.
+      </p>
 
       {/* ── Summary stat cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total Consents" value={total} color="text-white" />
-        <StatCard label="Accepted All"   value={acceptedAll}          color="text-green-400" />
+        <StatCard label="Accepted All" value={acceptedAll} color="text-green-400" />
         <StatCard label="Essential Only" value={counts['essential'] ?? 0} color="text-yellow-400" />
-        <StatCard label="Rejected"       value={counts['rejected'] ?? 0}  color="text-red-400" />
+        <StatCard label="Rejected" value={counts['rejected'] ?? 0} color="text-red-400" />
       </div>
 
       {/* ── Acceptance rate bar ── */}
@@ -103,19 +108,27 @@ export default async function AdminCookiesPage() {
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
         <h2 className="font-semibold text-white mb-4">Breakdown by choice</h2>
         <div className="space-y-3">
-          {['all', 'essential', 'rejected'].map(choice => {
+          {['all', 'essential', 'rejected'].map((choice) => {
             const count = counts[choice] ?? 0;
-            const pct   = total > 0 ? Math.round((count / total) * 100) : 0;
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
             const style = CHOICE_STYLES[choice];
             return (
               <div key={choice}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-300">{style.label}</span>
-                  <span className="text-sm text-white font-semibold">{count} <span className="text-gray-500 font-normal">({pct}%)</span></span>
+                  <span className="text-sm text-white font-semibold">
+                    {count} <span className="text-gray-500 font-normal">({pct}%)</span>
+                  </span>
                 </div>
                 <ProgressBar
                   percent={pct}
-                  color={choice === 'all' ? 'bg-green-500' : choice === 'essential' ? 'bg-yellow-500' : 'bg-red-500'}
+                  color={
+                    choice === 'all'
+                      ? 'bg-green-500'
+                      : choice === 'essential'
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500'
+                  }
                   height="h-1.5"
                 />
               </div>
@@ -147,37 +160,44 @@ export default async function AdminCookiesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {recent.map(row => {
+                {recent.map((row) => {
                   const style = CHOICE_STYLES[row.choice] ?? CHOICE_STYLES['essential'];
                   return (
                     <tr key={row.id} className="hover:bg-gray-800/50 transition">
                       <td className="py-2.5 pr-4 text-gray-400 whitespace-nowrap text-xs">
                         {new Date(row.createdAt).toLocaleString('en-GB', {
-                          day: '2-digit', month: 'short', year: 'numeric',
-                          hour: '2-digit', minute: '2-digit',
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })}
                       </td>
                       <td className="py-2.5 pr-4">
-                        <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${style.badge}`}>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full border font-medium ${style.badge}`}
+                        >
                           {style.label}
                         </span>
                       </td>
                       <td className="py-2.5 pr-4">
-                        <span className={`text-xs ${row.analytics ? 'text-green-400' : 'text-gray-600'}`}>
+                        <span
+                          className={`text-xs ${row.analytics ? 'text-green-400' : 'text-gray-600'}`}
+                        >
                           {row.analytics ? '✓' : '✕'}
                         </span>
                       </td>
                       <td className="py-2.5 pr-4">
-                        <span className={`text-xs ${row.marketing ? 'text-green-400' : 'text-gray-600'}`}>
+                        <span
+                          className={`text-xs ${row.marketing ? 'text-green-400' : 'text-gray-600'}`}
+                        >
                           {row.marketing ? '✓' : '✕'}
                         </span>
                       </td>
                       <td className="py-2.5 pr-4 text-xs text-gray-500">
                         {row.userId ? `#${row.userId}` : 'Guest'}
                       </td>
-                      <td className="py-2.5 text-xs text-gray-600 font-mono">
-                        {row.ip ?? '—'}
-                      </td>
+                      <td className="py-2.5 text-xs text-gray-600 font-mono">{row.ip ?? '—'}</td>
                     </tr>
                   );
                 })}

@@ -3,41 +3,41 @@
 // Suspense boundaries around each heavy section let them stream in independently
 // so the page feels fast even if one section's DB query is slow.
 
-import { Suspense } from "react";
-import Header from "./components/ui/Header";
-import Footer from "./components/ui/Footer";
-import Slideshow from "./components/ui/Slideshow";
-import FeaturedStories from "./components/ui/FeaturedStories";
-import PopularStories from "./components/ui/PopularStories";
-import CategoriesShowcase from "./components/ui/CategoriesShowcase";
-import LatestStories from "./components/ui/LatestStories";
-import TrendingStories from "./components/ui/TrendingStories";
-import StoryOfTheDay from "./components/ui/StoryOfTheDay";
-import PickOfMonth from "./components/ui/CreepyOfMonth";
-import ChallengeCountdownSection from "./components/ui/ChallengeCountdownSection";
-import JoinBanner from "./components/ui/JoinBanner";
-import RecentComments from "./components/ui/RecentComments";
-import WriterOfMonth from "./components/ui/WriterOfMonth";
-import TrendingTags from "./components/ui/TrendingTags";
-import StoryOfTheWeek from "./components/ui/StoryOfTheWeek";
-import HorrorCalendar from "./components/ui/HorrorCalendar";
-import FollowSuggestions from "./components/ui/FollowSuggestions";
-import WritingPromptBanner from "./components/ui/WritingPromptBanner";
-import TipLeaderboard from "./components/ui/TipLeaderboard";
-import HomepageVideos from "./components/ui/HomepageVideos";
-import StoryBattle from "./components/ui/StoryBattle";
-import VillainOfWeek from "./components/ui/VillainOfWeek";
-import HorrorQuoteOfDay from "./components/ui/HorrorQuoteOfDay";
-import LastWordsFeed from "./components/ui/LastWordsFeed";
-import MoodOfDay from "./components/ui/MoodOfDay";
+import { Suspense } from 'react';
+import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
+import Slideshow from './components/ui/Slideshow';
+import FeaturedStories from './components/ui/FeaturedStories';
+import PopularStories from './components/ui/PopularStories';
+import CategoriesShowcase from './components/ui/CategoriesShowcase';
+import LatestStories from './components/ui/LatestStories';
+import TrendingStories from './components/ui/TrendingStories';
+import StoryOfTheDay from './components/ui/StoryOfTheDay';
+import PickOfMonth from './components/ui/CreepyOfMonth';
+import ChallengeCountdownSection from './components/ui/ChallengeCountdownSection';
+import JoinBanner from './components/ui/JoinBanner';
+import RecentComments from './components/ui/RecentComments';
+import WriterOfMonth from './components/ui/WriterOfMonth';
+import TrendingTags from './components/ui/TrendingTags';
+import StoryOfTheWeek from './components/ui/StoryOfTheWeek';
+import HorrorCalendar from './components/ui/HorrorCalendar';
+import FollowSuggestions from './components/ui/FollowSuggestions';
+import WritingPromptBanner from './components/ui/WritingPromptBanner';
+import TipLeaderboard from './components/ui/TipLeaderboard';
+import HomepageVideos from './components/ui/HomepageVideos';
+import StoryBattle from './components/ui/StoryBattle';
+import VillainOfWeek from './components/ui/VillainOfWeek';
+import HorrorQuoteOfDay from './components/ui/HorrorQuoteOfDay';
+import LastWordsFeed from './components/ui/LastWordsFeed';
+import MoodOfDay from './components/ui/MoodOfDay';
 import {
   StoryCardSkeleton,
   StoryGridSkeleton,
   TrendingRowSkeleton,
   Skeleton,
-} from "./components/ui/Skeleton";
-import ContinueReading from "./components/ui/ContinueReading";
-import { getSessionUserId } from "@/lib/session";
+} from './components/ui/Skeleton';
+import ContinueReading from './components/ui/ContinueReading';
+import { getSessionUserId } from '@/lib/session';
 
 // ── Lightweight inline fallbacks ──────────────────────────────────────────────
 
@@ -183,12 +183,16 @@ export default async function Home() {
       <div className="max-w-6xl mx-auto px-4 pb-14 grid lg:grid-cols-3 gap-6 lg:gap-10">
         {/* min-w-0 prevents grid items from expanding beyond their track to fit content */}
         <div className="lg:col-span-2 min-w-0">
-          <Suspense fallback={
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-36 mb-2" />
-              {[...Array(5)].map((_, i) => <StoryCardSkeleton key={i} />)}
-            </div>
-          }>
+          <Suspense
+            fallback={
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-36 mb-2" />
+                {[...Array(5)].map((_, i) => (
+                  <StoryCardSkeleton key={i} />
+                ))}
+              </div>
+            }
+          >
             <LatestStories standalone />
           </Suspense>
         </div>

@@ -11,8 +11,8 @@ type Milestone = { kind: MilestoneKind; label: string };
 
 // Maps the API's semantic kind to the icon shown on the pill.
 const KIND_ICONS: Record<MilestoneKind, LucideIcon> = {
-  views:    Eye,
-  likes:    Heart,
+  views: Eye,
+  likes: Heart,
   comments: MessageSquare,
 };
 
@@ -23,8 +23,8 @@ export default function StoryMilestones({ storyId }: Props) {
 
   useEffect(() => {
     fetch(`/api/stories/${storyId}/milestones`)
-      .then(r => r.json())
-      .then(data => setMilestones(data.milestones ?? []))
+      .then((r) => r.json())
+      .then((data) => setMilestones(data.milestones ?? []))
       .catch(() => {});
   }, [storyId]);
 

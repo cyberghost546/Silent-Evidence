@@ -228,7 +228,6 @@ export default function StoryBattle({ userId }: Props) {
   // ─── Render: full battle UI ─────────────────────────────────────────────────
   return (
     <section className="max-w-6xl mx-auto px-4 pb-14">
-
       {/* ── Section heading ── */}
       <div className="flex items-center gap-3 mb-5">
         <span className="w-1 h-6 bg-red-600 rounded-full" />
@@ -239,7 +238,6 @@ export default function StoryBattle({ userId }: Props) {
       {/* ── Main battle card ── */}
       {/* Outer wrapper — dark card with a dramatic red glow border */}
       <div className="relative rounded-2xl overflow-hidden border border-red-800/40 bg-gray-950 shadow-[0_4px_60px_rgba(220,38,38,0.18)]">
-
         {/* Radial blood-red glow behind the VS centre */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(220,38,38,0.12)_0%,_transparent_65%)] pointer-events-none" />
 
@@ -253,7 +251,7 @@ export default function StoryBattle({ userId }: Props) {
 
           {/* Countdown timer — monospaced font keeps width stable as digits change */}
           <span className="text-xs font-mono text-gray-400 bg-gray-900 border border-gray-800 px-3 py-1 rounded-full">
- {countdown}
+            {countdown}
           </span>
         </div>
 
@@ -264,7 +262,6 @@ export default function StoryBattle({ userId }: Props) {
 
         {/* ── VS layout: Story A | VS glyph | Story B ── */}
         <div className="relative flex flex-col md:flex-row items-stretch gap-0 px-4 md:px-6 pb-6">
-
           {/* ── Story A card (left) ── */}
           {/* Clicking votes for Story A — button role with pointer cursor */}
           <button
@@ -291,8 +288,7 @@ export default function StoryBattle({ userId }: Props) {
               />
             ) : (
               /* Fallback placeholder when no cover image is set */
-              <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center">
-              </div>
+              <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center"></div>
             )}
 
             {/* Dark gradient overlay — makes white text readable over any image */}
@@ -301,7 +297,7 @@ export default function StoryBattle({ userId }: Props) {
             {/* Voted indicator ribbon — shows when this is the user's pick */}
             {votedA && (
               <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full animate-pulse">
- Your vote
+                Your vote
               </div>
             )}
 
@@ -374,8 +370,7 @@ export default function StoryBattle({ userId }: Props) {
                 className="w-full h-52 md:h-64 object-cover"
               />
             ) : (
-              <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center">
-              </div>
+              <div className="w-full h-52 md:h-64 bg-gray-800 flex items-center justify-center"></div>
             )}
 
             {/* Gradient overlay */}
@@ -384,7 +379,7 @@ export default function StoryBattle({ userId }: Props) {
             {/* Voted ribbon */}
             {votedB && (
               <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full animate-pulse">
- Your vote
+                Your vote
               </div>
             )}
 
@@ -430,7 +425,10 @@ export default function StoryBattle({ userId }: Props) {
           {!userId ? (
             /* Guest prompt — encourage sign-in to participate */
             <p className="text-sm text-gray-500">
-              <Link href="/auth/login" className="text-red-400 hover:text-red-300 font-semibold underline underline-offset-2">
+              <Link
+                href="/auth/login"
+                className="text-red-400 hover:text-red-300 font-semibold underline underline-offset-2"
+              >
                 Log in
               </Link>{' '}
               to cast your vote in the showdown.

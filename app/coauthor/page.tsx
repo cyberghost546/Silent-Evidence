@@ -9,14 +9,14 @@ import CoauthorBoard from './CoauthorBoard';
 export const metadata = { title: 'Co-author Requests | Silent Evidence' };
 
 export default async function CoauthorPage() {
-  const c      = await cookies();
+  const c = await cookies();
   const userId = Number(c.get('userId')?.value ?? 0) || null;
 
   // Load first page of open requests server-side for fast initial render
   const requests = await prisma.coauthorRequest.findMany({
-    where:   { isOpen: true },
+    where: { isOpen: true },
     orderBy: { createdAt: 'desc' },
-    take:    20,
+    take: 20,
     include: { author: { select: { username: true, profile: { select: { avatar: true } } } } },
   });
 

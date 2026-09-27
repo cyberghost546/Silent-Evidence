@@ -8,13 +8,13 @@ import { useState } from 'react';
 
 // targetUserId    — the database ID of the user being followed
 // initialFollowing — whether the current viewer is already following them (from the server)
-type Props = { targetUserId: number; initialFollowing: boolean; };
+type Props = { targetUserId: number; initialFollowing: boolean };
 
 export default function FollowButton({ targetUserId, initialFollowing }: Props) {
   // following — mirrors the actual follow state in the DB; starts from the server-side value
   const [following, setFollowing] = useState(initialFollowing);
   // loading — disables the button while the API request is in flight to prevent double-clicks
-  const [loading, setLoading]     = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Calls the follows API, which toggles follow/un-follow and sends notifications on new follows
   const toggle = async () => {

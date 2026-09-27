@@ -19,10 +19,16 @@ export const metadata = { title: 'Security — Admin' };
 // Newest first, and unacknowledged above acknowledged, so what needs attention
 // is always at the top.
 const SEVERITY_STYLE: Record<string, { chip: string; border: string }> = {
-  critical: { chip: 'bg-red-500/15 text-red-300 border-red-500/40',     border: 'border-red-500/30' },
-  high:     { chip: 'bg-orange-500/15 text-orange-300 border-orange-500/40', border: 'border-orange-500/25' },
-  medium:   { chip: 'bg-amber-500/15 text-amber-300 border-amber-500/40',   border: 'border-amber-500/20' },
-  low:      { chip: 'bg-gray-700/40 text-gray-300 border-gray-600',         border: 'border-gray-800' },
+  critical: { chip: 'bg-red-500/15 text-red-300 border-red-500/40', border: 'border-red-500/30' },
+  high: {
+    chip: 'bg-orange-500/15 text-orange-300 border-orange-500/40',
+    border: 'border-orange-500/25',
+  },
+  medium: {
+    chip: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+    border: 'border-amber-500/20',
+  },
+  low: { chip: 'bg-gray-700/40 text-gray-300 border-gray-600', border: 'border-gray-800' },
 };
 
 function styleFor(severity: string) {
@@ -50,8 +56,9 @@ export default async function AdminSecurityPage() {
           )}
         </div>
         <p className="text-sm text-gray-500 mb-8">
-          {failures24h} failed sign-in {failures24h === 1 ? 'attempt' : 'attempts'} in the last 24 hours.
-          Accounts lock for {RULES.lockoutMinutes} minutes after {RULES.lockoutThreshold} failures.
+          {failures24h} failed sign-in {failures24h === 1 ? 'attempt' : 'attempts'} in the last 24
+          hours. Accounts lock for {RULES.lockoutMinutes} minutes after {RULES.lockoutThreshold}{' '}
+          failures.
         </p>
 
         {/* ── Alerts ──────────────────────────────────────────────────────── */}
@@ -59,7 +66,11 @@ export default async function AdminSecurityPage() {
 
         {alerts.length === 0 ? (
           <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-8 text-center mb-10">
-            <ShieldCheck className="w-6 h-6 text-emerald-400 mx-auto mb-3" strokeWidth={1.5} aria-hidden="true" />
+            <ShieldCheck
+              className="w-6 h-6 text-emerald-400 mx-auto mb-3"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
             <p className="text-sm text-gray-300">No security alerts.</p>
             <p className="text-xs text-gray-600 mt-1">
               Detection runs on every failed sign-in. Nothing has crossed a threshold.
@@ -77,12 +88,16 @@ export default async function AdminSecurityPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${s.chip}`}>
+                        <span
+                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${s.chip}`}
+                        >
                           {a.severity}
                         </span>
                         <span className="text-xs text-gray-600">{a.kind.replace(/_/g, ' ')}</span>
                         {a.acknowledged && (
-                          <span className="text-[10px] uppercase tracking-wider text-gray-600">acknowledged</span>
+                          <span className="text-[10px] uppercase tracking-wider text-gray-600">
+                            acknowledged
+                          </span>
                         )}
                       </div>
 
@@ -158,11 +173,10 @@ export default async function AdminSecurityPage() {
         <p className="text-xs text-gray-700 mt-6 flex items-start gap-2">
           <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
           <span>
-            Source addresses are anonymised to the network (last octet removed), matching
-            how sign-in attempts have always been logged — so one &ldquo;source&rdquo; may
-            cover several devices behind the same router. High and critical alerts are also
-            emailed to admins, grouped by the hour so a sustained attack sends one message
-            rather than thousands.
+            Source addresses are anonymised to the network (last octet removed), matching how
+            sign-in attempts have always been logged — so one &ldquo;source&rdquo; may cover several
+            devices behind the same router. High and critical alerts are also emailed to admins,
+            grouped by the hour so a sustained attack sends one message rather than thousands.
           </span>
         </p>
       </div>

@@ -30,10 +30,7 @@ export async function GET(req: NextRequest) {
       // No `mode: 'insensitive'` — that filter is Postgres/Mongo only and is a
       // type error on MySQL. It isn't needed here either: these columns use the
       // utf8mb4_unicode_ci collation, which already compares case-insensitively.
-      OR: [
-        { username: { equals: q } },
-        { email:    { equals: q } },
-      ],
+      OR: [{ username: { equals: q } }, { email: { equals: q } }],
     },
     select: {
       id: true,
@@ -60,20 +57,33 @@ export async function POST(req: NextRequest) {
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await req.json();
-  const { action, userId } = body as { action: string; userId: number; subject?: string; message?: string };
+  const { action, userId } = body as {
+    action: string;
+    userId: number;
+    subject?: string;
+    message?: string;
+  };
 
-  if (!action || !userId) return NextResponse.json({ error: 'Missing action or userId' }, { status: 400 });
+  if (!action || !userId)
+    return NextResponse.json({ error: 'Missing action or userId' }, { status: 400 });
 
   const target = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true, email: true, isBanned: true, suspendedUntil: true, sessionVersion: true },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      isBanned: true,
+      suspendedUntil: true,
+      sessionVersion: true,
+    },
   });
   if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
   // ── Reset password ────────────────────────────────────────────────────────
   if (action === 'reset_password') {
     const tempPass = randomPassword();
-    const hashed   = await bcrypt.hash(tempPass, 12);
+    const hashed = await bcrypt.hash(tempPass, 12);
 
     await prisma.user.update({
       where: { id: userId },
@@ -92,12 +102,24 @@ export async function POST(req: NextRequest) {
         <p style="color:#6b7280;font-size:13px">If you did not request this, please contact us right away.</p>
       </div>`;
 
-    const sent = await sendMail({ to: target.email, subject: 'Your password has been reset', html });
+    const sent = await sendMail({
+      to: target.email,
+      subject: 'Your password has been reset',
+      html,
+    });
     await prisma.emailLog.create({
-      data: { to: target.email, subject: 'Your password has been reset', type: 'password-reset', status: sent ? 'sent' : 'failed' },
+      data: {
+        to: target.email,
+        subject: 'Your password has been reset',
+        type: 'password-reset',
+        status: sent ? 'sent' : 'failed',
+      },
     });
 
-    return NextResponse.json({ ok: true, message: `Temporary password emailed to ${target.email}` });
+    return NextResponse.json({
+      ok: true,
+      message: `Temporary password emailed to ${target.email}`,
+    });
   }
 
   // ── Send advice / custom message ─────────────────────────────────────────
@@ -135,7 +157,10 @@ export async function POST(req: NextRequest) {
   // ── Lift suspension ───────────────────────────────────────────────────────
   if (action === 'unsuspend') {
     await prisma.user.update({ where: { id: userId }, data: { suspendedUntil: null } });
-    return NextResponse.json({ ok: true, message: `${target.username}'s suspension has been lifted` });
+    return NextResponse.json({
+      ok: true,
+      message: `${target.username}'s suspension has been lifted`,
+    });
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });

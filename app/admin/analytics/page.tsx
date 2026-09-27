@@ -23,7 +23,6 @@ import { prisma } from '@/lib/prisma';
 import { SignupsChart, StoriesChart, CategoryChart } from '@/app/components/ui/AnalyticsCharts';
 
 export default async function AnalyticsPage() {
-
   // ── Auth check ─────────────────────────────────────────────────────────────
   // `cookies()` reads the HTTP request cookies on the server.
   // The app stores the logged-in user's database ID in a cookie called "userId".
@@ -85,7 +84,7 @@ export default async function AnalyticsPage() {
   });
 
   // Reshape into a simple { name, count } array that the chart component expects
-  const categoryData = categories.map(c => ({ name: c.name, count: c._count.stories }));
+  const categoryData = categories.map((c) => ({ name: c.name, count: c._count.stories }));
 
   // ── All-time totals ────────────────────────────────────────────────────────
   // Four queries run in parallel via Promise.all.
@@ -102,10 +101,14 @@ export default async function AnalyticsPage() {
   // Each entry has a display label, a pre-formatted value string, and a Tailwind
   // color class so each card has a distinct accent colour.
   const stats = [
-    { label: 'Total Users',       value: totalUsers.toLocaleString(),                   color: 'text-blue-400'   },
-    { label: 'Published Stories', value: totalStories.toLocaleString(),                 color: 'text-red-400'    },
-    { label: 'Total Comments',    value: totalComments.toLocaleString(),                 color: 'text-red-400'    },
-    { label: 'Total Views',       value: (totalViews._sum.views ?? 0).toLocaleString(), color: 'text-orange-400' },
+    { label: 'Total Users', value: totalUsers.toLocaleString(), color: 'text-blue-400' },
+    { label: 'Published Stories', value: totalStories.toLocaleString(), color: 'text-red-400' },
+    { label: 'Total Comments', value: totalComments.toLocaleString(), color: 'text-red-400' },
+    {
+      label: 'Total Views',
+      value: (totalViews._sum.views ?? 0).toLocaleString(),
+      color: 'text-orange-400',
+    },
   ];
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -122,8 +125,11 @@ export default async function AnalyticsPage() {
           Rendered from the `stats` array so adding a new card only requires
           pushing one more object into the array above. */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {stats.map(s => (
-          <div key={s.label} className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-center">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="bg-gray-800 border border-gray-700 rounded-xl p-5 text-center"
+          >
             {/* Large bold number with the per-stat accent colour */}
             <p className={`text-3xl font-extrabold ${s.color}`}>{s.value}</p>
             <p className="text-xs text-gray-500 mt-1">{s.label}</p>

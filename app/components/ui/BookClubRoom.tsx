@@ -8,7 +8,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Lock, Globe } from 'lucide-react';
 
-type Member = { id: number; joinedAt: string; user: { id: number; username: string; profile: { avatar: string | null } | null } };
+type Member = {
+  id: number;
+  joinedAt: string;
+  user: { id: number; username: string; profile: { avatar: string | null } | null };
+};
 
 type Club = {
   id: number;
@@ -19,7 +23,11 @@ type Club = {
   owner: { id: number; username: string; profile: { avatar: string | null } | null };
   members: Member[];
   story: {
-    id: number; title: string; slug: string; coverImage: string | null; excerpt: string | null;
+    id: number;
+    title: string;
+    slug: string;
+    coverImage: string | null;
+    excerpt: string | null;
     author: { username: string };
     _count: { likes: number; comments: number };
   } | null;
@@ -78,17 +86,19 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            {club.isPrivate
-              ? <Lock className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
-              : <Globe className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />}
+            {club.isPrivate ? (
+              <Lock className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+            ) : (
+              <Globe className="w-6 h-6 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+            )}
             <h1 className="text-3xl font-extrabold text-white">{club.name}</h1>
           </div>
           <p className="text-sm text-gray-500">
             Hosted by{' '}
             <Link href={`/user/${club.owner.username}`} className="text-red-400 hover:underline">
               {club.owner.username}
-            </Link>
-            {' '}· {club.members.length} member{club.members.length !== 1 ? 's' : ''}
+            </Link>{' '}
+            · {club.members.length} member{club.members.length !== 1 ? 's' : ''}
           </p>
           {club.description && (
             <p className="text-gray-400 text-sm mt-2 max-w-xl">{club.description}</p>
@@ -98,14 +108,20 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
         {/* Actions */}
         <div className="shrink-0 flex flex-col items-end gap-2">
           {isMember && !isOwner && (
-            <button onClick={leaveClub} disabled={leaving}
-              className="text-xs text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg border border-gray-700 hover:border-red-600/40">
+            <button
+              onClick={leaveClub}
+              disabled={leaving}
+              className="text-xs text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg border border-gray-700 hover:border-red-600/40"
+            >
               {leaving ? 'Leaving…' : 'Leave Club'}
             </button>
           )}
           {!isMember && !club.isPrivate && userId && (
-            <button onClick={joinPublic} disabled={joining}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition">
+            <button
+              onClick={joinPublic}
+              disabled={joining}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition"
+            >
               {joining ? 'Joining…' : 'Join Club'}
             </button>
           )}
@@ -118,18 +134,27 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
         <div className="md:col-span-2 space-y-6">
           {/* Current story */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h2 className="text-white font-bold mb-4 flex items-center gap-2">
-               Currently Reading
-            </h2>
+            <h2 className="text-white font-bold mb-4 flex items-center gap-2">Currently Reading</h2>
             {club.story ? (
-              <Link href={`/story/${club.story.slug}`}
-                className="flex gap-4 group hover:opacity-90 transition">
+              <Link
+                href={`/story/${club.story.slug}`}
+                className="flex gap-4 group hover:opacity-90 transition"
+              >
                 {club.story.coverImage ? (
-                  <Image src={club.story.coverImage} alt={club.story.title}
-                    width={80} height={112} className="object-cover rounded-xl shrink-0" />
+                  <Image
+                    src={club.story.coverImage}
+                    alt={club.story.title}
+                    width={80}
+                    height={112}
+                    className="object-cover rounded-xl shrink-0"
+                  />
                 ) : (
                   <div className="w-20 h-28 bg-gray-800 rounded-xl shrink-0 flex items-center justify-center">
-                    <BookOpen className="w-7 h-7 text-gray-600" strokeWidth={1.5} aria-hidden="true" />
+                    <BookOpen
+                      className="w-7 h-7 text-gray-600"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
                   </div>
                 )}
                 <div>
@@ -164,9 +189,11 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
               <p className="text-sm text-gray-400 mb-3">
                 Discuss the story in the comments section — look for the club banner at the top.
               </p>
-              <Link href={`/story/${club.story.slug}#comments`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition">
-                 Go to Discussion
+              <Link
+                href={`/story/${club.story.slug}#comments`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition"
+              >
+                Go to Discussion
               </Link>
             </div>
           )}
@@ -182,8 +209,10 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
                 <span className="flex-1 font-mono text-xl font-bold tracking-widest text-red-400 bg-gray-800 rounded-xl px-4 py-2 text-center">
                   {club.inviteCode}
                 </span>
-                <button onClick={copyCode}
-                  className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-xs font-semibold text-white transition">
+                <button
+                  onClick={copyCode}
+                  className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-xs font-semibold text-white transition"
+                >
                   {copied ? '✓' : 'Copy'}
                 </button>
               </div>
@@ -197,15 +226,24 @@ export default function BookClubRoom({ club, userId, isMember, isOwner }: Props)
               Members ({club.members.length})
             </h3>
             <div className="space-y-3">
-              {club.members.map(m => {
-                const avatar = m.user.profile?.avatar ??
+              {club.members.map((m) => {
+                const avatar =
+                  m.user.profile?.avatar ??
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(m.user.username)}&background=dc2626&color=fff&size=40`;
                 const isClubOwner = m.user.id === club.owner.id;
                 return (
-                  <Link key={m.id} href={`/user/${m.user.username}`}
-                    className="flex items-center gap-3 hover:opacity-80 transition">
-                    <Image src={avatar} alt={m.user.username}
-                      width={32} height={32} className="rounded-full object-cover shrink-0" />
+                  <Link
+                    key={m.id}
+                    href={`/user/${m.user.username}`}
+                    className="flex items-center gap-3 hover:opacity-80 transition"
+                  >
+                    <Image
+                      src={avatar}
+                      alt={m.user.username}
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover shrink-0"
+                    />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white truncate">{m.user.username}</p>
                     </div>

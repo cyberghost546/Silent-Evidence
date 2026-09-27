@@ -98,10 +98,10 @@ function avatarSrc(user: { username: string; profile: { avatar: string | null } 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime(); // milliseconds since event
   const mins = Math.floor(diff / 60000);
-  if (mins < 1)  return 'just now';
+  if (mins < 1) return 'just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h ago`;
+  if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days}d ago`;
   // Older than 30 days — show an absolute date like "Jan 5"
@@ -113,7 +113,6 @@ function timeAgo(dateStr: string) {
 // row layout. The `event.type` discriminant lets TypeScript know which fields
 // are safe to access inside each `if` branch (no type casting needed).
 function EventRow({ event }: { event: ActivityEvent }) {
-
   // ── Story row ──
   // Shows the author's avatar, an action sentence, and a clickable story card
   // with a thumbnail and the story title.
@@ -132,10 +131,13 @@ function EventRow({ event }: { event: ActivityEvent }) {
         <div className="flex-1 min-w-0">
           {/* Action sentence: "[username] published a new story" */}
           <p className="text-sm text-gray-300">
-            <Link href={`/user/${s.author.username}`} className="font-semibold text-white hover:text-red-300 transition">
+            <Link
+              href={`/user/${s.author.username}`}
+              className="font-semibold text-white hover:text-red-300 transition"
+            >
               {s.author.username}
-            </Link>
-            {' '}published a new story
+            </Link>{' '}
+            published a new story
           </p>
 
           {/* Clickable story preview card — the whole card is a <Link> so
@@ -147,7 +149,13 @@ function EventRow({ event }: { event: ActivityEvent }) {
             {/* Thumbnail — shows cover image if available, skull icon if not */}
             <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-700">
               {s.coverImage ? (
-                <Image src={s.coverImage} alt={s.title} width={48} height={48} className="object-cover" />
+                <Image
+                  src={s.coverImage}
+                  alt={s.title}
+                  width={48}
+                  height={48}
+                  className="object-cover"
+                />
               ) : (
                 // Fallback icon when no cover image has been set
                 <div className="w-full h-full flex items-center justify-center">
@@ -184,12 +192,18 @@ function EventRow({ event }: { event: ActivityEvent }) {
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-300">
-            <Link href={`/user/${l.user.username}`} className="font-semibold text-white hover:text-red-300 transition">
+            <Link
+              href={`/user/${l.user.username}`}
+              className="font-semibold text-white hover:text-red-300 transition"
+            >
               {l.user.username}
             </Link>
-            {/* Inline Heart icon — `inline` keeps it on the same text baseline */}
-            {' '}<Heart className="w-4 h-4 inline text-red-400" />{' '}liked{' '}
-            <Link href={`/story/${l.story.slug}`} className="text-red-400 hover:text-red-300 transition">
+            {/* Inline Heart icon — `inline` keeps it on the same text baseline */}{' '}
+            <Heart className="w-4 h-4 inline text-red-400" /> liked{' '}
+            <Link
+              href={`/story/${l.story.slug}`}
+              className="text-red-400 hover:text-red-300 transition"
+            >
               {l.story.title}
             </Link>
           </p>
@@ -215,12 +229,18 @@ function EventRow({ event }: { event: ActivityEvent }) {
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-300">
-          <Link href={`/user/${c.user.username}`} className="font-semibold text-white hover:text-red-300 transition">
+          <Link
+            href={`/user/${c.user.username}`}
+            className="font-semibold text-white hover:text-red-300 transition"
+          >
             {c.user.username}
           </Link>
-          {/* Inline MessageCircle icon for visual context */}
-          {' '}<MessageCircle className="w-4 h-4 inline text-gray-400" />{' '}commented on{' '}
-          <Link href={`/story/${c.story.slug}`} className="text-red-400 hover:text-red-300 transition">
+          {/* Inline MessageCircle icon for visual context */}{' '}
+          <MessageCircle className="w-4 h-4 inline text-gray-400" /> commented on{' '}
+          <Link
+            href={`/story/${c.story.slug}`}
+            className="text-red-400 hover:text-red-300 transition"
+          >
             {c.story.title}
           </Link>
         </p>
@@ -255,14 +275,16 @@ export default function ActivityFeed() {
   useEffect(() => {
     let cancelled = false;
     fetch('/api/activity?page=1')
-      .then(r => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data: { events: ActivityEvent[]; hasMore: boolean } | null) => {
         if (cancelled || !data) return;
         setEvents(data.events);
         setHasMore(data.hasMore);
         setLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []); // empty array — run once on mount only
 
   // Called when the user clicks "Load more".
@@ -276,7 +298,7 @@ export default function ActivityFeed() {
     if (res.ok) {
       const data = await res.json();
       // Spread the new page's events after the ones already in state
-      setEvents(prev => [...prev, ...data.events]);
+      setEvents((prev) => [...prev, ...data.events]);
       setHasMore(data.hasMore);
     }
     setLoadingMore(false);

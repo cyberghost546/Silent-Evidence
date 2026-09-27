@@ -39,7 +39,11 @@ export const metadata: Metadata = {
   description: 'Watch horror story videos shared by the Silent Evidence community.',
 };
 
-export default async function VideosPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+export default async function VideosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
   const { category } = await searchParams;
 
   const [stories, allCategories] = await Promise.all([
@@ -47,29 +51,32 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
       where: { status: 'PUBLISHED' },
       orderBy: { createdAt: 'desc' },
       select: {
-        id:        true,
-        title:     true,
-        slug:      true,
-        videoUrl:  true,
-        excerpt:   true,
-        views:     true,
+        id: true,
+        title: true,
+        slug: true,
+        videoUrl: true,
+        excerpt: true,
+        views: true,
         createdAt: true,
-        author:    { select: { username: true } },
-        category:  { select: { name: true, slug: true } },
-        _count:    { select: { likes: true, comments: true } },
+        author: { select: { username: true } },
+        category: { select: { name: true, slug: true } },
+        _count: { select: { likes: true, comments: true } },
       },
     }),
-    prisma.category.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true } }),
+    prisma.category.findMany({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, slug: true },
+    }),
   ]);
 
   const videos = stories.filter((s): s is typeof s & { videoUrl: string } => !!s.videoUrl);
 
   // Unique categories that actually have videos
   const videoCategories = Array.from(
-    new Map(videos.map(v => [v.category.slug, v.category])).values()
+    new Map(videos.map((v) => [v.category.slug, v.category])).values()
   );
 
-  const filtered = category ? videos.filter(v => v.category.slug === category) : videos;
+  const filtered = category ? videos.filter((v) => v.category.slug === category) : videos;
   const [featured, ...rest] = filtered;
 
   return (
@@ -93,7 +100,9 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
         </div>
 
         <div className="max-w-6xl mx-auto px-4 relative text-center">
-          <p className="text-red-500 text-xs font-bold uppercase tracking-[0.3em] mb-3">Silent Evidence</p>
+          <p className="text-red-500 text-xs font-bold uppercase tracking-[0.3em] mb-3">
+            Silent Evidence
+          </p>
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tight">
             Horror <span className="text-red-500">Videos</span>
           </h1>
@@ -106,7 +115,8 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
             <AddVideoButton categories={allCategories} />
             <span className="text-xs text-gray-600">
               {videos.length} video{videos.length !== 1 ? 's' : ''}
-              {videoCategories.length > 0 && ` · ${videoCategories.length} categor${videoCategories.length !== 1 ? 'ies' : 'y'}`}
+              {videoCategories.length > 0 &&
+                ` · ${videoCategories.length} categor${videoCategories.length !== 1 ? 'ies' : 'y'}`}
             </span>
           </div>
         </div>
@@ -116,7 +126,9 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
         {videos.length === 0 ? (
           <div className="text-center py-32">
             <h2 className="text-2xl font-bold text-white mb-2">No videos yet</h2>
-            <p className="text-gray-500 text-sm mb-6">Be the first to share a horror video with the community.</p>
+            <p className="text-gray-500 text-sm mb-6">
+              Be the first to share a horror video with the community.
+            </p>
             <AddVideoButton categories={allCategories} />
           </div>
         ) : (
@@ -124,13 +136,18 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
             {/* Category filter */}
             {videoCategories.length > 1 && (
               <div className="flex gap-2 flex-wrap mb-8">
-                <a href="/videos"
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition border ${!category ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`}>
+                <a
+                  href="/videos"
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition border ${!category ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`}
+                >
                   All
                 </a>
-                {videoCategories.map(c => (
-                  <a key={c.slug} href={`/videos?category=${c.slug}`}
-                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition border ${category === c.slug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`}>
+                {videoCategories.map((c) => (
+                  <a
+                    key={c.slug}
+                    href={`/videos?category=${c.slug}`}
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition border ${category === c.slug ? 'bg-red-600 border-red-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`}
+                  >
                     {c.name}
                   </a>
                 ))}
@@ -140,7 +157,9 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
             {/* Featured first video */}
             {featured && (
               <div className="mb-8">
-                <p className="text-xs text-red-500 font-bold uppercase tracking-widest mb-3">Featured</p>
+                <p className="text-xs text-red-500 font-bold uppercase tracking-widest mb-3">
+                  Featured
+                </p>
                 <VideoCard story={featured} featured />
               </div>
             )}
@@ -148,9 +167,11 @@ export default async function VideosPage({ searchParams }: { searchParams: Promi
             {/* Grid */}
             {rest.length > 0 && (
               <>
-                <p className="text-xs text-gray-600 uppercase tracking-widest mb-4 mt-10">More videos</p>
+                <p className="text-xs text-gray-600 uppercase tracking-widest mb-4 mt-10">
+                  More videos
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {rest.map(v => (
+                  {rest.map((v) => (
                     <VideoCard key={v.id} story={v} />
                   ))}
                 </div>

@@ -46,11 +46,16 @@ export default async function ListPage({ params }: Props) {
         include: {
           story: {
             select: {
-              id: true, title: true, slug: true, coverImage: true,
-              excerpt: true, content: true, createdAt: true,
-              author:   { select: { username: true } },
+              id: true,
+              title: true,
+              slug: true,
+              coverImage: true,
+              excerpt: true,
+              content: true,
+              createdAt: true,
+              author: { select: { username: true } },
               category: { select: { name: true, slug: true } },
-              _count:   { select: { likes: true, comments: true } },
+              _count: { select: { likes: true, comments: true } },
             },
           },
         },
@@ -69,13 +74,22 @@ export default async function ListPage({ params }: Props) {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-red-400">Reading List</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+              Reading List
+            </span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">{list.name}</h1>
           {list.description && <p className="text-gray-400">{list.description}</p>}
           <p className="text-sm text-gray-500 mt-3">
-            By <Link href={`/user/${list.user.username}`} className="text-gray-300 hover:text-white transition">{list.user.username}</Link>
-            {' · '}{list.items.length} {list.items.length === 1 ? 'story' : 'stories'}
+            By{' '}
+            <Link
+              href={`/user/${list.user.username}`}
+              className="text-gray-300 hover:text-white transition"
+            >
+              {list.user.username}
+            </Link>
+            {' · '}
+            {list.items.length} {list.items.length === 1 ? 'story' : 'stories'}
           </p>
         </div>
 
@@ -84,19 +98,34 @@ export default async function ListPage({ params }: Props) {
         ) : (
           <div className="flex flex-col gap-4">
             {list.items.map(({ story }, i) => (
-              <Link key={story.id} href={`/story/${story.slug}`}
-                className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-200">
+              <Link
+                key={story.id}
+                href={`/story/${story.slug}`}
+                className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl overflow-hidden transition-all duration-200"
+              >
                 <div className="w-12 flex-shrink-0 bg-gray-900 flex items-center justify-center">
-                  <span className="text-lg font-bold text-gray-700 group-hover:text-red-500 transition">{i + 1}</span>
+                  <span className="text-lg font-bold text-gray-700 group-hover:text-red-500 transition">
+                    {i + 1}
+                  </span>
                 </div>
                 {story.coverImage && (
                   <div className="relative w-20 flex-shrink-0 overflow-hidden">
-                    <Image src={story.coverImage} alt={story.title} fill sizes="80px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <Image
+                      src={story.coverImage}
+                      alt={story.title}
+                      fill
+                      sizes="80px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                 )}
                 <div className="flex-1 py-3 pr-4 flex flex-col justify-center gap-1 min-w-0">
-                  <span className="text-xs text-red-400 font-bold uppercase tracking-wide">{story.category.name}</span>
-                  <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-2">{story.title}</h3>
+                  <span className="text-xs text-red-400 font-bold uppercase tracking-wide">
+                    {story.category.name}
+                  </span>
+                  <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-2">
+                    {story.title}
+                  </h3>
                   <div className="flex items-center gap-2 text-xs text-gray-600 mt-0.5">
                     <span>{story.author.username}</span>
                     <span>·</span>

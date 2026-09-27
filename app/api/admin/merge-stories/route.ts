@@ -20,17 +20,26 @@ export async function POST(req: Request) {
   }
 
   const [source, target] = await Promise.all([
-    prisma.story.findUnique({ where: { id: sourceId }, select: { id: true, title: true, views: true } }),
+    prisma.story.findUnique({
+      where: { id: sourceId },
+      select: { id: true, title: true, views: true },
+    }),
     prisma.story.findUnique({ where: { id: targetId }, select: { id: true, title: true } }),
   ]);
   if (!source || !target) return NextResponse.json({ error: 'Story not found.' }, { status: 404 });
 
   // Run all migrations in a transaction
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     // Move likes — skip duplicates (user already liked target)
-    const existingLikes = await tx.like.findMany({ where: { storyId: targetId }, select: { userId: true } });
-    const existingLikeUsers = new Set(existingLikes.map(l => l.userId));
-    const sourceLikes = await tx.like.findMany({ where: { storyId: sourceId }, select: { userId: true } });
+    const existingLikes = await tx.like.findMany({
+      where: { storyId: targetId },
+      select: { userId: true },
+    });
+    const existingLikeUsers = new Set(existingLikes.map((l) => l.userId));
+    const sourceLikes = await tx.like.findMany({
+      where: { storyId: sourceId },
+      select: { userId: true },
+    });
     for (const like of sourceLikes) {
       if (!existingLikeUsers.has(like.userId)) {
         await tx.like.create({ data: { userId: like.userId, storyId: targetId } });
@@ -42,9 +51,15 @@ export async function POST(req: Request) {
     await tx.comment.updateMany({ where: { storyId: sourceId }, data: { storyId: targetId } });
 
     // Move bookmarks — skip duplicates
-    const existingBM = await tx.bookmark.findMany({ where: { storyId: targetId }, select: { userId: true } });
-    const existingBMUsers = new Set(existingBM.map(b => b.userId));
-    const sourceBM = await tx.bookmark.findMany({ where: { storyId: sourceId }, select: { userId: true } });
+    const existingBM = await tx.bookmark.findMany({
+      where: { storyId: targetId },
+      select: { userId: true },
+    });
+    const existingBMUsers = new Set(existingBM.map((b) => b.userId));
+    const sourceBM = await tx.bookmark.findMany({
+      where: { storyId: sourceId },
+      select: { userId: true },
+    });
     for (const bm of sourceBM) {
       if (!existingBMUsers.has(bm.userId)) {
         await tx.bookmark.create({ data: { userId: bm.userId, storyId: targetId } });
@@ -53,8 +68,11 @@ export async function POST(req: Request) {
     await tx.bookmark.deleteMany({ where: { storyId: sourceId } });
 
     // Move reactions — skip duplicates
-    const existingReactions = await tx.reaction.findMany({ where: { storyId: targetId }, select: { userId: true, type: true } });
-    const existingRSet = new Set(existingReactions.map(r => `${r.userId}:${r.type}`));
+    const existingReactions = await tx.reaction.findMany({
+      where: { storyId: targetId },
+      select: { userId: true, type: true },
+    });
+    const existingRSet = new Set(existingReactions.map((r) => `${r.userId}:${r.type}`));
     const sourceReactions = await tx.reaction.findMany({ where: { storyId: sourceId } });
     for (const r of sourceReactions) {
       if (!existingRSet.has(`${r.userId}:${r.type}`)) {
@@ -64,7 +82,10 @@ export async function POST(req: Request) {
     await tx.reaction.deleteMany({ where: { storyId: sourceId } });
 
     // Add source views to target
-    await tx.story.update({ where: { id: targetId }, data: { views: { increment: source.views } } });
+    await tx.story.update({
+      where: { id: targetId },
+      data: { views: { increment: source.views } },
+    });
 
     // Delete the source story
     await tx.story.delete({ where: { id: sourceId } });

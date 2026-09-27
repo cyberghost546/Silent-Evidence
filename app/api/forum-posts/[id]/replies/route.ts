@@ -47,7 +47,6 @@ async function getUserId() {
 // req    — the incoming HTTP request containing the reply content in its JSON body
 // params — contains the dynamic segment { id } from the URL
 export async function POST(req: NextRequest, { params }: Props) {
-
   // Check whether the user is logged in before doing anything else
   const userId = await getUserId();
 

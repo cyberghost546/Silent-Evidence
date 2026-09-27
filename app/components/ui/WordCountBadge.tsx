@@ -5,7 +5,7 @@
 // average reading speed, which is a commonly accepted benchmark.
 
 type Props = {
-  content: string;    // raw HTML content of the story
+  content: string; // raw HTML content of the story
   className?: string; // optional extra Tailwind classes from the parent
 };
 
@@ -15,9 +15,9 @@ const READING_SPEED = 200;
 // stripHtml — removes HTML tags and collapses whitespace to get raw text
 function stripHtml(html: string): string {
   return html
-    .replace(/<[^>]+>/g, ' ')  // replace every tag with a space
-    .replace(/&nbsp;/g, ' ')   // non-breaking spaces → regular space
-    .replace(/\s+/g, ' ')      // collapse multiple spaces/newlines
+    .replace(/<[^>]+>/g, ' ') // replace every tag with a space
+    .replace(/&nbsp;/g, ' ') // non-breaking spaces → regular space
+    .replace(/\s+/g, ' ') // collapse multiple spaces/newlines
     .trim();
 }
 

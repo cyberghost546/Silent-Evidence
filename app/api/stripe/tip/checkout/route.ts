@@ -23,16 +23,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { toUserId, amount, message } = body as {
       toUserId: number;
-      amount: number;    // Amount in cents, e.g. 500 = $5.00
-      message?: string;  // Optional note from the reader to the author
+      amount: number; // Amount in cents, e.g. 500 = $5.00
+      message?: string; // Optional note from the reader to the author
     };
 
     // Validate all required fields upfront
     if (!toUserId || !amount) {
-      return NextResponse.json(
-        { error: 'toUserId and amount are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'toUserId and amount are required' }, { status: 400 });
     }
 
     // Enforce a minimum tip of $1.00 (Stripe's minimum charge threshold)
@@ -45,10 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Prevent users from tipping themselves (bad UX and bad accounting)
     if (fromUserId === toUserId) {
-      return NextResponse.json(
-        { error: 'You cannot tip yourself' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'You cannot tip yourself' }, { status: 400 });
     }
 
     // Look up the author (recipient) so we can show their name in the Stripe UI.
@@ -91,7 +85,7 @@ export async function POST(request: NextRequest) {
       // All metadata is forwarded to the webhook payload.
       // The webhook uses these fields to create the Tip record in our DB.
       metadata: {
-        type: 'tip',               // Tells the webhook which DB action to take
+        type: 'tip', // Tells the webhook which DB action to take
         fromUserId: String(fromUserId),
         toUserId: String(toUserId),
         amount: String(amount),
@@ -103,9 +97,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('[stripe/tip/checkout] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create tip checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create tip checkout session' }, { status: 500 });
   }
 }

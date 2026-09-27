@@ -49,7 +49,9 @@ export default function ScreamAwards() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function vote(nominationId: number) {
     setVoting(nominationId);
@@ -67,14 +69,16 @@ export default function ScreamAwards() {
 
   if (loading) return <div className="text-center py-20 text-gray-600">Loading awards…</div>;
 
-  if (!award) return (
-    <div className="text-center py-20 text-gray-600">
-      <p>No awards ceremony running right now. Check back soon!</p>
-    </div>
-  );
+  if (!award)
+    return (
+      <div className="text-center py-20 text-gray-600">
+        <p>No awards ceremony running right now. Check back soon!</p>
+      </div>
+    );
 
   const totalVotesCast = award.categories.reduce(
-    (sum, cat) => sum + cat.nominations.reduce((s, n) => s + n._count.votes, 0), 0
+    (sum, cat) => sum + cat.nominations.reduce((s, n) => s + n._count.votes, 0),
+    0
   );
 
   return (
@@ -111,7 +115,8 @@ export default function ScreamAwards() {
 
             <div className="space-y-3">
               {cat.nominations.map((nom) => {
-                const pct = totalCatVotes > 0 ? Math.round((nom._count.votes / totalCatVotes) * 100) : 0;
+                const pct =
+                  totalCatVotes > 0 ? Math.round((nom._count.votes / totalCatVotes) * 100) : 0;
                 const isMyVote = myVotes.includes(nom.id);
 
                 return (
@@ -121,15 +126,19 @@ export default function ScreamAwards() {
                       className="absolute inset-0 rounded-xl bg-red-900/20 transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
-                    <div className={`relative flex items-center justify-between p-3 rounded-xl border transition-colors ${
-                      isMyVote ? 'border-red-700 bg-red-900/10' : 'border-gray-800 bg-gray-800/40'
-                    }`}>
+                    <div
+                      className={`relative flex items-center justify-between p-3 rounded-xl border transition-colors ${
+                        isMyVote ? 'border-red-700 bg-red-900/10' : 'border-gray-800 bg-gray-800/40'
+                      }`}
+                    >
                       <div className="flex items-center gap-3">
                         {isMyVote && <span className="text-red-400 text-sm">✓</span>}
                         <span className="text-gray-200 text-sm font-medium">{nom.label}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-gray-500 text-xs">{nom._count.votes} votes · {pct}%</span>
+                        <span className="text-gray-500 text-xs">
+                          {nom._count.votes} votes · {pct}%
+                        </span>
                         {award.isOpen && (
                           <button
                             onClick={() => vote(nom.id)}

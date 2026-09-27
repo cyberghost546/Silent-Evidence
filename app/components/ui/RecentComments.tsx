@@ -47,7 +47,6 @@ export default async function RecentComments() {
     // Full-width dark section — sits at the bottom of the homepage
     <section className="bg-gray-900 border-t border-gray-800 py-14">
       <div className="max-w-6xl mx-auto px-4">
-
         {/* Section header — red accent bar + title */}
         <div className="flex items-center gap-3 mb-8">
           <span className="w-1 h-6 bg-red-600 rounded-full" />
@@ -61,7 +60,6 @@ export default async function RecentComments() {
             <CommentCard key={comment.id} comment={comment} />
           ))}
         </div>
-
       </div>
     </section>
   );
@@ -96,7 +94,6 @@ function CommentCard({ comment }: { comment: CommentWithRelations }) {
   return (
     // Card container — hover lifts the red glow shadow for a depth effect.
     <div className="bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 flex flex-col gap-3 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]">
-
       {/* Top row: avatar image + username + relative timestamp */}
       <div className="flex items-center gap-3">
         <img
@@ -114,9 +111,7 @@ function CommentCard({ comment }: { comment: CommentWithRelations }) {
 
       {/* Comment text — line-clamp-3 cuts off at 3 lines to keep cards a uniform height.
           flex-1 pushes the story link to the bottom even on shorter comments. */}
-      <p className="text-sm text-gray-400 line-clamp-3 flex-1 leading-relaxed">
-        {comment.content}
-      </p>
+      <p className="text-sm text-gray-400 line-clamp-3 flex-1 leading-relaxed">{comment.content}</p>
 
       {/* Story link — sits at the bottom of every card, separated by a thin border.
           Links to the story page where this comment was left. */}
@@ -125,8 +120,19 @@ function CommentCard({ comment }: { comment: CommentWithRelations }) {
         className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition border-t border-gray-700/60 pt-3 truncate"
       >
         {/* Book SVG icon — flex-shrink-0 stops it from being squashed when the title is long */}
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-3 h-3 flex-shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+          />
         </svg>
         {/* truncate cuts the story title with "…" if it's too long for one line */}
         <span className="truncate">{comment.story.title}</span>

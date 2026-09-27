@@ -35,18 +35,12 @@ export async function POST() {
 
     // Guard: user doesn't have a subscription record at all
     if (!subscription) {
-      return NextResponse.json(
-        { error: 'No subscription found for this user' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'No subscription found for this user' }, { status: 404 });
     }
 
     // Guard: the subscription is already canceled — nothing to do
     if (subscription.status === 'canceled') {
-      return NextResponse.json(
-        { error: 'Subscription is already canceled' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Subscription is already canceled' }, { status: 400 });
     }
 
     // Guard: the Stripe subscription ID is missing, which means the webhook
@@ -74,9 +68,6 @@ export async function POST() {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[stripe/subscription/cancel] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to cancel subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to cancel subscription' }, { status: 500 });
   }
 }

@@ -24,24 +24,24 @@ import { CheckCircle2, MessageCircle, SkipForward, Send } from 'lucide-react';
 type Preview = { authorCount: number; newComments: number };
 
 // Result stats returned by POST /api/admin/digest after the emails are sent
-type Result  = { authorsNotified: number; totalComments: number; skipped: number };
+type Result = { authorsNotified: number; totalComments: number; skipped: number };
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AdminDigestClient({ initialPreview }: { initialPreview: Preview }) {
   // Preview data shown in the stat cards — starts with server-fetched values,
   // can be refreshed by clicking "↻ Refresh stats".
-  const [preview, setPreview]   = useState(initialPreview);
+  const [preview, setPreview] = useState(initialPreview);
 
   // True while the POST /api/admin/digest request is in flight
-  const [sending, setSending]   = useState(false);
+  const [sending, setSending] = useState(false);
 
   // Populated with the send result once the POST completes successfully.
   // null means the digest hasn't been sent yet this session.
-  const [result, setResult]     = useState<Result | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
 
   // Error message shown in a red box if the API call fails
-  const [error, setError]       = useState('');
+  const [error, setError] = useState('');
 
   // True while the GET /api/admin/digest refresh request is in flight
   const [refreshing, setRefreshing] = useState(false);
@@ -69,7 +69,10 @@ export default function AdminDigestClient({ initialPreview }: { initialPreview: 
     const res = await fetch('/api/admin/digest', { method: 'POST' });
     const data = await res.json();
     setSending(false);
-    if (!res.ok) { setError(data.error ?? 'Failed'); return; }
+    if (!res.ok) {
+      setError(data.error ?? 'Failed');
+      return;
+    }
     // Store the result so the success summary box is shown
     setResult(data);
   };
@@ -88,24 +91,34 @@ export default function AdminDigestClient({ initialPreview }: { initialPreview: 
         {/* How many authors will receive the email */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <p className="text-3xl font-bold text-white">{preview.authorCount}</p>
-          <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">Authors with stories</p>
+          <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">
+            Authors with stories
+          </p>
         </div>
         {/* How many comments have been left in the last 7 days */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <p className="text-3xl font-bold text-white">{preview.newComments}</p>
-          <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">Comments (last 7 days)</p>
+          <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">
+            Comments (last 7 days)
+          </p>
         </div>
       </div>
 
       {/* Refresh link — re-runs the GET to update both stat cards */}
-      <button onClick={refresh} disabled={refreshing} className="text-xs text-gray-500 hover:text-white mb-6 transition disabled:opacity-50">
+      <button
+        onClick={refresh}
+        disabled={refreshing}
+        className="text-xs text-gray-500 hover:text-white mb-6 transition disabled:opacity-50"
+      >
         {refreshing ? 'Refreshing…' : '↻ Refresh stats'}
       </button>
 
       {/* ── Error message ────────────────────────────────────────────────────── */}
       {/* Only rendered when the API returns a non-OK response */}
       {error && (
-        <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">{error}</div>
+        <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">
+          {error}
+        </div>
       )}
 
       {/* ── Success result summary ───────────────────────────────────────────── */}
@@ -116,12 +129,19 @@ export default function AdminDigestClient({ initialPreview }: { initialPreview: 
         <div className="mb-6 px-4 py-4 bg-red-500/10 border border-red-500/30 rounded-xl">
           <p className="text-red-400 font-semibold text-sm mb-1">Digest sent!</p>
           <p className="text-xs text-gray-400 flex items-center flex-wrap gap-x-2">
-            <span className="inline-flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-red-400" /> {result.authorsNotified} authors notified</span>
+            <span className="inline-flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-red-400" /> {result.authorsNotified} authors
+              notified
+            </span>
             <span>&nbsp;·&nbsp;</span>
-            <span className="inline-flex items-center gap-1"><MessageCircle className="w-3 h-3" /> {result.totalComments} comments included</span>
+            <span className="inline-flex items-center gap-1">
+              <MessageCircle className="w-3 h-3" /> {result.totalComments} comments included
+            </span>
             <span>&nbsp;·&nbsp;</span>
             {/* Skipped = authors who had no new comments — no email sent to them */}
-            <span className="inline-flex items-center gap-1"><SkipForward className="w-3 h-3" /> {result.skipped} skipped (no new comments)</span>
+            <span className="inline-flex items-center gap-1">
+              <SkipForward className="w-3 h-3" /> {result.skipped} skipped (no new comments)
+            </span>
           </p>
         </div>
       )}
@@ -134,7 +154,15 @@ export default function AdminDigestClient({ initialPreview }: { initialPreview: 
         disabled={sending || preview.authorCount === 0}
         className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl transition text-sm"
       >
-        {sending ? <span className="inline-flex items-center gap-1.5"><Send className="w-4 h-4" /> Sending…</span> : <span className="inline-flex items-center gap-1.5"><Send className="w-4 h-4" /> Send digest to {preview.authorCount} authors</span>}
+        {sending ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Send className="w-4 h-4" /> Sending…
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5">
+            <Send className="w-4 h-4" /> Send digest to {preview.authorCount} authors
+          </span>
+        )}
       </button>
     </div>
   );

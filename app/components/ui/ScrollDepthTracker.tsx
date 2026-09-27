@@ -29,7 +29,7 @@ export default function ScrollDepthTracker({ storyId }: { storyId: number }) {
 
     function getScrollPct(): number {
       const scrolled = window.scrollY;
-      const total    = document.documentElement.scrollHeight - window.innerHeight;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
       if (total <= 0) return 100;
       return Math.min(100, Math.round((scrolled / total) * 100));
     }
@@ -38,9 +38,9 @@ export default function ScrollDepthTracker({ storyId }: { storyId: number }) {
       if (pct <= reported.current) return;
       reported.current = pct;
       fetch('/api/reading-history', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ storyId, progress: pct }),
+        body: JSON.stringify({ storyId, progress: pct }),
       }).catch(() => {});
     }
 

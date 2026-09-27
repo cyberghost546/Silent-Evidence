@@ -78,6 +78,41 @@ enum NotificationType {
   COLLABORATE    // someone invited you to co-author a story
   DIRECT_MESSAGE // you received a private message
   GROUP_INVITE   // you were invited to join a group
+  MILESTONE      // you reached a milestone, e.g. earned author status
+  MODERATION     // a moderation decision was taken on your content or account
+}
+
+// What a moderation action did. Broad enough to cover content and account
+// actions, since both must carry a statement of reasons under the DSA.
+enum ModerationActionType {
+  CONTENT_REMOVED     // a story/comment/post was removed
+  CONTENT_HIDDEN      // content restricted from view but not deleted
+  CONTENT_REJECTED    // blocked at publish time (e.g. automated moderation)
+  WARNING             // a formal warning issued to the user
+  ACCOUNT_SUSPENDED   // temporary account restriction
+  ACCOUNT_BANNED      // permanent termination
+}
+
+// What content or account the action targeted.
+enum ModerationTargetType {
+  STORY
+  COMMENT
+  FORUM_POST
+  FORUM_REPLY
+  ACCOUNT
+}
+
+// Lifecycle of an action.
+enum ModerationActionStatus {
+  ACTIVE     // in force
+  REVERSED   // overturned, e.g. after a successful appeal
+}
+
+// Lifecycle of an appeal.
+enum AppealStatus {
+  OPEN        // awaiting review
+  UPHELD      // original decision stands
+  OVERTURNED  // decision reversed
 }
 
 // Role a user can hold inside a community Group.
@@ -141,6 +176,13 @@ enum ReportReason {
   SPAM
   INAPPROPRIATE
   THREATS
+  // Copyright infringement — the DMCA notice-and-takedown path. Kept distinct
+  // from the general reasons because it has its own legal process: counter
+  // notice, restoration window, and a repeat-infringer policy. See /copyright.
+  COPYRIGHT
+  // Content alleged to be unlawful. EU DSA Art. 16 requires a notice mechanism
+  // aimed specifically at illegal content, separate from terms violations.
+  ILLEGAL_CONTENT
   OTHER
 }
 
@@ -297,6 +339,9 @@ model User {
   // Two-factor authentication via email code
   twoFactorEnabled  Boolean @default(false)
   twoFactorCodes    TwoFactorCode[]
+  // Single-use backup codes for 2FA and emergency owner recovery. Each is stored
+  // only as a bcrypt hash — see lib/recoveryCodes.ts.
+  recoveryCodes     RecoveryCode[]
   sessionVersion    Int     @default(0)  // increment to invalidate all active sessions
 
   // Onboarding completion flag — false until wizard is finished
@@ -374,6 +419,20 @@ model User {
   confessions         Confession[]
   liveQASessions      LiveQASession[]
   recipes             HorrorRecipe[]
+
+  // Moderation & appeals (DSA statement-of-reasons + internal complaints)
+  moderationActionsReceived ModerationAction[] @relation("ModerationAffected")
+  moderationActionsTaken    ModerationAction[] @relation("ModerationBy")
+  appealsMade               ModerationAppeal[] @relation("AppealBy")
+  appealsReviewed           ModerationAppeal[] @relation("AppealReviewedBy")
+
+  // Author payouts via Stripe Connect. stripeConnectId is the connected account
+  // (acct_…) created when an author begins onboarding; onboarded flips true once
+  // Stripe reports the account can receive payouts. Null/false = not set up, and
+  // earnings simply accrue until they are.
+  stripeConnectId        String?
+  stripeConnectOnboarded Boolean  @default(false)
+  payouts                Payout[]
 }
 
 // ============================================================
@@ -569,6 +628,11 @@ model Story {
   @@index([creepyOfMonth])
   @@index([isPremiumOnly])
   @@index([scheduledAt])
+  // Full-text search indexes (MariaDB/MySQL FULLTEXT). Queried with MATCH...AGAINST
+  // in lib/search.ts, not through the Prisma query API. Two indexes: the wide one
+  // matches the story body, the title-only one lets us score title hits higher.
+  @@fulltext([title, excerpt, content])
+  @@fulltext([title])
 }
 
 // ============================================================
@@ -1581,6 +1645,8 @@ model StoryChapter {
 
   // Index for loading chapters of a story in order
   @@index([storyId, order])
+  // Full-text index so chapter bodies are searchable too (see lib/search.ts)
+  @@fulltext([title, content])
 }
 
 // ============================================================
@@ -1745,6 +1811,129 @@ model TwoFactorCode {
 
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Backup recovery codes — single-use secrets a user keeps offline. They cover
+// two situations:
+//   1. 2FA fallback: the user has 2FA on but cannot receive the emailed code
+//      (lost inbox access), so they enter a recovery code instead.
+//   2. Break-glass owner recovery: the site owner has lost their password or
+//      session and needs to regain admin access. See /api/auth/break-glass.
+//
+// SECURITY MODEL
+//   - Codes are never stored in the clear. Only a bcrypt hash is kept, exactly
+//     like a password, so a database leak does not reveal usable codes.
+//   - Each code is single use. `usedAt` is set the moment it is consumed, and a
+//     used code can never be accepted again.
+//   - Generating a fresh set deletes the previous set (see lib/recoveryCodes.ts),
+//     so the plaintext is shown to the user exactly once, at creation.
+model RecoveryCode {
+  id        Int       @id @default(autoincrement())
+  // bcrypt hash of the code. The plaintext is shown once at generation and
+  // never stored, mirroring how passwords are handled.
+  codeHash  String
+  used      Boolean   @default(false)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // "unused codes for this user" is the hot path at verification time.
+  @@index([userId, used])
+}
+
+// A payout of accrued earnings to an author's connected Stripe account. Recording
+// each payout lets us show a clear "paid out vs still owed" picture and prevents
+// double-paying: earnings up to `coveredThrough` are considered settled.
+model Payout {
+  id             Int      @id @default(autoincrement())
+  // Net amount transferred to the author, in cents (after the platform fee).
+  amountCents    Int
+  // Stripe transfer id (tr_…) once the transfer is created.
+  stripeTransferId String?
+  status         String   @default("pending") // pending | paid | failed
+  createdAt      DateTime @default(now())
+  // Earnings dated at or before this point are covered by this payout. The next
+  // payout only considers earnings after the latest covered point.
+  coveredThrough DateTime
+
+  authorId       Int
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, createdAt])
+}
+
+// A record of a moderation decision, with the "statement of reasons" the EU
+// Digital Services Act (Art. 17) requires whenever content is removed or an
+// account is restricted. Storing it as its own row — rather than just flipping a
+// report to REVIEWED — is what makes the decision explainable and appealable.
+model ModerationAction {
+  id             Int                    @id @default(autoincrement())
+  type           ModerationActionType
+  targetType     ModerationTargetType
+  // ID of the affected story/comment/post, or the user id for ACCOUNT actions.
+  targetId       Int
+  status         ModerationActionStatus @default(ACTIVE)
+
+  // ── Statement of reasons (DSA Art. 17) ────────────────────────────────────
+  reason         ReportReason           // the category relied on
+  // Plain-language explanation shown to the affected user.
+  explanation    String                 @db.Text
+  // The ground: our terms/policies vs a legal requirement. Free-text so it can
+  // name a specific clause or law.
+  legalGround    String?
+  // Whether this was an automated decision (e.g. the publish-time toxicity
+  // check). Art. 17 requires disclosing automated involvement.
+  automated      Boolean                @default(false)
+
+  createdAt      DateTime               @default(now())
+
+  // The affected user — who receives the statement and may appeal.
+  affectedUserId Int
+  affectedUser   User                   @relation("ModerationAffected", fields: [affectedUserId], references: [id], onDelete: Cascade)
+
+  // The admin who took the action. Null for automated actions.
+  moderatorId    Int?
+  moderator      User?                  @relation("ModerationBy", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  // Optional link back to the user report that prompted this.
+  reportId       Int?
+
+  appeals        ModerationAppeal[]
+
+  @@index([affectedUserId, createdAt])
+  @@index([status])
+}
+
+// A user's appeal against a ModerationAction — the DSA Art. 20 internal
+// complaint-handling path. The reviewer must not be the moderator who made the
+// original decision; that independence is enforced in the appeal-decision route.
+model ModerationAppeal {
+  id           Int          @id @default(autoincrement())
+  status       AppealStatus @default(OPEN)
+  // The appellant's explanation of why the decision was wrong.
+  message      String       @db.Text
+  // The reviewer's reasoning, shown back to the appellant.
+  decisionNote String?      @db.Text
+  createdAt    DateTime     @default(now())
+  decidedAt    DateTime?
+
+  actionId     Int
+  action       ModerationAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+
+  // The appellant. Must be the affected user of the action.
+  userId       Int
+  user         User         @relation("AppealBy", fields: [userId], references: [id], onDelete: Cascade)
+
+  // The admin who decided the appeal. Enforced to differ from the original
+  // moderator so review is independent.
+  reviewerId   Int?
+  reviewer     User?        @relation("AppealReviewedBy", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  // One open appeal per action per user — no spamming the same appeal.
+  @@unique([actionId, userId])
+  @@index([status, createdAt])
 }
 
 // ============================================================

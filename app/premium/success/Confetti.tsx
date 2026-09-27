@@ -10,10 +10,10 @@ import { useEffect, useState } from 'react';
 // so they appear scattered and feel organic.
 type Particle = {
   id: number;
-  x: number;      // % from left
-  delay: number;  // animation-delay in seconds
-  size: number;   // diameter in px
-  color: string;  // Tailwind bg-* class
+  x: number; // % from left
+  delay: number; // animation-delay in seconds
+  size: number; // diameter in px
+  color: string; // Tailwind bg-* class
   duration: number; // fall duration in seconds
 };
 
@@ -31,11 +31,11 @@ const COLORS = [
 function generateParticles(count: number): Particle[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,                  // Spread across full viewport width
-    delay: Math.random() * 3,                 // Stagger start times up to 3s
+    x: Math.random() * 100, // Spread across full viewport width
+    delay: Math.random() * 3, // Stagger start times up to 3s
     size: Math.floor(Math.random() * 8) + 4, // 4px–12px
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
-    duration: Math.random() * 3 + 2,         // Fall for 2–5 seconds
+    duration: Math.random() * 3 + 2, // Fall for 2–5 seconds
   }));
 }
 

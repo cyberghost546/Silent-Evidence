@@ -8,10 +8,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // Next.js dynamic-route handler — `params.slug` comes from the [slug] folder name
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   // Await the params Promise (required in Next.js 15+)
   const { slug } = await params;
 
@@ -25,13 +22,13 @@ export async function GET(
       id: true,
       title: true,
       slug: true,
-      content: true,      // Full HTML body — injected into the WebView
+      content: true, // Full HTML body — injected into the WebView
       excerpt: true,
       coverImage: true,
       views: true,
       mood: true,
-      warnings: true,     // Yellow warning bar shown before the content
-      scareScore: true,   // 1-10 AI-generated score
+      warnings: true, // Yellow warning bar shown before the content
+      scareScore: true, // 1-10 AI-generated score
       contentRating: true,
       createdAt: true,
       updatedAt: true,

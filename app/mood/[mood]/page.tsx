@@ -39,10 +39,10 @@
  */
 
 import { notFound } from 'next/navigation';
-import Link         from 'next/link';
-import { prisma }   from '@/lib/prisma';
-import Header       from '@/app/components/ui/Header';
-import Footer       from '@/app/components/ui/Footer';
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import Header from '@/app/components/ui/Header';
+import Footer from '@/app/components/ui/Footer';
 import { readingTime } from '@/lib/readingTime';
 import { createElement } from 'react';
 import { moodIcon } from '@/lib/moodIcons';
@@ -79,7 +79,6 @@ export default async function MoodPage({ params }: Props) {
   if (!isMood(moodKey)) return notFound();
   const meta = MOOD_META[moodKey];
 
-
   // ── Prisma query ──────────────────────────────────────────────────────────
   // Fetch all PUBLISHED stories with this mood, newest-first.
   // No cast is needed: the isMood guard above has already narrowed moodKey from
@@ -90,12 +89,12 @@ export default async function MoodPage({ params }: Props) {
   //   - category.name/slug for the category badge
   //   - _count.likes/_count.comments for the engagement numbers
   const stories = await prisma.story.findMany({
-    where:    { mood: moodKey, status: 'PUBLISHED' },
-    orderBy:  { createdAt: 'desc' },
+    where: { mood: moodKey, status: 'PUBLISHED' },
+    orderBy: { createdAt: 'desc' },
     include: {
-      author:   { select: { username: true } },
+      author: { select: { username: true } },
       category: { select: { name: true, slug: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
   });
 
@@ -107,10 +106,11 @@ export default async function MoodPage({ params }: Props) {
       {/* bg-gray-800 + border-b creates a subtle raised panel effect */}
       <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-6xl mx-auto px-4 py-12">
-
           {/* Breadcrumb trail: Home → Mood → {label} */}
           <div className="flex items-center gap-3 mb-2">
-            <Link href="/" className="text-xs text-gray-500 hover:text-gray-400">Home</Link>
+            <Link href="/" className="text-xs text-gray-500 hover:text-gray-400">
+              Home
+            </Link>
             <span className="text-gray-600">/</span>
             <span className="text-xs text-gray-400">Mood</span>
             <span className="text-gray-600">/</span>
@@ -122,9 +122,9 @@ export default async function MoodPage({ params }: Props) {
           <div className="flex items-center gap-4 mt-4">
             {/* Large icon acts as the page icon for this mood */}
             {createElement(moodIcon(moodKey), {
-              className: "w-12 h-12 shrink-0 text-gray-400",
+              className: 'w-12 h-12 shrink-0 text-gray-400',
               strokeWidth: 1.25,
-              "aria-hidden": "true",
+              'aria-hidden': 'true',
             })}
             <div>
               <h1 className="text-3xl font-bold text-white">{meta.label}</h1>
@@ -141,7 +141,6 @@ export default async function MoodPage({ params }: Props) {
 
       {/* ── All moods navigation + story grid ──────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 py-6">
-
         {/* ── All-moods pill navigation ────────────────────────────────────── */}
         {/*
           Object.entries(MOOD_META) gives [[key, meta], ...] pairs.
@@ -158,11 +157,15 @@ export default async function MoodPage({ params }: Props) {
               // Conditional class: active pill uses theme colour, others use neutral gray
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition ${
                 key === moodKey
-                  ? m.color  // active: coloured pill from lookup table
+                  ? m.color // active: coloured pill from lookup table
                   : 'text-gray-500 border-gray-700 hover:border-gray-500 hover:text-gray-300'
               }`}
             >
-              {createElement(moodIcon(key), { className: "w-3.5 h-3.5", strokeWidth: 1.75, "aria-hidden": "true" })}
+              {createElement(moodIcon(key), {
+                className: 'w-3.5 h-3.5',
+                strokeWidth: 1.75,
+                'aria-hidden': 'true',
+              })}
               {m.label}
             </Link>
           ))}
@@ -180,7 +183,7 @@ export default async function MoodPage({ params }: Props) {
           //   sm (≥640px):      2 columns
           //   lg (≥1024px):     3 columns
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {stories.map(story => (
+            {stories.map((story) => (
               // Each card is a Link — the whole card is clickable
               // group class enables child hover effects (scale, colour) keyed off the parent hover
               <Link
@@ -202,9 +205,9 @@ export default async function MoodPage({ params }: Props) {
                     // Fallback: gradient placeholder with the mood's icon centred
                     <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
                       {createElement(moodIcon(moodKey), {
-                        className: "w-10 h-10 text-gray-600",
+                        className: 'w-10 h-10 text-gray-600',
                         strokeWidth: 1.25,
-                        "aria-hidden": "true",
+                        'aria-hidden': 'true',
                       })}
                     </div>
                   )}
@@ -221,7 +224,6 @@ export default async function MoodPage({ params }: Props) {
                 {/* ── Card body ─────────────────────────────────────────────── */}
                 {/* flex flex-col gap-2 flex-1 stretches the body to fill the card height */}
                 <div className="p-4 flex flex-col gap-2 flex-1">
-
                   {/* Story title — group-hover:text-green-300 uses parent hover state */}
                   {/* line-clamp-2 caps the title at 2 lines, preventing layout variation */}
                   <h3 className="text-sm font-semibold text-white group-hover:text-green-300 transition-colors line-clamp-2">

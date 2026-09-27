@@ -95,8 +95,8 @@ export default function manifest(): MetadataRoute.Manifest {
       method: 'GET',
       params: {
         title: 'promptTitle',
-        text:  'prompt',
-        url:   'url',
+        text: 'prompt',
+        url: 'url',
       },
     },
   };

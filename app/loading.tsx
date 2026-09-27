@@ -9,7 +9,6 @@ function S({ className = '' }: { className?: string }) {
 export default function HomeLoading() {
   return (
     <div className="bg-gray-900 text-white min-h-screen overflow-hidden">
-
       {/* ── Header ── */}
       <div className="sticky top-0 z-50 bg-gray-950 border-b border-gray-800 px-6 h-16 flex items-center justify-between gap-4">
         <S className="h-7 w-36 rounded-lg" />
@@ -37,7 +36,6 @@ export default function HomeLoading() {
       <S className="w-full h-[420px] md:h-[520px] rounded-none" />
 
       <div className="max-w-6xl mx-auto px-4 space-y-14 py-10">
-
         {/* ── Featured Stories ── */}
         <section>
           <div className="flex items-center justify-between mb-5">
@@ -46,7 +44,10 @@ export default function HomeLoading() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
+              <div
+                key={i}
+                className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden"
+              >
                 <S className="w-full h-48 rounded-none" />
                 <div className="p-4 space-y-2">
                   <S className="h-3 w-20" />
@@ -70,7 +71,10 @@ export default function HomeLoading() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
+              <div
+                key={i}
+                className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden"
+              >
                 <S className="w-full h-40 rounded-none" />
                 <div className="p-3 space-y-2">
                   <S className="h-4 w-full" />
@@ -185,7 +189,6 @@ export default function HomeLoading() {
 
         {/* ── Main Grid: Latest Stories + Sidebar ── */}
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-10">
-
           {/* Latest Stories */}
           <div className="lg:col-span-2 space-y-5">
             <div className="flex items-center justify-between">
@@ -193,7 +196,10 @@ export default function HomeLoading() {
               <S className="h-4 w-24" />
             </div>
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden flex gap-0">
+              <div
+                key={i}
+                className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden flex gap-0"
+              >
                 <S className="w-32 h-28 rounded-none shrink-0" />
                 <div className="flex-1 p-4 space-y-2">
                   <S className="h-3 w-20" />
@@ -281,13 +287,15 @@ export default function HomeLoading() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-14 py-10">
-
         {/* ── Popular Stories ── */}
         <section>
           <S className="h-6 w-40 mb-5" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
+              <div
+                key={i}
+                className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden"
+              >
                 <S className="w-full h-44 rounded-none" />
                 <div className="p-4 space-y-2">
                   <S className="h-3 w-20" />
@@ -339,7 +347,6 @@ export default function HomeLoading() {
             ))}
           </div>
         </section>
-
       </div>
 
       {/* ── Footer ── */}
@@ -360,7 +367,6 @@ export default function HomeLoading() {
           <S className="h-3 w-32" />
         </div>
       </div>
-
     </div>
   );
 }

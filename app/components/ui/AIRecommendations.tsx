@@ -13,8 +13,8 @@ interface AIRecommendation {
   title: string;
   mood: string | null;
   categoryName: string;
-  reason: string;  // Claude's atmospheric explanation
-  slug?: string;   // Added when we fetch the full story details
+  reason: string; // Claude's atmospheric explanation
+  slug?: string; // Added when we fetch the full story details
 }
 
 interface Props {
@@ -26,14 +26,14 @@ interface Props {
 
 // Maps mood values to color classes for the mood badge
 const MOOD_COLORS: Record<string, string> = {
-  CREEPY:          'text-green-400 bg-green-500/10 border-green-500/20',
-  PARANOID:        'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
-  DISTURBING:      'text-red-400 bg-red-500/10 border-red-500/20',
-  ATMOSPHERIC:     'text-blue-400 bg-blue-500/10 border-blue-500/20',
-  PSYCHOLOGICAL:   'text-pink-400 bg-pink-500/10 border-pink-500/20',
-  SUPERNATURAL:    'text-teal-400 bg-teal-500/10 border-teal-500/20',
-  GORE:            'text-orange-400 bg-orange-500/10 border-orange-500/20',
-  JUMPSCARE:       'text-red-300 bg-red-400/10 border-red-400/20',
+  CREEPY: 'text-green-400 bg-green-500/10 border-green-500/20',
+  PARANOID: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
+  DISTURBING: 'text-red-400 bg-red-500/10 border-red-500/20',
+  ATMOSPHERIC: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  PSYCHOLOGICAL: 'text-pink-400 bg-pink-500/10 border-pink-500/20',
+  SUPERNATURAL: 'text-teal-400 bg-teal-500/10 border-teal-500/20',
+  GORE: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  JUMPSCARE: 'text-red-300 bg-red-400/10 border-red-400/20',
 };
 
 export default function AIRecommendations({ excludeId, take = 4 }: Props) {
@@ -47,11 +47,11 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
     if (excludeId) params.set('exclude', String(excludeId));
 
     fetch(`/api/recommendations/ai?${params}`)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error('Failed to load');
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         setRecs(data);
         setLoading(false);
       })
@@ -90,7 +90,7 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {recs.map(rec => (
+          {recs.map((rec) => (
             <div
               key={rec.id}
               className="group bg-gray-800 border border-gray-700 hover:border-green-500/40 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.10)] hover:shadow-[0_8px_30px_rgba(139,92,246,0.25)]"
@@ -103,7 +103,9 @@ export default function AIRecommendations({ excludeId, take = 4 }: Props) {
                   </span>
                 )}
                 {rec.mood && (
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${MOOD_COLORS[rec.mood] ?? 'text-gray-400 bg-gray-700 border-gray-600'}`}>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${MOOD_COLORS[rec.mood] ?? 'text-gray-400 bg-gray-700 border-gray-600'}`}
+                  >
                     {rec.mood.charAt(0) + rec.mood.slice(1).toLowerCase()}
                   </span>
                 )}

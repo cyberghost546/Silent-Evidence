@@ -14,11 +14,16 @@ export default async function AdminStoriesPage() {
   const stories = await prisma.story.findMany({
     orderBy: { createdAt: 'desc' },
     select: {
-      id: true, title: true, slug: true, status: true,
-      featured: true, creepyOfMonth: true, createdAt: true,
-      author:   { select: { username: true } },
+      id: true,
+      title: true,
+      slug: true,
+      status: true,
+      featured: true,
+      creepyOfMonth: true,
+      createdAt: true,
+      author: { select: { username: true } },
       category: { select: { name: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
   });
 

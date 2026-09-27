@@ -12,8 +12,8 @@ import { Heart, Reply, UserPlus, MessageSquare, type LucideIcon } from 'lucide-r
 // Shape of a single notification from the /api/notifications endpoint
 type Notification = {
   id: number;
-  type: string;       // 'LIKE', 'REPLY', 'FOLLOW', 'COMMENT', etc.
-  message: string;    // Human-readable text, e.g. "Chris liked your story"
+  type: string; // 'LIKE', 'REPLY', 'FOLLOW', 'COMMENT', etc.
+  message: string; // Human-readable text, e.g. "Chris liked your story"
   read: boolean;
   createdAt: string;
   story: { slug: string; title: string } | null; // The story this relates to (if any)
@@ -24,29 +24,28 @@ type Toast = { id: number; message: string; icon: LucideIcon; href: string };
 
 // iconFor — maps a notification type to the icon displayed in the UI
 function iconFor(type: string): LucideIcon {
-  if (type === 'LIKE')   return Heart;
-  if (type === 'REPLY')  return Reply;
+  if (type === 'LIKE') return Heart;
+  if (type === 'REPLY') return Reply;
   if (type === 'FOLLOW') return UserPlus;
   return MessageSquare; // Default for COMMENT and anything else
 }
 
 export default function NotificationBell() {
   // Controls whether the dropdown panel is visible
-  const [open, setOpen]                   = useState(false);
+  const [open, setOpen] = useState(false);
   // Full list of notifications shown in the dropdown
   const [notifications, setNotifications] = useState<Notification[]>([]);
   // Count of unread notifications — shown as the red badge on the bell
-  const [unread, setUnread]               = useState(0);
+  const [unread, setUnread] = useState(0);
   // Active toast popups shown in the bottom-right corner
-  const [toasts, setToasts]               = useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
   // Ref attached to the wrapper div — used to detect clicks outside the dropdown
-  const ref                               = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   // Track the highest notification ID we've already toasted to avoid re-showing
-  const lastSeenId                        = useRef<number | null>(null);
+  const lastSeenId = useRef<number | null>(null);
 
   // dismissToast — removes one toast from the stack by its ID
-  const dismissToast = (id: number) =>
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  const dismissToast = (id: number) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
   // load — fetches the latest notifications from the API and updates state.
   // Wrapped in useCallback so it doesn't get recreated on every render
@@ -62,8 +61,7 @@ export default function NotificationBell() {
     // Find unread notifications we haven't shown as a toast yet.
     // We compare against lastSeenId so we don't re-toast old notifications on every poll.
     const newOnes: Notification[] = data.notifications.filter(
-      (n: Notification) =>
-        !n.read && (lastSeenId.current === null || n.id > lastSeenId.current)
+      (n: Notification) => !n.read && (lastSeenId.current === null || n.id > lastSeenId.current)
     );
 
     if (newOnes.length > 0) {
@@ -129,8 +127,19 @@ export default function NotificationBell() {
           aria-label="Notifications"
         >
           {/* Bell SVG icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"
+            />
           </svg>
           {/* Red badge — only shown when there are unread notifications; caps at "9+" */}
           {unread > 0 && (
@@ -146,7 +155,13 @@ export default function NotificationBell() {
             <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
               <span className="text-sm font-semibold text-white">Notifications</span>
               {unread > 0 && (
-                <button type="button" onClick={markRead} className="text-xs text-gray-500 hover:text-red-400 transition">Mark all read</button>
+                <button
+                  type="button"
+                  onClick={markRead}
+                  className="text-xs text-gray-500 hover:text-red-400 transition"
+                >
+                  Mark all read
+                </button>
               )}
             </div>
             <div className="max-h-80 overflow-y-auto">
@@ -163,15 +178,30 @@ export default function NotificationBell() {
                   >
                     {(() => {
                       const NIcon = iconFor(n.type);
-                      return <NIcon className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />;
+                      return (
+                        <NIcon
+                          className="w-4 h-4 mt-0.5 shrink-0"
+                          strokeWidth={1.75}
+                          aria-hidden="true"
+                        />
+                      );
                     })()}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-300 leading-snug">{n.message}</p>
-                      {n.story && <p className="text-xs text-gray-600 truncate mt-0.5">{n.story.title}</p>}
-                      <p className="text-xs text-gray-600 mt-1">{new Date(n.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                      {n.story && (
+                        <p className="text-xs text-gray-600 truncate mt-0.5">{n.story.title}</p>
+                      )}
+                      <p className="text-xs text-gray-600 mt-1">
+                        {new Date(n.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
                     </div>
                     {/* Small red dot on the right for unread notifications */}
-                    {!n.read && <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1.5" />}
+                    {!n.read && (
+                      <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1.5" />
+                    )}
                   </a>
                 ))
               )}
@@ -192,12 +222,19 @@ export default function NotificationBell() {
               className="pointer-events-auto flex items-start gap-3 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 shadow-2xl w-80 animate-slide-in hover:border-red-600/50 transition-colors"
               onClick={() => dismissToast(t.id)}
             >
-              <t.icon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
+              <t.icon
+                className="w-4 h-4 mt-0.5 shrink-0 text-gray-400"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <p className="text-sm text-gray-200 flex-1 leading-snug">{t.message}</p>
               {/* X button — stops propagation so clicking X doesn't also follow the link */}
               <button
                 type="button"
-                onClick={(e) => { e.preventDefault(); dismissToast(t.id); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  dismissToast(t.id);
+                }}
                 className="text-gray-600 hover:text-white transition flex-shrink-0 text-base leading-none"
               >
                 ✕

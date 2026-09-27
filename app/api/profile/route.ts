@@ -114,8 +114,6 @@ export async function PATCH(req: Request) {
 
   // Return the updated username when it was included, otherwise return a generic success flag.
   return NextResponse.json(
-    username !== undefined
-      ? { username: username.trim() }
-      : { success: true }
+    username !== undefined ? { username: username.trim() } : { success: true }
   );
 }

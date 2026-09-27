@@ -49,7 +49,7 @@ export async function POST(req: NextRequest, { params }: Props) {
   }
 
   // Convert userId and votedFor to integers (they may arrive as strings from JSON)
-  const userIdNum   = Number(userId);
+  const userIdNum = Number(userId);
   const votedForNum = Number(votedFor);
 
   // ── Validate the battle ───────────────────────────────────────────────────
@@ -58,9 +58,9 @@ export async function POST(req: NextRequest, { params }: Props) {
   const battle = await prisma.storyBattle.findUnique({
     where: { id: battleId },
     select: {
-      id: true,       // the battle's own ID
-      active: true,   // whether the battle is still enabled
-      endsAt: true,   // when the battle ends
+      id: true, // the battle's own ID
+      active: true, // whether the battle is still enabled
+      endsAt: true, // when the battle ends
       storyAId: true, // the ID of the first (left) story
       storyBId: true, // the ID of the second (right) story
     },
@@ -100,9 +100,9 @@ export async function POST(req: NextRequest, { params }: Props) {
     },
     create: {
       // Fields for a brand-new vote record
-      battleId,               // which battle this vote belongs to
-      userId: userIdNum,      // which user is voting
-      votedFor: votedForNum,  // which story they chose
+      battleId, // which battle this vote belongs to
+      userId: userIdNum, // which user is voting
+      votedFor: votedForNum, // which story they chose
     },
     update: {
       // Only update the choice if the user is changing their vote
@@ -114,8 +114,8 @@ export async function POST(req: NextRequest, { params }: Props) {
   // Fetch all votes for this battle — we need fresh data because another user
   // might have voted between when this user loaded the page and when they submitted.
   const votes = await prisma.battleVote.findMany({
-    where: { battleId },                             // only votes for this battle
-    select: { votedFor: true, userId: true },        // only fetch what we need
+    where: { battleId }, // only votes for this battle
+    select: { votedFor: true, userId: true }, // only fetch what we need
   });
 
   // Count how many votes went to story A
@@ -130,12 +130,12 @@ export async function POST(req: NextRequest, { params }: Props) {
   // Return the fresh vote breakdown so the client can update the UI immediately.
   // This avoids a second fetch and reduces perceived latency.
   return NextResponse.json({
-    battleId,          // echo back the battle ID for context
-    totalVotes,        // combined vote count across both stories
+    battleId, // echo back the battle ID for context
+    totalVotes, // combined vote count across both stories
 
     storyA: {
-      id: battle.storyAId,  // story A's database ID
-      votes: votesForA,     // how many votes story A has received
+      id: battle.storyAId, // story A's database ID
+      votes: votesForA, // how many votes story A has received
 
       // Percentage: (votesForA / total) * 100, rounded to one decimal.
       // Math.round(x * 1000) / 10 gives one decimal place (e.g. 66.7).
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     },
 
     storyB: {
-      id: battle.storyBId,  // story B's database ID
+      id: battle.storyBId, // story B's database ID
       votes: votesForB,
       pct: totalVotes > 0 ? Math.round((votesForB / totalVotes) * 1000) / 10 : 50,
     },

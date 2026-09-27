@@ -13,8 +13,8 @@ export async function GET() {
     // Pick a deterministic "story of the day" based on the current date.
     // We count all published stories and use the day-of-year as an offset,
     // so the same story appears all day but changes each day automatically.
-    const now        = new Date();
-    const dayOfYear  = Math.floor(
+    const now = new Date();
+    const dayOfYear = Math.floor(
       (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000
     );
 
@@ -23,19 +23,19 @@ export async function GET() {
 
     // Skip to a different story each day using modulo so we always have a valid index
     const story = await prisma.story.findFirst({
-      where:   { status: 'PUBLISHED', contentRating: 'ALL' }, // only safe-for-all in widget
+      where: { status: 'PUBLISHED', contentRating: 'ALL' }, // only safe-for-all in widget
       orderBy: { createdAt: 'asc' },
-      skip:    dayOfYear % total,
+      skip: dayOfYear % total,
       select: {
-        id:         true,
-        title:      true,
-        slug:       true,
-        excerpt:    true,
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
         coverImage: true,
-        mood:       true,
-        views:      true,
-        author:     { select: { username: true } },
-        _count:     { select: { likes: true } },
+        mood: true,
+        views: true,
+        author: { select: { username: true } },
+        _count: { select: { likes: true } },
       },
     });
 

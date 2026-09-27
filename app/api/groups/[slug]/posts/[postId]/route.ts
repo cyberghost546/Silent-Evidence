@@ -29,7 +29,6 @@ type Params = { params: Promise<{ slug: string; postId: string }> };
 // ── DELETE handler ────────────────────────────────────────────────────────────
 // Deletes the specified group post if the caller has permission.
 export async function DELETE(req: Request, { params }: Params) {
-
   // Await the params Promise and read both dynamic segments from the URL
   const { slug, postId } = await params;
 
@@ -73,8 +72,7 @@ export async function DELETE(req: Request, { params }: Params) {
   //   a) They are the post's author, OR
   //   b) They are an OWNER or MODERATOR of this group
   const canDelete =
-    post.authorId === userId ||
-    ['OWNER', 'MODERATOR'].includes(membership?.role ?? '');
+    post.authorId === userId || ['OWNER', 'MODERATOR'].includes(membership?.role ?? '');
 
   // If neither condition is true, reject with 403 Forbidden
   if (!canDelete) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });

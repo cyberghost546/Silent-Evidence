@@ -13,9 +13,9 @@ export const metadata = { title: 'Writing Sprints | Silent Evidence' };
 export const revalidate = 30;
 
 export default async function SprintsPage() {
-  const c      = await cookies();
+  const c = await cookies();
   const userId = Number(c.get('userId')?.value ?? 0) || null;
-  const now    = new Date();
+  const now = new Date();
 
   // Load active sprints that haven't ended, newest first
   const sprints = await prisma.writingSprint.findMany({
@@ -25,8 +25,8 @@ export default async function SprintsPage() {
       participants: {
         select: {
           wordCount: true,
-          userId:    true,
-          user:      { select: { username: true } },
+          userId: true,
+          user: { select: { username: true } },
         },
         orderBy: { wordCount: 'desc' },
       },
@@ -39,7 +39,8 @@ export default async function SprintsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Writing Sprints</h1>
         <p className="text-gray-400 text-sm">
-          Join a timed sprint, write as much as you can, and see how you stack up against other horror authors.
+          Join a timed sprint, write as much as you can, and see how you stack up against other
+          horror authors.
         </p>
       </div>
 
@@ -51,14 +52,14 @@ export default async function SprintsPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {sprints.map(sprint => (
+          {sprints.map((sprint) => (
             // Cast the Prisma result shape to the component's expected type
             <WritingSprintTimer
               key={sprint.id}
               sprint={{
                 ...sprint,
                 startsAt: sprint.startsAt.toISOString(),
-                endsAt:   sprint.endsAt.toISOString(),
+                endsAt: sprint.endsAt.toISOString(),
                 participants: sprint.participants as {
                   userId: number;
                   wordCount: number;

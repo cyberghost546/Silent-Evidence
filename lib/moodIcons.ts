@@ -15,20 +15,29 @@
 // and its keys must stay in step with MOODS there.
 
 import {
-  Eye, Tornado, Skull, CloudFog, Brain, Ghost, Droplet, Zap, Drama, Moon,
+  Eye,
+  Tornado,
+  Skull,
+  CloudFog,
+  Brain,
+  Ghost,
+  Droplet,
+  Zap,
+  Drama,
+  Moon,
   type LucideIcon,
 } from 'lucide-react';
 
 export const MOOD_ICONS: Record<string, LucideIcon> = {
-  CREEPY:        Eye,
-  PARANOID:      Tornado,
-  DISTURBING:    Skull,
-  ATMOSPHERIC:   CloudFog,
+  CREEPY: Eye,
+  PARANOID: Tornado,
+  DISTURBING: Skull,
+  ATMOSPHERIC: CloudFog,
   PSYCHOLOGICAL: Brain,
-  SUPERNATURAL:  Ghost,
-  GORE:          Droplet,
-  JUMPSCARE:     Zap,
-  DARK:          Moon,
+  SUPERNATURAL: Ghost,
+  GORE: Droplet,
+  JUMPSCARE: Zap,
+  DARK: Moon,
 };
 
 // Used when a mood is missing, unknown, or newly added to the enum but not here.

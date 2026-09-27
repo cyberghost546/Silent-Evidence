@@ -47,15 +47,12 @@ export default function RecipesPage() {
     // min-h-screen ensures a dark background even on short pages
     // py-12 = 48px top/bottom padding; px-4 = 16px horizontal gutter (mobile)
     <main className="min-h-screen bg-gray-950 py-12 px-4">
-
       {/* max-w-4xl centres a 896px column — wider than recipe detail because
           the feed shows a grid of cards rather than long-form text */}
       <div className="max-w-4xl mx-auto">
-
         {/* ── Page header — decorative hero section above the feed ────────── */}
         {/* text-center centres all children including the emoji and headings */}
         <div className="text-center mb-10">
-
           {/* Decorative large emoji — text-5xl = 48px; mb-4 = 16px bottom margin */}
 
           {/* Page title — &amp; renders the & entity safely in JSX */}
@@ -63,7 +60,8 @@ export default function RecipesPage() {
 
           {/* Subtitle — text-lg = 18px; <br /> creates a line break inside the paragraph */}
           <p className="text-gray-400 text-lg">
-            Cursed foods. Blood cocktails. Dark rituals.<br />
+            Cursed foods. Blood cocktails. Dark rituals.
+            <br />
             Cook at your own risk.
           </p>
         </div>
@@ -77,7 +75,6 @@ export default function RecipesPage() {
             Passing no props here — RecipesFeed manages its own data fetching.
             This is the recommended pattern when the client component owns its state. */}
         <RecipesFeed />
-
       </div>
     </main>
   );

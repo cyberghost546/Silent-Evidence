@@ -59,7 +59,10 @@ export async function PATCH(req: Request) {
   // Enforce a minimum password length for basic security.
   // 8 characters is a common minimum recommended by security guidelines.
   if (newPassword.length < 8) {
-    return NextResponse.json({ error: 'New password must be at least 8 characters.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'New password must be at least 8 characters.' },
+      { status: 400 }
+    );
   }
 
   // Look up the user's full record from the database.

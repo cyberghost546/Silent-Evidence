@@ -27,17 +27,25 @@
  */
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { MessagesSquare, Clapperboard, BookOpen, Palette, PenLine, Moon, type LucideIcon } from 'lucide-react';
+import {
+  MessagesSquare,
+  Clapperboard,
+  BookOpen,
+  Palette,
+  PenLine,
+  Moon,
+  type LucideIcon,
+} from 'lucide-react';
 
 // Forum icons are chosen by slug, so a renamed emoji in the DB seed can never
 // change what the page shows.
 const FORUM_ICONS: Record<string, LucideIcon> = {
-  general:         MessagesSquare,
+  general: MessagesSquare,
   recommendations: Clapperboard,
-  feedback:        BookOpen,
-  'fan-art':       Palette,
-  'writing-tips':  PenLine,
-  'off-topic':     Moon,
+  feedback: BookOpen,
+  'fan-art': Palette,
+  'writing-tips': PenLine,
+  'off-topic': Moon,
 };
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -50,11 +58,36 @@ async function ensureForums() {
   if (count === 0) {
     await prisma.forum.createMany({
       data: [
-        { name: 'General Discussion', slug: 'general', description: 'Talk about anything horror related.', order: 1 },
-        { name: 'Horror & Paranormal Recommendations', slug: 'recommendations', description: 'Recommend horror stories, films, books, and more.', order: 2 },
-        { name: 'Story Feedback & Reviews', slug: 'feedback', description: 'Get feedback on your stories or review others.', order: 3 },
-        { name: 'Fan Art & Creations', slug: 'fan-art', description: 'Share your fan art, illustrations, and creative work.', order: 4 },
-        { name: 'Writing Tips', slug: 'writing-tips', description: 'Share tips, techniques, and advice for horror writing.', order: 5 },
+        {
+          name: 'General Discussion',
+          slug: 'general',
+          description: 'Talk about anything horror related.',
+          order: 1,
+        },
+        {
+          name: 'Horror & Paranormal Recommendations',
+          slug: 'recommendations',
+          description: 'Recommend horror stories, films, books, and more.',
+          order: 2,
+        },
+        {
+          name: 'Story Feedback & Reviews',
+          slug: 'feedback',
+          description: 'Get feedback on your stories or review others.',
+          order: 3,
+        },
+        {
+          name: 'Fan Art & Creations',
+          slug: 'fan-art',
+          description: 'Share your fan art, illustrations, and creative work.',
+          order: 4,
+        },
+        {
+          name: 'Writing Tips',
+          slug: 'writing-tips',
+          description: 'Share tips, techniques, and advice for horror writing.',
+          order: 5,
+        },
         { name: 'Off Topic', slug: 'off-topic', description: 'Anything goes.', order: 6 },
       ],
     });
@@ -92,24 +125,40 @@ export default async function ForumsPage() {
           <span className="w-1 h-7 bg-red-600 rounded-full" />
           <div>
             <h1 className="text-2xl font-bold text-white">Forums</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{totalPosts} posts across {forums.length} boards</p>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {totalPosts} posts across {forums.length} boards
+            </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
-          {forums.map(forum => (
-            <Link key={forum.id} href={`/forums/${forum.slug}`}
-              className="group flex items-center gap-5 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-5 transition-all duration-200">
+          {forums.map((forum) => (
+            <Link
+              key={forum.id}
+              href={`/forums/${forum.slug}`}
+              className="group flex items-center gap-5 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-5 transition-all duration-200"
+            >
               {(() => {
                 const ForumIcon = FORUM_ICONS[forum.slug] ?? MessagesSquare;
-                return <ForumIcon className="w-7 h-7 shrink-0 text-gray-400" strokeWidth={1.5} aria-hidden="true" />;
+                return (
+                  <ForumIcon
+                    className="w-7 h-7 shrink-0 text-gray-400"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                );
               })()}
               <div className="flex-1 min-w-0">
-                <h2 className="font-semibold text-white group-hover:text-red-300 transition-colors">{forum.name}</h2>
-                {forum.description && <p className="text-sm text-gray-500 mt-0.5">{forum.description}</p>}
+                <h2 className="font-semibold text-white group-hover:text-red-300 transition-colors">
+                  {forum.name}
+                </h2>
+                {forum.description && (
+                  <p className="text-sm text-gray-500 mt-0.5">{forum.description}</p>
+                )}
                 {forum.posts[0] && (
                   <p className="text-xs text-gray-600 mt-2 truncate">
-                    Latest: <span className="text-gray-400">{forum.posts[0].title}</span> by {forum.posts[0].author.username}
+                    Latest: <span className="text-gray-400">{forum.posts[0].title}</span> by{' '}
+                    {forum.posts[0].author.username}
                   </p>
                 )}
               </div>

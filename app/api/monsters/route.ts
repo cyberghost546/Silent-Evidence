@@ -18,8 +18,14 @@ export async function GET(req: NextRequest) {
       },
       orderBy: [{ scareFactor: 'desc' }, { name: 'asc' }],
       select: {
-        id: true, name: true, slug: true, description: true,
-        origin: true, image: true, type: true, scareFactor: true,
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        origin: true,
+        image: true,
+        type: true,
+        scareFactor: true,
         _count: { select: { storyLinks: true } },
       },
     });
@@ -36,9 +42,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, description, origin, image, type, scareFactor } = body;
     if (!name || !description || !type) {
-      return NextResponse.json({ error: 'name, description, and type are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'name, description, and type are required' },
+        { status: 400 }
+      );
     }
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
     const monster = await prisma.monster.create({
       data: { name, slug, description, origin, image, type, scareFactor: scareFactor ?? 5 },
     });

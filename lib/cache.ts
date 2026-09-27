@@ -31,8 +31,8 @@ function getRedis(): Redis | null {
       port: u.port ? parseInt(u.port, 10) : 6379,
       ...(u.password && { password: decodeURIComponent(u.password) }),
       ...(u.pathname.length > 1 && { db: parseInt(u.pathname.slice(1), 10) }),
-      maxRetriesPerRequest: 0,   // fail fast — don't queue commands while reconnecting
-      retryStrategy: (times) => (times >= 3 ? null : 500),  // 3 attempts, 500 ms apart
+      maxRetriesPerRequest: 0, // fail fast — don't queue commands while reconnecting
+      retryStrategy: (times) => (times >= 3 ? null : 500), // 3 attempts, 500 ms apart
       enableOfflineQueue: false,
       lazyConnect: true,
     });
@@ -156,13 +156,7 @@ export async function invalidatePattern(pattern: string): Promise<void> {
     // SCAN is non-blocking unlike KEYS — safe to use in production
     let cursor = '0';
     do {
-      const [nextCursor, keys] = await client.scan(
-        cursor,
-        'MATCH',
-        PREFIX + pattern,
-        'COUNT',
-        100
-      );
+      const [nextCursor, keys] = await client.scan(cursor, 'MATCH', PREFIX + pattern, 'COUNT', 100);
       cursor = nextCursor;
       if (keys.length > 0) {
         await client.del(...keys);
@@ -192,8 +186,8 @@ export async function hasRecentView(storyId: number, ip: string): Promise<boolea
 
 // ── Cache TTL constants — use these for consistency across routes ─────────────
 export const TTL = {
-  SHORT:   30,         // 30 seconds — frequently changing data (notifications, counts)
-  MEDIUM:  60 * 5,     // 5 minutes  — semi-static data (story listings, categories)
-  LONG:    60 * 60,    // 1 hour     — rarely changing data (user profiles, tags)
-  DAY:     60 * 60 * 24, // 24 hours — very stable data (static pages, leaderboards)
+  SHORT: 30, // 30 seconds — frequently changing data (notifications, counts)
+  MEDIUM: 60 * 5, // 5 minutes  — semi-static data (story listings, categories)
+  LONG: 60 * 60, // 1 hour     — rarely changing data (user profiles, tags)
+  DAY: 60 * 60 * 24, // 24 hours — very stable data (static pages, leaderboards)
 } as const;

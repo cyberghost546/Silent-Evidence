@@ -12,7 +12,7 @@ export const metadata = { title: 'Verify Your Age | Silent Evidence' };
 
 export default async function VerifyAgePage() {
   // Must be logged in
-  const c      = await cookies();
+  const c = await cookies();
   const userId = Number(c.get('userId')?.value ?? 0) || null;
   if (!userId) redirect('/login');
 

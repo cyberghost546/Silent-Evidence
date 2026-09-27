@@ -46,8 +46,7 @@ export async function GET() {
 
     // A subscription is considered "active" if its status is 'active' or 'trialing'.
     // 'past_due' and 'canceled' are treated as inactive for content gating purposes.
-    const isActive =
-      subscription.status === 'active' || subscription.status === 'trialing';
+    const isActive = subscription.status === 'active' || subscription.status === 'trialing';
 
     return NextResponse.json({
       isActive,
@@ -57,9 +56,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('[stripe/subscription/status] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch subscription status' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch subscription status' }, { status: 500 });
   }
 }

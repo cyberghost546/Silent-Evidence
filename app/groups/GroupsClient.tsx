@@ -48,22 +48,38 @@ type Group = {
 };
 
 // Horror genre filter tabs for group browsing
-const SUBGENRES = ['All', 'Paranormal', 'Supernatural', 'Psychological Horror', 'Slasher', 'Gothic Horror', 'Cosmic Horror', 'Dark Fantasy', 'Other'];
+const SUBGENRES = [
+  'All',
+  'Paranormal',
+  'Supernatural',
+  'Psychological Horror',
+  'Slasher',
+  'Gothic Horror',
+  'Cosmic Horror',
+  'Dark Fantasy',
+  'Other',
+];
 
-export default function GroupsClient({ groups: initial, userId }: { groups: Group[]; userId: number | null }) {
+export default function GroupsClient({
+  groups: initial,
+  userId,
+}: {
+  groups: Group[];
+  userId: number | null;
+}) {
   // groups — full list, starts from server-fetched data passed as props
-  const [groups, setGroups]           = useState(initial);
+  const [groups, setGroups] = useState(initial);
   // filter — which subgenre tab is active; 'All' shows everything
-  const [filter, setFilter]           = useState('All');
+  const [filter, setFilter] = useState('All');
   // showCreate — controls whether the create-group modal is open
-  const [showCreate, setShowCreate]   = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   // Derived list — no state needed; recomputed on every render from `groups` + `filter`
   // filter === 'All' skips filtering entirely; otherwise match by subgenre string
-  const filtered = filter === 'All' ? groups : groups.filter(g => g.subgenre === filter);
+  const filtered = filter === 'All' ? groups : groups.filter((g) => g.subgenre === filter);
 
   // Called by CreateGroupModal after a successful POST — prepend to keep it at the top
-  const handleCreated = (g: Group) => setGroups(prev => [g, ...prev]);
+  const handleCreated = (g: Group) => setGroups((prev) => [g, ...prev]);
 
   return (
     <div>
@@ -85,7 +101,7 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
 
       {/* Subgenre filter tabs */}
       <div className="flex flex-wrap gap-2 mb-8">
-        {SUBGENRES.map(s => (
+        {SUBGENRES.map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -103,11 +119,14 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
       {/* Grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-600">
-          <p>No groups yet{filter !== 'All' ? ` in ${filter}` : ''}.{userId ? ' Create the first one!' : ''}</p>
+          <p>
+            No groups yet{filter !== 'All' ? ` in ${filter}` : ''}.
+            {userId ? ' Create the first one!' : ''}
+          </p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map(group => {
+          {filtered.map((group) => {
             const isMember = group.members.length > 0;
             return (
               <Link
@@ -118,24 +137,39 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
                 {/* Cover image or gradient placeholder */}
                 {group.coverImage ? (
                   <div className="relative h-28 overflow-hidden">
-                    <Image src={group.coverImage} alt={group.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <Image
+                      src={group.coverImage}
+                      alt={group.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
                 ) : (
-                  <div className="h-28 bg-gradient-to-br from-red-950/40 to-gray-800 flex items-center justify-center">
-                  </div>
+                  <div className="h-28 bg-gradient-to-br from-red-950/40 to-gray-800 flex items-center justify-center"></div>
                 )}
 
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-semibold text-white group-hover:text-red-400 transition line-clamp-1">{group.name}</h3>
-                    {isMember && <span className="flex-shrink-0 text-xs text-green-400 bg-green-500/10 border border-green-500/30 rounded-full px-2 py-0.5">Joined</span>}
+                    <h3 className="font-semibold text-white group-hover:text-red-400 transition line-clamp-1">
+                      {group.name}
+                    </h3>
+                    {isMember && (
+                      <span className="flex-shrink-0 text-xs text-green-400 bg-green-500/10 border border-green-500/30 rounded-full px-2 py-0.5">
+                        Joined
+                      </span>
+                    )}
                   </div>
-                  {group.subgenre && <span className="text-xs text-red-400 font-semibold">{group.subgenre}</span>}
+                  {group.subgenre && (
+                    <span className="text-xs text-red-400 font-semibold">{group.subgenre}</span>
+                  )}
                   {group.description && (
                     <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{group.description}</p>
                   )}
                   <div className="flex items-center gap-3 mt-3 text-xs text-gray-600">
-                    <span>{group._count.members} {group._count.members === 1 ? 'member' : 'members'}</span>
+                    <span>
+                      {group._count.members} {group._count.members === 1 ? 'member' : 'members'}
+                    </span>
                     <span>·</span>
                     <span>{group._count.posts} posts</span>
                   </div>
@@ -147,10 +181,7 @@ export default function GroupsClient({ groups: initial, userId }: { groups: Grou
       )}
 
       {showCreate && (
-        <CreateGroupModal
-          onClose={() => setShowCreate(false)}
-          onCreated={handleCreated}
-        />
+        <CreateGroupModal onClose={() => setShowCreate(false)} onCreated={handleCreated} />
       )}
     </div>
   );

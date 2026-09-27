@@ -10,12 +10,12 @@ export default function NewSeriesForm() {
   const router = useRouter();
 
   // Form field state
-  const [name, setName]               = useState('');
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   // UI state
-  const [saving, setSaving]   = useState(false);
-  const [error, setError]     = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +49,6 @@ export default function NewSeriesForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" suppressHydrationWarning>
-
       {/* Error banner */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
@@ -65,7 +64,7 @@ export default function NewSeriesForm() {
         <input
           type="text"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="e.g. The Whispering Dark"
           required
           maxLength={100}
@@ -83,7 +82,7 @@ export default function NewSeriesForm() {
         </label>
         <textarea
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           placeholder="What is this series about? Give readers a taste of what awaits them..."
           rows={4}
           maxLength={500}

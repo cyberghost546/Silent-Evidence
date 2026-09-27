@@ -5,7 +5,17 @@
 // icon fixed to the bottom-left corner on every page.
 
 import { useState, useEffect } from 'react';
-import { Skull, BookOpen, Search, Heart, PenLine, Users, Trophy, Crown, CheckCircle2 } from 'lucide-react';
+import {
+  Skull,
+  BookOpen,
+  Search,
+  Heart,
+  PenLine,
+  Users,
+  Trophy,
+  Crown,
+  CheckCircle2,
+} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
@@ -81,8 +91,8 @@ const STEPS = [
 
 export default function TutorialGuide() {
   const pathname = usePathname();
-  const [open, setOpen]   = useState(false);
-  const [step, setStep]   = useState(0);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState(0);
   const [ready, setReady] = useState(false); // prevents SSR flash
 
   // On mount — auto-open for first-time visitors (skipped on admin pages)
@@ -98,7 +108,10 @@ export default function TutorialGuide() {
 
   // Listen for the dropdown "Site Guide" button event
   useEffect(() => {
-    const handler = () => { setStep(0); setOpen(true); };
+    const handler = () => {
+      setStep(0);
+      setOpen(true);
+    };
     window.addEventListener('open-tutorial', handler);
     return () => window.removeEventListener('open-tutorial', handler);
   }, []);
@@ -110,14 +123,14 @@ export default function TutorialGuide() {
 
   function next() {
     if (step < STEPS.length - 1) {
-      setStep(s => s + 1);
+      setStep((s) => s + 1);
     } else {
       dismiss();
     }
   }
 
   function back() {
-    setStep(s => Math.max(0, s - 1));
+    setStep((s) => Math.max(0, s - 1));
   }
 
   function reopen() {
@@ -125,8 +138,8 @@ export default function TutorialGuide() {
     setOpen(true);
   }
 
-  const current  = STEPS[step];
-  const isLast   = step === STEPS.length - 1;
+  const current = STEPS[step];
+  const isLast = step === STEPS.length - 1;
   const progress = Math.round(((step + 1) / STEPS.length) * 100);
 
   if (!ready || pathname.startsWith('/admin')) return null;
@@ -137,16 +150,19 @@ export default function TutorialGuide() {
 
       {/* ── Step panel ── */}
       {open && (
-        <div className="fixed bottom-24 left-3 sm:left-6 z-50 w-[calc(100vw-24px)] max-w-sm sm:max-w-96 flex flex-col
+        <div
+          className="fixed bottom-24 left-3 sm:left-6 z-50 w-[calc(100vw-24px)] max-w-sm sm:max-w-96 flex flex-col
                         bg-gray-900 border border-green-900/50 rounded-xl
-                        shadow-2xl shadow-black/60 overflow-hidden">
-
+                        shadow-2xl shadow-black/60 overflow-hidden"
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-green-900/40">
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-sm font-semibold text-green-400">Site Guide</p>
-                <p className="text-xs text-gray-500">Step {step + 1} of {STEPS.length}</p>
+                <p className="text-xs text-gray-500">
+                  Step {step + 1} of {STEPS.length}
+                </p>
               </div>
             </div>
             <button
@@ -171,8 +187,10 @@ export default function TutorialGuide() {
           <div className="p-4">
             <div className="flex items-start gap-3">
               {/* Emoji avatar */}
-              <div className="w-8 h-8 rounded-full bg-green-900/50 border border-green-800/60
-                              flex items-center justify-center text-base shrink-0 mt-0.5">
+              <div
+                className="w-8 h-8 rounded-full bg-green-900/50 border border-green-800/60
+                              flex items-center justify-center text-base shrink-0 mt-0.5"
+              >
                 <current.icon className="w-10 h-10" strokeWidth={1.25} aria-hidden="true" />
               </div>
 
@@ -226,8 +244,8 @@ export default function TutorialGuide() {
                     i === step
                       ? 'bg-green-500 w-3 h-1.5'
                       : i < step
-                      ? 'bg-green-800 w-1.5 h-1.5'
-                      : 'bg-gray-700 w-1.5 h-1.5'
+                        ? 'bg-green-800 w-1.5 h-1.5'
+                        : 'bg-gray-700 w-1.5 h-1.5'
                   }`}
                 />
               ))}

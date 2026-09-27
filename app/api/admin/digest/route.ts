@@ -74,7 +74,7 @@ export async function POST() {
   if (!process.env.SMTP_HOST) {
     return NextResponse.json(
       { error: 'SMTP is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in your environment.' },
-      { status: 503 }, // 503 = Service Unavailable — the server exists but a dependency is missing
+      { status: 503 } // 503 = Service Unavailable — the server exists but a dependency is missing
     );
   }
 

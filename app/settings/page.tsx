@@ -50,21 +50,44 @@ import PremiumAppearancePicker from '@/app/components/ui/PremiumAppearancePicker
 import Link from 'next/link';
 
 const AGE_CONFIG = {
-  UNDER_13: { label: 'Kids Mode',   sub: 'General content only',         color: 'text-blue-400',   dot: 'bg-blue-400'   },
-  TEEN:     { label: 'Teen Access', sub: 'General and teen-rated content', color: 'text-yellow-400', dot: 'bg-yellow-400' },
-  ADULT:    { label: 'Full Access', sub: 'Unrestricted access to all content', color: 'text-green-400',  dot: 'bg-green-400'  },
+  UNDER_13: {
+    label: 'Kids Mode',
+    sub: 'General content only',
+    color: 'text-blue-400',
+    dot: 'bg-blue-400',
+  },
+  TEEN: {
+    label: 'Teen Access',
+    sub: 'General and teen-rated content',
+    color: 'text-yellow-400',
+    dot: 'bg-yellow-400',
+  },
+  ADULT: {
+    label: 'Full Access',
+    sub: 'Unrestricted access to all content',
+    color: 'text-green-400',
+    dot: 'bg-green-400',
+  },
 } as const;
 
-function Section({ id, title, desc, children }: { id: string; title: string; desc: string; children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  desc,
+  children,
+}: {
+  id: string;
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+}) {
   return (
     <section id={id} className="scroll-mt-24">
       <div className="mb-5">
         <h2 className="text-base font-semibold text-white tracking-tight">{title}</h2>
         <p className="text-sm text-gray-500 mt-0.5">{desc}</p>
       </div>
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6">
-        {children}
-      </div>
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6">{children}</div>
     </section>
   );
 }
@@ -75,7 +98,7 @@ export default async function SettingsPage() {
   if (!userId) redirect('/login');
 
   const user = await prisma.user.findUnique({
-    where:   { id: userId },
+    where: { id: userId },
     include: { profile: true, subscription: { select: { status: true } } },
   });
   if (!user) redirect('/login');
@@ -86,15 +109,15 @@ export default async function SettingsPage() {
   const age = AGE_CONFIG[user.ageGroup as keyof typeof AGE_CONFIG] ?? AGE_CONFIG.ADULT;
 
   const navLinks = [
-    { href: '#profile',       label: 'Profile'         },
-    { href: '#age',           label: 'Age & Content'   },
-    { href: '#fear-profile',  label: 'Fear Profile'    },
-    { href: '#reading-speed', label: 'Reading Speed'   },
-    { href: '#notifications', label: 'Notifications'   },
-    { href: '#blocked',       label: 'Blocked Users'   },
-    { href: '#appearance',    label: 'Appearance'      },
-    { href: '#discord',       label: 'Discord'         },
-    { href: '#account',       label: 'Account'         },
+    { href: '#profile', label: 'Profile' },
+    { href: '#age', label: 'Age & Content' },
+    { href: '#fear-profile', label: 'Fear Profile' },
+    { href: '#reading-speed', label: 'Reading Speed' },
+    { href: '#notifications', label: 'Notifications' },
+    { href: '#blocked', label: 'Blocked Users' },
+    { href: '#appearance', label: 'Appearance' },
+    { href: '#discord', label: 'Discord' },
+    { href: '#account', label: 'Account' },
   ];
 
   return (
@@ -102,15 +125,15 @@ export default async function SettingsPage() {
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-10">
-
         {/* Page title */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage your profile, preferences, and account.</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Manage your profile, preferences, and account.
+          </p>
         </div>
 
         <div className="flex gap-10">
-
           {/* Sidebar nav — sticky, desktop only */}
           <aside className="hidden lg:block w-44 shrink-0">
             <nav className="sticky top-24 flex flex-col gap-0.5">
@@ -128,19 +151,26 @@ export default async function SettingsPage() {
 
           {/* Main content */}
           <div className="flex-1 min-w-0 space-y-8">
-
-            <Section id="profile" title="Profile" desc="Update your public profile information and avatar.">
+            <Section
+              id="profile"
+              title="Profile"
+              desc="Update your public profile information and avatar."
+            >
               <EditProfileForm
                 initialData={{
                   username: user.username,
-                  bio:      user.profile?.bio     ?? '',
-                  avatar:   user.profile?.avatar  ?? '',
-                  website:  user.profile?.website ?? '',
+                  bio: user.profile?.bio ?? '',
+                  avatar: user.profile?.avatar ?? '',
+                  website: user.profile?.website ?? '',
                 }}
               />
             </Section>
 
-            <Section id="age" title="Age & Content Access" desc="Controls which stories you can read based on content rating.">
+            <Section
+              id="age"
+              title="Age & Content Access"
+              desc="Controls which stories you can read based on content rating."
+            >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${age.dot}`} />
@@ -158,29 +188,51 @@ export default async function SettingsPage() {
               </div>
             </Section>
 
-            <Section id="fear-profile" title="Fear Profile" desc="Choose up to 3 moods that define your horror taste.">
+            <Section
+              id="fear-profile"
+              title="Fear Profile"
+              desc="Choose up to 3 moods that define your horror taste."
+            >
               <FearProfilePicker initialFearMoods={user.profile?.fearMoods ?? ''} />
             </Section>
 
-            <Section id="reading-speed" title="Reading Speed" desc="Adjust how reading time estimates are calculated for you.">
+            <Section
+              id="reading-speed"
+              title="Reading Speed"
+              desc="Adjust how reading time estimates are calculated for you."
+            >
               <ReadingSpeedSetting initialSpeed={user.readingSpeed} />
             </Section>
 
-            <Section id="notifications" title="Notifications" desc="Choose which emails and alerts you receive.">
+            <Section
+              id="notifications"
+              title="Notifications"
+              desc="Choose which emails and alerts you receive."
+            >
               <div className="space-y-3">
                 <NewsletterToggle initialSubscribed={user.newsletterSubscribed} />
                 <DigestFrequencySelector
-                  initialFrequency={(user.digestFrequency ?? 'WEEKLY') as 'DAILY' | 'WEEKLY' | 'NEVER'}
+                  initialFrequency={
+                    (user.digestFrequency ?? 'WEEKLY') as 'DAILY' | 'WEEKLY' | 'NEVER'
+                  }
                 />
                 <PushNotificationToggle />
               </div>
             </Section>
 
-            <Section id="blocked" title="Blocked Users" desc="Block users to hide their content and stop interactions.">
+            <Section
+              id="blocked"
+              title="Blocked Users"
+              desc="Block users to hide their content and stop interactions."
+            >
               <BlockedUsersSection />
             </Section>
 
-            <Section id="appearance" title="Profile Appearance" desc="Customise your profile theme and avatar border animation. Premium members only.">
+            <Section
+              id="appearance"
+              title="Profile Appearance"
+              desc="Customise your profile theme and avatar border animation. Premium members only."
+            >
               <PremiumAppearancePicker
                 initialTheme={user.profile?.profileTheme ?? 'default'}
                 initialBorder={user.profile?.avatarBorder ?? 'none'}
@@ -188,17 +240,27 @@ export default async function SettingsPage() {
               />
             </Section>
 
-            <Section id="discord" title="Discord" desc="Connect your Discord account to join the community server.">
+            <Section
+              id="discord"
+              title="Discord"
+              desc="Connect your Discord account to join the community server."
+            >
               <DiscordConnect
                 discordUsername={user.discordUsername ?? null}
                 isPremium={isPremium}
               />
             </Section>
 
-            <Section id="account" title="Account" desc="Manage your password, privacy, and account deletion.">
-              <AccountSettings isPrivate={user.isPrivate} twoFactorEnabled={user.twoFactorEnabled} />
+            <Section
+              id="account"
+              title="Account"
+              desc="Manage your password, privacy, and account deletion."
+            >
+              <AccountSettings
+                isPrivate={user.isPrivate}
+                twoFactorEnabled={user.twoFactorEnabled}
+              />
             </Section>
-
           </div>
         </div>
       </div>

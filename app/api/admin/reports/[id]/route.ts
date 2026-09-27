@@ -34,10 +34,7 @@ import { prisma } from '@/lib/prisma';
 // "{ params }: { params: Promise<{ id: string }> }" — Next.js passes the dynamic [id]
 //   URL segment as a string inside a Promise-wrapped params object.
 //   Even though our DB uses integer IDs, the URL always provides it as a string.
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // ── Auth check ────────────────────────────────────────────────────────────────
 
   // Read all cookies attached to the incoming request

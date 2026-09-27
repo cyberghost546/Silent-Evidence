@@ -44,10 +44,10 @@ function fmtTime(secs: number): string {
 
 export default function AudioPlayer({ audioUrl, title }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing,   setPlaying]   = useState(false);
-  const [current,   setCurrent]   = useState(0); // current playback time in seconds
-  const [duration,  setDuration]  = useState(0); // total duration in seconds
-  const [volume,    setVolume]    = useState(1);  // 0.0 – 1.0
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0); // current playback time in seconds
+  const [duration, setDuration] = useState(0); // total duration in seconds
+  const [volume, setVolume] = useState(1); // 0.0 – 1.0
   const [dismissed, setDismissed] = useState(false); // user closed the player
 
   // Sync audio element volume whenever the slider changes
@@ -64,7 +64,9 @@ export default function AudioPlayer({ audioUrl, title }: Props) {
       el.pause();
       setPlaying(false);
     } else {
-      el.play().then(() => setPlaying(true)).catch(() => {});
+      el.play()
+        .then(() => setPlaying(true))
+        .catch(() => {});
     }
   };
 
@@ -90,7 +92,6 @@ export default function AudioPlayer({ audioUrl, title }: Props) {
 
       {/* Sticky bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur border-t border-gray-800 px-4 py-3 flex items-center gap-4 shadow-2xl">
-
         {/* Play / Pause button */}
         <button
           onClick={toggle}
@@ -113,13 +114,17 @@ export default function AudioPlayer({ audioUrl, title }: Props) {
 
         {/* Story title — truncated */}
         <div className="hidden sm:block flex-shrink-0 max-w-[160px]">
-          <p className="text-xs text-gray-400 truncate" title={title}>{title}</p>
+          <p className="text-xs text-gray-400 truncate" title={title}>
+            {title}
+          </p>
           <p className="text-xs text-gray-600">Audio narration</p>
         </div>
 
         {/* Time + scrubber */}
         <div className="flex-1 flex items-center gap-2 min-w-0">
-          <span className="text-xs text-gray-500 tabular-nums flex-shrink-0">{fmtTime(current)}</span>
+          <span className="text-xs text-gray-500 tabular-nums flex-shrink-0">
+            {fmtTime(current)}
+          </span>
           <input
             type="range"
             min={0}
@@ -130,7 +135,9 @@ export default function AudioPlayer({ audioUrl, title }: Props) {
             className="flex-1 h-1.5 appearance-none bg-gray-700 rounded-full accent-red-600 cursor-pointer"
             aria-label="Seek"
           />
-          <span className="text-xs text-gray-500 tabular-nums flex-shrink-0">{fmtTime(duration)}</span>
+          <span className="text-xs text-gray-500 tabular-nums flex-shrink-0">
+            {fmtTime(duration)}
+          </span>
         </div>
 
         {/* Volume slider — hidden on very small screens */}
@@ -152,11 +159,20 @@ export default function AudioPlayer({ audioUrl, title }: Props) {
 
         {/* Dismiss button */}
         <button
-          onClick={() => { audioRef.current?.pause(); setDismissed(true); }}
+          onClick={() => {
+            audioRef.current?.pause();
+            setDismissed(true);
+          }}
           className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition"
           aria-label="Close player"
         >
-          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-4 h-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

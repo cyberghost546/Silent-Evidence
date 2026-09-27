@@ -4,11 +4,17 @@
 // After a successful submission the textarea is cleared and the page is
 // refreshed (via router.refresh()) so the new reply appears in the list.
 
-import { useState } from 'react';               // useState — manages textarea value, loading flag, and error message
-import { useRouter } from 'next/navigation';     // useRouter — used to call router.refresh() after a reply is posted
+import { useState } from 'react'; // useState — manages textarea value, loading flag, and error message
+import { useRouter } from 'next/navigation'; // useRouter — used to call router.refresh() after a reply is posted
 
 // Props passed in by the parent forum post page
-export default function ForumReplyForm({ postId, forumSlug }: { postId: number; forumSlug: string }) {
+export default function ForumReplyForm({
+  postId,
+  forumSlug,
+}: {
+  postId: number;
+  forumSlug: string;
+}) {
   // content — the current text inside the reply textarea (controlled input)
   const [content, setContent] = useState('');
 
@@ -16,7 +22,7 @@ export default function ForumReplyForm({ postId, forumSlug }: { postId: number; 
   const [loading, setLoading] = useState(false);
 
   // error — holds any error message returned by the API so it can be shown to the user
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
 
   // router — Next.js app-router instance; we call router.refresh() to re-fetch server data after posting
   const router = useRouter();
@@ -25,8 +31,9 @@ export default function ForumReplyForm({ postId, forumSlug }: { postId: number; 
   // Prevents the default HTML form navigation, POSTs the reply to the API,
   // and either shows an error or clears the form and refreshes the page.
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault();               // stop the browser from reloading the page
-    setLoading(true); setError('');   // show loading state, clear any previous error
+    e.preventDefault(); // stop the browser from reloading the page
+    setLoading(true);
+    setError(''); // show loading state, clear any previous error
 
     // POST the reply content to the replies endpoint for this forum post
     const res = await fetch(`/api/forum-posts/${postId}/replies`, {
@@ -56,7 +63,6 @@ export default function ForumReplyForm({ postId, forumSlug }: { postId: number; 
   return (
     // The form element calls submit on submission
     <form onSubmit={submit} className="bg-gray-800 border border-gray-700 rounded-xl p-5">
-
       {/* Form heading */}
       <h3 className="text-sm font-semibold text-gray-300 mb-3">Leave a Reply</h3>
 
@@ -66,7 +72,7 @@ export default function ForumReplyForm({ postId, forumSlug }: { postId: number; 
       {/* Reply textarea — controlled input, required so the browser validates before submit */}
       <textarea
         value={content}
-        onChange={e => setContent(e.target.value)} // update state on every keystroke
+        onChange={(e) => setContent(e.target.value)} // update state on every keystroke
         placeholder="Write your reply..."
         required
         rows={4}

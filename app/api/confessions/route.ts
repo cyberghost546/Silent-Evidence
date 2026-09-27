@@ -11,7 +11,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',
@@ -33,7 +35,11 @@ export async function GET() {
       content: c.content,
       isAnonymous: c.isAnonymous,
       createdAt: c.createdAt,
-      author: c.isAnonymous ? null : c.user ? { username: c.user.username, avatar: c.user.profile?.avatar ?? null } : null,
+      author: c.isAnonymous
+        ? null
+        : c.user
+          ? { username: c.user.username, avatar: c.user.profile?.avatar ?? null }
+          : null,
       reactionCounts: c.reactions.reduce<Record<string, number>>((acc, r) => {
         acc[r.emoji] = (acc[r.emoji] ?? 0) + 1;
         return acc;

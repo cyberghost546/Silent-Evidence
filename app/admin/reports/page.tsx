@@ -35,8 +35,14 @@ export default async function AdminReportsPage() {
       <div>
         <h1 className="text-2xl font-bold text-white mb-4">Content Reports</h1>
         <div className="bg-yellow-900/30 border border-yellow-700 rounded-xl p-6 text-yellow-300 text-sm">
-          <p className="font-semibold mb-2 flex items-center gap-1.5"><AlertTriangle className="w-4 h-4" /> Prisma client needs regenerating</p>
-          <p>Stop your dev server, run <code className="bg-gray-800 px-1 rounded">npx prisma generate</code>, then restart with <code className="bg-gray-800 px-1 rounded">npm run dev</code>.</p>
+          <p className="font-semibold mb-2 flex items-center gap-1.5">
+            <AlertTriangle className="w-4 h-4" /> Prisma client needs regenerating
+          </p>
+          <p>
+            Stop your dev server, run{' '}
+            <code className="bg-gray-800 px-1 rounded">npx prisma generate</code>, then restart with{' '}
+            <code className="bg-gray-800 px-1 rounded">npm run dev</code>.
+          </p>
         </div>
       </div>
     );

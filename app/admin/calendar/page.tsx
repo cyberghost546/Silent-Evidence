@@ -38,18 +38,18 @@ type ScheduledStory = {
   id: number;
   title: string;
   slug: string;
-  scheduledAt: string;       // ISO date string from the API
+  scheduledAt: string; // ISO date string from the API
   author: { username: string };
   category: { name: string };
 };
 
 type CalendarEvent = {
   id: number;
-  date: string;              // ISO date string (YYYY-MM-DD)
+  date: string; // ISO date string (YYYY-MM-DD)
   title: string;
-  icon: string;              // Stored icon id chosen from EVENT_ICON_OPTIONS
-  note: string | null;       // Optional hover description
-  linkUrl: string | null;    // Optional internal link (e.g. /story/slug)
+  icon: string; // Stored icon id chosen from EVENT_ICON_OPTIONS
+  note: string | null; // Optional hover description
+  linkUrl: string | null; // Optional internal link (e.g. /story/slug)
 };
 
 // Short weekday headers for the calendar column labels.
@@ -57,8 +57,18 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // Full month names indexed 0–11, matching JavaScript's Date.getMonth() return values.
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 // Icon choices live in lib/calendarIcons so the admin picker and the public
@@ -101,27 +111,27 @@ export default function AdminCalendarPage() {
   // ── State ─────────────────────────────────────────────────────────────────
   // year/month control which month is displayed — independent of today's date
   // once the user navigates forward/backward.
-  const [year, setYear]   = useState(now.getFullYear());
+  const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
 
   // Data loaded from the two API endpoints.
-  const [stories, setStories]  = useState<ScheduledStory[]>([]);
-  const [events, setEvents]    = useState<CalendarEvent[]>([]);
-  const [loading, setLoading]  = useState(true);
+  const [stories, setStories] = useState<ScheduledStory[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Modal state — `selected` being non-null means the modal is open.
   const [selected, setSelected] = useState<{
-    date: string;           // The clicked day's YYYY-MM-DD key
+    date: string; // The clicked day's YYYY-MM-DD key
     existing: CalendarEvent | null; // null = creating new; non-null = editing
   } | null>(null);
 
   // Controlled form fields inside the modal.
   const [formTitle, setFormTitle] = useState('');
-  const [formIcon, setFormIcon]   = useState(DEFAULT_EVENT_ICON_ID);
-  const [formNote, setFormNote]   = useState('');
-  const [formLink, setFormLink]   = useState('');
-  const [saving, setSaving]       = useState(false);
-  const [msg, setMsg]             = useState('');  // Inline error message
+  const [formIcon, setFormIcon] = useState(DEFAULT_EVENT_ICON_ID);
+  const [formNote, setFormNote] = useState('');
+  const [formLink, setFormLink] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(''); // Inline error message
 
   // ── Data fetch on mount ───────────────────────────────────────────────────
   // We only need to fetch once when the component mounts; the calendar shows all
@@ -130,25 +140,31 @@ export default function AdminCalendarPage() {
     // Promise.all fetches both endpoints simultaneously, cutting total load time
     // to max(storiesLatency, eventsLatency) rather than their sum.
     Promise.all([
-      fetch('/api/admin/calendar').then(r => r.json()),
-      fetch('/api/admin/calendar/events').then(r => r.json()),
-    ]).then(([storiesData, eventsData]) => {
-      // Guard against the API returning an error object instead of an array.
-      setStories(storiesData.stories ?? []);
-      setEvents(Array.isArray(eventsData) ? eventsData : []);
-    }).finally(() => setLoading(false)); // Always clear the loading spinner
+      fetch('/api/admin/calendar').then((r) => r.json()),
+      fetch('/api/admin/calendar/events').then((r) => r.json()),
+    ])
+      .then(([storiesData, eventsData]) => {
+        // Guard against the API returning an error object instead of an array.
+        setStories(storiesData.stories ?? []);
+        setEvents(Array.isArray(eventsData) ? eventsData : []);
+      })
+      .finally(() => setLoading(false)); // Always clear the loading spinner
   }, []); // Empty dep array → runs once after first render, not on re-renders
 
   // ── Month navigation helpers ──────────────────────────────────────────────
   // When decrementing past January (month 0), we roll back to December and
   // decrement the year. Vice-versa for nextMonth.
   const prevMonth = () => {
-    if (month === 0) { setMonth(11); setYear(y => y - 1); }
-    else setMonth(m => m - 1);
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else setMonth((m) => m - 1);
   };
   const nextMonth = () => {
-    if (month === 11) { setMonth(0); setYear(y => y + 1); }
-    else setMonth(m => m + 1);
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else setMonth((m) => m + 1);
   };
 
   // Build the flat array of cells for the current month/year.
@@ -186,11 +202,17 @@ export default function AdminCalendarPage() {
     setMsg('');
   };
 
-  const closeModal = () => { setSelected(null); setMsg(''); };
+  const closeModal = () => {
+    setSelected(null);
+    setMsg('');
+  };
 
   // ── Save event (create or update) ─────────────────────────────────────────
   const saveEvent = async () => {
-    if (!formTitle.trim()) { setMsg('Title is required.'); return; }
+    if (!formTitle.trim()) {
+      setMsg('Title is required.');
+      return;
+    }
 
     setSaving(true);
     setMsg('');
@@ -216,15 +238,18 @@ export default function AdminCalendarPage() {
 
     setSaving(false);
 
-    if (!res.ok) { setMsg('Failed to save.'); return; }
+    if (!res.ok) {
+      setMsg('Failed to save.');
+      return;
+    }
 
     // Parse the saved event returned by the API (includes the DB-assigned id).
     const saved: CalendarEvent = await res.json();
 
     // Optimistic update: replace any existing event with the same id, or append
     // if it's new. This avoids a full refetch and keeps the UI in sync instantly.
-    setEvents(prev => {
-      const filtered = prev.filter(e => e.id !== saved.id);
+    setEvents((prev) => {
+      const filtered = prev.filter((e) => e.id !== saved.id);
       return [...filtered, saved];
     });
 
@@ -242,15 +267,15 @@ export default function AdminCalendarPage() {
     await fetch(`/api/admin/calendar/events/${selected.existing.id}`, { method: 'DELETE' });
 
     // Remove the deleted event from local state immediately.
-    setEvents(prev => prev.filter(e => e.id !== selected.existing!.id));
+    setEvents((prev) => prev.filter((e) => e.id !== selected.existing!.id));
     setSaving(false);
     closeModal();
   };
 
   // Snapshot today's date for highlighting the current day in the grid.
-  const today      = now.getDate();
+  const today = now.getDate();
   const todayMonth = now.getMonth();
-  const todayYear  = now.getFullYear();
+  const todayYear = now.getFullYear();
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -262,8 +287,11 @@ export default function AdminCalendarPage() {
 
       {/* ── Month navigation ── */}
       <div className="flex items-center gap-4 mb-6">
-        <button type="button" onClick={prevMonth}
-          className="px-3 py-1.5 text-sm rounded-lg border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition">
+        <button
+          type="button"
+          onClick={prevMonth}
+          className="px-3 py-1.5 text-sm rounded-lg border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition"
+        >
           ← Prev
         </button>
         {/* `min-w-[160px] text-center` prevents the heading from jumping width
@@ -271,14 +299,22 @@ export default function AdminCalendarPage() {
         <h2 className="text-lg font-bold text-white min-w-[160px] text-center">
           {MONTHS[month]} {year}
         </h2>
-        <button type="button" onClick={nextMonth}
-          className="px-3 py-1.5 text-sm rounded-lg border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition">
+        <button
+          type="button"
+          onClick={nextMonth}
+          className="px-3 py-1.5 text-sm rounded-lg border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition"
+        >
           Next →
         </button>
         {/* "Today" button jumps directly back to the current month/year */}
-        <button type="button"
-          onClick={() => { setMonth(now.getMonth()); setYear(now.getFullYear()); }}
-          className="ml-auto text-xs text-gray-500 hover:text-white transition border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg">
+        <button
+          type="button"
+          onClick={() => {
+            setMonth(now.getMonth());
+            setYear(now.getFullYear());
+          }}
+          className="ml-auto text-xs text-gray-500 hover:text-white transition border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg"
+        >
           Today
         </button>
       </div>
@@ -291,8 +327,11 @@ export default function AdminCalendarPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           {/* Day-of-week column headers */}
           <div className="grid grid-cols-7 border-b border-gray-800">
-            {DAYS.map(d => (
-              <div key={d} className="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {DAYS.map((d) => (
+              <div
+                key={d}
+                className="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+              >
                 {d}
               </div>
             ))}
@@ -307,7 +346,7 @@ export default function AdminCalendarPage() {
               const dateKey = day ? toDateKey(year, month, day) : null;
               // Look up pre-indexed data for this day.
               const dayStories = dateKey ? (storiesByDay.get(dateKey) ?? []) : [];
-              const dayEvents  = dateKey ? (eventsByDay.get(dateKey) ?? []) : [];
+              const dayEvents = dateKey ? (eventsByDay.get(dateKey) ?? []) : [];
 
               return (
                 <div
@@ -321,17 +360,21 @@ export default function AdminCalendarPage() {
                   {day && (
                     <>
                       {/* Day number — red filled circle when today, plain text otherwise */}
-                      <span className={`inline-flex w-6 h-6 items-center justify-center rounded-full text-xs font-bold mb-1 ${
-                        isToday ? 'bg-red-600 text-white' : 'text-gray-500'
-                      }`}>
+                      <span
+                        className={`inline-flex w-6 h-6 items-center justify-center rounded-full text-xs font-bold mb-1 ${
+                          isToday ? 'bg-red-600 text-white' : 'text-gray-500'
+                        }`}
+                      >
                         {day}
                       </span>
 
                       <div className="space-y-1">
                         {/* Custom homepage calendar events (purple) */}
-                        {dayEvents.map(e => (
-                          <div key={e.id}
-                            className="flex items-center gap-1 text-[10px] leading-tight px-1.5 py-0.5 rounded bg-purple-600/20 border border-purple-600/30 text-purple-300 truncate">
+                        {dayEvents.map((e) => (
+                          <div
+                            key={e.id}
+                            className="flex items-center gap-1 text-[10px] leading-tight px-1.5 py-0.5 rounded bg-purple-600/20 border border-purple-600/30 text-purple-300 truncate"
+                          >
                             <span>{e.icon}</span>
                             <span className="truncate">{e.title}</span>
                           </div>
@@ -340,10 +383,14 @@ export default function AdminCalendarPage() {
                         {/* Scheduled stories (red) — clicking navigates to /admin/stories,
                             e.stopPropagation() prevents the day-cell click from also
                             opening the event-creation modal simultaneously. */}
-                        {dayStories.map(s => (
-                          <Link key={s.id} href="/admin/stories" title={s.title}
-                            onClick={e => e.stopPropagation()}
-                            className="block text-[10px] leading-tight px-1.5 py-0.5 rounded bg-red-600/20 border border-red-600/30 text-red-300 hover:bg-red-600/30 transition truncate">
+                        {dayStories.map((s) => (
+                          <Link
+                            key={s.id}
+                            href="/admin/stories"
+                            title={s.title}
+                            onClick={(e) => e.stopPropagation()}
+                            className="block text-[10px] leading-tight px-1.5 py-0.5 rounded bg-red-600/20 border border-red-600/30 text-red-300 hover:bg-red-600/30 transition truncate"
+                          >
                             {s.title}
                           </Link>
                         ))}
@@ -392,7 +439,7 @@ export default function AdminCalendarPage() {
         >
           <div
             className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
             <div className="flex items-center justify-between mb-5">
@@ -405,7 +452,12 @@ export default function AdminCalendarPage() {
                   {selected.date} · shows on homepage calendar
                 </p>
               </div>
-              <button onClick={closeModal} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-white text-xl leading-none"
+              >
+                ×
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -415,13 +467,17 @@ export default function AdminCalendarPage() {
                 <div className="flex flex-wrap gap-2">
                   {EVENT_ICON_OPTIONS.map(({ id, icon: Icon, label }) => (
                     // Highlight the selected icon with a purple border/background
-                    <button key={id} type="button" onClick={() => setFormIcon(id)}
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setFormIcon(id)}
                       title={label}
                       className={`w-9 h-9 rounded-lg border transition flex items-center justify-center ${
                         formIcon === id
                           ? 'border-purple-500 bg-purple-900/40 text-purple-300'
                           : 'border-gray-700 hover:border-gray-500 text-gray-400'
-                      }`}>
+                      }`}
+                    >
                       <Icon className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
                       <span className="sr-only">{label}</span>
                     </button>
@@ -436,7 +492,7 @@ export default function AdminCalendarPage() {
                 </label>
                 <input
                   value={formTitle}
-                  onChange={e => setFormTitle(e.target.value)}
+                  onChange={(e) => setFormTitle(e.target.value)}
                   maxLength={80}
                   placeholder="e.g. Halloween Reading Marathon"
                   className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
@@ -450,7 +506,7 @@ export default function AdminCalendarPage() {
                 </label>
                 <textarea
                   value={formNote}
-                  onChange={e => setFormNote(e.target.value)}
+                  onChange={(e) => setFormNote(e.target.value)}
                   rows={2}
                   maxLength={200}
                   placeholder="Short description shown on hover"
@@ -465,7 +521,7 @@ export default function AdminCalendarPage() {
                 </label>
                 <input
                   value={formLink}
-                  onChange={e => setFormLink(e.target.value)}
+                  onChange={(e) => setFormLink(e.target.value)}
                   placeholder="e.g. /story/halloween-special"
                   className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
                 />
@@ -477,20 +533,29 @@ export default function AdminCalendarPage() {
               {/* ── Action buttons ── */}
               <div className="flex gap-3 pt-1">
                 {/* Primary save/create button — disabled while the request is in-flight */}
-                <button onClick={saveEvent} disabled={saving}
-                  className="flex-1 py-2.5 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition">
+                <button
+                  onClick={saveEvent}
+                  disabled={saving}
+                  className="flex-1 py-2.5 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition"
+                >
                   {saving ? 'Saving…' : selected.existing ? 'Save Changes' : 'Add to Calendar'}
                 </button>
 
                 {/* Delete button — only shown when editing an existing event */}
                 {selected.existing && (
-                  <button onClick={deleteEvent} disabled={saving}
-                    className="px-4 py-2.5 bg-red-900/40 hover:bg-red-900/60 text-red-400 text-sm rounded-xl transition border border-red-800/40">
+                  <button
+                    onClick={deleteEvent}
+                    disabled={saving}
+                    className="px-4 py-2.5 bg-red-900/40 hover:bg-red-900/60 text-red-400 text-sm rounded-xl transition border border-red-800/40"
+                  >
                     Delete
                   </button>
                 )}
 
-                <button onClick={closeModal} className="px-4 py-2.5 text-gray-400 hover:text-white text-sm transition">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2.5 text-gray-400 hover:text-white text-sm transition"
+                >
                   Cancel
                 </button>
               </div>

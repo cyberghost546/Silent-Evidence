@@ -33,7 +33,6 @@ import { updateWritingStreak } from '@/lib/streaks';
 // This is the main function Next.js will call when a GET request hits this URL.
 // req is the raw incoming HTTP Request object
 export async function GET(req: Request) {
-
   // Read the "Authorization" header from the request.
   // If no header was sent, fall back to an empty string so the comparison below
   // doesn't crash with a null reference error.
@@ -82,7 +81,7 @@ export async function GET(req: Request) {
   // instead of one at a time, which is much faster for large batches.
   await Promise.all(
     // .map() turns each story object into a Prisma update promise
-    due.map(s =>
+    due.map((s) =>
       prisma.story.update({
         // Target this specific story by its unique id
         where: { id: s.id },
@@ -95,7 +94,7 @@ export async function GET(req: Request) {
   // Build a deduplicated list of author IDs so we don't run the badge/streak
   // checks twice for the same author if they had multiple stories publishing now.
   // new Set() removes duplicates, then [...] spreads it back into a plain array.
-  const authorIds = [...new Set(due.map(s => s.authorId))];
+  const authorIds = [...new Set(due.map((s) => s.authorId))];
 
   // Loop over each unique author and trigger their post-publish side effects.
   // .catch(() => {}) means "fire and forget" — if these helpers throw an error
@@ -109,5 +108,5 @@ export async function GET(req: Request) {
 
   // Return a success response with how many stories were published
   // and an array of their IDs (useful for logging in the cron service dashboard)
-  return NextResponse.json({ published: due.length, ids: due.map(s => s.id) });
+  return NextResponse.json({ published: due.length, ids: due.map((s) => s.id) });
 }

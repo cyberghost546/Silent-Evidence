@@ -17,7 +17,11 @@ type Props = {
 };
 
 export default function AuthorSubscribeButton({
-  plan, cta, highlight, isLoggedIn, isAuthorPro,
+  plan,
+  cta,
+  highlight,
+  isLoggedIn,
+  isAuthorPro,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,16 +83,29 @@ export default function AuthorSubscribeButton({
           w-full py-2.5 rounded-xl text-sm font-bold
           disabled:opacity-60 disabled:cursor-not-allowed
           transition flex items-center justify-center gap-2
-          ${highlight
-            ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-gray-900 hover:from-amber-300 hover:to-orange-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
-            : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
+          ${
+            highlight
+              ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-gray-900 hover:from-amber-300 hover:to-orange-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
+              : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
           }
         `}
       >
         {loading ? (
           <>
-            <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <svg
+              className="w-4 h-4 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
             </svg>
             Redirecting…

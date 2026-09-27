@@ -14,14 +14,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-type AgeGroup      = 'UNDER_13' | 'TEEN' | 'ADULT' | null;
+type AgeGroup = 'UNDER_13' | 'TEEN' | 'ADULT' | null;
 type ContentRating = 'ALL' | 'TEEN' | 'MATURE';
 
 type Props = {
-  contentRating: ContentRating;  // rating assigned to this story
-  ageGroup:      AgeGroup;       // viewer's age group from their account (null = guest)
-  warnings:      string[];       // legacy content warning tags (used for the guest gate)
-  children:      React.ReactNode;
+  contentRating: ContentRating; // rating assigned to this story
+  ageGroup: AgeGroup; // viewer's age group from their account (null = guest)
+  warnings: string[]; // legacy content warning tags (used for the guest gate)
+  children: React.ReactNode;
 };
 
 // Legacy: warnings that trigger the guest confirmation gate
@@ -29,20 +29,23 @@ const GATED_WARNINGS = ['Gore', 'Sexual Content', 'Torture', 'Self-harm', 'Suici
 
 // Whether this viewer's ageGroup can access this content rating
 function canAccess(ageGroup: AgeGroup, rating: ContentRating): boolean {
-  if (rating === 'ALL')    return true;                        // anyone can read ALL
-  if (rating === 'TEEN')   return ageGroup !== 'UNDER_13';    // TEEN+ can read TEEN
+  if (rating === 'ALL') return true; // anyone can read ALL
+  if (rating === 'TEEN') return ageGroup !== 'UNDER_13'; // TEEN+ can read TEEN
   if (rating === 'MATURE') return ageGroup === 'ADULT' || ageGroup === null; // ADULT or guest
   return true;
 }
 
 export default function AgeGate({ contentRating, ageGroup, warnings, children }: Props) {
   const [guestAllowed, setGuestAllowed] = useState(false);
-  const [checked,      setChecked]      = useState(false);
+  const [checked, setChecked] = useState(false);
 
   // For guests on MATURE content: check if they've already confirmed this session
   useEffect(() => {
-    if (ageGroup !== null) { setChecked(true); return; }  // logged-in: no session check needed
-    if (contentRating !== 'MATURE' && !warnings.some(w => GATED_WARNINGS.includes(w))) {
+    if (ageGroup !== null) {
+      setChecked(true);
+      return;
+    } // logged-in: no session check needed
+    if (contentRating !== 'MATURE' && !warnings.some((w) => GATED_WARNINGS.includes(w))) {
       setGuestAllowed(true);
     } else if (sessionStorage.getItem('se_age_confirmed') === '1') {
       setGuestAllowed(true);
@@ -60,8 +63,8 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
           <h2 className="text-xl font-bold text-white mb-2">Content Not Available</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
             This story is rated{' '}
-            <span className="font-semibold text-yellow-400">{contentRating}</span> and
-            isn&apos;t available for your age group.
+            <span className="font-semibold text-yellow-400">{contentRating}</span> and isn&apos;t
+            available for your age group.
           </p>
           <p className="text-xs text-gray-500 mb-6">
             Ask a parent or guardian if you have questions about your account settings.
@@ -84,17 +87,17 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
         <div className="max-w-sm w-full bg-gray-900 border border-yellow-900/50 rounded-2xl p-8 text-center shadow-2xl">
           <h2 className="text-xl font-bold text-white mb-2">18+ Content</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-            This story contains mature content for adults only.
-            You need to be 18 or older to read it.
+            This story contains mature content for adults only. You need to be 18 or older to read
+            it.
           </p>
           <p className="text-xs text-gray-500 mb-6">
             Your age group is set to{' '}
-            <span className="text-yellow-400 font-semibold">Teen (13–17)</span>.
-            If you&apos;re actually 18+,{' '}
+            <span className="text-yellow-400 font-semibold">Teen (13–17)</span>. If you&apos;re
+            actually 18+,{' '}
             <Link href="/verify-age" className="text-red-400 hover:text-red-300 underline">
               update your age
-            </Link>
-            {' '}in settings.
+            </Link>{' '}
+            in settings.
           </p>
           <Link
             href="/"
@@ -110,7 +113,7 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
   // ── Guest gate for MATURE content (or legacy gated warnings) ─────────────
   const needsGuestGate =
     ageGroup === null &&
-    (contentRating === 'MATURE' || warnings.some(w => GATED_WARNINGS.includes(w)));
+    (contentRating === 'MATURE' || warnings.some((w) => GATED_WARNINGS.includes(w)));
 
   if (needsGuestGate && !guestAllowed) {
     return (
@@ -119,10 +122,12 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
           <h2 className="text-xl font-bold text-white mb-2">Mature Content Warning</h2>
           <p className="text-sm text-gray-400 mb-4 leading-relaxed">
             This story is rated <span className="text-red-400 font-semibold">Mature (18+)</span>
-            {warnings.some(w => GATED_WARNINGS.includes(w)) && (
-              <> and contains:{' '}
+            {warnings.some((w) => GATED_WARNINGS.includes(w)) && (
+              <>
+                {' '}
+                and contains:{' '}
                 <span className="text-red-400 font-medium">
-                  {warnings.filter(w => GATED_WARNINGS.includes(w)).join(', ')}
+                  {warnings.filter((w) => GATED_WARNINGS.includes(w)).join(', ')}
                 </span>
               </>
             )}
@@ -151,8 +156,8 @@ export default function AgeGate({ contentRating, ageGroup, warnings, children }:
           <p className="text-xs text-gray-600 mt-4">
             <Link href="/register" className="text-red-500 hover:text-red-400 underline">
               Create an account
-            </Link>
-            {' '}to manage your age settings permanently.
+            </Link>{' '}
+            to manage your age settings permanently.
           </p>
         </div>
       </div>

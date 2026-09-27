@@ -36,10 +36,10 @@ export async function GET(_req: Request, { params }: Ctx) {
     });
 
     return NextResponse.json({
-      goalAmount:      story.tipGoalAmount,
-      goalTitle:       story.tipGoalTitle,
+      goalAmount: story.tipGoalAmount,
+      goalTitle: story.tipGoalTitle,
       goalDescription: story.tipGoalDescription,
-      totalTipsCents:  totalTips._sum.amount ?? 0,
+      totalTipsCents: totalTips._sum.amount ?? 0,
     });
   } catch (err) {
     console.error('[tip-goal GET]', err);
@@ -49,8 +49,8 @@ export async function GET(_req: Request, { params }: Ctx) {
 
 // Zod schema for setting a tip goal
 const TipGoalSchema = z.object({
-  goalAmount:      z.number().int().min(100, 'Minimum goal is $1.00').max(1000000),
-  goalTitle:       z.string().min(1).max(100),
+  goalAmount: z.number().int().min(100, 'Minimum goal is $1.00').max(1000000),
+  goalTitle: z.string().min(1).max(100),
   goalDescription: z.string().max(500).optional(),
 });
 
@@ -65,7 +65,10 @@ export async function PATCH(req: Request, { params }: Ctx) {
 
   try {
     // Verify the requester owns this story
-    const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true } });
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      select: { authorId: true },
+    });
     if (!story) return notFound();
     if (story.authorId !== userId) return forbidden();
 
@@ -78,8 +81,8 @@ export async function PATCH(req: Request, { params }: Ctx) {
     await prisma.story.update({
       where: { id: storyId },
       data: {
-        tipGoalAmount:      goalAmount,
-        tipGoalTitle:       goalTitle,
+        tipGoalAmount: goalAmount,
+        tipGoalTitle: goalTitle,
         tipGoalDescription: goalDescription ?? null,
       },
     });
@@ -101,7 +104,10 @@ export async function DELETE(_req: Request, { params }: Ctx) {
   if (!userId) return unauthorized();
 
   try {
-    const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true } });
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      select: { authorId: true },
+    });
     if (!story) return notFound();
     if (story.authorId !== userId) return forbidden();
 

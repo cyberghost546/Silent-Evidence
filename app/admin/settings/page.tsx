@@ -34,15 +34,44 @@ type Flag = { key: string; label: string; desc: string; danger?: boolean };
 // The full list of configurable site flags.
 // To add a new feature flag: add a row here + handle `key` in the API route.
 const FLAGS: Flag[] = [
-  { key: 'registration_open',       label: 'User Registration',        desc: 'Allow new users to create accounts' },
-  { key: 'story_submissions_open',  label: 'Story Submissions',         desc: 'Allow authors to submit new stories' },
-  { key: 'comments_enabled',        label: 'Comments',                  desc: 'Allow readers to post comments on stories' },
-  { key: 'challenge_entries_open',  label: 'Challenge Entries',         desc: 'Allow users to enter writing challenges' },
-  { key: 'tipping_enabled',         label: 'Tipping',                   desc: 'Allow readers to tip authors' },
-  { key: 'ai_generation_enabled',   label: 'AI Story Generation',       desc: 'Allow admins to generate stories with AI' },
-  { key: 'premium_gating',          label: 'Premium Gating',            desc: 'Enforce premium paywall on premium-only stories' },
-  { key: 'reading_limit_enabled',   label: 'Free Reading Limit',        desc: 'Enforce the monthly free story reading cap' },
-  { key: 'maintenance_mode',        label: 'Maintenance Mode',          desc: 'Show maintenance banner across the site', danger: true },
+  {
+    key: 'registration_open',
+    label: 'User Registration',
+    desc: 'Allow new users to create accounts',
+  },
+  {
+    key: 'story_submissions_open',
+    label: 'Story Submissions',
+    desc: 'Allow authors to submit new stories',
+  },
+  { key: 'comments_enabled', label: 'Comments', desc: 'Allow readers to post comments on stories' },
+  {
+    key: 'challenge_entries_open',
+    label: 'Challenge Entries',
+    desc: 'Allow users to enter writing challenges',
+  },
+  { key: 'tipping_enabled', label: 'Tipping', desc: 'Allow readers to tip authors' },
+  {
+    key: 'ai_generation_enabled',
+    label: 'AI Story Generation',
+    desc: 'Allow admins to generate stories with AI',
+  },
+  {
+    key: 'premium_gating',
+    label: 'Premium Gating',
+    desc: 'Enforce premium paywall on premium-only stories',
+  },
+  {
+    key: 'reading_limit_enabled',
+    label: 'Free Reading Limit',
+    desc: 'Enforce the monthly free story reading cap',
+  },
+  {
+    key: 'maintenance_mode',
+    label: 'Maintenance Mode',
+    desc: 'Show maintenance banner across the site',
+    danger: true,
+  },
 ];
 
 export default function AdminSettingsPage() {
@@ -65,8 +94,8 @@ export default function AdminSettingsPage() {
   // react-hooks/set-state-in-effect linter rule.
   useEffect(() => {
     fetch('/api/admin/settings')
-      .then(r => r.json())
-      .then(d => setSettings(d.settings ?? {}))
+      .then((r) => r.json())
+      .then((d) => setSettings(d.settings ?? {}))
       .finally(() => setLoading(false));
   }, []); // empty array — run once when the component mounts
 
@@ -79,7 +108,7 @@ export default function AdminSettingsPage() {
     const newVal = !settings[key];
     setSaving(key);
     // Update local state immediately — the toggle responds at once
-    setSettings(prev => ({ ...prev, [key]: newVal }));
+    setSettings((prev) => ({ ...prev, [key]: newVal }));
     await fetch('/api/admin/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -91,12 +120,14 @@ export default function AdminSettingsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Site Settings</h1>
-      <p className="text-gray-500 text-sm mb-6">Toggle features on or off instantly — changes take effect on the next request.</p>
+      <p className="text-gray-500 text-sm mb-6">
+        Toggle features on or off instantly — changes take effect on the next request.
+      </p>
 
       {/* ── Feature flag rows ─────────────────────────────────────────────
           `space-y-3` adds vertical gap between rows without individual margins. */}
       <div className="space-y-3">
-        {FLAGS.map(flag => {
+        {FLAGS.map((flag) => {
           // Default to true when a flag has no DB row yet — "if not explicitly
           // disabled, the feature is on" is the safer default for most flags.
           const on = settings[flag.key] ?? true;
@@ -112,7 +143,9 @@ export default function AdminSettingsPage() {
                   <p className="font-semibold text-white text-sm">{flag.label}</p>
                   {/* Warning pill — only shown for danger flags when they're active */}
                   {flag.danger && on && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-600/20 border border-red-600/40 text-red-400">Active</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-600/20 border border-red-600/40 text-red-400">
+                      Active
+                    </span>
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">{flag.desc}</p>
@@ -133,7 +166,9 @@ export default function AdminSettingsPage() {
                 className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none disabled:opacity-50 ${on ? (flag.danger ? 'bg-red-600' : 'bg-green-600') : 'bg-gray-700'}`}
               >
                 {/* Thumb: white circle that slides along the pill track */}
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${on ? 'translate-x-6' : 'translate-x-0'}`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${on ? 'translate-x-6' : 'translate-x-0'}`}
+                />
               </button>
             </div>
           );

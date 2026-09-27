@@ -43,20 +43,20 @@ type Story = {
   id: number;
   slug: string;
   title: string;
-  excerpt: string | null;    // optional short teaser below the title
+  excerpt: string | null; // optional short teaser below the title
   coverImage: string | null; // URL to the cover image, or null for the placeholder
-  content: string;           // full Markdown body — used only for readingTime()
-  createdAt: string;         // ISO string (was a Date on the server)
+  content: string; // full Markdown body — used only for readingTime()
+  createdAt: string; // ISO string (was a Date on the server)
   views: number;
-  author:   { username: string };
+  author: { username: string };
   category: { name: string; slug: string };
-  _count:   { likes: number; comments: number };
-  mood?: string | null;      // optional mood tag (e.g. 'DARK', 'CREEPY')
+  _count: { likes: number; comments: number };
+  mood?: string | null; // optional mood tag (e.g. 'DARK', 'CREEPY')
 };
 
 type Props = {
-  initialStories: Story[];  // first page of stories — server-rendered, no loading flash
-  readIds: number[];        // story IDs the logged-in user has already read ([] for guests)
+  initialStories: Story[]; // first page of stories — server-rendered, no loading flash
+  readIds: number[]; // story IDs the logged-in user has already read ([] for guests)
 };
 
 // PAGE_SIZE must match the `take` parameter used in the server component
@@ -64,7 +64,6 @@ type Props = {
 const PAGE_SIZE = 6;
 
 export default function LatestStoriesSection({ initialStories, readIds }: Props) {
-
   // ── State ─────────────────────────────────────────────────────────────────
 
   // The currently active mood filter (empty string = "All" / no filter).
@@ -116,9 +115,9 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
       const res = await fetch(`/api/stories${qs}`);
       if (res.ok) {
         const data = await res.json();
-        setStories(data);                          // replace the grid entirely
-        setHasMore(data.length === PAGE_SIZE);     // infer if more pages exist
-        skipRef.current = data.length;             // next load starts from here
+        setStories(data); // replace the grid entirely
+        setHasMore(data.length === PAGE_SIZE); // infer if more pages exist
+        skipRef.current = data.length; // next load starts from here
       }
     } catch {
       // Keep existing stories on network error — better to show stale data
@@ -144,9 +143,9 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
       if (res.ok) {
         const data = await res.json();
         // Append to existing list (don't replace).
-        setStories(prev => [...prev, ...data]);
+        setStories((prev) => [...prev, ...data]);
         setHasMore(data.length === PAGE_SIZE); // false if last page was partial
-        skipRef.current += data.length;        // advance the offset
+        skipRef.current += data.length; // advance the offset
       }
     } catch {
       // Fail silently — the user can scroll back up and down to retry.
@@ -190,7 +189,6 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <section>
-
       {/* ── Section header + mood filter row ─────────────────────────────── */}
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex items-center justify-between">
@@ -266,7 +264,6 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
             >
               {/* ── Cover image area ────────────────────────────────────── */}
               <div className="h-44 overflow-hidden relative">
-
                 {/* "✓ Read" badge — only shown for stories in the readSet.
                     readSet is derived from the readIds prop (server-fetched).
                     backdrop-blur-sm blurs whatever's behind the badge for legibility. */}
@@ -288,7 +285,9 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
                     alt={story.title}
                     loading="lazy"
                     decoding="async"
-                    onLoad={e => (e.currentTarget as HTMLImageElement).classList.add('img-loaded')}
+                    onLoad={(e) =>
+                      (e.currentTarget as HTMLImageElement).classList.add('img-loaded')
+                    }
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 img-lazy"
                   />
                 ) : (
@@ -303,7 +302,11 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
                       stroke="currentColor"
                       strokeWidth={1}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
                     </svg>
                   </div>
                 )}
@@ -322,7 +325,6 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
               {/* flex flex-col gap-2 flex-1 — body expands to fill remaining card
                   height, keeping the metadata row always at the card bottom. */}
               <div className="p-4 flex flex-col gap-2 flex-1">
-
                 {/* Story title — clamp to 2 lines to keep card heights consistent */}
                 <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition-colors leading-snug line-clamp-2">
                   {story.title}
@@ -361,7 +363,11 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
                       stroke="currentColor"
                       strokeWidth={2}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0z"
+                      />
                     </svg>
                     {story._count.likes}
                   </span>
@@ -375,7 +381,11 @@ export default function LatestStoriesSection({ initialStories, readIds }: Props)
                       stroke="currentColor"
                       strokeWidth={2}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
                     {story._count.comments}
                   </span>

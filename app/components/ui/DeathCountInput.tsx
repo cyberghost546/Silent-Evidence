@@ -50,15 +50,12 @@ export default function DeathCountInput({ value, onChange }: Props) {
         <span
           className="text-xl drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]"
           aria-hidden="true"
-        >
-        </span>
+        ></span>
         Body Count
       </label>
 
       {/* Helper text shown below the label */}
-      <p className="text-xs text-gray-500 -mt-0.5">
-        How many characters die in this story?
-      </p>
+      <p className="text-xs text-gray-500 -mt-0.5">How many characters die in this story?</p>
 
       {/* Number input — dark red accent border, red focus ring */}
       <div className="relative">
@@ -66,8 +63,7 @@ export default function DeathCountInput({ value, onChange }: Props) {
         <span
           className="absolute right-3 top-1/2 -translate-y-1/2 text-red-900/60 text-lg pointer-events-none select-none"
           aria-hidden="true"
-        >
-        </span>
+        ></span>
 
         <input
           type="number"

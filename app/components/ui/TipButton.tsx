@@ -9,8 +9,8 @@ import { useState } from 'react';
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type Props = {
-  toUserId: number;      // The author receiving the tip
-  toUsername: string;    // Shown in the modal title
+  toUserId: number; // The author receiving the tip
+  toUsername: string; // Shown in the modal title
   fromUserId: number | null; // null when the visitor is not logged in
 };
 
@@ -54,7 +54,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
           // converted them — it does not, so every tip was rejected by the
           // server's `amount < 100` minimum check.
           amount: selectedAmount * 100,
-          message: message.trim(),  // Empty string is fine — message is optional
+          message: message.trim(), // Empty string is fine — message is optional
         }),
       });
 
@@ -89,7 +89,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
           shadow-[0_0_10px_rgba(16,185,129,0.3)]
         "
       >
-         Send a Tip
+        Send a Tip
       </button>
 
       {/* ── Modal backdrop + panel ───────────────────────────────────────── */}
@@ -103,7 +103,6 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
           }}
         >
           <div className="relative w-full max-w-sm mx-4 bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl">
-
             {/* Close button — top-right corner */}
             <button
               onClick={() => setOpen(false)}
@@ -115,12 +114,9 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
 
             {/* Title */}
             <h2 className="text-lg font-bold text-white mb-1">
-              Support{' '}
-              <span className="text-red-400">@{toUsername}</span>&apos;s writing
+              Support <span className="text-red-400">@{toUsername}</span>&apos;s writing
             </h2>
-            <p className="text-xs text-gray-500 mb-5">
-              Tips go directly to the author.
-            </p>
+            <p className="text-xs text-gray-500 mb-5">Tips go directly to the author.</p>
 
             {/* ── Not logged in guard ─────────────────────────────────── */}
             {fromUserId === null ? (
@@ -143,11 +139,12 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
                       onClick={() => setSelectedAmount(amount)}
                       className={`
                         py-2 rounded-lg text-sm font-bold border transition
-                        ${selectedAmount === amount
-                          /* Highlighted: solid red — clearly selected */
-                          ? 'bg-red-600 border-red-500 text-white shadow-[0_0_8px_rgba(220,38,38,0.5)]'
-                          /* Inactive: dark ghost button */
-                          : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-red-500/50 hover:text-white'
+                        ${
+                          selectedAmount === amount
+                            ? /* Highlighted: solid red — clearly selected */
+                              'bg-red-600 border-red-500 text-white shadow-[0_0_8px_rgba(220,38,38,0.5)]'
+                            : /* Inactive: dark ghost button */
+                              'bg-gray-800 border-gray-700 text-gray-300 hover:border-red-500/50 hover:text-white'
                         }
                       `}
                     >
@@ -172,9 +169,7 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
                 />
 
                 {/* ── Error message ────────────────────────────────────── */}
-                {error && (
-                  <p className="text-red-400 text-xs mb-3">{error}</p>
-                )}
+                {error && <p className="text-red-400 text-xs mb-3">{error}</p>}
 
                 {/* ── Submit button ────────────────────────────────────── */}
                 <button
@@ -193,10 +188,22 @@ export default function TipButton({ toUserId, toUsername, fromUserId }: Props) {
                       <svg
                         className="w-4 h-4 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 24 24"
+                        fill="none"
+                        viewBox="0 0 24 24"
                       >
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        />
                       </svg>
                       Redirecting…
                     </>

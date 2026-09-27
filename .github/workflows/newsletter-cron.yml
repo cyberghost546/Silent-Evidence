@@ -1,0 +1,50 @@
+# .github/workflows/newsletter-cron.yml
+#
+# Triggers the weekly newsletter by calling the app's cron endpoint.
+#
+# WHY THIS EXISTS
+#   The Vercel Hobby plan allows only 2 cron jobs (used by publish-scheduled and
+#   data-retention in vercel.json). GitHub Actions scheduled workflows are free
+#   and unlimited, so the weekly newsletter runs from here instead. The endpoint
+#   is the same one Vercel Cron would hit; it is protected by CRON_SECRET.
+#
+# SETUP (one time) — add two repository secrets under
+# Settings → Secrets and variables → Actions:
+#   CRON_SECRET  — the same value as the app's CRON_SECRET env var on Vercel.
+#   SITE_URL     — the deployed base URL, e.g. https://silent-evidence.vercel.app
+#
+# If either secret is missing the job exits early with a clear message rather
+# than sending an unauthenticated request.
+
+name: Weekly newsletter
+
+on:
+  schedule:
+    # 09:00 UTC every Monday — the same time the Vercel cron used to run.
+    - cron: '0 9 * * 1'
+  # Allow running it by hand from the Actions tab for testing.
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger newsletter endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$SITE_URL" ]; then
+            echo "::error::CRON_SECRET and SITE_URL repository secrets must be set."
+            exit 1
+          fi
+          # Fail the job on any non-2xx response so a broken newsletter is visible.
+          code=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${SITE_URL%/}/api/cron/newsletter")
+          echo "HTTP $code"
+          cat /tmp/out.txt
+          case "$code" in
+            2*) echo "Newsletter triggered." ;;
+            *)  echo "::error::Newsletter endpoint returned $code"; exit 1 ;;
+          esac

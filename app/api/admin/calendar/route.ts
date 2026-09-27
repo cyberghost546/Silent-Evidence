@@ -15,8 +15,11 @@ export async function GET() {
     where: { status: 'SCHEDULED', scheduledAt: { not: null } },
     orderBy: { scheduledAt: 'asc' },
     select: {
-      id: true, title: true, slug: true, scheduledAt: true,
-      author:   { select: { username: true } },
+      id: true,
+      title: true,
+      slug: true,
+      scheduledAt: true,
+      author: { select: { username: true } },
       category: { select: { name: true } },
     },
   });

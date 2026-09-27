@@ -42,19 +42,20 @@ type Props = {
 
 export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
   // UI state: collapsed panel, create/join mode, active room
-  const [open,      setOpen]      = useState(false);
-  const [mode,      setMode]      = useState<'idle' | 'create' | 'join'>('idle');
-  const [joinCode,  setJoinCode]  = useState('');
-  const [roomCode,  setRoomCode]  = useState<string | null>(null);
-  const [members,   setMembers]   = useState<Member[]>([]);
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<'idle' | 'create' | 'join'>('idle');
+  const [joinCode, setJoinCode] = useState('');
+  const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
   const [myProgress, setMyProgress] = useState(0);
-  const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // ── Create a new room ────────────────────────────────────────────────────
 
   const createRoom = async () => {
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     const res = await fetch('/api/reading-rooms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -73,7 +74,8 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
 
   const joinRoom = async () => {
     if (!joinCode.trim()) return;
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     const res = await fetch(`/api/reading-rooms/${joinCode.trim().toUpperCase()}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -114,7 +116,9 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
       setMembers(data.members);
     };
     channel.bind('room-update', handler);
-    return () => { channel.unbind('room-update', handler); };
+    return () => {
+      channel.unbind('room-update', handler);
+    };
   }, [channel]);
 
   // Poll for updates — reduced to 15s when Pusher is active (safety net),
@@ -141,7 +145,11 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
 
   // ── Leave room ───────────────────────────────────────────────────────────
 
-  const leaveRoom = () => { setRoomCode(null); setMembers([]); setMode('idle'); };
+  const leaveRoom = () => {
+    setRoomCode(null);
+    setMembers([]);
+    setMode('idle');
+  };
 
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -151,16 +159,17 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
     <div className="mt-6">
       {/* Toggle button */}
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-400 transition"
       >
-        {roomCode ? `Reading Room · ${members.length} member${members.length !== 1 ? 's' : ''}` : 'Reading Room'}
+        {roomCode
+          ? `Reading Room · ${members.length} member${members.length !== 1 ? 's' : ''}`
+          : 'Reading Room'}
         <span className="text-xs">{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
         <div className="mt-3 bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-[0_4px_20px_rgba(220,38,38,0.1)]">
-
           {/* ── Active room view ── */}
           {roomCode ? (
             <div className="space-y-4">
@@ -169,7 +178,9 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Room Code</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-extrabold text-white font-mono tracking-widest">{roomCode}</span>
+                    <span className="text-2xl font-extrabold text-white font-mono tracking-widest">
+                      {roomCode}
+                    </span>
                     <button
                       onClick={() => navigator.clipboard.writeText(roomCode)}
                       className="text-xs text-gray-500 hover:text-white border border-gray-700 rounded px-2 py-0.5 transition"
@@ -177,16 +188,23 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
                       Copy
                     </button>
                   </div>
-                  <p className="text-[10px] text-gray-600 mt-1">Share this code with friends to read together</p>
+                  <p className="text-[10px] text-gray-600 mt-1">
+                    Share this code with friends to read together
+                  </p>
                 </div>
-                <button onClick={leaveRoom} className="text-xs text-red-500 hover:text-red-400 transition">Leave</button>
+                <button
+                  onClick={leaveRoom}
+                  className="text-xs text-red-500 hover:text-red-400 transition"
+                >
+                  Leave
+                </button>
               </div>
 
               {/* Member list with progress bars */}
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Members</p>
                 <div className="space-y-2">
-                  {members.map(m => (
+                  {members.map((m) => (
                     <div key={m.userId}>
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="text-xs text-white font-medium">{m.username}</span>
@@ -204,36 +222,45 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
                 </div>
               </div>
             </div>
-
           ) : mode === 'idle' ? (
             /* ── Idle: create or join buttons ── */
             <div className="flex gap-3">
-              <button onClick={() => setMode('create')}
-                className="flex-1 py-2.5 bg-red-600/20 border border-red-600/40 text-red-300 hover:bg-red-600/30 text-sm font-semibold rounded-xl transition">
+              <button
+                onClick={() => setMode('create')}
+                className="flex-1 py-2.5 bg-red-600/20 border border-red-600/40 text-red-300 hover:bg-red-600/30 text-sm font-semibold rounded-xl transition"
+              >
                 + Create Room
               </button>
-              <button onClick={() => setMode('join')}
-                className="flex-1 py-2.5 bg-gray-800 border border-gray-700 text-gray-300 hover:border-gray-500 text-sm font-semibold rounded-xl transition">
+              <button
+                onClick={() => setMode('join')}
+                className="flex-1 py-2.5 bg-gray-800 border border-gray-700 text-gray-300 hover:border-gray-500 text-sm font-semibold rounded-xl transition"
+              >
                 Join Room
               </button>
             </div>
-
           ) : mode === 'create' ? (
             /* ── Create room confirmation ── */
             <div className="space-y-3">
-              <p className="text-sm text-gray-400">Create a new room and share the code with friends. Everyone reads together!</p>
+              <p className="text-sm text-gray-400">
+                Create a new room and share the code with friends. Everyone reads together!
+              </p>
               {error && <p className="text-xs text-red-400">{error}</p>}
               <div className="flex gap-2">
-                <button onClick={createRoom} disabled={loading}
-                  className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition">
+                <button
+                  onClick={createRoom}
+                  disabled={loading}
+                  className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition"
+                >
                   {loading ? 'Creating…' : 'Create Room'}
                 </button>
-                <button onClick={() => setMode('idle')} className="px-4 border border-gray-700 text-gray-400 rounded-xl text-sm hover:border-gray-500 transition">
+                <button
+                  onClick={() => setMode('idle')}
+                  className="px-4 border border-gray-700 text-gray-400 rounded-xl text-sm hover:border-gray-500 transition"
+                >
                   Cancel
                 </button>
               </div>
             </div>
-
           ) : (
             /* ── Join room by code ── */
             <div className="space-y-3">
@@ -242,17 +269,25 @@ export default function ReadingRoom({ storyId, isLoggedIn }: Props) {
               <div className="flex gap-2">
                 <input
                   value={joinCode}
-                  onChange={e => setJoinCode(e.target.value.toUpperCase())}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="ANIME7"
                   maxLength={6}
                   className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono tracking-widest text-center text-lg focus:outline-none focus:border-red-600/60 transition"
                 />
-                <button onClick={joinRoom} disabled={loading || joinCode.length < 6}
-                  className="px-5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition">
+                <button
+                  onClick={joinRoom}
+                  disabled={loading || joinCode.length < 6}
+                  className="px-5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition"
+                >
                   {loading ? '…' : 'Join'}
                 </button>
               </div>
-              <button onClick={() => setMode('idle')} className="text-xs text-gray-500 hover:text-white transition">← Back</button>
+              <button
+                onClick={() => setMode('idle')}
+                className="text-xs text-gray-500 hover:text-white transition"
+              >
+                ← Back
+              </button>
             </div>
           )}
         </div>

@@ -48,26 +48,27 @@ export default async function FeedPage() {
     select: { followingId: true },
   });
   // Extract just the IDs into a plain array so we can use them in the next query.
-  const followingIds = following.map(f => f.followingId);
+  const followingIds = following.map((f) => f.followingId);
 
   // Step 2: Fetch stories — only if the user actually follows someone.
   // Using a ternary: if followingIds is empty we skip the DB query and return [].
   // authorId: { in: followingIds } means "story must be written by one of these authors".
-  const stories = followingIds.length > 0
-    ? await prisma.story.findMany({
-        where: { status: 'PUBLISHED', authorId: { in: followingIds } },
-        orderBy: { createdAt: 'desc' },  // newest first
-        take: 20,                         // limit to 20 stories per page load
-        include: {
-          // We need the author's username and avatar for the card header
-          author: { select: { username: true, profile: { select: { avatar: true } } } },
-          // We need the category to show a label like "Supernatural"
-          category: { select: { name: true, slug: true } },
-          // _count gives us aggregate counts without loading every like/comment record
-          _count: { select: { likes: true, comments: true } },
-        },
-      })
-    : [];
+  const stories =
+    followingIds.length > 0
+      ? await prisma.story.findMany({
+          where: { status: 'PUBLISHED', authorId: { in: followingIds } },
+          orderBy: { createdAt: 'desc' }, // newest first
+          take: 20, // limit to 20 stories per page load
+          include: {
+            // We need the author's username and avatar for the card header
+            author: { select: { username: true, profile: { select: { avatar: true } } } },
+            // We need the category to show a label like "Supernatural"
+            category: { select: { name: true, slug: true } },
+            // _count gives us aggregate counts without loading every like/comment record
+            _count: { select: { likes: true, comments: true } },
+          },
+        })
+      : [];
 
   return (
     <main className="min-h-screen bg-gray-900 text-white">
@@ -87,8 +88,13 @@ export default async function FeedPage() {
           // Empty state — user doesn't follow anyone yet
           <div className="text-center py-20">
             <p className="text-gray-400 mb-2">You&apos;re not following anyone yet.</p>
-            <p className="text-gray-600 text-sm mb-6">Visit an author&apos;s profile and click Follow to see their stories here.</p>
-            <Link href="/search" className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition">
+            <p className="text-gray-600 text-sm mb-6">
+              Visit an author&apos;s profile and click Follow to see their stories here.
+            </p>
+            <Link
+              href="/search"
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition"
+            >
               Discover stories
             </Link>
           </div>
@@ -101,35 +107,59 @@ export default async function FeedPage() {
             {stories.map((story) => {
               // Fall back to a generated avatar if the author hasn't uploaded one.
               // ui-avatars.com generates an avatar image from initials — very handy!
-              const avatar = story.author.profile?.avatar ??
+              const avatar =
+                story.author.profile?.avatar ??
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
               return (
                 // Each card is a full <Link> so clicking anywhere navigates to the story
-                <Link key={story.id} href={`/story/${story.slug}`}
+                <Link
+                  key={story.id}
+                  href={`/story/${story.slug}`}
                   className="group flex gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/50 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]"
                 >
                   {story.coverImage && (
-                    <Image src={story.coverImage} alt={story.title} width={112} height={80} className="object-cover rounded-lg shrink-0" />
+                    <Image
+                      src={story.coverImage}
+                      alt={story.title}
+                      width={112}
+                      height={80}
+                      className="object-cover rounded-lg shrink-0"
+                    />
                   )}
                   <div className="flex-1 min-w-0">
                     {/* Author row — tiny avatar + username + category */}
                     <div className="flex items-center gap-2 mb-1">
-                      <Image src={avatar} alt={story.author.username} width={20} height={20} className="rounded-full object-cover" />
+                      <Image
+                        src={avatar}
+                        alt={story.author.username}
+                        width={20}
+                        height={20}
+                        className="rounded-full object-cover"
+                      />
                       <span className="text-xs text-gray-400">{story.author.username}</span>
                       <span className="text-xs text-gray-600">in</span>
                       <span className="text-xs text-red-400">{story.category.name}</span>
                     </div>
                     {/* Story title — line-clamp-2 cuts it off at 2 lines with "…" */}
-                    <h3 className="text-base font-semibold text-white group-hover:text-red-300 transition line-clamp-2">{story.title}</h3>
+                    <h3 className="text-base font-semibold text-white group-hover:text-red-300 transition line-clamp-2">
+                      {story.title}
+                    </h3>
                     {/* Excerpt — only shown if one exists */}
-                    {story.excerpt && <p className="text-sm text-gray-500 line-clamp-2 mt-1">{story.excerpt}</p>}
+                    {story.excerpt && (
+                      <p className="text-sm text-gray-500 line-clamp-2 mt-1">{story.excerpt}</p>
+                    )}
                     {/* Stats footer — reading time (computed from word count), likes, comments, date */}
                     <div className="flex items-center gap-4 text-xs text-gray-600 mt-2">
                       <span>{readingTime(story.content)}</span>
                       <span>{story._count.likes}</span>
                       <span>{story._count.comments}</span>
                       {/* ml-auto pushes the date to the right edge */}
-                      <span className="ml-auto">{new Date(story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      <span className="ml-auto">
+                        {new Date(story.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
                     </div>
                   </div>
                 </Link>

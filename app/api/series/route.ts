@@ -63,7 +63,8 @@ function slugify(name: string) {
       .replace(/-+/g, '-') +
     // Append a dash and 4 random alphanumeric characters (base-36 = 0-9 and a-z).
     // Math.random().toString(36) looks like "0.1hk3a8z"; .slice(2,6) takes 4 chars.
-    '-' + Math.random().toString(36).slice(2, 6)
+    '-' +
+    Math.random().toString(36).slice(2, 6)
   );
 }
 

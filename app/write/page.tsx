@@ -53,7 +53,6 @@ export default async function WritePage({ searchParams }: Props) {
     <main className="min-h-screen bg-gray-950 text-white">
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-10">
-
         {/* Page heading */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Write a Story</h1>
@@ -64,11 +63,14 @@ export default async function WritePage({ searchParams }: Props) {
           <div className="mt-4 h-px bg-gradient-to-r from-red-600/60 to-transparent" />
           {/* Quick links to related writing tools */}
           <div className="flex gap-4 mt-3">
-            <Link href="/write/sprints" className="text-xs text-gray-500 hover:text-red-400 transition">
- Writing Sprints
+            <Link
+              href="/write/sprints"
+              className="text-xs text-gray-500 hover:text-red-400 transition"
+            >
+              Writing Sprints
             </Link>
             <Link href="/coauthor" className="text-xs text-gray-500 hover:text-red-400 transition">
- Co-author Requests
+              Co-author Requests
             </Link>
           </div>
         </div>
@@ -78,7 +80,7 @@ export default async function WritePage({ searchParams }: Props) {
         {prompt && (
           <div className="mb-6 bg-red-950/30 border border-red-900/40 rounded-xl p-4">
             <p className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">
- Writing Prompt{promptTitle ? ` — ${promptTitle}` : ''}
+              Writing Prompt{promptTitle ? ` — ${promptTitle}` : ''}
             </p>
             <p className="text-sm text-gray-300">{prompt}</p>
           </div>
@@ -87,7 +89,11 @@ export default async function WritePage({ searchParams }: Props) {
         {/* StoryForm is a client component (it uses React state for the rich-text editor
             and form inputs). We pass the category list from the server and optionally
             pre-fill the excerpt field with the writing prompt text. */}
-        <StoryForm categories={categories} initialExcerpt={prompt ?? ''} isAuthorPro={isAuthorPro} />
+        <StoryForm
+          categories={categories}
+          initialExcerpt={prompt ?? ''}
+          isAuthorPro={isAuthorPro}
+        />
       </div>
       <Footer />
     </main>

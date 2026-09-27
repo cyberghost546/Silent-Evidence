@@ -28,20 +28,19 @@ export default function OfflinePage() {
 
   return (
     <main className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center px-4 text-center">
-
       {/* Animated skull icon */}
       <div className={`text-8xl mb-6 ${isOnline ? 'animate-bounce' : 'animate-pulse'}`}>
-        {isOnline
-          ? <Wifi className="w-12 h-12 text-gray-400" strokeWidth={1.25} aria-hidden="true" />
-          : <WifiOff className="w-12 h-12 text-gray-500" strokeWidth={1.25} aria-hidden="true" />}
+        {isOnline ? (
+          <Wifi className="w-12 h-12 text-gray-400" strokeWidth={1.25} aria-hidden="true" />
+        ) : (
+          <WifiOff className="w-12 h-12 text-gray-500" strokeWidth={1.25} aria-hidden="true" />
+        )}
       </div>
 
       {isOnline ? (
         // Connection restored state
         <>
-          <h1 className="text-3xl font-bold text-green-400 mb-3">
-            Back from the void!
-          </h1>
+          <h1 className="text-3xl font-bold text-green-400 mb-3">Back from the void!</h1>
           <p className="text-gray-400 max-w-sm mb-6">
             Your connection has returned. Reloading the page...
           </p>
@@ -53,13 +52,11 @@ export default function OfflinePage() {
       ) : (
         // Offline state
         <>
-          <h1 className="text-3xl font-bold text-red-500 mb-3">
-            Lost in the Dark
-          </h1>
+          <h1 className="text-3xl font-bold text-red-500 mb-3">Lost in the Dark</h1>
 
           <p className="text-gray-400 max-w-sm mb-2">
-            You have no internet connection. The horrors cannot reach you right now —
-            but they will when you reconnect.
+            You have no internet connection. The horrors cannot reach you right now — but they will
+            when you reconnect.
           </p>
 
           <p className="text-gray-600 text-sm mb-8">
@@ -68,7 +65,9 @@ export default function OfflinePage() {
 
           {/* Offline tips */}
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 mb-8 max-w-sm text-left">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">While you wait...</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+              While you wait...
+            </p>
             <ul className="space-y-2 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="text-red-400 mt-0.5">•</span>

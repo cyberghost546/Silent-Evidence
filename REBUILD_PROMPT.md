@@ -100,6 +100,7 @@ enum ContentRating { ALL TEEN MATURE }
 ### Core Models
 
 **User** — central model with 60+ relations:
+
 - id, email (unique), username (unique), password (bcrypt hash)
 - role (default USER), emailVerified (bool), isVerified (blue checkmark), isPrivate
 - pinnedStoryId (optional), dateOfBirth (optional DateTime), ageGroup
@@ -109,12 +110,14 @@ enum ContentRating { ALL TEEN MATURE }
 - Relations: Profile, stories, likes, comments, bookmarks, reactions, notifications, badges, follows (both directions), blockedBy, blocked, reports, warnings, auditLogs, loginLogs, messagesSent, messagesReceived, subscription, tips, storyPurchases, bundlePurchases, chapterPurchases, groupsOwned, groupMemberships, squadsOwned, squadMemberships, readingHistory, readingGoal, writingStreak, readingStreak, pushSubscriptions, writingSprints (SprintParticipant), tagFollows, sequelRequests, fanArt, betaReaderInvites, coauthorRequests, storyCollaborators, quizAttempts, lastWords, chainStorySegments, screamNominations, screamVotes, AuthorQA
 
 **Profile** — one-to-one with User:
+
 - id, userId (unique), bio, avatar (Cloudinary URL), website, location
 - fearMoods (String array — favorite horror moods), merchUrl
 - twitterHandle, instagramHandle
 - createdAt, updatedAt
 
 **Story** — main content model:
+
 - id, title, slug (unique), content (LongText), excerpt
 - coverImage (Cloudinary URL), status (default DRAFT)
 - authorId → User, categoryId → Category, seriesId → Series (optional), seriesOrder (optional Int)
@@ -130,10 +133,12 @@ enum ContentRating { ALL TEEN MATURE }
 - Relations: author, category, tags (StoryTag), likes, comments, reactions, bookmarks, chapters, scareRatings, readingHistory, storyLists, purchases, bundleItems, collaborators, planner, milestones, presence, draftShareTokens, sequelRequests, fanArt, betaReaderInvites, coauthorRequests, authorQAs, branchNodes, lastWords, chainStories, monsterLinks
 
 **Category** — story categories (Paranormal, True Stories, Supernatural, Psychological, Slasher, etc.):
+
 - id, name (unique), slug (unique), description, icon (optional emoji)
 - createdAt
 
 **Tag** — story tags (forest, possessed, haunted, etc.):
+
 - id, name (unique), slug (unique)
 
 **StoryTag** — join table: storyId + tagId
@@ -547,11 +552,13 @@ vercel.json                     # Cron job config
 Build all components as React client or server components. Key ones:
 
 **Layout:**
+
 - `Header.tsx` — site nav, search bar, notification bell, user menu
 - `Footer.tsx` — links, newsletter signup
 - `AdminSidebar.tsx` — collapsible admin nav with 40+ links
 
 **Story Creation:**
+
 - `StoryForm.tsx` — full story creation/edit form with:
   - TipTap `RichEditor.tsx` for content
   - Autosave to localStorage every 30 seconds
@@ -575,6 +582,7 @@ Build all components as React client or server components. Key ones:
 - `ChapterManager.tsx` — add/reorder/price chapters
 
 **Story Reading:**
+
 - `StoryInteractions.tsx` — like button, bookmark, share, report, comment section
 - `ReactionBar.tsx` — LOVE/SCARED/GHOST/FIRE emoji reactions with counts
 - `ScareOMeter.tsx` — display AI scare score + crowd scare ratings
@@ -592,6 +600,7 @@ Build all components as React client or server components. Key ones:
 - `AgeGate.tsx` — modal for MATURE content requiring DOB verification
 
 **Discovery & Feeds:**
+
 - `PopularStories.tsx` — trending story cards
 - `StoryCard.tsx` — story preview card (cover, title, author, tags, scare score)
 - `MoodFilter.tsx` — filter by mood chips
@@ -599,6 +608,7 @@ Build all components as React client or server components. Key ones:
 - `RelatedTagsSidebar.tsx` — related tags in story sidebar
 
 **User & Social:**
+
 - `FollowButton.tsx` — follow/unfollow with optimistic UI
 - `FollowListModal.tsx` — followers/following list modal
 - `ProfileStoriesGrid.tsx` — masonry grid of user's stories
@@ -608,6 +618,7 @@ Build all components as React client or server components. Key ones:
 - `DaresInbox.tsx` — received dares list
 
 **Gamification:**
+
 - `WritingStreakBadge.tsx` — flame icon + streak count
 - `ReadingStreakBadge.tsx` — streak count for reading
 - `ReadingBadge.tsx` — achievement badge display
@@ -618,6 +629,7 @@ Build all components as React client or server components. Key ones:
 - `ScareOMeter.tsx` — scare score display
 
 **Community:**
+
 - `ForumReplyForm.tsx` — reply to forum post
 - `ForumReportButton.tsx` — report forum content
 - `ForumsDropdown.tsx` — forum quick-nav dropdown
@@ -626,17 +638,20 @@ Build all components as React client or server components. Key ones:
 - `NewChallengeForm.tsx` — create writing challenge (admin)
 
 **Premium & Payments:**
+
 - `PremiumBadge.tsx` — "PREMIUM" pill badge
 - `BundlePurchaseButton.tsx` — Stripe checkout for bundles
 - `TipButton.tsx` — tip author via Stripe
 - `AddToListButton.tsx` — add story to reading list
 
 **Creator Tools:**
+
 - `StoryAnalytics.tsx` / `StoryAnalyticsPanel.tsx` — views, likes, comments over time (Recharts)
 - `DraftSharePanel.tsx` — generate share token for beta readers
 - `CoAuthorInvite.tsx` — invite collaborator
 
 **Admin:**
+
 - `AdminStoriesClient.tsx` — story management table with actions
 - `AdminCommentsClient.tsx` — comment moderation table
 - `AdminOverviewChart.tsx` — Recharts dashboard charts
@@ -644,6 +659,7 @@ Build all components as React client or server components. Key ones:
 - `BatchClient.tsx` — batch AI story generation UI
 
 **Misc UI:**
+
 - `AnnouncementBanner.tsx` — dismissible site-wide banner (from SiteSetting)
 - `ThemeToggle.tsx` — light/dark mode toggle
 - `PushNotificationToggle.tsx` — enable/disable browser push
@@ -662,6 +678,7 @@ Build all components as React client or server components. Key ones:
 ## API ROUTES (app/api/)
 
 ### Auth (`/api/auth/`)
+
 - `POST /login` — validate email+password, rate limit, set `userId` cookie, or send 2FA
 - `POST /logout` — clear cookie
 - `POST /register` — hash password, create user+profile, send verification email
@@ -674,6 +691,7 @@ Build all components as React client or server components. Key ones:
 - `GET /oauth/microsoft` — Microsoft OAuth callback → same flow
 
 ### Stories (`/api/stories/`)
+
 - `GET /` — paginated list, filter by status/category/mood/tag/search, include author+tags
 - `POST /` — create story (auth required, sanitize content, compute reading time, auto-slug from title)
 - `GET /trending` — top stories by views in last 7 days
@@ -688,6 +706,7 @@ Build all components as React client or server components. Key ones:
 - `GET /[id]/milestones` — return milestone achievements for story
 
 ### Engagement
+
 - `POST /api/likes` — like story; `DELETE /api/likes/[id]` — unlike
 - `POST /api/reactions` — add emoji reaction; `DELETE /api/reactions/[id]` — remove
 - `POST /api/bookmarks` — bookmark; `DELETE /api/bookmarks/[id]` — remove
@@ -697,6 +716,7 @@ Build all components as React client or server components. Key ones:
 - `POST /api/scare-rating` — upsert scare rating (1-5) for story
 
 ### Users & Social
+
 - `GET /api/user` — current user profile+stats
 - `PUT /api/user` — update profile fields
 - `GET /api/users?q=` — search users
@@ -706,6 +726,7 @@ Build all components as React client or server components. Key ones:
 - `GET /api/followers` — list current user's followers
 
 ### Community
+
 - `GET /api/forums` — list forums; `POST /api/forums` — create (admin)
 - `POST /api/forum-posts` — create post; `GET /api/forum-posts/[id]` — get post with replies
 - `GET /api/groups` — list groups; `POST /api/groups` — create group
@@ -716,31 +737,37 @@ Build all components as React client or server components. Key ones:
 - `POST /api/notifications/read` — mark all read
 
 ### Payments
+
 - `POST /api/stripe/create-checkout` — create Stripe checkout session (bundle or subscription)
 - `POST /api/stripe/webhook` — handle Stripe events (subscription created/updated/deleted, payment succeeded)
 - `POST /api/tips` — send tip (Stripe Payment Intent)
 - `GET /api/tips` — tip leaderboard
 
 ### AI
+
 - `POST /api/ai/generate` — generate story with Claude (or Ollama fallback), stream response
 - `POST /api/ai/translate` — translate story to target language
 - `POST /api/ai/detect-mood` — classify story mood
 - `POST /api/ai/rate-scare` — compute scare score 1-10
 
 ### Upload & Media
+
 - `POST /api/upload` — upload image file → Cloudinary → return URL
 - `POST /api/upload/avatar` — avatar upload
 - `POST /api/upload/cover` — story cover upload
 
 ### Push Notifications
+
 - `POST /api/push/subscribe` — save PushSubscription to DB
 - `POST /api/push/notify` — send Web Push to user (admin/system use)
 
 ### Real-time
+
 - `POST /api/pusher/auth` — authenticate private Pusher channel
 - `POST /api/stories/presence` — update live reader count for story
 
 ### Admin (`/api/admin/`)
+
 - `GET /analytics` — dashboard stats (total users, stories, revenue, views)
 - `GET /users` — all users with filters (role, banned, search)
 - `PUT /users/[id]` — update role, ban/unban
@@ -757,6 +784,7 @@ Build all components as React client or server components. Key ones:
 - `PUT /settings/[key]` — update setting value
 
 ### Cron (`/api/cron/`) — all protected by CRON_SECRET header
+
 - `POST /publish-scheduled` — find SCHEDULED stories past scheduledAt, set PUBLISHED
 - `POST /newsletter` — compose and send weekly newsletter
 - `POST /comments-digest` — send comments digest emails
@@ -764,6 +792,7 @@ Build all components as React client or server components. Key ones:
 - `POST /check-streaks` — update reading/writing streaks
 
 ### Other
+
 - `POST /api/contact` — save ContactMessage, send email notification
 - `POST /api/cookie-consent` — log GDPR consent
 - `GET /api/og` — generate Open Graph image via @vercel/og
@@ -775,6 +804,7 @@ Build all components as React client or server components. Key ones:
 ## MIDDLEWARE
 
 `middleware.ts` at root:
+
 - Runs on edge runtime
 - Matches `/admin/:path*`
 - Reads `userId` cookie — if missing, redirect to `/login?from=/admin/...`
@@ -785,18 +815,19 @@ Build all components as React client or server components. Key ones:
 ## AUTH SESSION
 
 `lib/session.ts`:
+
 ```ts
 // Read userId cookie → return userId string or null
-export async function getSessionUserId(): Promise<string | null>
+export async function getSessionUserId(): Promise<string | null>;
 
 // Fetch full User from DB or null
-export async function getSessionUser(): Promise<User | null>
+export async function getSessionUser(): Promise<User | null>;
 
 // Throw 401 ApiError if not logged in
-export async function requireAuth(): Promise<User>
+export async function requireAuth(): Promise<User>;
 
 // Throw 403 ApiError if not ADMIN role
-export async function requireAdmin(): Promise<User>
+export async function requireAdmin(): Promise<User>;
 ```
 
 Cookie name: `userId`, HttpOnly, SameSite=Lax, Secure in production.
@@ -879,6 +910,7 @@ All cron routes validate `Authorization: Bearer <CRON_SECRET>` header.
 ## DOCKER (local dev)
 
 `docker-compose.yml`:
+
 ```yaml
 services:
   db:
@@ -887,7 +919,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: silent_evidence
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - db_data:/var/lib/mysql
 volumes:

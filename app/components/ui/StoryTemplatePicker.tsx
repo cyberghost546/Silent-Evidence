@@ -26,13 +26,15 @@ export default function StoryTemplatePicker({ onSelect, onClose }: Props) {
       {/* Modal panel — stop click propagation so clicking inside doesn't close */}
       <div
         className="relative w-full max-w-2xl bg-gray-950 border border-gray-800 rounded-2xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-bold text-white">Choose a Template</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Start with a horror genre opener — you can edit everything.</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Start with a horror genre opener — you can edit everything.
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -45,7 +47,7 @@ export default function StoryTemplatePicker({ onSelect, onClose }: Props) {
 
         {/* Template grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {STORY_TEMPLATES.map(template => (
+          {STORY_TEMPLATES.map((template) => (
             <button
               key={template.id}
               onClick={() => onSelect(template)}
@@ -59,7 +61,11 @@ export default function StoryTemplatePicker({ onSelect, onClose }: Props) {
             >
               {/* Icon + label */}
               <div className="flex items-center gap-2 mb-1.5">
-                <template.icon className="w-5 h-5 text-gray-400" strokeWidth={1.5} aria-hidden="true" />
+                <template.icon
+                  className="w-5 h-5 text-gray-400"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
                 <span className="text-sm font-semibold text-white">{template.label}</span>
               </div>
 

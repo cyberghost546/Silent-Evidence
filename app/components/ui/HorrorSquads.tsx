@@ -141,7 +141,11 @@ export default function HorrorSquads({ userId }: Props) {
       const res = await fetch('/api/squads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName.trim(), description: newDesc.trim() || null, hostId: userId }),
+        body: JSON.stringify({
+          name: newName.trim(),
+          description: newDesc.trim() || null,
+          hostId: userId,
+        }),
       });
       if (res.ok) {
         // Reset the form and refresh the squad list
@@ -207,9 +211,7 @@ export default function HorrorSquads({ userId }: Props) {
       if (res.ok) {
         const newPost: SquadPost = await res.json();
         // Prepend the new post to the local feed so the user sees it immediately
-        setActiveSquad((prev) =>
-          prev ? { ...prev, posts: [newPost, ...prev.posts] } : prev
-        );
+        setActiveSquad((prev) => (prev ? { ...prev, posts: [newPost, ...prev.posts] } : prev));
         setPostContent('');
         setPostStoryUrl('');
       } else {
@@ -325,7 +327,7 @@ export default function HorrorSquads({ userId }: Props) {
                                transition-colors"
                   >
                     {/* Link icon + truncated URL */}
- {post.storyUrl}
+                    {post.storyUrl}
                   </a>
                 )}
               </div>
@@ -345,14 +347,19 @@ export default function HorrorSquads({ userId }: Props) {
         <h2 className="text-sm font-bold tracking-widest text-green-500 uppercase">
           Horror Squads
         </h2>
-        <p className="mt-0.5 text-xs text-neutral-500">Private groups for sharing horror stories with friends</p>
+        <p className="mt-0.5 text-xs text-neutral-500">
+          Private groups for sharing horror stories with friends
+        </p>
       </div>
 
       {/* Tab switcher */}
       <div className="flex border-b border-green-900/30">
         {/* "My Squads" tab */}
         <button
-          onClick={() => { setTab('mine'); setError(''); }}
+          onClick={() => {
+            setTab('mine');
+            setError('');
+          }}
           className={`flex-1 py-2 text-xs font-semibold transition-colors ${
             tab === 'mine'
               ? 'border-b-2 border-green-600 text-green-400'
@@ -363,7 +370,10 @@ export default function HorrorSquads({ userId }: Props) {
         </button>
         {/* "Join a Squad" tab */}
         <button
-          onClick={() => { setTab('join'); setError(''); }}
+          onClick={() => {
+            setTab('join');
+            setError('');
+          }}
           className={`flex-1 py-2 text-xs font-semibold transition-colors ${
             tab === 'join'
               ? 'border-b-2 border-green-600 text-green-400'
@@ -387,7 +397,10 @@ export default function HorrorSquads({ userId }: Props) {
           <div className="space-y-3">
             {/* Create Squad button — toggles the inline create form */}
             <button
-              onClick={() => { setShowCreateForm((v) => !v); setError(''); }}
+              onClick={() => {
+                setShowCreateForm((v) => !v);
+                setError('');
+              }}
               className="w-full rounded border border-green-900/50 bg-green-950/30 py-2 text-xs
                          font-semibold text-green-400 hover:bg-green-950/60 hover:border-green-700
                          transition-colors"
@@ -459,7 +472,8 @@ export default function HorrorSquads({ userId }: Props) {
                   <div>
                     <p className="text-sm font-bold text-green-300">{squad.name}</p>
                     <p className="text-xs text-neutral-500">
-                      by {squad.hostUsername} &bull; {squad.memberCount} member{squad.memberCount !== 1 ? 's' : ''}
+                      by {squad.hostUsername} &bull; {squad.memberCount} member
+                      {squad.memberCount !== 1 ? 's' : ''}
                     </p>
                   </div>
                   {/* Invite code badge */}
@@ -469,7 +483,9 @@ export default function HorrorSquads({ userId }: Props) {
                 </div>
                 {/* Optional description */}
                 {squad.description && (
-                  <p className="mt-1.5 text-xs text-neutral-500 line-clamp-2">{squad.description}</p>
+                  <p className="mt-1.5 text-xs text-neutral-500 line-clamp-2">
+                    {squad.description}
+                  </p>
                 )}
                 {/* Enter button — loads the squad feed view */}
                 <button

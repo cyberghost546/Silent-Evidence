@@ -9,9 +9,7 @@
 
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import {
-  DollarSign, Package, Clock, Lock, Headphones, BarChart3, PenLine,
-} from 'lucide-react';
+import { DollarSign, Package, Clock, Lock, Headphones, BarChart3, PenLine } from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import { hasAuthorPro } from '@/lib/authorPro';
@@ -46,12 +44,36 @@ const PLANS = [
 
 // Every perk here is enforced server-side. If you add a line, add the gate.
 const PERKS = [
-  { icon: DollarSign, title: 'Charge for your stories',  text: 'Set a price on any story and keep selling it through Stripe.' },
-  { icon: Package,    title: 'Build bundles',            text: 'Package your stories together and sell them as a collection.' },
-  { icon: Lock,       title: 'Premium-only stories',     text: 'Publish work exclusively for paying members of the site.' },
-  { icon: Clock,      title: 'Early access windows',     text: 'Give members a head start before a story opens to everyone.' },
-  { icon: Headphones, title: 'Audio, video & soundtrack', text: 'Attach narration, video, and a Spotify playlist to a story.' },
-  { icon: BarChart3,  title: 'Advanced analytics',       text: 'Per-story reads, engagement rate, sales and tips over time.' },
+  {
+    icon: DollarSign,
+    title: 'Charge for your stories',
+    text: 'Set a price on any story and keep selling it through Stripe.',
+  },
+  {
+    icon: Package,
+    title: 'Build bundles',
+    text: 'Package your stories together and sell them as a collection.',
+  },
+  {
+    icon: Lock,
+    title: 'Premium-only stories',
+    text: 'Publish work exclusively for paying members of the site.',
+  },
+  {
+    icon: Clock,
+    title: 'Early access windows',
+    text: 'Give members a head start before a story opens to everyone.',
+  },
+  {
+    icon: Headphones,
+    title: 'Audio, video & soundtrack',
+    text: 'Attach narration, video, and a Spotify playlist to a story.',
+  },
+  {
+    icon: BarChart3,
+    title: 'Advanced analytics',
+    text: 'Per-story reads, engagement rate, sales and tips over time.',
+  },
 ];
 
 export default async function AuthorProPage() {
@@ -65,7 +87,8 @@ export default async function AuthorProPage() {
   // button implying they are being billed would be untrue.
   const authorSub = userId
     ? await prisma.authorSubscription.findUnique({
-        where: { userId }, select: { status: true },
+        where: { userId },
+        select: { status: true },
       })
     : null;
   const isPaying = authorSub?.status === 'active' || authorSub?.status === 'trialing';
@@ -95,8 +118,8 @@ export default async function AuthorProPage() {
           </span>
         </h1>
         <p className="relative text-gray-400 text-lg max-w-xl mx-auto">
-          Turn your writing into income. Sell stories and bundles, publish early
-          to members, and finally see what your readers actually do.
+          Turn your writing into income. Sell stories and bundles, publish early to members, and
+          finally see what your readers actually do.
         </p>
       </section>
 
@@ -106,8 +129,8 @@ export default async function AuthorProPage() {
           <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 px-6 py-5">
             <p className="font-bold text-emerald-300">You already have Author Pro access</p>
             <p className="text-xs text-gray-400 mt-1">
-              You were using these features before Author Pro launched, so your
-              account keeps them free of charge. There is nothing to pay.
+              You were using these features before Author Pro launched, so your account keeps them
+              free of charge. There is nothing to pay.
             </p>
           </div>
         </section>
@@ -135,9 +158,16 @@ export default async function AuthorProPage() {
       <section className="max-w-4xl mx-auto px-4 pb-4">
         <div className="grid sm:grid-cols-2 gap-3 mb-12">
           {PERKS.map((perk) => (
-            <div key={perk.title} className="flex gap-3 bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div
+              key={perk.title}
+              className="flex gap-3 bg-gray-900 border border-gray-800 rounded-xl p-4"
+            >
               <span className="shrink-0 w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <perk.icon className="w-4 h-4 text-amber-400" strokeWidth={1.75} aria-hidden="true" />
+                <perk.icon
+                  className="w-4 h-4 text-amber-400"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white">{perk.title}</p>
@@ -159,13 +189,16 @@ export default async function AuthorProPage() {
                 </div>
               )}
 
-              <div className={`
+              <div
+                className={`
                 flex-1 flex flex-col rounded-2xl p-6 border
-                ${plan.highlight
-                  ? 'bg-gray-900 border-amber-500/40 shadow-[0_0_30px_rgba(251,191,36,0.12)]'
-                  : 'bg-gray-900 border-gray-800'
+                ${
+                  plan.highlight
+                    ? 'bg-gray-900 border-amber-500/40 shadow-[0_0_30px_rgba(251,191,36,0.12)]'
+                    : 'bg-gray-900 border-gray-800'
                 }
-              `}>
+              `}
+              >
                 <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-2">
                   {plan.label}
                 </p>
@@ -189,10 +222,12 @@ export default async function AuthorProPage() {
         </div>
 
         <p className="text-center text-xs text-gray-600 mt-8">
-          Cancel anytime. Payments processed securely by Stripe.
-          Author Pro is a plan for writers — it does not include the reader
-          membership. Looking to read premium stories instead?{' '}
-          <Link href="/premium" className="text-gray-400 hover:text-white underline underline-offset-2">
+          Cancel anytime. Payments processed securely by Stripe. Author Pro is a plan for writers —
+          it does not include the reader membership. Looking to read premium stories instead?{' '}
+          <Link
+            href="/premium"
+            className="text-gray-400 hover:text-white underline underline-offset-2"
+          >
             See Horror Elite
           </Link>
           .

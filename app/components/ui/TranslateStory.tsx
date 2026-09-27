@@ -12,9 +12,9 @@ import { LANGUAGES } from '@/lib/languages'; // LANGUAGES — full list of suppo
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 type Props = {
-  originalContent: string;           // Raw HTML of the story body — sent to the translation API
-  originalExcerpt?: string | null;   // Optional story excerpt — also translated if present
-  storyLang: string;                 // BCP-47 code of the story's original language (e.g. "en")
+  originalContent: string; // Raw HTML of the story body — sent to the translation API
+  originalExcerpt?: string | null; // Optional story excerpt — also translated if present
+  storyLang: string; // BCP-47 code of the story's original language (e.g. "en")
   // Called with the translated HTML content and translated excerpt when translation succeeds
   onTranslated: (content: string, excerpt: string | null) => void;
   // Called when the user wants to revert back to the original language
@@ -23,7 +23,13 @@ type Props = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function TranslateStory({ originalContent, originalExcerpt, storyLang, onTranslated, onReset }: Props) {
+export default function TranslateStory({
+  originalContent,
+  originalExcerpt,
+  storyLang,
+  onTranslated,
+  onReset,
+}: Props) {
   // targetLang — the language code the user wants to translate INTO (default: English)
   const [targetLang, setTargetLang] = useState('en');
 
@@ -37,12 +43,12 @@ export default function TranslateStory({ originalContent, originalExcerpt, story
   const [error, setError] = useState('');
 
   // availableLanguages — all languages except the story's own language (no point translating to itself)
-  const availableLanguages = LANGUAGES.filter(l => l.code !== storyLang);
+  const availableLanguages = LANGUAGES.filter((l) => l.code !== storyLang);
 
   // translate — calls /api/translate for the main content, then again for the excerpt if one exists
   const translate = async () => {
     setLoading(true); // show spinner on the Translate button
-    setError('');     // clear any previous error
+    setError(''); // clear any previous error
 
     try {
       // First request: translate the main story body
@@ -89,21 +95,34 @@ export default function TranslateStory({ originalContent, originalExcerpt, story
   };
 
   // reset — reverts state and calls onReset() so the parent shows the original content
-  const reset = () => { setTranslated(false); onReset(); };
+  const reset = () => {
+    setTranslated(false);
+    onReset();
+  };
 
   // activeLang — the full language object for the currently selected target language
   // (used to show the flag and label in the "Translated" confirmation badge)
-  const activeLang = LANGUAGES.find(l => l.code === targetLang);
+  const activeLang = LANGUAGES.find((l) => l.code === targetLang);
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
     // Flex row wrapping all controls — collapses gracefully on narrow screens
     <div className="flex flex-wrap items-center gap-3">
-
       {/* Globe / translate icon — purely decorative */}
-      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 0 1 6.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-4 h-4 text-gray-500 flex-shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 0 1 6.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+        />
       </svg>
 
       {/* Label */}
@@ -123,7 +142,9 @@ export default function TranslateStory({ originalContent, originalExcerpt, story
       >
         {/* One <option> per supported language — shows flag, English name, and native name */}
         {availableLanguages.map((l) => (
-          <option key={l.code} value={l.code}>{l.flag} {l.label} ({l.nativeLabel})</option>
+          <option key={l.code} value={l.code}>
+            {l.flag} {l.label} ({l.nativeLabel})
+          </option>
         ))}
       </select>
 
@@ -131,21 +152,36 @@ export default function TranslateStory({ originalContent, originalExcerpt, story
       {!translated ? (
         // ── Not yet translated: show the "Translate" button ──────────────────
         <button
-          onClick={translate}  // triggers the API call
-          disabled={loading}   // prevent double-clicks while the API is in-flight
+          onClick={translate} // triggers the API call
+          disabled={loading} // prevent double-clicks while the API is in-flight
           className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-red-600 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition"
         >
           {loading ? (
             // ── Loading state: spinning ring while awaiting the API ──────────
             <>
               {/* Animated SVG spinner */}
-              <svg className="animate-spin w-3.5 h-3.5 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v8z"/>
+              <svg
+                className="animate-spin w-3.5 h-3.5 text-red-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v8z" />
               </svg>
               Translating…
             </>
-          ) : 'Translate'} {/* Idle state: plain label */}
+          ) : (
+            'Translate'
+          )}{' '}
+          {/* Idle state: plain label */}
         </button>
       ) : (
         // ── Already translated: show the "Show original" revert button ───────

@@ -73,9 +73,7 @@ export default function TrendingStories({ stories }: Props) {
               {medalColor ? (
                 <Medal className={`w-6 h-6 ${medalColor}`} />
               ) : (
-                <span className="text-2xl font-extrabold text-gray-600 tabular-nums">
-                  {rank}
-                </span>
+                <span className="text-2xl font-extrabold text-gray-600 tabular-nums">{rank}</span>
               )}
             </div>
 
@@ -134,7 +132,11 @@ export default function TrendingStories({ stories }: Props) {
                   {story.author.isVerified && (
                     // Blue checkmark for verified authors
                     <svg className="w-3 h-3 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </div>
@@ -143,13 +145,19 @@ export default function TrendingStories({ stories }: Props) {
                 <span className="w-1 h-1 rounded-full bg-gray-700 flex-shrink-0" />
 
                 {/* Views */}
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500"><Eye className="w-3 h-3" /> {fmtNum(story.views)}</span>
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                  <Eye className="w-3 h-3" /> {fmtNum(story.views)}
+                </span>
 
                 {/* Likes */}
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500"><Heart className="w-3 h-3" /> {fmtNum(story._count.likes)}</span>
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                  <Heart className="w-3 h-3" /> {fmtNum(story._count.likes)}
+                </span>
 
                 {/* Comments */}
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500"><MessageCircle className="w-3 h-3" /> {story._count.comments}</span>
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                  <MessageCircle className="w-3 h-3" /> {story._count.comments}
+                </span>
               </div>
             </div>
 

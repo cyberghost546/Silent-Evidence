@@ -14,9 +14,9 @@ import Link from 'next/link';
 import type { StoryGraph as StoryGraphData, GraphNode } from '@/lib/storyGraph';
 
 const FILL = {
-  author:   { circle: '#ef4444', text: '#fecaca' },
+  author: { circle: '#ef4444', text: '#fecaca' },
   category: { circle: '#a1a1aa', text: '#d4d4d8' },
-  story:    { circle: '#71717a', text: '#a1a1aa' },
+  story: { circle: '#71717a', text: '#a1a1aa' },
 } as const;
 
 function NodeLabel({ node }: { node: GraphNode }) {

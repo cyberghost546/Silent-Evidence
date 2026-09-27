@@ -42,7 +42,6 @@ async function getUserId() {
 // This is a public endpoint — anyone can read the forum without logging in.
 // _req is prefixed with _ to signal that we intentionally don't use the request object here
 export async function GET(_req: NextRequest, { params }: Props) {
-
   // Await the params object to read the slug segment
   const { slug } = await params;
 
@@ -85,7 +84,6 @@ export async function GET(_req: NextRequest, { params }: Props) {
 // Creates a new discussion post (thread) in this forum.
 // Only logged-in users may create posts.
 export async function POST(req: NextRequest, { params }: Props) {
-
   // Must be logged in to create a post
   const userId = await getUserId();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

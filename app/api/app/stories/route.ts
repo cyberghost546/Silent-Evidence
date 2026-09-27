@@ -11,11 +11,11 @@ export async function GET() {
   // ALL-rated content is safe for every age group, so no auth check is needed.
   const stories = await prisma.story.findMany({
     where: {
-      status: 'PUBLISHED',         // Only fully published stories
-      contentRating: 'ALL',        // Safe for all users — no age-gate required
+      status: 'PUBLISHED', // Only fully published stories
+      contentRating: 'ALL', // Safe for all users — no age-gate required
     },
     orderBy: { createdAt: 'desc' }, // Newest first
-    take: 20,                       // Limit to 20 stories per request
+    take: 20, // Limit to 20 stories per request
     select: {
       id: true,
       title: true,

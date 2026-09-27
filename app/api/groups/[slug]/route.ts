@@ -31,7 +31,6 @@ type Params = { params: Promise<{ slug: string }> };
 // Returns null if the group doesn't exist.
 // Returns { group, role } where role is the caller's membership role or null.
 async function getGroupAndRole(slug: string, userId: number) {
-
   // Fetch the full group with members, recent posts, open polls, and counts
   const group = await prisma.group.findUnique({
     where: { slug },
@@ -103,7 +102,7 @@ async function getGroupAndRole(slug: string, userId: number) {
   if (!group) return null;
 
   // Find the calling user's membership row (if they're a member)
-  const membership = group.members.find(m => m.userId === userId);
+  const membership = group.members.find((m) => m.userId === userId);
 
   // Return both the group data and the caller's role.
   // role is null when the user is not a member or not logged in.
@@ -113,7 +112,6 @@ async function getGroupAndRole(slug: string, userId: number) {
 // ── GET handler ───────────────────────────────────────────────────────────────
 // Returns the full group object plus the caller's role.
 export async function GET(req: Request, { params }: Params) {
-
   // Read the slug from the URL params
   const { slug } = await params;
 
@@ -135,7 +133,6 @@ export async function GET(req: Request, { params }: Params) {
 // Updates group name, description, or cover image.
 // Only OWNER and MODERATOR members can make changes.
 export async function PATCH(req: Request, { params }: Params) {
-
   // Read the slug from URL params
   const { slug } = await params;
 
@@ -180,7 +177,6 @@ export async function PATCH(req: Request, { params }: Params) {
 // Permanently deletes the group and all its data.
 // Only the OWNER may delete — moderators cannot.
 export async function DELETE(req: Request, { params }: Params) {
-
   // Read the slug from URL params
   const { slug } = await params;
 

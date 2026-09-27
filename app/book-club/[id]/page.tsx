@@ -10,7 +10,9 @@ import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import BookClubRoom from '@/app/components/ui/BookClubRoom';
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -38,7 +40,12 @@ export default async function BookClubDetailPage({ params }: Props) {
       },
       story: {
         select: {
-          id: true, title: true, slug: true, coverImage: true, excerpt: true, content: true,
+          id: true,
+          title: true,
+          slug: true,
+          coverImage: true,
+          excerpt: true,
+          content: true,
           author: { select: { username: true } },
           _count: { select: { likes: true, comments: true } },
         },
@@ -49,7 +56,7 @@ export default async function BookClubDetailPage({ params }: Props) {
   if (!club) notFound();
 
   // Only members (or public club visitors) can view
-  const isMember = userId ? club.members.some(m => m.userId === userId) : false;
+  const isMember = userId ? club.members.some((m) => m.userId === userId) : false;
   const isOwner = userId === club.owner.id;
   const canView = !club.isPrivate || isMember;
 
@@ -62,7 +69,10 @@ export default async function BookClubDetailPage({ params }: Props) {
           <p className="text-gray-400 text-sm text-center max-w-sm">
             This book club is invite-only. Ask a member for the invite code to join.
           </p>
-          <Link href="/book-club" className="mt-2 px-5 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition">
+          <Link
+            href="/book-club"
+            className="mt-2 px-5 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition"
+          >
             Browse Public Clubs
           </Link>
         </div>

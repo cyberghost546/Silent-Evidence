@@ -15,8 +15,8 @@ import { useState } from 'react'; // useState — controls whether the warning h
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 type Props = {
-  warnings: string;          // Comma-separated warning tags from the story record
-                             // e.g. "Gore, Disturbing imagery, Violence"
+  warnings: string; // Comma-separated warning tags from the story record
+  // e.g. "Gore, Disturbing imagery, Violence"
   children: React.ReactNode; // The full rendered story content shown after acceptance
 };
 
@@ -48,16 +48,13 @@ export default function StoryWarningModal({ warnings, children }: Props) {
       {/* ── Warning overlay ──────────────────────────────────────────────── */}
       {/* Fixed overlay covering the entire viewport; sits above all page content */}
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-
         {/* Modal card — centered, with a red glow border */}
         <div className="relative max-w-md w-full bg-gray-900 border border-red-800/60 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(220,38,38,0.3)]">
-
           {/* Decorative red glow blob — sits behind the skull icon at the top */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/20 blur-3xl rounded-full pointer-events-none" />
 
           {/* Content area — all text and buttons are relative so they sit above the glow */}
           <div className="relative p-8 text-center">
-
             {/* Pulsing skull emoji — draws attention and reinforces the horror theme */}
 
             {/* Modal title */}
@@ -74,27 +71,30 @@ export default function StoryWarningModal({ warnings, children }: Props) {
             {/* Split the warnings string on commas, trim whitespace,
                 remove empty strings, then render each as its own badge */}
             <div className="flex flex-wrap justify-center gap-2 mb-6">
-              {warnings.split(',').map(w => w.trim()).filter(Boolean).map(tag => (
-                // Each warning tag gets its own red badge with a warning emoji prefix
-                <span
-                  key={tag} // tag text used as key — warnings are unique by definition
-                  className="px-3 py-1 text-xs font-semibold rounded-full bg-red-950 border border-red-700/50 text-red-300"
-                >
- {tag}
-                </span>
-              ))}
+              {warnings
+                .split(',')
+                .map((w) => w.trim())
+                .filter(Boolean)
+                .map((tag) => (
+                  // Each warning tag gets its own red badge with a warning emoji prefix
+                  <span
+                    key={tag} // tag text used as key — warnings are unique by definition
+                    className="px-3 py-1 text-xs font-semibold rounded-full bg-red-950 border border-red-700/50 text-red-300"
+                  >
+                    {tag}
+                  </span>
+                ))}
             </div>
 
             {/* Age / comfort confirmation paragraph */}
             <p className="text-sm text-gray-400 mb-8 leading-relaxed">
-              By continuing you confirm you are comfortable with the above themes
-              and are of appropriate age to read this content.
+              By continuing you confirm you are comfortable with the above themes and are of
+              appropriate age to read this content.
             </p>
 
             {/* ── Action buttons ──────────────────────────────────────── */}
             {/* Stack vertically on mobile, side-by-side on sm+ screens */}
             <div className="flex flex-col sm:flex-row gap-3">
-
               {/* Go Back button — navigates the browser back one history entry */}
               <button
                 onClick={() => window.history.back()} // uses the browser History API to go back

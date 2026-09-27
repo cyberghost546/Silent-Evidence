@@ -10,11 +10,11 @@
 // Rate: Claude is called at most once per user per 30 minutes (cached in Redis).
 // Requires ANTHROPIC_API_KEY to be set. Falls back to basic scoring if not configured.
 
-import { NextResponse }   from 'next/server';
-import { cookies }        from 'next/headers';
-import Anthropic          from '@anthropic-ai/sdk';
-import { prisma }         from '@/lib/prisma';
-import { cache, TTL }     from '@/lib/cache';
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import Anthropic from '@anthropic-ai/sdk';
+import { prisma } from '@/lib/prisma';
+import { cache, TTL } from '@/lib/cache';
 import { unauthorized, serverError } from '@/lib/apiError';
 
 // Initialise Anthropic client lazily — avoids crashing if key is not set
@@ -69,12 +69,12 @@ export async function GET(req: Request) {
       });
 
       // Candidate pool — stories the user hasn't read yet
-      const readStoryIds = history.map(h => h.story).filter(Boolean);
+      const readStoryIds = history.map((h) => h.story).filter(Boolean);
       const readIds = await prisma.readingHistory.findMany({
         where: { userId },
         select: { storyId: true },
       });
-      const excludeIds = readIds.map(r => r.storyId);
+      const excludeIds = readIds.map((r) => r.storyId);
       if (excludeId) excludeIds.push(excludeId);
 
       // Fetch 30 unread stories as candidates for Claude to choose from
@@ -102,7 +102,7 @@ export async function GET(req: Request) {
 
       // If AI is not configured, fall back to simple popularity-based picks
       if (!ai) {
-        return candidates.slice(0, take).map(s => ({
+        return candidates.slice(0, take).map((s) => ({
           id: s.id,
           title: s.title,
           reason: 'Popular in your preferred genres.',
@@ -112,19 +112,28 @@ export async function GET(req: Request) {
       // Summarise the user's reading taste for Claude
       const tasteContext = [
         history.length > 0
-          ? `Recently read: ${history.slice(0, 8).map(h => `"${h.story.title}" (${h.story.mood ?? 'unknown mood'})`).join(', ')}`
+          ? `Recently read: ${history
+              .slice(0, 8)
+              .map((h) => `"${h.story.title}" (${h.story.mood ?? 'unknown mood'})`)
+              .join(', ')}`
           : 'No reading history yet.',
         liked.length > 0
-          ? `Liked: ${liked.slice(0, 5).map(l => `"${l.story.title}"`).join(', ')}`
+          ? `Liked: ${liked
+              .slice(0, 5)
+              .map((l) => `"${l.story.title}"`)
+              .join(', ')}`
           : '',
-        profile?.fearMoods
-          ? `Fear preferences: ${profile.fearMoods}`
-          : '',
-      ].filter(Boolean).join('\n');
+        profile?.fearMoods ? `Fear preferences: ${profile.fearMoods}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
 
       // Story candidates formatted for Claude
       const candidateList = candidates
-        .map(s => `ID:${s.id} | "${s.title}" | Mood:${s.mood ?? 'none'} | Category:${s.category?.name} | Likes:${s._count.likes} | Excerpt:${s.excerpt?.slice(0, 100) ?? ''}`)
+        .map(
+          (s) =>
+            `ID:${s.id} | "${s.title}" | Mood:${s.mood ?? 'none'} | Category:${s.category?.name} | Likes:${s._count.likes} | Excerpt:${s.excerpt?.slice(0, 100) ?? ''}`
+        )
         .join('\n');
 
       // Ask Claude to pick the best matches and explain why in a horror-appropriate tone
@@ -160,15 +169,15 @@ Keep reasons under 80 characters. Use dark, atmospheric language that fits a hor
         if (jsonMatch) picks = JSON.parse(jsonMatch[0]);
       } catch {
         // If parsing fails, fall back to the first N candidates
-        picks = candidates.slice(0, take).map(s => ({
+        picks = candidates.slice(0, take).map((s) => ({
           id: s.id,
           reason: 'A dark tale that awaits.',
         }));
       }
 
       // Attach story details to the picks so the frontend doesn't need another fetch
-      return picks.map(pick => {
-        const story = candidates.find(c => c.id === pick.id);
+      return picks.map((pick) => {
+        const story = candidates.find((c) => c.id === pick.id);
         return {
           id: pick.id,
           title: story?.title ?? '',

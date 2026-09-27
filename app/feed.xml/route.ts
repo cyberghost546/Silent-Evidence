@@ -31,7 +31,9 @@ export async function GET() {
     },
   });
 
-  const items = stories.map(s => `
+  const items = stories
+    .map(
+      (s) => `
     <item>
       <title>${escapeXml(s.title)}</title>
       <link>${BASE_URL}/story/${s.slug}</link>
@@ -40,7 +42,9 @@ export async function GET() {
       <author>${escapeXml(s.author.username)}</author>
       <category>${escapeXml(s.category.name)}</category>
       ${s.excerpt ? `<description>${escapeXml(s.excerpt)}</description>` : ''}
-    </item>`).join('\n');
+    </item>`
+    )
+    .join('\n');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

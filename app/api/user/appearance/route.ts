@@ -7,7 +7,7 @@ import { unauthorized, serverError } from '@/lib/apiError';
 import { THEMES, BORDERS } from '@/app/lib/themes';
 import { hasPremiumAccess } from '@/lib/premiumCheck';
 
-const VALID_THEMES  = Object.keys(THEMES);
+const VALID_THEMES = Object.keys(THEMES);
 const VALID_BORDERS = Object.keys(BORDERS);
 
 export async function PATCH(req: Request) {
@@ -17,16 +17,16 @@ export async function PATCH(req: Request) {
     if (!userId) return unauthorized();
 
     // Admins and premium subscribers can change cosmetics
-    if (!await hasPremiumAccess(userId)) {
+    if (!(await hasPremiumAccess(userId))) {
       return NextResponse.json({ error: 'Premium subscription required.' }, { status: 403 });
     }
 
     const { profileTheme, avatarBorder } = await req.json();
-    const theme  = VALID_THEMES.includes(profileTheme)  ? profileTheme  : 'default';
+    const theme = VALID_THEMES.includes(profileTheme) ? profileTheme : 'default';
     const border = VALID_BORDERS.includes(avatarBorder) ? avatarBorder : 'none';
 
     await prisma.profile.upsert({
-      where:  { userId },
+      where: { userId },
       update: { profileTheme: theme, avatarBorder: border },
       create: { userId, profileTheme: theme, avatarBorder: border },
     });

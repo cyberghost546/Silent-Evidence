@@ -4,7 +4,7 @@
 // Called from the stories POST route when a story is published without a mood set.
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
-const OLLAMA_MODEL    = process.env.OLLAMA_MODEL    ?? 'llama3.2:3b';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
 
 // Valid mood values, imported from the canonical list rather than redeclared.
 //
@@ -41,7 +41,10 @@ export async function detectMood(title: string, excerpt: string): Promise<Mood |
     if (!res.ok) return null;
 
     const data = await res.json();
-    const raw = (data.response ?? '').trim().toUpperCase().replace(/[^A-Z_]/g, '');
+    const raw = (data.response ?? '')
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z_]/g, '');
 
     return isMood(raw) ? raw : null;
   } catch {

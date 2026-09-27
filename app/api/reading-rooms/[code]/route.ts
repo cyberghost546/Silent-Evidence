@@ -6,10 +6,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { pushRoomUpdate } from '@/lib/pusher';
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const cookieStore = await cookies();
   const userId = Number(cookieStore.get('userId')?.value ?? 0);

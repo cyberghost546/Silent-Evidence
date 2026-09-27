@@ -109,10 +109,10 @@ export async function POST(_req: Request, { params }: Ctx) {
       where: { id: chapterId },
 
       select: {
-        id: true,                              // the chapter's primary key
-        title: true,                           // the chapter's display title (for metadata)
-        price: true,                           // the chapter's price in cents (e.g. 199 = $1.99)
-        story: { select: { title: true } },    // the parent story's title (for receipt email)
+        id: true, // the chapter's primary key
+        title: true, // the chapter's display title (for metadata)
+        price: true, // the chapter's price in cents (e.g. 199 = $1.99)
+        story: { select: { title: true } }, // the parent story's title (for receipt email)
       },
     });
 
@@ -147,8 +147,8 @@ export async function POST(_req: Request, { params }: Ctx) {
     // the customer's card details via Stripe's Payment Element.
     // Create a Stripe PaymentIntent — the frontend will confirm it with the card details
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: chapter.price,       // Amount in cents — must match the chapter's price field
-      currency: 'usd',             // US dollars — change if you support other currencies
+      amount: chapter.price, // Amount in cents — must match the chapter's price field
+      currency: 'usd', // US dollars — change if you support other currencies
 
       // Send a receipt to the user's email after successful payment
       receipt_email: user?.email,
@@ -156,11 +156,11 @@ export async function POST(_req: Request, { params }: Ctx) {
       // metadata is stored with the PaymentIntent in Stripe's dashboard and
       // used in the /confirm endpoint to verify the payment matches this chapter/user
       metadata: {
-        type: 'chapter_purchase',                   // helps categorise payments in Stripe dashboard
-        chapterId: String(chapterId),               // store as string — Stripe metadata is strings only
-        userId: String(userId),                     // the user who initiated the purchase
-        chapterTitle: chapter.title,                // human-readable label for Stripe dashboard
-        storyTitle: chapter.story.title,            // the parent story's title for context
+        type: 'chapter_purchase', // helps categorise payments in Stripe dashboard
+        chapterId: String(chapterId), // store as string — Stripe metadata is strings only
+        userId: String(userId), // the user who initiated the purchase
+        chapterTitle: chapter.title, // human-readable label for Stripe dashboard
+        storyTitle: chapter.story.title, // the parent story's title for context
       },
 
       // Let Stripe automatically show the best payment methods for the user's location
@@ -170,7 +170,6 @@ export async function POST(_req: Request, { params }: Ctx) {
     // Return the clientSecret to the frontend.
     // The frontend passes this to stripe.confirmPayment() to collect card details and pay.
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
-
   } catch (err) {
     // Log the error server-side so we can investigate in the server logs
     console.error('[chapter-purchase]', err);

@@ -63,7 +63,9 @@ export default async function ForumPage({ params }: Props) {
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 text-xs text-gray-500">
-          <Link href="/forums" className="hover:text-gray-300 transition">Forums</Link>
+          <Link href="/forums" className="hover:text-gray-300 transition">
+            Forums
+          </Link>
           <span>/</span>
           <span className="text-gray-300">{forum.name}</span>
         </div>
@@ -84,22 +86,41 @@ export default async function ForumPage({ params }: Props) {
           {forum.posts.length === 0 && (
             <p className="text-center text-gray-600 py-12">No posts yet. Be the first!</p>
           )}
-          {forum.posts.map(post => (
-            <Link key={post.id} href={`/forums/${slug}/${post.id}`}
-              className="group flex items-start gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/40 rounded-xl p-4 transition">
+          {forum.posts.map((post) => (
+            <Link
+              key={post.id}
+              href={`/forums/${slug}/${post.id}`}
+              className="group flex items-start gap-4 bg-gray-800 border border-gray-700 hover:border-red-600/40 rounded-xl p-4 transition"
+            >
               <img
-                src={post.author.profile?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username)}&background=dc2626&color=fff&size=40`}
-                alt={post.author.username} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                src={
+                  post.author.profile?.avatar ??
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username)}&background=dc2626&color=fff&size=40`
+                }
+                alt={post.author.username}
+                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  {post.pinned && <span className="text-xs font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full">Pinned</span>}
-                  <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-1">{post.title}</h3>
+                  {post.pinned && (
+                    <span className="text-xs font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full">
+                      Pinned
+                    </span>
+                  )}
+                  <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors line-clamp-1">
+                    {post.title}
+                  </h3>
                 </div>
                 <p className="text-xs text-gray-500 mt-1 line-clamp-2">{post.content}</p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-gray-600">
                   <span>{post.author.username}</span>
                   <span>·</span>
-                  <span>{new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  <span>
+                    {new Date(post.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
                   <span>·</span>
                   <span>{post._count.replies} replies</span>
                 </div>

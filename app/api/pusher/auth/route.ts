@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   // Pusher sends the socket_id and channel_name as form data
   const body = await req.formData();
-  const socketId    = body.get('socket_id') as string;
+  const socketId = body.get('socket_id') as string;
   const channelName = body.get('channel_name') as string;
 
   if (!socketId || !channelName) {

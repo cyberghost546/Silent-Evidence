@@ -26,9 +26,20 @@ export async function POST(req: Request) {
       authorId: adminId,
       options: { create: options.map((text: string) => ({ text })) },
     },
-    include: { options: { include: { _count: { select: { votes: true } } } }, _count: { select: { votes: true } } },
+    include: {
+      options: { include: { _count: { select: { votes: true } } } },
+      _count: { select: { votes: true } },
+    },
   });
-  await prisma.auditLog.create({ data: { adminId, action: 'CREATE_POLL', targetId: poll.id, targetType: 'Poll', detail: question } });
+  await prisma.auditLog.create({
+    data: {
+      adminId,
+      action: 'CREATE_POLL',
+      targetId: poll.id,
+      targetType: 'Poll',
+      detail: question,
+    },
+  });
   return NextResponse.json(poll);
 }
 
@@ -45,6 +56,8 @@ export async function DELETE(req: Request) {
   if (!adminId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const { id } = await req.json();
   await prisma.poll.delete({ where: { id } });
-  await prisma.auditLog.create({ data: { adminId, action: 'DELETE_POLL', targetId: id, targetType: 'Poll' } });
+  await prisma.auditLog.create({
+    data: { adminId, action: 'DELETE_POLL', targetId: id, targetType: 'Poll' },
+  });
   return NextResponse.json({ ok: true });
 }

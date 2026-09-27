@@ -20,9 +20,9 @@ export default async function PickOfMonth() {
   const story = await prisma.story.findFirst({
     where: { creepyOfMonth: true, status: 'PUBLISHED' },
     include: {
-      author:   { select: { username: true, profile: { select: { avatar: true } } } },
+      author: { select: { username: true, profile: { select: { avatar: true } } } },
       category: { select: { name: true, slug: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
   });
 
@@ -30,7 +30,8 @@ export default async function PickOfMonth() {
   if (!story) return null;
 
   // Fallback avatar using ui-avatars service with green background to match theme
-  const avatar = story.author.profile?.avatar ??
+  const avatar =
+    story.author.profile?.avatar ??
     `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=dc2626&color=fff&size=64`;
 
   return (
@@ -46,7 +47,13 @@ export default async function PickOfMonth() {
         {/* Cover image rendered at low opacity as a background layer */}
         {story.coverImage && (
           <div className="absolute inset-0">
-            <Image src={story.coverImage} alt="" fill sizes="100vw" className="object-cover opacity-20" />
+            <Image
+              src={story.coverImage}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover opacity-20"
+            />
             {/* Gradient overlay fades image toward the left so text remains readable */}
             <div className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-800/90 to-transparent" />
           </div>
@@ -54,13 +61,16 @@ export default async function PickOfMonth() {
 
         {/* Floating green crown badge in the top-right corner */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
- Pick of the Month
+          Pick of the Month
         </div>
 
         {/* Card content: category link, title, excerpt, author row, and CTA */}
         <div className="relative p-8 md:p-10 flex flex-col gap-4 max-w-2xl">
           {/* Category pill — links to the category archive */}
-          <Link href={`/category/${story.category.slug}`} className="text-xs font-bold uppercase tracking-widest text-green-400 hover:text-green-300 transition w-fit">
+          <Link
+            href={`/category/${story.category.slug}`}
+            className="text-xs font-bold uppercase tracking-widest text-green-400 hover:text-green-300 transition w-fit"
+          >
             {story.category.name}
           </Link>
 
@@ -78,12 +88,20 @@ export default async function PickOfMonth() {
 
           {/* Author info row: avatar, username, reading time, and like count */}
           <div className="flex items-center gap-3 mt-1">
-            <Image src={avatar} alt={story.author.username} width={32} height={32} className="rounded-full border-2 border-green-500/40 object-cover" />
+            <Image
+              src={avatar}
+              alt={story.author.username}
+              width={32}
+              height={32}
+              className="rounded-full border-2 border-green-500/40 object-cover"
+            />
             <span className="text-sm text-gray-300">{story.author.username}</span>
             <span className="text-gray-600">·</span>
             <span className="text-xs text-gray-500">{readingTime(story.content)}</span>
             <span className="text-gray-600">·</span>
-            <span className="text-xs text-gray-500 inline-flex items-center gap-0.5"><Heart className="w-3 h-3" /> {story._count.likes}</span>
+            <span className="text-xs text-gray-500 inline-flex items-center gap-0.5">
+              <Heart className="w-3 h-3" /> {story._count.likes}
+            </span>
           </div>
 
           {/* Call-to-action button — green pill linking to the full story */}

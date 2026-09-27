@@ -36,7 +36,7 @@ export async function GET() {
     where: {
       weekOf: {
         gte: start, // greater than or equal to Monday midnight
-        lte: end,   // less than or equal to Sunday 23:59
+        lte: end, // less than or equal to Sunday 23:59
       },
     },
     include: {
@@ -62,7 +62,7 @@ export async function GET() {
     storyId: v.storyId,
     weekOf: v.weekOf,
     createdAt: v.createdAt,
-    voteCount: v.votes.length,          // total number of votes
+    voteCount: v.votes.length, // total number of votes
     voterIds: v.votes.map((vt) => vt.userId), // list of user IDs who voted
   }));
 
@@ -79,10 +79,7 @@ export async function POST(req: NextRequest) {
 
     // name and userId are required; the rest are optional
     if (!name || !userId) {
-      return NextResponse.json(
-        { error: 'name and userId are required.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'name and userId are required.' }, { status: 400 });
     }
 
     // weekOf is always set to the start of the current week (Monday midnight UTC)

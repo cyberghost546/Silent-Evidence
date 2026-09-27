@@ -12,8 +12,8 @@ type Props = {
 
 export default function NewsletterToggle({ initialSubscribed }: Props) {
   const [subscribed, setSubscribed] = useState(initialSubscribed);
-  const [saving, setSaving]         = useState(false);
-  const [saved, setSaved]           = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const toggle = async () => {
     const next = !subscribed;
@@ -46,9 +46,7 @@ export default function NewsletterToggle({ initialSubscribed }: Props) {
 
       <div className="flex items-center gap-3 flex-shrink-0">
         {/* Confirmation pill — flashes briefly after save */}
-        {saved && (
-          <span className="text-xs text-green-400 font-medium">✓ Saved</span>
-        )}
+        {saved && <span className="text-xs text-green-400 font-medium">✓ Saved</span>}
 
         {/* Toggle switch — same pattern used elsewhere in AccountSettings */}
         <button

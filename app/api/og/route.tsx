@@ -15,7 +15,6 @@ export const runtime = 'nodejs';
 
 // Mood emoji mapping — matches the Mood enum values for visual flair on OG cards
 
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get('slug');
@@ -44,7 +43,9 @@ export async function GET(req: Request) {
   // Truncate title and excerpt so they fit the card layout without overflow
   const title = story.title.length > 80 ? story.title.slice(0, 77) + '...' : story.title;
   const excerpt = story.excerpt
-    ? story.excerpt.length > 120 ? story.excerpt.slice(0, 117) + '...' : story.excerpt
+    ? story.excerpt.length > 120
+      ? story.excerpt.slice(0, 117) + '...'
+      : story.excerpt
     : 'A horror story on Silent Evidence';
   // The badge shows the mood name only — this renders to a PNG via Satori,
   // where a text label reproduces far more reliably than any glyph.
@@ -55,122 +56,118 @@ export async function GET(req: Request) {
 
   // Generate the image using Next.js ImageResponse (uses Satori under the hood)
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '60px',
+        // Dark gradient background with a subtle purple tint — matches the Silent Evidence theme
+        background: 'linear-gradient(145deg, #0a0a0a 0%, #0f0520 50%, #0a0a0a 100%)',
+        color: '#ffffff',
+        fontFamily: 'system-ui, sans-serif',
+      }}
+    >
+      {/* Top section — category badge and mood indicator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Category pill — green accent to match Silent Evidence theme */}
+        <div
+          style={{
+            backgroundColor: 'rgba(124, 58, 237, 0.3)',
+            border: '1px solid rgba(124, 58, 237, 0.6)',
+            borderRadius: '20px',
+            padding: '6px 16px',
+            fontSize: '16px',
+            color: '#a78bfa',
+            fontWeight: 600,
+          }}
+        >
+          {story.category.name}
+        </div>
+
+        {/* Mood badge — shows emoji + label if the story has a mood set */}
+        {moodLabel && (
+          <div
+            style={{
+              fontSize: '16px',
+              color: '#888',
+            }}
+          >
+            {moodLabel}
+          </div>
+        )}
+      </div>
+
+      {/* Middle section — title and excerpt */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div
+          style={{
+            fontSize: '48px',
+            fontWeight: 800,
+            lineHeight: 1.15,
+            // Subtle green text shadow for depth
+            textShadow: '0 2px 20px rgba(124, 58, 237, 0.3)',
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            fontSize: '22px',
+            color: '#999',
+            lineHeight: 1.4,
+          }}
+        >
+          {excerpt}
+        </div>
+      </div>
+
+      {/* Bottom section — author info and site branding */}
       <div
         style={{
-          width: '100%',
-          height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '60px',
-          // Dark gradient background with a subtle purple tint — matches the Silent Evidence theme
-          background: 'linear-gradient(145deg, #0a0a0a 0%, #0f0520 50%, #0a0a0a 100%)',
-          color: '#ffffff',
-          fontFamily: 'system-ui, sans-serif',
+          alignItems: 'center',
         }}
       >
-        {/* Top section — category badge and mood indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Category pill — green accent to match Silent Evidence theme */}
-          <div
-            style={{
-              backgroundColor: 'rgba(124, 58, 237, 0.3)',
-              border: '1px solid rgba(124, 58, 237, 0.6)',
-              borderRadius: '20px',
-              padding: '6px 16px',
-              fontSize: '16px',
-              color: '#a78bfa',
-              fontWeight: 600,
-            }}
-          >
-            {story.category.name}
-          </div>
-
-          {/* Mood badge — shows emoji + label if the story has a mood set */}
-          {moodLabel && (
-            <div
-              style={{
-                fontSize: '16px',
-                color: '#888',
-              }}
-            >
-              {moodLabel}
-            </div>
-          )}
-        </div>
-
-        {/* Middle section — title and excerpt */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div
-            style={{
-              fontSize: '48px',
-              fontWeight: 800,
-              lineHeight: 1.15,
-              // Subtle green text shadow for depth
-              textShadow: '0 2px 20px rgba(124, 58, 237, 0.3)',
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              fontSize: '22px',
-              color: '#999',
-              lineHeight: 1.4,
-            }}
-          >
-            {excerpt}
+          {/* Author name */}
+          <div style={{ fontSize: '18px', color: '#aaa' }}>by {story.author.username}</div>
+          {/* Engagement stats — likes and comments count */}
+          <div style={{ fontSize: '16px', color: '#555' }}>
+            {story._count.likes} likes · {story._count.comments} comments
           </div>
         </div>
 
-        {/* Bottom section — author info and site branding */}
+        {/* Site branding — bottom right corner in green accent */}
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
+            gap: '8px',
+            fontSize: '20px',
+            fontWeight: 700,
+            color: '#22c55e',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Author name */}
-            <div style={{ fontSize: '18px', color: '#aaa' }}>
-              by {story.author.username}
-            </div>
-            {/* Engagement stats — likes and comments count */}
-            <div style={{ fontSize: '16px', color: '#555' }}>
-              {story._count.likes} likes · {story._count.comments} comments
-            </div>
-          </div>
-
-          {/* Site branding — bottom right corner in green accent */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '20px',
-              fontWeight: 700,
-              color: '#22c55e',
-            }}
-          >
-            Silent Evidence
-          </div>
+          Silent Evidence
         </div>
-
-        {/* Decorative green gradient line at the bottom — subtle brand accent */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, transparent, #22c55e, transparent)',
-          }}
-        />
       </div>
-    ),
+
+      {/* Decorative green gradient line at the bottom — subtle brand accent */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, transparent, #22c55e, transparent)',
+        }}
+      />
+    </div>,
     {
       width: 1200,
       height: 630,

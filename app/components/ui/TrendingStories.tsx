@@ -26,7 +26,12 @@ export default async function TrendingStories() {
       where: { status: 'PUBLISHED', createdAt: { gte: thirtyDaysAgo } },
       take: 60,
       select: {
-        id: true, title: true, slug: true, views: true, coverImage: true, createdAt: true,
+        id: true,
+        title: true,
+        slug: true,
+        views: true,
+        coverImage: true,
+        createdAt: true,
         author: { select: { username: true } },
         category: { select: { name: true, slug: true } },
         likes: { where: { createdAt: { gte: fortyEightHoursAgo } }, select: { id: true } },
@@ -37,12 +42,13 @@ export default async function TrendingStories() {
 
     const now = Date.now();
     const scored = stories
-      .map(s => {
+      .map((s) => {
         const ageDays = (now - s.createdAt.getTime()) / 86400000;
         const recency = ageDays < 1 ? 20 : ageDays < 3 ? 10 : ageDays < 7 ? 5 : 0;
         const score = s.likes.length * 5 + s.comments.length * 8 + s.views * 0.1 + recency;
         const { likes, comments, ...rest } = s;
-        void likes; void comments;
+        void likes;
+        void comments;
         return { ...rest, score };
       })
       .sort((a, b) => b.score - a.score)
@@ -56,13 +62,18 @@ export default async function TrendingStories() {
       orderBy: { views: 'desc' },
       take: 5,
       select: {
-        id: true, title: true, slug: true, views: true, coverImage: true, createdAt: true,
+        id: true,
+        title: true,
+        slug: true,
+        views: true,
+        coverImage: true,
+        createdAt: true,
         author: { select: { username: true } },
         category: { select: { name: true, slug: true } },
         _count: { select: { likes: true } },
       },
     });
-    return fallback.map(s => ({ ...s, score: s.views }));
+    return fallback.map((s) => ({ ...s, score: s.views }));
   });
 
   // If there are truly no stories at all, show a friendly placeholder
@@ -75,7 +86,9 @@ export default async function TrendingStories() {
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 text-center">
           <p className="text-gray-400 text-sm">No trending stories yet this week.</p>
-          <p className="text-gray-600 text-xs mt-1">Check back soon — or be the first to write one.</p>
+          <p className="text-gray-600 text-xs mt-1">
+            Check back soon — or be the first to write one.
+          </p>
         </div>
       </section>
     );
@@ -86,7 +99,9 @@ export default async function TrendingStories() {
       <div className="flex items-center gap-3 mb-6">
         <span className="w-1 h-6 bg-orange-500 rounded-full" />
         <h2 className="text-2xl font-bold text-white">Trending</h2>
-        <span className="text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full">This week</span>
+        <span className="text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full">
+          This week
+        </span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -97,18 +112,36 @@ export default async function TrendingStories() {
             className="group flex items-center gap-4 bg-gray-800 border border-gray-700 hover:border-orange-500/40 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_20px_rgba(220,38,38,0.15)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)]"
           >
             {/* Rank number — gold for #1, silver for #2, bronze for #3, grey for the rest */}
-            <span className={`text-2xl font-extrabold w-8 text-center flex-shrink-0 ${
-              i === 0 ? 'text-red-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-amber-700' : 'text-gray-600'
-            }`}>
+            <span
+              className={`text-2xl font-extrabold w-8 text-center flex-shrink-0 ${
+                i === 0
+                  ? 'text-red-400'
+                  : i === 1
+                    ? 'text-gray-400'
+                    : i === 2
+                      ? 'text-amber-700'
+                      : 'text-gray-600'
+              }`}
+            >
               {i + 1}
             </span>
             {story.coverImage && (
               // Using Next.js Image for automatic resizing, WebP conversion, and lazy loading
-              <Image src={story.coverImage} alt={story.title} width={56} height={56} className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
+              <Image
+                src={story.coverImage}
+                alt={story.title}
+                width={56}
+                height={56}
+                className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
+              />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-0.5">{story.category.name}</p>
-              <h3 className="text-sm font-semibold text-white group-hover:text-orange-300 transition line-clamp-1">{story.title}</h3>
+              <p className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-0.5">
+                {story.category.name}
+              </p>
+              <h3 className="text-sm font-semibold text-white group-hover:text-orange-300 transition line-clamp-1">
+                {story.title}
+              </h3>
               <p className="text-xs text-gray-500 mt-0.5">{story.author.username}</p>
             </div>
             <div className="flex flex-col items-end gap-1 flex-shrink-0 text-xs text-gray-500">

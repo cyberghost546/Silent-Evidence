@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         title: true,
-        price: true,   // Price in cents; null means free
-        status: true,  // Only published stories should be purchasable
+        price: true, // Price in cents; null means free
+        status: true, // Only published stories should be purchasable
       },
     });
 
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       // them to create the StoryPurchase row and link the payment to the correct
       // user and story without any additional DB queries.
       metadata: {
-        type: 'story_purchase',     // Tells the webhook which action to perform
+        type: 'story_purchase', // Tells the webhook which action to perform
         userId: String(userId),
         storyId: String(storyId),
         amount: String(story.price),
@@ -115,9 +115,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('[stripe/story/checkout] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create story checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create story checkout session' }, { status: 500 });
   }
 }

@@ -11,15 +11,19 @@ import { verifyCsrfToken } from '@/lib/csrf';
 import { z } from 'zod';
 
 const CreateCommentSchema = z.object({
-  storyId:  z.number().int().positive('A valid story ID is required.'),
-  content:  z.string().min(1, 'Comment cannot be empty.').max(2000, 'Comment is too long (max 2000 characters).'),
+  storyId: z.number().int().positive('A valid story ID is required.'),
+  content: z
+    .string()
+    .min(1, 'Comment cannot be empty.')
+    .max(2000, 'Comment is too long (max 2000 characters).'),
   parentId: z.number().int().positive().nullable().optional(),
 });
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
   const rl = await checkRateLimit(ip, 'comments', { limit: 10, windowMs: 60 * 1000 });
-  if (rl.blocked) return NextResponse.json({ error: 'Too many comments — slow down.' }, { status: 429 });
+  if (rl.blocked)
+    return NextResponse.json({ error: 'Too many comments — slow down.' }, { status: 429 });
 
   if (!(await verifyCsrfToken(req))) {
     return NextResponse.json({ error: 'Invalid CSRF token.' }, { status: 403 });
@@ -32,7 +36,10 @@ export async function POST(req: Request) {
   const rawBody = await req.json();
   const parsed = CreateCommentSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid request', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
   const { storyId, content: rawContent, parentId } = parsed.data;
   const content = rawContent.trim();
@@ -41,7 +48,9 @@ export async function POST(req: Request) {
   const toxicity = await checkToxicity(content);
   if (toxicity.flagged) {
     return NextResponse.json(
-      { error: 'Your comment was flagged for potentially harmful content and could not be posted.' },
+      {
+        error: 'Your comment was flagged for potentially harmful content and could not be posted.',
+      },
       { status: 422 }
     );
   }
@@ -62,7 +71,10 @@ export async function POST(req: Request) {
     },
   });
 
-  const commenter = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+  const commenter = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { username: true },
+  });
 
   if (parentId) {
     // Reply — notify the parent comment's author (in-app + email)
@@ -71,17 +83,20 @@ export async function POST(req: Request) {
       select: { userId: true, story: { select: { title: true, slug: true } } },
     });
     if (parent && parent.userId !== userId) {
-      prisma.notification.create({
-        data: {
-          userId: parent.userId,
-          type: 'REPLY',
-          message: `${commenter?.username ?? 'Someone'} replied to your comment.`,
-          storyId,
-        },
-      }).catch(() => {});
+      prisma.notification
+        .create({
+          data: {
+            userId: parent.userId,
+            type: 'REPLY',
+            message: `${commenter?.username ?? 'Someone'} replied to your comment.`,
+            storyId,
+          },
+        })
+        .catch(() => {});
 
       // Email the parent comment author
-      prisma.user.findUnique({ where: { id: parent.userId }, select: { email: true, username: true } })
+      prisma.user
+        .findUnique({ where: { id: parent.userId }, select: { email: true, username: true } })
         .then((parentUser) => {
           if (parentUser && commenter && parent.story) {
             notifyCommentReply({
@@ -93,7 +108,8 @@ export async function POST(req: Request) {
               replyExcerpt: content,
             }).catch(() => {});
           }
-        }).catch(() => {});
+        })
+        .catch(() => {});
     }
   } else {
     // Top-level comment — notify story author (in-app + email)
@@ -102,17 +118,20 @@ export async function POST(req: Request) {
       select: { authorId: true, title: true, slug: true },
     });
     if (story && story.authorId !== userId) {
-      prisma.notification.create({
-        data: {
-          userId: story.authorId,
-          type: 'COMMENT',
-          message: `${commenter?.username ?? 'Someone'} commented on your story.`,
-          storyId,
-        },
-      }).catch(() => {});
+      prisma.notification
+        .create({
+          data: {
+            userId: story.authorId,
+            type: 'COMMENT',
+            message: `${commenter?.username ?? 'Someone'} commented on your story.`,
+            storyId,
+          },
+        })
+        .catch(() => {});
 
       // Email + push the story author
-      prisma.user.findUnique({ where: { id: story.authorId }, select: { email: true, username: true } })
+      prisma.user
+        .findUnique({ where: { id: story.authorId }, select: { email: true, username: true } })
         .then((storyAuthor) => {
           if (storyAuthor && commenter) {
             notifyNewComment({
@@ -130,15 +149,16 @@ export async function POST(req: Request) {
               url: `/story/${story.slug}#comments`,
             }).catch(() => {});
           }
-        }).catch(() => {});
+        })
+        .catch(() => {});
     }
   }
 
   // Detect @mentions in the comment text and notify each mentioned user.
   // A mention is any @word that matches an existing username.
-  const mentionHandles = [...new Set(
-    (content.match(/@(\w+)/g) ?? []).map((m: string) => m.slice(1).toLowerCase())
-  )] as string[];
+  const mentionHandles = [
+    ...new Set((content.match(/@(\w+)/g) ?? []).map((m: string) => m.slice(1).toLowerCase())),
+  ] as string[];
   if (mentionHandles.length > 0) {
     const mentionedUsers = await prisma.user.findMany({
       where: { username: { in: mentionHandles } },
@@ -147,14 +167,16 @@ export async function POST(req: Request) {
     for (const mu of mentionedUsers) {
       // Don't notify yourself, and don't double-notify story author/parent author
       if (mu.id === userId) continue;
-      prisma.notification.create({
-        data: {
-          userId: mu.id,
-          type: 'MENTION',
-          message: `${commenter?.username ?? 'Someone'} mentioned you in a comment.`,
-          storyId,
-        },
-      }).catch(() => {});
+      prisma.notification
+        .create({
+          data: {
+            userId: mu.id,
+            type: 'MENTION',
+            message: `${commenter?.username ?? 'Someone'} mentioned you in a comment.`,
+            storyId,
+          },
+        })
+        .catch(() => {});
     }
   }
 

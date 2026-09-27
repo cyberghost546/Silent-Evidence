@@ -99,7 +99,7 @@ function allowedRatings(ageGroup: string | null | undefined): ContentRating[] {
 function baseWhere(
   currentStoryId: number,
   ageGroup: string | null | undefined,
-  hasPremium: boolean,
+  hasPremium: boolean
 ): Prisma.StoryWhereInput {
   const now = new Date();
   return {
@@ -112,10 +112,7 @@ function baseWhere(
       ? {}
       : {
           isPremiumOnly: false,
-          OR: [
-            { earlyAccessUntil: null },
-            { earlyAccessUntil: { lte: now } },
-          ],
+          OR: [{ earlyAccessUntil: null }, { earlyAccessUntil: { lte: now } }],
         }),
   };
 }
@@ -135,8 +132,14 @@ export interface NextStoryInput {
 
 export async function getNextStory(input: NextStoryInput): Promise<NextStory | null> {
   const {
-    currentStoryId, userId, ageGroup, hasPremium = false,
-    seriesId, seriesOrder, categoryId, mood,
+    currentStoryId,
+    userId,
+    ageGroup,
+    hasPremium = false,
+    seriesId,
+    seriesOrder,
+    categoryId,
+    mood,
   } = input;
 
   const where = baseWhere(currentStoryId, ageGroup, hasPremium);
@@ -172,7 +175,7 @@ export async function getNextStory(input: NextStoryInput): Promise<NextStory | n
   // Most recent first: the thing they walked away from yesterday is a better
   // bet than the one they abandoned in March.
   const unfinished = history.filter(
-    (h) => h.progress >= RESUME_FLOOR && h.progress < FINISHED_AT && h.storyId !== currentStoryId,
+    (h) => h.progress >= RESUME_FLOOR && h.progress < FINISHED_AT && h.storyId !== currentStoryId
   );
 
   if (unfinished.length > 0) {
@@ -188,7 +191,11 @@ export async function getNextStory(input: NextStoryInput): Promise<NextStory | n
 
   // ── 3. Similar to what they read and liked ────────────────────────────────
   const similar = await scoreSimilar({
-    where, userId, readIds, categoryId, mood,
+    where,
+    userId,
+    readIds,
+    categoryId,
+    mood,
   });
   if (similar) return similar;
 
@@ -233,7 +240,10 @@ async function scoreSimilar(args: {
   ]);
 
   const fearMoods = new Set(
-    (profile?.fearMoods ?? '').split(',').map((m) => m.trim()).filter(Boolean),
+    (profile?.fearMoods ?? '')
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean)
   );
   const followedIds = new Set(follows.map((f) => f.followingId));
   const likedCategories = new Set(likes.map((l) => l.story?.categoryId).filter(Boolean));
@@ -290,7 +300,7 @@ async function scoreSimilar(args: {
 /** Popular recent stories — the honest fallback when nothing personal applies. */
 async function trending(
   where: Prisma.StoryWhereInput,
-  excludeIds: number[] = [],
+  excludeIds: number[] = []
 ): Promise<NextStory | null> {
   const story = await prisma.story.findFirst({
     where: excludeIds.length

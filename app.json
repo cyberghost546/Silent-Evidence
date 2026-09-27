@@ -11,9 +11,7 @@
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.silentevidence.app",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ]
+        "UIBackgroundModes": ["remote-notification"]
       }
     },
     "android": {

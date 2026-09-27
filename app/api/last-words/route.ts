@@ -85,7 +85,6 @@ export async function GET() {
 
     // Return the shaped array as JSON
     return NextResponse.json(shaped);
-
   } catch (err) {
     // Log the full error server-side for debugging
     console.error('[GET /api/last-words]', err);
@@ -119,7 +118,7 @@ export async function POST(req: Request) {
     if (content.length > 280) {
       return NextResponse.json(
         { error: 'Last words must be 280 characters or fewer.' },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -155,7 +154,6 @@ export async function POST(req: Request) {
         avatar: avatarUrl(word.user.username, word.user.profile?.avatar),
       },
     });
-
   } catch (err) {
     // Log the error server-side
     console.error('[POST /api/last-words]', err);

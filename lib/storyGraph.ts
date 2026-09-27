@@ -53,10 +53,10 @@ export interface StoryGraph {
 }
 
 // Layout constants, in SVG units.
-const CATEGORY_RING = 260;   // distance from author to each category
-const STORY_RING    = 150;   // distance from a category to its stories
-const AUTHOR_R      = 26;
-const CATEGORY_R    = 13;
+const CATEGORY_RING = 260; // distance from author to each category
+const STORY_RING = 150; // distance from a category to its stories
+const AUTHOR_R = 26;
+const CATEGORY_R = 13;
 
 /**
  * Story node radius, scaled by views.
@@ -95,9 +95,14 @@ export async function getStoryGraph(username: string): Promise<StoryGraph | null
   // Group by category. Stories with no category are collected under a single
   // "Uncategorised" bucket rather than dropped, so the totals on the page always
   // add up to the number of stories the author actually has.
-  const buckets = new Map<string, {
-    name: string; slug: string | null; stories: typeof stories;
-  }>();
+  const buckets = new Map<
+    string,
+    {
+      name: string;
+      slug: string | null;
+      stories: typeof stories;
+    }
+  >();
 
   for (const s of stories) {
     const key = s.category ? String(s.category.id) : 'none';

@@ -31,7 +31,7 @@ export default function MyInvitesClient({ invites: initial }: { invites: Invite[
     setBusy(null);
     if (res.ok) {
       // Update the local state so the UI reflects the decision immediately
-      setInvites(prev => prev.map(inv => inv.id === id ? { ...inv, accepted } : inv));
+      setInvites((prev) => prev.map((inv) => (inv.id === id ? { ...inv, accepted } : inv)));
     }
   };
 
@@ -61,7 +61,11 @@ export default function MyInvitesClient({ invites: initial }: { invites: Invite[
               {inv.story.title}
             </Link>
             <p className="text-xs text-gray-600 mt-1">
-              {new Date(inv.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {new Date(inv.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </p>
           </div>
 

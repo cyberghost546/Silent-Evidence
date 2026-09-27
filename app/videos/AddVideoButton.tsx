@@ -55,7 +55,9 @@ function getYouTubeThumbnail(url: string): string | null {
       if (shorts) id = shorts[1];
     }
     return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function isValidVideoUrl(url: string) {
@@ -64,7 +66,9 @@ function isValidVideoUrl(url: string) {
     const isYT = ['youtu.be', 'www.youtube.com', 'youtube.com'].includes(u.hostname);
     const isDirect = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
     return isYT || isDirect;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export default function AddVideoButton({ categories }: { categories: Category[] }) {
@@ -106,8 +110,14 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
   }
 
   async function handleSubmit() {
-    if (!title.trim()) { setError('Title is required.'); return; }
-    if (!categoryId) { setError('Please select a category.'); return; }
+    if (!title.trim()) {
+      setError('Title is required.');
+      return;
+    }
+    if (!categoryId) {
+      setError('Please select a category.');
+      return;
+    }
 
     setSubmitting(true);
     setError('');
@@ -150,7 +160,13 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition shadow-lg shadow-red-600/20"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
         Add Video
@@ -160,15 +176,24 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl">
-
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
               <div>
                 <h2 className="text-white font-bold text-lg">Add a Video</h2>
                 <p className="text-xs text-gray-500 mt-0.5">Step {step} of 2</p>
               </div>
-              <button type="button" onClick={reset} className="text-gray-500 hover:text-white transition p-1">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <button
+                type="button"
+                onClick={reset}
+                className="text-gray-500 hover:text-white transition p-1"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -185,7 +210,10 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                     <input
                       type="url"
                       value={videoUrl}
-                      onChange={e => { setVideoUrl(e.target.value); setUrlError(''); }}
+                      onChange={(e) => {
+                        setVideoUrl(e.target.value);
+                        setUrlError('');
+                      }}
                       placeholder="https://youtube.com/watch?v=..."
                       className="w-full bg-gray-800 border border-gray-700 focus:border-red-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder-gray-600"
                     />
@@ -195,10 +223,21 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                   {/* Thumbnail preview */}
                   {videoUrl && isValidVideoUrl(videoUrl) && thumb && (
                     <div className="rounded-xl overflow-hidden border border-gray-800">
-                      <div className="relative w-full" style={{ maxHeight: '192px', aspectRatio: '16/9' }}>
-                        <Image src={thumb} alt="Preview" fill sizes="(max-width: 640px) 100vw, 512px" className="object-cover" />
+                      <div
+                        className="relative w-full"
+                        style={{ maxHeight: '192px', aspectRatio: '16/9' }}
+                      >
+                        <Image
+                          src={thumb}
+                          alt="Preview"
+                          fill
+                          sizes="(max-width: 640px) 100vw, 512px"
+                          className="object-cover"
+                        />
                       </div>
-                      <p className="text-xs text-gray-500 px-3 py-2">Preview looks good? Continue to add details.</p>
+                      <p className="text-xs text-gray-500 px-3 py-2">
+                        Preview looks good? Continue to add details.
+                      </p>
                     </div>
                   )}
 
@@ -218,7 +257,13 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                   {/* Thumbnail small preview */}
                   {thumb && (
                     <div className="flex gap-3 items-center bg-gray-800 rounded-xl p-3">
-                      <Image src={thumb} alt="thumb" width={80} height={48} className="object-cover rounded-lg shrink-0" />
+                      <Image
+                        src={thumb}
+                        alt="thumb"
+                        width={80}
+                        height={48}
+                        className="object-cover rounded-lg shrink-0"
+                      />
                       <p className="text-xs text-gray-400 truncate">{videoUrl}</p>
                     </div>
                   )}
@@ -230,7 +275,7 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                     <input
                       type="text"
                       value={title}
-                      onChange={e => setTitle(e.target.value)}
+                      onChange={(e) => setTitle(e.target.value)}
                       placeholder="Give your video a title…"
                       maxLength={200}
                       className="w-full bg-gray-800 border border-gray-700 focus:border-red-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder-gray-600"
@@ -243,7 +288,7 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                     </label>
                     <textarea
                       value={excerpt}
-                      onChange={e => setExcerpt(e.target.value)}
+                      onChange={(e) => setExcerpt(e.target.value)}
                       placeholder="Short description of the video…"
                       rows={3}
                       className="w-full bg-gray-800 border border-gray-700 focus:border-red-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder-gray-600 resize-none"
@@ -256,11 +301,13 @@ export default function AddVideoButton({ categories }: { categories: Category[] 
                     </label>
                     <select
                       value={categoryId}
-                      onChange={e => setCategoryId(Number(e.target.value))}
+                      onChange={(e) => setCategoryId(Number(e.target.value))}
                       className="w-full bg-gray-800 border border-gray-700 focus:border-red-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition"
                     >
-                      {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
                       ))}
                     </select>
                   </div>

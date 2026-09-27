@@ -22,7 +22,7 @@ export async function GET() {
   if (grouped.length === 0) return NextResponse.json([]);
 
   // Fetch user details for each recipient
-  const userIds = grouped.map(g => g.toUserId);
+  const userIds = grouped.map((g) => g.toUserId);
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
     select: {
@@ -33,15 +33,15 @@ export async function GET() {
     },
   });
 
-  const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+  const userMap = Object.fromEntries(users.map((u) => [u.id, u]));
 
   const result = grouped
-    .filter(g => userMap[g.toUserId]) // skip if user was deleted
-    .map(g => ({
-      username:   userMap[g.toUserId].username,
-      avatar:     userMap[g.toUserId].profile?.avatar ?? null,
+    .filter((g) => userMap[g.toUserId]) // skip if user was deleted
+    .map((g) => ({
+      username: userMap[g.toUserId].username,
+      avatar: userMap[g.toUserId].profile?.avatar ?? null,
       isVerified: userMap[g.toUserId].isVerified,
-      totalTips:  g._sum.amount ?? 0,
+      totalTips: g._sum.amount ?? 0,
     }));
 
   return NextResponse.json(result);

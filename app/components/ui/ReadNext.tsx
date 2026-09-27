@@ -53,7 +53,10 @@ export default function ReadNext({ story }: { story: NextStory }) {
     <section className="mt-10" aria-labelledby="read-next-heading">
       <div className="flex items-center gap-2 mb-3">
         <meta.icon className={`w-4 h-4 ${meta.accent}`} strokeWidth={1.75} aria-hidden="true" />
-        <h2 id="read-next-heading" className={`text-xs font-bold uppercase tracking-widest ${meta.accent}`}>
+        <h2
+          id="read-next-heading"
+          className={`text-xs font-bold uppercase tracking-widest ${meta.accent}`}
+        >
           {meta.label}
         </h2>
       </div>
@@ -113,7 +116,9 @@ export default function ReadNext({ story }: { story: NextStory }) {
               </div>
             )}
 
-            <span className={`inline-flex items-center gap-1.5 text-sm font-semibold mt-4 ${meta.accent}`}>
+            <span
+              className={`inline-flex items-center gap-1.5 text-sm font-semibold mt-4 ${meta.accent}`}
+            >
               {story.reason === 'resume' ? 'Continue reading' : 'Read it now'}
               <ArrowRight
                 className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"

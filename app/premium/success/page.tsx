@@ -21,7 +21,6 @@ export default function PremiumSuccessPage() {
 
       {/* ── Hero success card ──────────────────────────────────────────────── */}
       <section className="flex-1 flex items-center justify-center px-4 py-20 relative">
-
         {/* Decorative background glows */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {/* Central gold bloom */}
@@ -31,11 +30,9 @@ export default function PremiumSuccessPage() {
         </div>
 
         <div className="relative z-10 max-w-lg w-full text-center">
-
           {/* ── Animated badge ──────────────────────────────────────────────
               Wrapped in a scale + pulse animation via Tailwind animate classes */}
-          <div className="flex justify-center mb-6 animate-bounce">
-          </div>
+          <div className="flex justify-center mb-6 animate-bounce"></div>
 
           {/* Main heading */}
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-3 leading-tight">
@@ -52,21 +49,24 @@ export default function PremiumSuccessPage() {
 
           {/* Sub-copy */}
           <p className="text-gray-400 text-base mb-10 leading-relaxed">
-            Your subscription is now active. The darkest stories on the web are
-            yours to devour. Your elite badge will appear on your profile shortly.
+            Your subscription is now active. The darkest stories on the web are yours to devour.
+            Your elite badge will appear on your profile shortly.
           </p>
 
           {/* Divider with skulls */}
-          <div className="flex items-center gap-3 justify-center mb-8 text-gray-700 text-lg select-none" aria-hidden="true">
+          <div
+            className="flex items-center gap-3 justify-center mb-8 text-gray-700 text-lg select-none"
+            aria-hidden="true"
+          >
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
           </div>
 
           {/* ── Perks reminder ─────────────────────────────────────────────── */}
           <ul className="text-left space-y-3 mb-10 max-w-xs mx-auto">
             {[
-              { icon: Zap,     text: 'Horror Elite badge is now showing on your profile' },
-              { icon: Unlock,  text: 'All premium stories are unlocked' },
-              { icon: Crown,   text: 'You have priority in leaderboards' },
+              { icon: Zap, text: 'Horror Elite badge is now showing on your profile' },
+              { icon: Unlock, text: 'All premium stories are unlocked' },
+              { icon: Crown, text: 'You have priority in leaderboards' },
               { icon: Palette, text: 'Exclusive blood theme available in settings' },
             ].map((perk) => (
               <li key={perk.text} className="flex items-start gap-3 text-sm text-gray-300">
@@ -94,8 +94,7 @@ export default function PremiumSuccessPage() {
           </Link>
 
           {/* Bottom decorative skulls */}
-          <p className="mt-12 text-3xl opacity-10 select-none" aria-hidden="true">
-          </p>
+          <p className="mt-12 text-3xl opacity-10 select-none" aria-hidden="true"></p>
         </div>
       </section>
 

@@ -48,7 +48,7 @@ export async function GET() {
         take: 200,
       });
 
-      const scored = stories.map(story => {
+      const scored = stories.map((story) => {
         const recentLikes = story.likes.length;
         const recentComments = story.comments.length;
         const ageMs = now.getTime() - story.createdAt.getTime();
@@ -59,14 +59,11 @@ export async function GET() {
         else if (ageDays < 3) recencyBonus = 10;
         else if (ageDays < 7) recencyBonus = 5;
 
-        const score =
-          recentLikes * 5 +
-          recentComments * 8 +
-          story.views * 0.1 +
-          recencyBonus;
+        const score = recentLikes * 5 + recentComments * 8 + story.views * 0.1 + recencyBonus;
 
         const { likes, comments, ...rest } = story;
-        void likes; void comments;
+        void likes;
+        void comments;
 
         return { ...rest, trendingScore: Math.round(score) };
       });

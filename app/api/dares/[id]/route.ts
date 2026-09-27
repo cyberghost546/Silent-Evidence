@@ -28,7 +28,6 @@ type Params = { params: Promise<{ id: string }> };
 // req   — the incoming HTTP request (we'll read the JSON body from it)
 // params — the dynamic URL segments, here just { id: string }
 export async function PATCH(req: Request, { params }: Params) {
-
   // We must await params before we can read any segment from it.
   // This is required in Next.js 14+ because params is now a Promise.
   const { id } = await params;

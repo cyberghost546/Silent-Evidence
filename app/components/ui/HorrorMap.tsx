@@ -36,7 +36,7 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
     let cancelled = false;
 
     // Dynamically import Leaflet (client-only)
-    import('leaflet').then(L => {
+    import('leaflet').then((L) => {
       // Bail out if the component was unmounted or map already initialized
       if (cancelled || !mapRef.current || (mapRef.current as any)._leaflet_id) return;
 
@@ -63,14 +63,14 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
       // Custom skull marker icon using a div with an emoji + glowing drop-shadow
       const skullIcon = L.divIcon({
         html: '',
-        className: '',    // empty string removes Leaflet's default white box
+        className: '', // empty string removes Leaflet's default white box
         iconSize: [28, 28],
-        iconAnchor: [14, 28],   // bottom-centre of the icon sits on the coordinate
-        popupAnchor: [0, -30],  // popup opens above the marker
+        iconAnchor: [14, 28], // bottom-centre of the icon sits on the coordinate
+        popupAnchor: [0, -30], // popup opens above the marker
       });
 
       // Place one skull marker on the map for each story with a location
-      stories.forEach(story => {
+      stories.forEach((story) => {
         // Popup HTML — inline styles are needed because Leaflet popups are outside
         // the Next.js component tree so Tailwind classes won't be applied.
         const popup = `
@@ -108,7 +108,10 @@ export default function HorrorMap({ stories }: { stories: Story[] }) {
       <style>{`.horror-popup .leaflet-popup-content-wrapper{background:#1f2937;border:1px solid #374151;color:#fff;border-radius:12px}.horror-popup .leaflet-popup-tip{background:#1f2937}`}</style>
 
       {/* The empty div that Leaflet will render the map canvas into */}
-      <div ref={mapRef} className="w-full h-[500px] rounded-xl overflow-hidden border border-gray-700" />
+      <div
+        ref={mapRef}
+        className="w-full h-[500px] rounded-xl overflow-hidden border border-gray-700"
+      />
     </>
   );
 }

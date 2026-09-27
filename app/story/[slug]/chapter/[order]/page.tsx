@@ -37,9 +37,15 @@ export default async function ChapterPage({ params }: Props) {
   // Fetch the story and all its chapters so we can build prev/next links
   const story = await prisma.story.findUnique({
     where: { slug, status: 'PUBLISHED', isChaptered: true },
-    select: { id: true, title: true, slug: true, language: true,
-              isPremiumOnly: true, earlyAccessUntil: true,
-              author: { select: { id: true, username: true } } },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      language: true,
+      isPremiumOnly: true,
+      earlyAccessUntil: true,
+      author: { select: { id: true, username: true } },
+    },
   });
   if (!story) return notFound();
 
@@ -50,7 +56,7 @@ export default async function ChapterPage({ params }: Props) {
     select: { id: true, title: true, order: true },
   });
 
-  const currentIndex = allChapters.findIndex(c => c.order === order);
+  const currentIndex = allChapters.findIndex((c) => c.order === order);
   if (currentIndex === -1) return notFound();
 
   // Fetch full content only for the current chapter
@@ -60,7 +66,7 @@ export default async function ChapterPage({ params }: Props) {
   if (!chapter) return notFound();
 
   // Admins + premium subscribers can read all chapters; everyone else is limited to chapter 1
-  const isAuthor   = userId === story.author.id;
+  const isAuthor = userId === story.author.id;
   const hasPremium = await hasPremiumAccess(userId);
 
   // Three separate reasons a chapter can be locked, all resolving to the same
@@ -77,9 +83,14 @@ export default async function ChapterPage({ params }: Props) {
 
   // Deduplicated chapter view counter
   const reqHeaders = await headers();
-  const viewerIp = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? reqHeaders.get('x-real-ip') ?? 'unknown';
-  if (!await hasRecentView(chapter.id * -1, viewerIp)) {
-    prisma.storyChapter.update({ where: { id: chapter.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  const viewerIp =
+    reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    reqHeaders.get('x-real-ip') ??
+    'unknown';
+  if (!(await hasRecentView(chapter.id * -1, viewerIp))) {
+    prisma.storyChapter
+      .update({ where: { id: chapter.id }, data: { views: { increment: 1 } } })
+      .catch(() => {});
   }
 
   const prev = allChapters[currentIndex - 1] ?? null;
@@ -91,7 +102,10 @@ export default async function ChapterPage({ params }: Props) {
 
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Breadcrumb */}
-        <Link href={`/story/${slug}`} className="text-xs text-gray-500 hover:text-red-400 transition">
+        <Link
+          href={`/story/${slug}`}
+          className="text-xs text-gray-500 hover:text-red-400 transition"
+        >
           ← Back to {story.title}
         </Link>
 
@@ -100,7 +114,9 @@ export default async function ChapterPage({ params }: Props) {
           <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-2">
             Chapter {currentIndex + 1} of {allChapters.length}
           </p>
-          <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{chapter.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+            {chapter.title}
+          </h1>
           <p className="text-sm text-gray-500 mt-2">by {story.author.username}</p>
         </div>
 
@@ -111,15 +127,20 @@ export default async function ChapterPage({ params }: Props) {
             <p className="text-sm text-gray-400 mb-2">
               Chapter 1 is free for everyone. Continue the story by upgrading to premium.
             </p>
-            <p className="text-xs text-gray-600 mb-6">Unlock all chapters on every story, plus every other premium perk.</p>
+            <p className="text-xs text-gray-600 mb-6">
+              Unlock all chapters on every story, plus every other premium perk.
+            </p>
             <a
               href="/premium"
               className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-sm"
             >
- Unlock All Chapters
+              Unlock All Chapters
             </a>
             <div className="mt-4">
-              <Link href={`/story/${slug}/chapter/${allChapters[0].order}`} className="text-xs text-gray-500 hover:text-gray-400 transition underline">
+              <Link
+                href={`/story/${slug}/chapter/${allChapters[0].order}`}
+                className="text-xs text-gray-500 hover:text-gray-400 transition underline"
+              >
                 ← Re-read Chapter 1 for free
               </Link>
             </div>
@@ -138,7 +159,9 @@ export default async function ChapterPage({ params }: Props) {
               <span>←</span>
               <span className="truncate max-w-40">{prev.title}</span>
             </Link>
-          ) : <span />}
+          ) : (
+            <span />
+          )}
 
           {/* Chapter list dropdown - shows all chapters inline */}
           <Link
@@ -169,7 +192,9 @@ export default async function ChapterPage({ params }: Props) {
 
         {/* Table of contents — compact list of all chapters */}
         <div className="mt-10 bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Table of Contents</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+            Table of Contents
+          </p>
           <div className="space-y-1">
             {allChapters.map((c, i) => {
               const locked = i > 0 && !hasPremium && !isAuthor;
@@ -185,7 +210,13 @@ export default async function ChapterPage({ params }: Props) {
                 >
                   <span className="text-xs text-gray-600 w-5 shrink-0">{i + 1}</span>
                   <span className="truncate">{c.title}</span>
-                  {locked && <Lock className="ml-auto w-3 h-3 text-yellow-600 shrink-0" strokeWidth={2} aria-label="Locked" />}
+                  {locked && (
+                    <Lock
+                      className="ml-auto w-3 h-3 text-yellow-600 shrink-0"
+                      strokeWidth={2}
+                      aria-label="Locked"
+                    />
+                  )}
                   {!locked && c.order === order && <span className="ml-auto text-xs">← here</span>}
                 </Link>
               );

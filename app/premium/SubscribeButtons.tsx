@@ -8,11 +8,11 @@
 import { useState } from 'react';
 
 type Props = {
-  plan: string;           // 'monthly' | 'yearly' — passed to the API
-  cta: string;            // Button label text (e.g. "Subscribe Monthly")
-  highlight: boolean;     // Yearly plan gets the gold gradient CTA
-  userId: number | null;  // null when the visitor is not logged in
-  isSubscribed: boolean;  // Hides the button entirely if already subscribed
+  plan: string; // 'monthly' | 'yearly' — passed to the API
+  cta: string; // Button label text (e.g. "Subscribe Monthly")
+  highlight: boolean; // Yearly plan gets the gold gradient CTA
+  userId: number | null; // null when the visitor is not logged in
+  isSubscribed: boolean; // Hides the button entirely if already subscribed
 };
 
 export default function SubscribeButtons({ plan, cta, highlight, userId, isSubscribed }: Props) {
@@ -27,7 +27,7 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
   if (isSubscribed) {
     return (
       <div className="w-full py-2.5 rounded-xl text-center text-sm font-semibold text-yellow-400 border border-yellow-500/30 bg-yellow-500/10">
- Active plan
+        Active plan
       </div>
     );
   }
@@ -84,11 +84,12 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
           w-full py-2.5 rounded-xl text-sm font-bold
           disabled:opacity-60 disabled:cursor-not-allowed
           transition flex items-center justify-center gap-2
-          ${highlight
-            /* Yearly plan: gold gradient to match its premium emphasis */
-            ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-gray-900 hover:from-yellow-300 hover:to-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
-            /* Monthly plan: standard green CTA */
-            : 'bg-red-600 hover:bg-red-700 text-white border border-red-500'
+          ${
+            highlight
+              ? /* Yearly plan: gold gradient to match its premium emphasis */
+                'bg-gradient-to-r from-yellow-400 to-amber-400 text-gray-900 hover:from-yellow-300 hover:to-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
+              : /* Monthly plan: standard green CTA */
+                'bg-red-600 hover:bg-red-700 text-white border border-red-500'
           }
         `}
       >
@@ -98,9 +99,17 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
             <svg
               className="w-4 h-4 animate-spin"
               xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 24 24"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
             </svg>
             Redirecting…
@@ -111,9 +120,7 @@ export default function SubscribeButtons({ plan, cta, highlight, userId, isSubsc
       </button>
 
       {/* Inline error from the API */}
-      {error && (
-        <p className="text-red-400 text-xs mt-2 text-center">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-xs mt-2 text-center">{error}</p>}
     </div>
   );
 }

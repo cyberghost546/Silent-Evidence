@@ -15,15 +15,15 @@ import { Bot, Zap, Key, Heart, Bug, Frown, Wind, Brain, Droplet, Ghost } from 'l
 // Mood options control the emotional tone sent to the AI prompt.
 // "none" = let the AI choose freely.
 const MOODS = [
-  { value: 'none',          label: 'Any mood' },
-  { value: 'CREEPY',        label: 'Creepy' },
-  { value: 'PARANOID',      label: 'Paranoid' },
-  { value: 'DISTURBING',    label: 'Disturbing' },
-  { value: 'ATMOSPHERIC',   label: 'Atmospheric' },
+  { value: 'none', label: 'Any mood' },
+  { value: 'CREEPY', label: 'Creepy' },
+  { value: 'PARANOID', label: 'Paranoid' },
+  { value: 'DISTURBING', label: 'Disturbing' },
+  { value: 'ATMOSPHERIC', label: 'Atmospheric' },
   { value: 'PSYCHOLOGICAL', label: 'Psychological' },
-  { value: 'SUPERNATURAL',  label: 'Supernatural' },
-  { value: 'GORE',          label: 'Gore' },
-  { value: 'JUMPSCARE',     label: 'Jumpscare' },
+  { value: 'SUPERNATURAL', label: 'Supernatural' },
+  { value: 'GORE', label: 'Gore' },
+  { value: 'JUMPSCARE', label: 'Jumpscare' },
 ];
 
 // Writing tone presets sent to the AI — e.g. "Found footage style" instructs Claude
@@ -53,10 +53,10 @@ export default function GenerateClient({ categories }: { categories: Category[] 
   const [seedPrompt, setSeedPrompt] = useState('');
 
   // UI state
-  const [generating, setGenerating] = useState(false);   // true while waiting for Claude
+  const [generating, setGenerating] = useState(false); // true while waiting for Claude
   const [result, setResult] = useState<{ title: string; slug: string } | null>(null); // set on success
-  const [error, setError] = useState('');   // shown if generation fails
-  const [log, setLog] = useState('');       // short status message shown below the button
+  const [error, setError] = useState(''); // shown if generation fails
+  const [log, setLog] = useState(''); // short status message shown below the button
 
   // Sends the selected options to the API which calls Claude and saves the story as a draft.
   // The story is NOT published automatically — the admin must review it first.
@@ -95,12 +95,13 @@ export default function GenerateClient({ categories }: { categories: Category[] 
         <span className="w-1 h-7 bg-red-500 rounded-full" />
         <div>
           <h1 className="text-2xl font-bold text-white">AI Story Generator</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Use Claude to write horror stories for your site</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Use Claude to write horror stories for your site
+          </p>
         </div>
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
-
         {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1.5">Category</label>
@@ -109,11 +110,13 @@ export default function GenerateClient({ categories }: { categories: Category[] 
           ) : (
             <select
               value={categorySlug}
-              onChange={e => setCategorySlug(e.target.value)}
+              onChange={(e) => setCategorySlug(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
             >
-              {categories.map(c => (
-                <option key={c.slug} value={c.slug}>{c.name}</option>
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
               ))}
             </select>
           )}
@@ -123,7 +126,7 @@ export default function GenerateClient({ categories }: { categories: Category[] 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1.5">Mood</label>
           <div className="flex flex-wrap gap-2">
-            {MOODS.map(m => (
+            {MOODS.map((m) => (
               <button
                 key={m.value}
                 onClick={() => setMood(m.value)}
@@ -143,7 +146,7 @@ export default function GenerateClient({ categories }: { categories: Category[] 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1.5">Writing Tone</label>
           <div className="flex flex-wrap gap-2">
-            {TONES.map(t => (
+            {TONES.map((t) => (
               <button
                 key={t}
                 onClick={() => setTone(t)}
@@ -164,10 +167,10 @@ export default function GenerateClient({ categories }: { categories: Category[] 
           <label className="block text-sm font-medium text-gray-300 mb-1.5">Story Length</label>
           <div className="flex gap-2">
             {[
-              { value: 'short',  label: 'Short',  sub: '400–600 words' },
+              { value: 'short', label: 'Short', sub: '400–600 words' },
               { value: 'medium', label: 'Medium', sub: '700–1000 words' },
-              { value: 'long',   label: 'Long',   sub: '1200–1800 words' },
-            ].map(l => (
+              { value: 'long', label: 'Long', sub: '1200–1800 words' },
+            ].map((l) => (
               <button
                 key={l.value}
                 onClick={() => setLength(l.value)}
@@ -191,7 +194,7 @@ export default function GenerateClient({ categories }: { categories: Category[] 
           </label>
           <textarea
             value={seedPrompt}
-            onChange={e => setSeedPrompt(e.target.value)}
+            onChange={(e) => setSeedPrompt(e.target.value)}
             placeholder="e.g. A night shift worker finds a door that wasn't there yesterday..."
             rows={3}
             suppressHydrationWarning
@@ -208,13 +211,22 @@ export default function GenerateClient({ categories }: { categories: Category[] 
           {generating ? (
             <>
               <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
               Generating…
             </>
           ) : (
-            <><Bot className="w-4 h-4" /> Generate Story</>
+            <>
+              <Bot className="w-4 h-4" /> Generate Story
+            </>
           )}
         </button>
 
@@ -253,9 +265,19 @@ export default function GenerateClient({ categories }: { categories: Category[] 
       </div>
 
       <div className="mt-4 bg-gray-900/50 border border-gray-800 rounded-xl px-4 py-3 text-xs text-gray-500 space-y-1">
-        <p className="flex items-center gap-1.5"><Zap className="w-3 h-3 flex-shrink-0" /> Stories are saved as <strong className="text-gray-400">drafts</strong> — review before publishing.</p>
-        <p className="flex items-center gap-1.5"><Key className="w-3 h-3 flex-shrink-0" /> Requires <strong className="text-gray-400">ANTHROPIC_API_KEY</strong> in your <code>.env</code> file.</p>
-        <p className="flex items-center gap-1.5"><Heart className="w-3 h-3 flex-shrink-0 text-purple-400" /> Powered by <strong className="text-gray-400">Claude Opus 4.6</strong></p>
+        <p className="flex items-center gap-1.5">
+          <Zap className="w-3 h-3 flex-shrink-0" /> Stories are saved as{' '}
+          <strong className="text-gray-400">drafts</strong> — review before publishing.
+        </p>
+        <p className="flex items-center gap-1.5">
+          <Key className="w-3 h-3 flex-shrink-0" /> Requires{' '}
+          <strong className="text-gray-400">ANTHROPIC_API_KEY</strong> in your <code>.env</code>{' '}
+          file.
+        </p>
+        <p className="flex items-center gap-1.5">
+          <Heart className="w-3 h-3 flex-shrink-0 text-purple-400" /> Powered by{' '}
+          <strong className="text-gray-400">Claude Opus 4.6</strong>
+        </p>
       </div>
     </div>
   );

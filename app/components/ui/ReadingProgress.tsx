@@ -26,7 +26,6 @@ import { useEffect, useState } from 'react';
 
 // ReadingProgress — the component. Accepts an optional storyId prop.
 export default function ReadingProgress({ storyId }: { storyId?: number }) {
-
   // progress — a number 0–100 representing how far the user has scrolled.
   // It's stored in React state so changing it triggers a re-render (updates the bar width).
   const [progress, setProgress] = useState(0);
@@ -54,7 +53,7 @@ export default function ReadingProgress({ storyId }: { storyId?: number }) {
       // behavior: 'instant' means no animation — jumps immediately so the user sees their spot
       window.scrollTo({ top: (saved / 100) * docHeight, behavior: 'instant' });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey]);
 
   // ── Effect 2: Track scroll position and update the bar + localStorage ─────────

@@ -4,118 +4,122 @@
 //
 // PATCH  /api/admin/users/[id] — change the user's role.
 //                                Body: { role: "GUEST" | "USER" | "AUTHOR" | "ADMIN" }
-//                                Validates the role before writing to prevent invalid values.
-// DELETE /api/admin/users/[id] — permanently delete the user account from the database.
-//                                This is irreversible and also cascades to all related data
-//                                (stories, comments, likes, etc.) depending on Prisma schema rules.
+// DELETE /api/admin/users/[id] — permanently delete the user account.
 //
 // AUTH:
-//   Both handlers verify the requesting user is an ADMIN using the isAdmin() helper below.
-//   Non-admins receive 403 Forbidden.
+//   Both handlers require an ADMIN session and a valid CSRF token. Both also
+//   enforce the owner / last-admin protections in lib/owner.ts, so this route
+//   cannot be used — even by a legitimate admin, or a hijacked admin session —
+//   to lock the site's owner out or remove the final administrator.
 
-// Import NextResponse for building JSON HTTP responses with optional status codes
 import { NextResponse } from 'next/server';
-
-// Import the cookies() helper to read the userId cookie server-side
 import { cookies } from 'next/headers';
-
-// Import the Prisma client to read and write to the database
 import { prisma } from '@/lib/prisma';
+import { verifyCsrfToken } from '@/lib/csrf';
+import { checkOwnerProtection, adminCount } from '@/lib/owner';
 
-// Shared type alias for the dynamic route params shape.
-// Next.js wraps URL segments in a Promise — we await them before use.
-// "{ id: string }" means the URL contains a segment named "id" that is always a string.
 type Params = { params: Promise<{ id: string }> };
 
-// ── Auth helper ───────────────────────────────────────────────────────────────
-
-// Reads the userId cookie and checks whether that user has the ADMIN role in the database.
-// Returns true for admins, false for everyone else (including unauthenticated users).
-// Defining this once at the top keeps both handlers below clean and avoids duplicated code.
-// "async" is required because we use "await" for cookies() and the Prisma query.
-async function isAdmin() {
-  // Read all cookies from the incoming request
+// Returns the acting admin's user id, or null if the caller is not an admin.
+// Returning the id (rather than a boolean) lets the handlers attribute audit-log
+// entries to the admin who made the change.
+async function currentAdminId(): Promise<number | null> {
   const cookieStore = await cookies();
-
-  // Get the userId cookie value and convert it to a number; default to 0 if absent.
-  // ?.value uses optional chaining: returns undefined if the cookie doesn't exist.
-  // ?? 0 replaces undefined/null with 0 — our "no user" sentinel value.
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
-
-  // If userId is 0, no cookie was present — the user is not logged in
-  if (!userId) return false;
-
-  // Look up the user in the database; only fetch the role column for efficiency
+  if (!userId) return null;
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
-
-  // Return true only if the user record exists and their role is exactly 'ADMIN'
-  return user?.role === 'ADMIN';
+  return user?.role === 'ADMIN' ? userId : null;
 }
 
 // ── PATCH /api/admin/users/[id] — change a user's role ───────────────────────
-
-// Updates the role of a specific user.
-// Valid roles: GUEST, USER, AUTHOR, ADMIN.
-// Invalid role values are rejected with 400 Bad Request.
-//
-// "req: Request" — the incoming HTTP request; we read its JSON body for { role }
-// "{ params }: Params" — the dynamic [id] URL segment provided by Next.js
 export async function PATCH(req: Request, { params }: Params) {
-  // Block non-admins — return 403 Forbidden without touching the database
-  if (!(await isAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const actingAdminId = await currentAdminId();
+  if (!actingAdminId) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
-  // Await the params Promise to get the user id string from the URL segment
+  // Mutating admin action — protect it against CSRF like the rest of the app.
+  if (!(await verifyCsrfToken(req))) {
+    return NextResponse.json({ error: 'Invalid CSRF token.' }, { status: 403 });
+  }
+
   const { id } = await params;
-
-  // Parse the JSON body to get the new role value.
-  // Destructure directly: { role } pulls the role property from the body object.
   const { role } = await req.json();
 
-  // ── Validate the role ─────────────────────────────────────────────────────────
-
-  // Define the four valid roles that match the Role enum in the Prisma schema.
-  // Using an array constant makes it easy to update if roles change in the future.
   const VALID_ROLES = ['GUEST', 'USER', 'AUTHOR', 'ADMIN'];
-
-  // .includes() returns false if role is not in the array.
-  // This prevents rogue values (e.g. "SUPERUSER") from being written to the database.
   if (!VALID_ROLES.includes(role)) {
     return NextResponse.json({ error: 'Invalid role.' }, { status: 400 });
   }
 
-  // ── Update the user's role in the database ────────────────────────────────────
+  // ── Owner / last-admin protection ──────────────────────────────────────────
+  // Without this, an admin (or a compromised admin session) could demote the
+  // owner, or demote the only remaining admin, leaving the site with no way in
+  // except server access. checkOwnerProtection encodes both invariants.
+  const target = await prisma.user.findUnique({
+    where: { id: Number(id) },
+    select: { id: true, email: true, role: true },
+  });
+  if (!target) return NextResponse.json({ error: 'User not found.' }, { status: 404 });
 
-  // prisma.user.update() runs a SQL UPDATE on the User table.
-  // where: { id: Number(id) } targets the specific user row.
-  //   Number(id) converts the URL string "5" to the integer 5 for the DB query.
-  // data: { role } sets only the role column — all other user fields are untouched.
-  await prisma.user.update({ where: { id: Number(id) }, data: { role } });
+  const protection = checkOwnerProtection(target, role, await adminCount());
+  if (!protection.allowed) {
+    return NextResponse.json({ error: protection.reason }, { status: 409 });
+  }
 
-  // Return a simple success acknowledgement
+  await prisma.user.update({ where: { id: target.id }, data: { role } });
+
+  // Role changes are exactly the kind of privileged action the audit log exists
+  // for, and this route logged nothing before.
+  await prisma.auditLog
+    .create({
+      data: {
+        adminId: actingAdminId,
+        action: 'CHANGE_USER_ROLE',
+        detail: `Changed role of user ${target.id} (${target.email}) from ${target.role} to ${role}.`,
+        targetType: 'User',
+        targetId: target.id,
+      },
+    })
+    .catch(() => {});
+
   return NextResponse.json({ ok: true });
 }
 
 // ── DELETE /api/admin/users/[id] — delete a user account ─────────────────────
+export async function DELETE(req: Request, { params }: Params) {
+  const actingAdminId = await currentAdminId();
+  if (!actingAdminId) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
-// Permanently removes the user row from the database.
-// Depending on the Prisma schema's referential actions, this may also cascade-delete
-// all content owned by the user (stories, comments, likes, follows, etc.).
-// THIS ACTION IS IRREVERSIBLE — the admin UI should show a confirmation dialog first.
-//
-// "_req" is prefixed with underscore to signal we intentionally ignore the request body.
-// "{ params }: Params" — the dynamic [id] URL segment provided by Next.js.
-export async function DELETE(_req: Request, { params }: Params) {
-  // Block non-admins — return 403 Forbidden without touching the database
-  if (!(await isAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await verifyCsrfToken(req))) {
+    return NextResponse.json({ error: 'Invalid CSRF token.' }, { status: 403 });
+  }
 
-  // Await the params Promise to get the user id string from the URL segment
   const { id } = await params;
 
-  // Delete the user row by their primary key.
-  // Number(id) converts the URL string "5" to the integer 5.
-  // prisma.user.delete() throws a Prisma error if no row matches — the user must exist.
-  await prisma.user.delete({ where: { id: Number(id) } });
+  const target = await prisma.user.findUnique({
+    where: { id: Number(id) },
+    select: { id: true, email: true, role: true },
+  });
+  if (!target) return NextResponse.json({ error: 'User not found.' }, { status: 404 });
 
-  // Return a simple success acknowledgement
+  // Deletion is a role change to "nobody": pass newRole = null so the owner and
+  // last-admin guards apply here too.
+  const protection = checkOwnerProtection(target, null, await adminCount());
+  if (!protection.allowed) {
+    return NextResponse.json({ error: protection.reason }, { status: 409 });
+  }
+
+  await prisma.user.delete({ where: { id: target.id } });
+
+  await prisma.auditLog
+    .create({
+      data: {
+        adminId: actingAdminId,
+        action: 'DELETE_USER',
+        detail: `Deleted user ${target.id} (${target.email}), role ${target.role}.`,
+        targetType: 'User',
+        targetId: target.id,
+      },
+    })
+    .catch(() => {});
+
   return NextResponse.json({ ok: true });
 }

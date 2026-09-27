@@ -26,12 +26,12 @@ async function requireAdmin() {
 }
 
 export async function GET() {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const rows = await prisma.siteSetting.findMany({ where: { key: { in: [...FEATURE_FLAGS] } } });
   const settings: Record<string, boolean> = {};
   for (const flag of FEATURE_FLAGS) {
-    const row = rows.find(r => r.key === flag);
+    const row = rows.find((r) => r.key === flag);
     // Default: most features are ON, maintenance_mode is OFF
     settings[flag] = row ? row.value === 'true' : flag !== 'maintenance_mode';
   }
@@ -39,7 +39,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const { key, value } = await req.json();
   if (!FEATURE_FLAGS.includes(key) || typeof value !== 'boolean') {
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   }
 
   await prisma.siteSetting.upsert({
-    where:  { key },
+    where: { key },
     create: { key, value: String(value) },
     update: { value: String(value) },
   });

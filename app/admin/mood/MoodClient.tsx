@@ -44,14 +44,14 @@ import { moodIcon } from '@/lib/moodIcons';
 // The icon is rendered large (text-2xl) inside the mood grid buttons so admins
 // can quickly identify moods at a glance without reading the label.
 const MOODS = [
-  { value: 'CREEPY',        label: 'Creepy',        icon: moodIcon('CREEPY') },
-  { value: 'PARANOID',      label: 'Paranoid',      icon: moodIcon('PARANOID') },
-  { value: 'DISTURBING',    label: 'Disturbing',    icon: moodIcon('DISTURBING') },
-  { value: 'ATMOSPHERIC',   label: 'Atmospheric',   icon: moodIcon('ATMOSPHERIC') },
+  { value: 'CREEPY', label: 'Creepy', icon: moodIcon('CREEPY') },
+  { value: 'PARANOID', label: 'Paranoid', icon: moodIcon('PARANOID') },
+  { value: 'DISTURBING', label: 'Disturbing', icon: moodIcon('DISTURBING') },
+  { value: 'ATMOSPHERIC', label: 'Atmospheric', icon: moodIcon('ATMOSPHERIC') },
   { value: 'PSYCHOLOGICAL', label: 'Psychological', icon: moodIcon('PSYCHOLOGICAL') },
-  { value: 'SUPERNATURAL',  label: 'Supernatural',  icon: moodIcon('SUPERNATURAL') },
-  { value: 'GORE',          label: 'Gore',          icon: moodIcon('GORE') },
-  { value: 'JUMPSCARE',     label: 'Jumpscare',     icon: moodIcon('JUMPSCARE') },
+  { value: 'SUPERNATURAL', label: 'Supernatural', icon: moodIcon('SUPERNATURAL') },
+  { value: 'GORE', label: 'Gore', icon: moodIcon('GORE') },
+  { value: 'JUMPSCARE', label: 'Jumpscare', icon: moodIcon('JUMPSCARE') },
 ];
 
 // ── Type definitions ──────────────────────────────────────────────────────────
@@ -59,16 +59,16 @@ const MOODS = [
 // Shape of a single mood record as returned by the server / Prisma
 type MoodOfDay = {
   id: number;
-  mood: string;           // one of the MOODS value strings (e.g. 'CREEPY')
+  mood: string; // one of the MOODS value strings (e.g. 'CREEPY')
   message: string | null; // optional tagline — null if the admin left it blank
-  setAt: string;          // ISO date string — when this mood was saved
+  setAt: string; // ISO date string — when this mood was saved
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function MoodClient({
-  current,   // the currently active mood (or null if none set yet)
-  history,   // previous mood entries — shown in the history list below
+  current, // the currently active mood (or null if none set yet)
+  history, // previous mood entries — shown in the history list below
 }: {
   current: MoodOfDay | null;
   history: MoodOfDay[];
@@ -134,9 +134,7 @@ export default function MoodClient({
             {current.mood}
           </p>
           {/* Optional tagline — only rendered if the admin set one */}
-          {current.message && (
-            <p className="text-sm text-gray-400 mt-1">"{current.message}"</p>
-          )}
+          {current.message && <p className="text-sm text-gray-400 mt-1">"{current.message}"</p>}
           {/* When the mood was last updated — toLocaleString uses the browser's locale */}
           <p className="text-xs text-gray-600 mt-2">
             Set {new Date(current.setAt).toLocaleString()}
@@ -153,14 +151,14 @@ export default function MoodClient({
             Each button is a flex column with a large emoji and a text label.
             The selected button gets a red border and a faint red background tint. */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          {MOODS.map(m => (
+          {MOODS.map((m) => (
             <button
               key={m.value}
               onClick={() => setSelected(m.value)}
               className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-sm font-medium transition ${
                 selected === m.value
-                  ? 'border-red-600 bg-red-600/10 text-white'   // active: red highlight
-                  : 'border-gray-800 bg-gray-800 text-gray-400 hover:border-gray-600'  // inactive
+                  ? 'border-red-600 bg-red-600/10 text-white' // active: red highlight
+                  : 'border-gray-800 bg-gray-800 text-gray-400 hover:border-gray-600' // inactive
               }`}
             >
               {/* Large emoji icon — easier to click/scan than text alone */}
@@ -176,7 +174,7 @@ export default function MoodClient({
           <label className="text-xs text-gray-500 mb-1 block">Tagline (optional)</label>
           <input
             value={message}
-            onChange={e => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             maxLength={100}
             placeholder="e.g. Something watches from the trees…"
             className="w-full bg-gray-800 border border-gray-700 focus:border-red-600 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition"
@@ -200,13 +198,15 @@ export default function MoodClient({
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <h2 className="font-semibold text-white mb-4">History</h2>
           <div className="space-y-2">
-            {history.map(h => (
+            {history.map((h) => (
               <div key={h.id} className="flex items-center justify-between text-sm">
                 {/* Icon + mood name + optional tagline in one line */}
                 <span className="inline-flex items-center gap-1.5 text-gray-300">
                   {(() => {
                     const Icon = moodIcon(h.mood);
-                    return <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />;
+                    return (
+                      <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                    );
                   })()}
                   {h.mood}
                   {h.message ? ` — "${h.message}"` : ''}

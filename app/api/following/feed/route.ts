@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     select: { followingId: true },
   });
 
-  const followedIds = follows.map(f => f.followingId);
+  const followedIds = follows.map((f) => f.followingId);
 
   if (followedIds.length === 0) {
     return NextResponse.json({ stories: [], followedIds: [] });
@@ -44,9 +44,9 @@ export async function GET(req: Request) {
       createdAt: true,
       views: true,
       mood: true,
-      author:   { select: { username: true, profile: { select: { avatar: true } } } },
+      author: { select: { username: true, profile: { select: { avatar: true } } } },
       category: { select: { name: true, slug: true } },
-      _count:   { select: { likes: true, comments: true } },
+      _count: { select: { likes: true, comments: true } },
     },
   });
 

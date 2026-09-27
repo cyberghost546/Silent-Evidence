@@ -9,7 +9,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',
@@ -24,7 +26,8 @@ export async function POST(req: NextRequest) {
     if (!session.userId) return NextResponse.json({ error: 'Login required' }, { status: 401 });
 
     const { recipeId, emoji } = await req.json();
-    if (!ALLOWED.includes(emoji)) return NextResponse.json({ error: 'Invalid emoji' }, { status: 400 });
+    if (!ALLOWED.includes(emoji))
+      return NextResponse.json({ error: 'Invalid emoji' }, { status: 400 });
 
     const existing = await prisma.recipeReaction.findFirst({
       where: { recipeId, userId: session.userId, emoji },

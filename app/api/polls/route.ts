@@ -31,9 +31,12 @@ import { z } from 'zod';
 
 const CreatePollSchema = z.object({
   question: z.string().min(1, 'Question is required.').max(500),
-  options:  z.array(z.string().min(1)).min(2, 'Provide between 2 and 10 options.').max(10, 'Provide between 2 and 10 options.'),
-  endsAt:   z.string().nullable().optional(),
-  groupId:  z.number().int().positive().nullable().optional(),
+  options: z
+    .array(z.string().min(1))
+    .min(2, 'Provide between 2 and 10 options.')
+    .max(10, 'Provide between 2 and 10 options.'),
+  endsAt: z.string().nullable().optional(),
+  groupId: z.number().int().positive().nullable().optional(),
 });
 
 // ── Helper: builds the Prisma select object for poll queries ─────────────────
@@ -144,7 +147,10 @@ export async function POST(req: Request) {
   const rawBody = await req.json();
   const parsed = CreatePollSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid request', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
   const { question: rawQuestion, options, endsAt, groupId } = parsed.data;
 
@@ -153,7 +159,8 @@ export async function POST(req: Request) {
   const cleanOptions: string[] = options.map((o: string) => o.trim()).filter(Boolean);
 
   // Re-check the count after cleaning in case whitespace-only strings reduced the valid count below 2
-  if (cleanOptions.length < 2) return NextResponse.json({ error: 'At least 2 non-empty options required.' }, { status: 400 });
+  if (cleanOptions.length < 2)
+    return NextResponse.json({ error: 'At least 2 non-empty options required.' }, { status: 400 });
 
   // Create the poll AND all its options in a single database operation.
   // Prisma's nested `create` inside `options: { create: [...] }` handles this
@@ -171,7 +178,7 @@ export async function POST(req: Request) {
       groupId: groupId ?? null,
       // Create all answer options in the same DB write.
       // cleanOptions.map(text => ({ text })) builds an array of { text: "..." } objects.
-      options: { create: cleanOptions.map(text => ({ text })) },
+      options: { create: cleanOptions.map((text) => ({ text })) },
     },
     // Use the shared select helper so the response matches the GET format exactly
     select: pollSelect(userId),

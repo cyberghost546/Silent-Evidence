@@ -33,7 +33,9 @@ export default function ContactForm() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -56,7 +58,14 @@ export default function ContactForm() {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-4">
         <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -65,7 +74,10 @@ export default function ContactForm() {
           Thanks for reaching out. We will get back to you within 24–48 hours.
         </p>
         <button
-          onClick={() => { setStatus('idle'); setForm({ name: '', email: '', subject: '', message: '' }); }}
+          onClick={() => {
+            setStatus('idle');
+            setForm({ name: '', email: '', subject: '', message: '' });
+          }}
           className="mt-2 text-sm text-red-400 hover:text-red-300 transition"
         >
           Send another message
@@ -82,16 +94,24 @@ export default function ContactForm() {
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1.5">Your Name</label>
           <input
-            name="name" type="text" placeholder="John Doe"
-            value={form.name} onChange={handleChange} required
+            name="name"
+            type="text"
+            placeholder="John Doe"
+            value={form.name}
+            onChange={handleChange}
+            required
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
           />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1.5">Email Address</label>
           <input
-            name="email" type="email" placeholder="you@example.com"
-            value={form.email} onChange={handleChange} required
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={handleChange}
+            required
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
           />
         </div>
@@ -100,10 +120,15 @@ export default function ContactForm() {
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1.5">Subject</label>
         <select
-          name="subject" value={form.subject} onChange={handleChange} required
+          name="subject"
+          value={form.subject}
+          onChange={handleChange}
+          required
           className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
         >
-          <option value="" disabled>Select a subject…</option>
+          <option value="" disabled>
+            Select a subject…
+          </option>
           <option value="General Question">General Question</option>
           <option value="Report a User">Report a User</option>
           <option value="Report Content">Report Content</option>
@@ -117,8 +142,12 @@ export default function ContactForm() {
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1.5">Message</label>
         <textarea
-          name="message" placeholder="Tell us what's on your mind…"
-          value={form.message} onChange={handleChange} required rows={6}
+          name="message"
+          placeholder="Tell us what's on your mind…"
+          value={form.message}
+          onChange={handleChange}
+          required
+          rows={6}
           className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition resize-none"
         />
       </div>

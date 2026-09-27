@@ -7,54 +7,58 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface Participant {
-  userId:    number;
+  userId: number;
   wordCount: number;
   user: { username: string };
 }
 
 interface Sprint {
-  id:           number;
-  title:        string;
+  id: number;
+  title: string;
   durationMins: number;
-  startsAt:     string;  // ISO string
-  endsAt:       string;  // ISO string
+  startsAt: string; // ISO string
+  endsAt: string; // ISO string
   participants: Participant[];
 }
 
 interface Props {
-  sprint:     Sprint;
+  sprint: Sprint;
   currentUserId: number | null;
 }
 
 // Format seconds as MM:SS
 function formatCountdown(secs: number): string {
   if (secs <= 0) return '00:00';
-  const m = Math.floor(secs / 60).toString().padStart(2, '0');
+  const m = Math.floor(secs / 60)
+    .toString()
+    .padStart(2, '0');
   const s = (secs % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
 }
 
 export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
-  const endsAt   = new Date(sprint.endsAt).getTime();
+  const endsAt = new Date(sprint.endsAt).getTime();
   const startsAt = new Date(sprint.startsAt).getTime();
 
   // Seconds remaining until end (or until start if not yet begun)
-  const [secsLeft,  setSecsLeft]  = useState(() => Math.max(0, Math.round((endsAt - Date.now()) / 1000)));
+  const [secsLeft, setSecsLeft] = useState(() =>
+    Math.max(0, Math.round((endsAt - Date.now()) / 1000))
+  );
   const [hasStarted, setHasStarted] = useState(() => Date.now() >= startsAt);
 
   // Leaderboard participants (refreshed via poll)
   const [participants, setParticipants] = useState<Participant[]>(sprint.participants);
 
-  const [joined,    setJoined]    = useState(() =>
-    sprint.participants.some(p => p.userId === currentUserId)
+  const [joined, setJoined] = useState(() =>
+    sprint.participants.some((p) => p.userId === currentUserId)
   );
-  const [wordCount, setWordCount] = useState(() =>
-    sprint.participants.find(p => p.userId === currentUserId)?.wordCount ?? 0
+  const [wordCount, setWordCount] = useState(
+    () => sprint.participants.find((p) => p.userId === currentUserId)?.wordCount ?? 0
   );
-  const [inputVal,  setInputVal]  = useState(() =>
-    String(sprint.participants.find(p => p.userId === currentUserId)?.wordCount ?? 0)
+  const [inputVal, setInputVal] = useState(() =>
+    String(sprint.participants.find((p) => p.userId === currentUserId)?.wordCount ?? 0)
   );
-  const [saving,    setSaving]    = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Countdown ticker
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
         const res = await fetch('/api/sprints');
         if (!res.ok) return;
         const sprints: Sprint[] = await res.json();
-        const updated = sprints.find(s => s.id === sprint.id);
+        const updated = sprints.find((s) => s.id === sprint.id);
         if (updated) setParticipants(updated.participants);
       } catch {
         // ignore poll errors silently
@@ -98,45 +102,50 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
     if (isNaN(count) || count < 0) return;
     setSaving(true);
     const res = await fetch(`/api/sprints/${sprint.id}/join`, {
-      method:  'PATCH',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ wordCount: count }),
+      body: JSON.stringify({ wordCount: count }),
     });
     if (res.ok) {
       setWordCount(count);
       // Update local leaderboard optimistically
-      setParticipants(prev =>
-        prev.map(p => p.userId === currentUserId ? { ...p, wordCount: count } : p)
+      setParticipants((prev) =>
+        prev.map((p) => (p.userId === currentUserId ? { ...p, wordCount: count } : p))
       );
     }
     setSaving(false);
   };
 
   // % progress of the timer (for the progress bar)
-  const totalSecs    = sprint.durationMins * 60;
-  const elapsedSecs  = Math.max(0, totalSecs - secsLeft);
+  const totalSecs = sprint.durationMins * 60;
+  const elapsedSecs = Math.max(0, totalSecs - secsLeft);
   const timerPercent = Math.min(100, Math.round((elapsedSecs / totalSecs) * 100));
 
   return (
     <div className="border border-gray-800 rounded-xl p-5 bg-gray-900 space-y-4">
-
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-0.5">Writing Sprint</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-0.5">
+            Writing Sprint
+          </p>
           <h3 className="text-base font-bold text-white">{sprint.title}</h3>
-          <p className="text-xs text-gray-500">{sprint.durationMins} min sprint · {participants.length} participant{participants.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-500">
+            {sprint.durationMins} min sprint · {participants.length} participant
+            {participants.length !== 1 ? 's' : ''}
+          </p>
         </div>
 
         {/* Countdown */}
         <div className="text-right flex-shrink-0">
-          <p className={`text-2xl font-mono font-bold tabular-nums ${isEnded ? 'text-gray-500' : hasStarted ? 'text-red-400' : 'text-yellow-400'}`}>
+          <p
+            className={`text-2xl font-mono font-bold tabular-nums ${isEnded ? 'text-gray-500' : hasStarted ? 'text-red-400' : 'text-yellow-400'}`}
+          >
             {isEnded
               ? 'ENDED'
               : hasStarted
                 ? formatCountdown(secsLeft)
-                : `Starts in ${formatCountdown(Math.max(0, Math.round((startsAt - Date.now()) / 1000)))}`
-            }
+                : `Starts in ${formatCountdown(Math.max(0, Math.round((startsAt - Date.now()) / 1000)))}`}
           </p>
           {!isEnded && hasStarted && (
             <p className="text-xs text-gray-500 mt-0.5">{timerPercent}% done</p>
@@ -171,7 +180,7 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
                 type="number"
                 min={0}
                 value={inputVal}
-                onChange={e => setInputVal(e.target.value)}
+                onChange={(e) => setInputVal(e.target.value)}
                 placeholder="Words written…"
                 className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 transition"
               />
@@ -185,7 +194,10 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
             </div>
           )}
           {joined && (
-            <p className="text-xs text-gray-500 mt-1.5">Your word count: <span className="text-white font-semibold">{wordCount.toLocaleString()}</span></p>
+            <p className="text-xs text-gray-500 mt-1.5">
+              Your word count:{' '}
+              <span className="text-white font-semibold">{wordCount.toLocaleString()}</span>
+            </p>
           )}
         </div>
       )}
@@ -193,7 +205,9 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
       {/* Leaderboard */}
       {participants.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Leaderboard</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Leaderboard
+          </p>
           {[...participants]
             .sort((a, b) => b.wordCount - a.wordCount)
             .slice(0, 10)
@@ -201,17 +215,29 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
               <div key={p.userId} className="flex items-center justify-between gap-2 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   {/* Rank badge */}
-                  <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${
-                    i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-gray-600'
-                  }`}>
+                  <span
+                    className={`text-xs font-bold w-5 text-center flex-shrink-0 ${
+                      i === 0
+                        ? 'text-yellow-400'
+                        : i === 1
+                          ? 'text-gray-300'
+                          : i === 2
+                            ? 'text-amber-600'
+                            : 'text-gray-600'
+                    }`}
+                  >
                     {i + 1}
                   </span>
-                  <span className={`truncate ${p.userId === currentUserId ? 'text-red-400 font-semibold' : 'text-gray-300'}`}>
+                  <span
+                    className={`truncate ${p.userId === currentUserId ? 'text-red-400 font-semibold' : 'text-gray-300'}`}
+                  >
                     {p.user.username}
                     {p.userId === currentUserId && ' (you)'}
                   </span>
                 </div>
-                <span className="text-white font-mono text-xs flex-shrink-0">{p.wordCount.toLocaleString()} words</span>
+                <span className="text-white font-mono text-xs flex-shrink-0">
+                  {p.wordCount.toLocaleString()} words
+                </span>
               </div>
             ))}
         </div>
@@ -220,7 +246,9 @@ export default function WritingSprintTimer({ sprint, currentUserId }: Props) {
       {/* Ended state */}
       {isEnded && (
         <p className="text-center text-sm text-gray-500 py-2">
-          This sprint has ended. {participants.length > 0 && `Winner: ${[...participants].sort((a, b) => b.wordCount - a.wordCount)[0]?.user.username}`}
+          This sprint has ended.{' '}
+          {participants.length > 0 &&
+            `Winner: ${[...participants].sort((a, b) => b.wordCount - a.wordCount)[0]?.user.username}`}
         </p>
       )}
     </div>

@@ -17,7 +17,6 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="relative min-h-screen bg-gray-950 flex items-center justify-center px-4 overflow-hidden">
-
       {/* Fog */}
       <div className="animate-fog absolute bottom-0 left-0 w-[200%] h-48 bg-linear-to-t from-red-950/30 to-transparent blur-3xl pointer-events-none" />
       <div className="animate-fog-delayed absolute bottom-0 left-0 w-[200%] h-32 bg-linear-to-t from-gray-900/60 to-transparent blur-2xl pointer-events-none" />
@@ -29,7 +28,6 @@ export default function Error({ error, reset }: ErrorProps) {
       <div className="scanlines absolute inset-0 pointer-events-none opacity-[0.03]" />
 
       <div className="relative text-center max-w-xl z-10">
-
         {/* Glitchy warning icon */}
 
         {/* Heading */}
@@ -39,8 +37,8 @@ export default function Error({ error, reset }: ErrorProps) {
 
         {/* Copy */}
         <p className="animate-float-up-delay-1 text-gray-400 text-base leading-relaxed mb-3">
-          An unexpected error crept out of the dark. Our team has been alerted.
-          You can try again or retreat to the homepage.
+          An unexpected error crept out of the dark. Our team has been alerted. You can try again or
+          retreat to the homepage.
         </p>
 
         {/* Error digest */}
@@ -66,7 +64,6 @@ export default function Error({ error, reset }: ErrorProps) {
             ← Back to Home
           </a>
         </div>
-
       </div>
     </div>
   );

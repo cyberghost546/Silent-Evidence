@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Both passwords are required' }, { status: 400 });
   }
   if (newPassword.length < 8) {
-    return NextResponse.json({ error: 'New password must be at least 8 characters' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'New password must be at least 8 characters' },
+      { status: 400 }
+    );
   }
 
   // Fetch the stored hash to verify the current password

@@ -8,7 +8,8 @@ const stories = [
     categoryId: 1,
     title: 'I Found Hidden Cameras in My Rental',
     slug: 'i-found-hidden-cameras-in-my-rental',
-    excerpt: 'I only noticed the tiny lens because the light caught it at the wrong angle. What I found next changed how I sleep forever.',
+    excerpt:
+      'I only noticed the tiny lens because the light caught it at the wrong angle. What I found next changed how I sleep forever.',
     coverImage: 'https://picsum.photos/seed/true2/800/400',
     content: `I had been renting the apartment for four months before I found the first one. It was a Saturday morning in October and I was moving a bookshelf to vacuum behind it. The light from the window caught something in the smoke detector — a tiny, perfect circle of glass that had no business being there.
 
@@ -60,7 +61,8 @@ I changed my locks the next day. I have not told my mother.`,
     categoryId: 2,
     title: 'The Mirror That Showed the Wrong Reflection',
     slug: 'the-mirror-that-showed-the-wrong-reflection',
-    excerpt: 'For three weeks, the antique mirror in my hallway showed me one second behind. Then it started showing something else entirely.',
+    excerpt:
+      'For three weeks, the antique mirror in my hallway showed me one second behind. Then it started showing something else entirely.',
     coverImage: 'https://picsum.photos/seed/para2/800/400',
     content: `My wife found the mirror at an estate sale. Victorian, she said. The frame was ornate dark wood, slightly worn at the corners. It was beautiful and I had no objection to it hanging in the hallway.
 
@@ -86,7 +88,8 @@ We sold the mirror the following weekend. The buyer was delighted with it. I did
     categoryId: 2,
     title: 'The Voice on the Baby Monitor',
     slug: 'the-voice-on-the-baby-monitor',
-    excerpt: 'We heard a voice on the baby monitor that was not our daughter. It knew things it could not have known.',
+    excerpt:
+      'We heard a voice on the baby monitor that was not our daughter. It knew things it could not have known.',
     coverImage: 'https://picsum.photos/seed/para3/800/400',
     content: `Our daughter Maisie was eight months old. We had a standard audio monitor — nothing fancy, no camera, just sound. We kept it on the nightstand.
 
@@ -116,7 +119,8 @@ She stopped doing it when she started talking. She has never mentioned it.`,
     categoryId: 3,
     title: 'The Smiling Man of Decker Avenue',
     slug: 'the-smiling-man-of-decker-avenue',
-    excerpt: 'Every person who has reported seeing the Smiling Man describes the same thing: too tall, too thin, and a smile that does not belong on a human face.',
+    excerpt:
+      'Every person who has reported seeing the Smiling Man describes the same thing: too tall, too thin, and a smile that does not belong on a human face.',
     coverImage: 'https://picsum.photos/seed/urban2/800/400',
     content: `Decker Avenue runs through the older part of the city, the part that was built in the 1920s and has never quite been redeveloped. The streetlights are spaced too far apart. Late at night, there are long stretches of near-dark between pools of orange light.
 
@@ -186,7 +190,7 @@ It's that both settings were on the same side of the table. Whoever sat there sa
     categoryId: 4,
     title: 'The Tooth',
     slug: 'the-tooth',
-    excerpt: 'I woke up with someone else\'s tooth in my hand. The DNA results came back last week.',
+    excerpt: "I woke up with someone else's tooth in my hand. The DNA results came back last week.",
     coverImage: 'https://picsum.photos/seed/short3/800/400',
     content: `I woke up on a Wednesday morning with my hand clenched in a fist. This is not unusual for me — I clench my fists in my sleep, it's stress-related, my doctor has mentioned it several times.
 
@@ -216,7 +220,8 @@ Just in case.`,
     categoryId: 5,
     title: 'The Library That Closes at Three',
     slug: 'the-library-that-closes-at-three',
-    excerpt: 'Harwick Public Library has a sign on the door: No entry after 3pm on Sundays. The staff will not say why.',
+    excerpt:
+      'Harwick Public Library has a sign on the door: No entry after 3pm on Sundays. The staff will not say why.',
     coverImage: 'https://picsum.photos/seed/haunt2/800/400',
     content: `Harwick Public Library was built in 1931 and hasn't been significantly renovated since 1974. It smells the way good libraries should — old paper, wood polish, the particular mustiness of knowledge left undisturbed.
 
@@ -246,9 +251,10 @@ He has not discussed what he saw.`,
   },
   {
     categoryId: 5,
-    title: 'The Hotel Room That Isn\'t on Any Floor',
+    title: "The Hotel Room That Isn't on Any Floor",
     slug: 'the-hotel-room-that-isnt-on-any-floor',
-    excerpt: 'The Meridian Grand has 14 floors and 280 rooms. Guests have reported checking into room 1408 — a room that does not officially exist.',
+    excerpt:
+      'The Meridian Grand has 14 floors and 280 rooms. Guests have reported checking into room 1408 — a room that does not officially exist.',
     coverImage: 'https://picsum.photos/seed/haunt3/800/400',
     content: `The Meridian Grand Hotel opened in 1962 and has operated continuously since then. It has fourteen floors, a standard configuration, and according to its official room registry, 280 guest rooms numbered sequentially from 101 to 1420 — with one gap.
 
@@ -268,9 +274,10 @@ A former front desk employee gave an interview to a paranormal podcast in 2020. 
   // ── Ghost Encounters (6) ──────────────────────────────────────
   {
     categoryId: 6,
-    title: 'My Daughter\'s Imaginary Friend Left a Handprint',
+    title: "My Daughter's Imaginary Friend Left a Handprint",
     slug: 'my-daughters-imaginary-friend-left-a-handprint',
-    excerpt: 'Children have imaginary friends. I know this. But imaginary friends do not leave handprints on fogged glass.',
+    excerpt:
+      'Children have imaginary friends. I know this. But imaginary friends do not leave handprints on fogged glass.',
     coverImage: 'https://picsum.photos/seed/ghost2/800/400',
     content: `My daughter Petra started talking about Thomas when she was three. Thomas was her imaginary friend. He sat with her at meals, accompanied her to the park, and apparently had very specific opinions about which stories she should be read at bedtime.
 
@@ -298,7 +305,8 @@ I didn't ask where.`,
     categoryId: 6,
     title: 'The Funeral Where the Wrong Person Was in the Coffin',
     slug: 'the-funeral-where-the-wrong-person-was-in-the-coffin',
-    excerpt: 'I went to my uncle\'s funeral on a Saturday. That Monday, he called me to ask how it went.',
+    excerpt:
+      "I went to my uncle's funeral on a Saturday. That Monday, he called me to ask how it went.",
     coverImage: 'https://picsum.photos/seed/ghost3/800/400',
     content: `I want to be precise about the facts because the facts are strange enough without embellishment.
 
@@ -338,7 +346,8 @@ I still don't know whose funeral I attended that Saturday. I'm not sure I want t
     categoryId: 7,
     title: 'The Confession That Was Filed Before the Crime',
     slug: 'the-confession-that-was-filed-before-the-crime',
-    excerpt: 'A man walked into a police station and confessed to a murder. The body was found three days later.',
+    excerpt:
+      'A man walked into a police station and confessed to a murder. The body was found three days later.',
     coverImage: 'https://picsum.photos/seed/crime2/800/400',
     content: `On the fourteenth of April, 2003, a man named Dale Pruitt walked into the Marchfield Police Department and told the desk officer that he had murdered a woman named Carol Vess.
 
@@ -364,7 +373,8 @@ The case is studied in criminology programs as an example of the unreliability o
     categoryId: 7,
     title: 'The Map Found in the Walls',
     slug: 'the-map-found-in-the-walls',
-    excerpt: 'Renovating a Victorian terrace, the builders found a detailed hand-drawn map inside the walls. It showed tunnels beneath the city that don\'t appear on any official record — and one of them appears to run directly under the house.',
+    excerpt:
+      "Renovating a Victorian terrace, the builders found a detailed hand-drawn map inside the walls. It showed tunnels beneath the city that don't appear on any official record — and one of them appears to run directly under the house.",
     coverImage: 'https://picsum.photos/seed/crime3/800/400',
     content: `The house on Aldgate Terrace was built in 1887 and had not been seriously renovated until it was purchased in 2017. The new owners, a couple named the Harmons, hired a local firm to gut the ground floor.
 
@@ -392,7 +402,8 @@ They have not opened it.`,
     categoryId: 8,
     title: 'The Boy Who Came Back Speaking a Different Language',
     slug: 'the-boy-who-came-back-speaking-a-different-language',
-    excerpt: 'Oliver was missing for eleven days. When he came back, he spoke no English. He had spoken nothing but English since birth.',
+    excerpt:
+      'Oliver was missing for eleven days. When he came back, he spoke no English. He had spoken nothing but English since birth.',
     coverImage: 'https://picsum.photos/seed/miss2/800/400',
     content: `Oliver Marsh was seven years old when he disappeared from his parents' back garden in rural Somerset on a Tuesday afternoon in June. The garden backed onto farmland. There was no gate, no road, nowhere obvious to go. He was there at two-fifteen. He was not there at two-thirty.
 
@@ -416,7 +427,8 @@ Oliver is twenty-three. He is studying linguistics at university. He says it was
     categoryId: 8,
     title: 'Gone in the Grocery Store',
     slug: 'gone-in-the-grocery-store',
-    excerpt: 'I turned around for thirty seconds. My son was gone. The cameras showed him walking into an aisle and not coming out.',
+    excerpt:
+      'I turned around for thirty seconds. My son was gone. The cameras showed him walking into an aisle and not coming out.',
     coverImage: 'https://picsum.photos/seed/miss3/800/400',
     content: `My son Elliot is fine. I want to start there. He came back. He is sitting in the next room right now watching television and I can hear him laughing and he is fine.
 
@@ -446,7 +458,8 @@ I can't stop.`,
     categoryId: 9,
     title: 'The Same Figure in Three Countries',
     slug: 'the-same-figure-in-three-countries',
-    excerpt: 'I described my sleep paralysis figure to a woman I met in Tokyo. She went pale. She had seen the same one.',
+    excerpt:
+      'I described my sleep paralysis figure to a woman I met in Tokyo. She went pale. She had seen the same one.',
     coverImage: 'https://picsum.photos/seed/sleep2/800/400',
     content: `I've had sleep paralysis episodes since I was about sixteen. The figure in mine is consistent: a tall, thin shape in the corner of the room, darker than the surrounding darkness, that moves toward the bed when it thinks I'm not watching.
 
@@ -480,7 +493,8 @@ I just want to know why we're all seeing the same thing.`,
     categoryId: 9,
     title: 'It Spoke This Time',
     slug: 'it-spoke-this-time',
-    excerpt: 'I\'ve had sleep paralysis for ten years. The figure has never spoken before. Last week it did.',
+    excerpt:
+      "I've had sleep paralysis for ten years. The figure has never spoken before. Last week it did.",
     coverImage: 'https://picsum.photos/seed/sleep3/800/400',
     content: `Ten years. I've had sleep paralysis episodes for ten years. I know the routine: wake unable to move, figure in the corner or by the door, crushing weight on the chest, ten to ninety seconds, then release. I've learned not to panic. I breathe. I wait. It passes.
 
@@ -512,7 +526,8 @@ I don't know what that means. I'm not sure I want to.`,
     categoryId: 10,
     title: 'The Deer That Watched Us Camp',
     slug: 'the-deer-that-watched-us-camp',
-    excerpt: 'It stood at the edge of the firelight for three hours. It never moved. It never blinked.',
+    excerpt:
+      'It stood at the edge of the firelight for three hours. It never moved. It never blinked.',
     coverImage: 'https://picsum.photos/seed/forest2/800/400',
     content: `We were four days into a camping trip in the national forest when the deer appeared.
 
@@ -546,7 +561,8 @@ The ranger nodded. He said: "If you see it again, don't go toward it. Just wait 
     categoryId: 10,
     title: 'The Trail That Changed Overnight',
     slug: 'the-trail-that-changed-overnight',
-    excerpt: 'We hiked in on a clear marked trail. We camped. In the morning the trail behind us was gone.',
+    excerpt:
+      'We hiked in on a clear marked trail. We camped. In the morning the trail behind us was gone.',
     coverImage: 'https://picsum.photos/seed/forest3/800/400',
     content: `We had been on the Greer Valley trail a dozen times. It's a well-maintained path, marked every quarter mile, maps available at the trail head. A six-hour return hike through mixed woodland to a viewpoint over the valley, then back the same way.
 
@@ -576,7 +592,8 @@ We have never found an explanation. We have not been back.`,
     categoryId: 11,
     title: 'The Patient in Bay Four',
     slug: 'the-patient-in-bay-four',
-    excerpt: 'Bay four had been empty for a week. The monitors showed no patient. The nurses heard someone breathing.',
+    excerpt:
+      'Bay four had been empty for a week. The monitors showed no patient. The nurses heard someone breathing.',
     coverImage: 'https://picsum.photos/seed/night2/800/400',
     content: `I've been an A&E nurse for fourteen years. I've worked nights for most of them. You develop a tolerance for strangeness — not indifference, just tolerance. The things you see become categorisable. Strange, yes, but usually strange in ways that have explanations, even if the explanations are themselves disturbing.
 
@@ -600,9 +617,10 @@ She never explained why.`,
   },
   {
     categoryId: 11,
-    title: 'The Security Guard\'s Last Round',
+    title: "The Security Guard's Last Round",
     slug: 'the-security-guards-last-round',
-    excerpt: 'The office building had been empty for six months. The motion sensors still triggered every night at 3:15.',
+    excerpt:
+      'The office building had been empty for six months. The motion sensors still triggered every night at 3:15.',
     coverImage: 'https://picsum.photos/seed/night3/800/400',
     content: `The Prentiss Building had been vacant since the company that occupied it went into administration in the spring. My job was to make regular checks, monitor the alarm system, and ensure no vandals or squatters had gotten in.
 
@@ -656,7 +674,8 @@ I don't know who called me. I don't know how they knew. I just know that I take 
     categoryId: 12,
     title: 'The Automated Call About the Accident',
     slug: 'the-automated-call-about-the-accident',
-    excerpt: 'I received an automated call from my insurance company regarding my accident. I hadn\'t been in an accident. Yet.',
+    excerpt:
+      "I received an automated call from my insurance company regarding my accident. I hadn't been in an accident. Yet.",
     coverImage: 'https://picsum.photos/seed/phone3/800/400',
     content: `I received the call on a Thursday at half past eleven in the morning. An automated voice — the kind that sounds almost but not quite human, the telltale flatness of text-to-speech — identifying itself as calling from my car insurance provider regarding "the incident on 14th November."
 
@@ -684,7 +703,8 @@ I didn't push it.`,
     categoryId: 13,
     title: 'The Thing Beneath the Ice',
     slug: 'the-thing-beneath-the-ice',
-    excerpt: 'The lake froze over in January. We could see something moving beneath the ice. It was too large to be anything we knew.',
+    excerpt:
+      'The lake froze over in January. We could see something moving beneath the ice. It was too large to be anything we knew.',
     coverImage: 'https://picsum.photos/seed/creature2/800/400',
     content: `Greer Lake freezes solid most winters. It's a popular spot for ice fishing in January and February — the ice gets thick enough to drive a snowmobile across safely.
 
@@ -710,7 +730,8 @@ None of us have been back. Two of us moved away from the area the following year
     categoryId: 13,
     title: 'The Figure in the Field at Harvest',
     slug: 'the-figure-in-the-field-at-harvest',
-    excerpt: 'Every harvest season, for twenty years, the same figure has appeared at the edge of my family\'s field at dusk. We have never been able to get closer than fifty metres before it disappears.',
+    excerpt:
+      "Every harvest season, for twenty years, the same figure has appeared at the edge of my family's field at dusk. We have never been able to get closer than fifty metres before it disappears.",
     coverImage: 'https://picsum.photos/seed/creature3/800/400',
     content: `My family has farmed the same land for four generations. The field I'm talking about is the eastern pasture — sixty acres of flat ground that borders a small wood on the far side.
 
@@ -738,7 +759,8 @@ It's just there. It's been there longer than we have.`,
     categoryId: 14,
     title: 'The Photographs in the Abandoned House',
     slug: 'the-photographs-in-the-abandoned-house',
-    excerpt: 'Every room in the abandoned house was empty — except one, which was full of photographs of people sleeping. None of them knew they\'d been photographed.',
+    excerpt:
+      "Every room in the abandoned house was empty — except one, which was full of photographs of people sleeping. None of them knew they'd been photographed.",
     coverImage: 'https://picsum.photos/seed/abandon2/800/400',
     content: `I explore abandoned buildings. I know the risks, I take the precautions, I don't need the lecture. What I want to tell you about is the house on the Old Croft Road.
 
@@ -770,7 +792,8 @@ My locks were changed that afternoon. They have not found them yet.`,
     categoryId: 14,
     title: 'The Church That Never Closed',
     slug: 'the-church-that-never-closed',
-    excerpt: 'The Church of St Aldric was deconsecrated in 1971. Nobody told whoever is still holding services there.',
+    excerpt:
+      'The Church of St Aldric was deconsecrated in 1971. Nobody told whoever is still holding services there.',
     coverImage: 'https://picsum.photos/seed/abandon3/800/400',
     content: `The Church of St Aldric sits at the end of a lane outside the village of Petworth Cross, surrounded by a graveyard that stopped receiving new residents in 1969. It was deconsecrated in 1971 and has been privately owned since 1983.
 
@@ -800,9 +823,10 @@ I drove back to photograph the interior again. The candles had burned down. The 
   // ── Psychological Drama (15) ─────────────────────────────────
   {
     categoryId: 15,
-    title: 'I Keep Finding Notes I Don\'t Remember Writing',
+    title: "I Keep Finding Notes I Don't Remember Writing",
     slug: 'i-keep-finding-notes-i-dont-remember-writing',
-    excerpt: 'Post-it notes in my handwriting, in my home, describing things I was about to do before I did them. Always waiting for me. Always accurate.',
+    excerpt:
+      'Post-it notes in my handwriting, in my home, describing things I was about to do before I did them. Always waiting for me. Always accurate.',
     coverImage: 'https://picsum.photos/seed/psych2/800/400',
     content: `It started small. A post-it note on the bathroom mirror: "Out of toothpaste." I was out of toothpaste. I didn't remember writing it.
 
@@ -826,9 +850,10 @@ I don't know what I'm ready for. I'm not sure I want to find out.`,
   },
   {
     categoryId: 15,
-    title: 'My Therapist Doesn\'t Exist',
+    title: "My Therapist Doesn't Exist",
     slug: 'my-therapist-doesnt-exist',
-    excerpt: 'I saw my therapist every Tuesday for eight months. Then I tried to refer a friend to her and discovered her practice had never been registered.',
+    excerpt:
+      'I saw my therapist every Tuesday for eight months. Then I tried to refer a friend to her and discovered her practice had never been registered.',
     coverImage: 'https://picsum.photos/seed/psych3/800/400',
     content: `I want to write this down while it still makes sense to me, while I can still put the events in order. I am not sure how much longer I will be able to do that.
 
@@ -858,7 +883,8 @@ I am better than I was. Whatever that means.`,
     categoryId: 16,
     title: 'The Rain That Fell Upward',
     slug: 'the-rain-that-fell-upward',
-    excerpt: 'For eleven minutes on a Thursday afternoon, the rain over our street fell upward. Forty-three residents witnessed it. Meteorology has no explanation.',
+    excerpt:
+      'For eleven minutes on a Thursday afternoon, the rain over our street fell upward. Forty-three residents witnessed it. Meteorology has no explanation.',
     coverImage: 'https://picsum.photos/seed/super2/800/400',
     content: `I want to be clear that this account is corroborated by forty-two other people and was reported to the local meteorological office, to a university physics department, and to the local authority. None of them provided a satisfactory explanation.
 
@@ -882,7 +908,8 @@ It happened. I don't know why. I'm not sure knowing why would make me feel bette
     categoryId: 16,
     title: 'The Night All the Clocks Ran Backwards',
     slug: 'the-night-all-the-clocks-ran-backwards',
-    excerpt: 'We lost four hours we cannot account for. Every clock in the town ran backwards. The dogs didn\'t stop barking until dawn.',
+    excerpt:
+      "We lost four hours we cannot account for. Every clock in the town ran backwards. The dogs didn't stop barking until dawn.",
     coverImage: 'https://picsum.photos/seed/super3/800/400',
     content: `It is difficult to describe an event that, by its nature, disrupted the very mechanism we use to sequence events. I'll do my best.
 
@@ -910,7 +937,8 @@ We filed a report with the regional government. It was logged as an "unexplained
     categoryId: 17,
     title: 'The Festival You Must Not Attend Twice',
     slug: 'the-festival-you-must-not-attend-twice',
-    excerpt: 'The village holds a festival every ten years. Everyone is welcome to attend once. Nobody who attends twice is ever quite right afterwards.',
+    excerpt:
+      'The village holds a festival every ten years. Everyone is welcome to attend once. Nobody who attends twice is ever quite right afterwards.',
     coverImage: 'https://picsum.photos/seed/folk2/800/400',
     content: `In the highlands of a country I will not name, in a village small enough that you would not find it on a standard map, there is a festival that occurs every ten years at midsummer.
 
@@ -934,7 +962,8 @@ She has not returned.`,
     categoryId: 17,
     title: 'The Name You Must Not Say Before Sunrise',
     slug: 'the-name-you-must-not-say-before-sunrise',
-    excerpt: 'In my grandmother\'s village, every child was taught the name you must never say before the sun comes up. My cousin said it on a dare.',
+    excerpt:
+      "In my grandmother's village, every child was taught the name you must never say before the sun comes up. My cousin said it on a dare.",
     coverImage: 'https://picsum.photos/seed/folk3/800/400',
     content: `My grandmother came from a coastal fishing village in the north. She brought very little with her when she emigrated — some photographs, a small wooden box, and a rule.
 
@@ -966,7 +995,8 @@ We never found out what the name was. None of us have tried.`,
     categoryId: 18,
     title: 'The Town That Vanished Overnight',
     slug: 'the-town-that-vanished-overnight',
-    excerpt: 'In 1952, a town of 300 people was recorded in the census. By 1953, there was no record it had ever existed. The land was empty.',
+    excerpt:
+      'In 1952, a town of 300 people was recorded in the census. By 1953, there was no record it had ever existed. The land was empty.',
     coverImage: 'https://picsum.photos/seed/unsolved2/800/400',
     content: `The town of Morrow's Landing appears in the 1952 regional census with a recorded population of 312 people. It is listed with a post office, a school with an enrollment of forty-seven children, two churches, and a railway halt.
 
@@ -988,7 +1018,8 @@ Morrow's Landing has 312 people in one document and nothing in all the others. N
     categoryId: 18,
     title: 'The Signal From Nowhere',
     slug: 'the-signal-from-nowhere',
-    excerpt: 'In 1977, a radio telescope received a signal that has never been explained. In 2003, a different telescope received a response.',
+    excerpt:
+      'In 1977, a radio telescope received a signal that has never been explained. In 2003, a different telescope received a response.',
     coverImage: 'https://picsum.photos/seed/unsolved3/800/400',
     content: `On the 15th of August, 1977, an astronomer named Jerry Ehman was reviewing data from a radio telescope survey when he circled an anomaly and wrote a single word in the margin: "Wow!"
 
@@ -1024,5 +1055,8 @@ async function main() {
 }
 
 main()
-  .catch(e => { console.error(e.message); process.exit(1); })
+  .catch((e) => {
+    console.error(e.message);
+    process.exit(1);
+  })
   .finally(() => prisma.$disconnect());

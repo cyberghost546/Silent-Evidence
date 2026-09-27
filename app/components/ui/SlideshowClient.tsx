@@ -30,9 +30,9 @@ import { useState, useEffect, useCallback } from 'react';
 type Slide = {
   id: number;
   title: string;
-  subtitle: string | null;  // optional tagline shown below the title
-  image: string;            // URL of the background image
-  linkUrl: string | null;   // optional href for the "Read Story" button
+  subtitle: string | null; // optional tagline shown below the title
+  image: string; // URL of the background image
+  linkUrl: string | null; // optional href for the "Read Story" button
 };
 
 export default function SlideshowClient({ slides }: { slides: Slide[] }) {
@@ -77,7 +77,6 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
   return (
     // Outer container: full width, fixed height (520px), clips overflowing image edges
     <div className="relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden bg-gray-950">
-
       {/* Background image — only rendered when imageOk is true.
           key={slide.id} forces React to remount the <img> element when the
           slide changes, which triggers a fresh load and fade-in animation. */}
@@ -104,7 +103,6 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
       {/* Slide text content — pinned to the bottom-left of the hero.
           text-on-image is a global CSS class that forces white text regardless of theme. */}
       <div className="absolute inset-0 flex flex-col justify-end px-4 sm:px-8 pb-8 sm:pb-14 max-w-4xl text-on-image">
-
         {/* "Featured Story" label — small uppercase pill above the title */}
         <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-red-400 mb-4">
           <span className="w-4 h-px bg-red-500" />
@@ -130,7 +128,14 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
             className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm w-fit"
           >
             Read Story
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </a>
@@ -165,7 +170,14 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
             className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white transition"
             aria-label="Previous slide"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -176,7 +188,14 @@ export default function SlideshowClient({ slides }: { slides: Slide[] }) {
             className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white transition"
             aria-label="Next slide"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -211,15 +230,21 @@ function HeroFallback() {
         </h1>
 
         <p className="text-gray-400 text-lg max-w-xl leading-relaxed mb-8">
-          Stories that can&apos;t be explained. Accounts that were never meant to be found.
-          This is where the truth hides.
+          Stories that can&apos;t be explained. Accounts that were never meant to be found. This is
+          where the truth hides.
         </p>
 
         <div className="flex gap-4">
-          <a href="/search" className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm">
+          <a
+            href="/search"
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition text-sm"
+          >
             Browse Stories
           </a>
-          <a href="/register" className="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-semibold rounded-xl transition text-sm">
+          <a
+            href="/register"
+            className="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-semibold rounded-xl transition text-sm"
+          >
             Share Yours
           </a>
         </div>

@@ -9,18 +9,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-const FONT_SIZES  = [14, 16, 18, 20, 22] as const;
+const FONT_SIZES = [14, 16, 18, 20, 22] as const;
 const LINE_HEIGHTS = [1.5, 1.75, 2.0, 2.25] as const;
 
-const LS_FONT   = 'se_reader_font';
-const LS_LINE   = 'se_reader_line';
+const LS_FONT = 'se_reader_font';
+const LS_LINE = 'se_reader_line';
 
 const DEFAULT_FONT = 18;
 const DEFAULT_LINE = 1.75;
 
 export default function ReaderSettings() {
-  const [open, setOpen]       = useState(false);
-  const [fontSize, setFontSize]   = useState(DEFAULT_FONT);
+  const [open, setOpen] = useState(false);
+  const [fontSize, setFontSize] = useState(DEFAULT_FONT);
   const [lineHeight, setLineHeight] = useState(DEFAULT_LINE);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +66,7 @@ export default function ReaderSettings() {
       {/* Floating "Aa" trigger button */}
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         aria-label="Reader settings"
         className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 border border-gray-700 hover:border-red-600/50 text-gray-300 hover:text-white text-sm font-bold shadow-lg transition"
       >
@@ -76,13 +76,15 @@ export default function ReaderSettings() {
       {/* Settings panel — slides up from the button */}
       {open && (
         <div className="absolute bottom-12 right-0 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-4 w-56">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Reader settings</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            Reader settings
+          </p>
 
           {/* Font size */}
           <div className="mb-4">
             <p className="text-xs text-gray-500 mb-2">Font size</p>
             <div className="flex gap-1.5">
-              {FONT_SIZES.map(size => (
+              {FONT_SIZES.map((size) => (
                 <button
                   type="button"
                   key={size}
@@ -103,7 +105,7 @@ export default function ReaderSettings() {
           <div>
             <p className="text-xs text-gray-500 mb-2">Line spacing</p>
             <div className="flex gap-1.5">
-              {LINE_HEIGHTS.map(lh => (
+              {LINE_HEIGHTS.map((lh) => (
                 <button
                   type="button"
                   key={lh}

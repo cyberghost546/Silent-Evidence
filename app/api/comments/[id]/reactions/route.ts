@@ -62,28 +62,30 @@ export async function GET(req: NextRequest, { params }: Params) {
   //                             WHERE commentId = ? GROUP BY emoji
   // Group reactions by emoji and count them
   const grouped = await prisma.commentReaction.groupBy({
-    by: ['emoji'],                // group all rows that share the same emoji value
-    where: { commentId },         // only count reactions for this specific comment
-    _count: { emoji: true },      // count how many rows each emoji group has
+    by: ['emoji'], // group all rows that share the same emoji value
+    where: { commentId }, // only count reactions for this specific comment
+    _count: { emoji: true }, // count how many rows each emoji group has
   });
 
   // Transform the grouped array into a plain object { emoji: count, ... }
   // Object.fromEntries() converts an array of [key, value] pairs into an object.
   // grouped.map returns [ ["😱", 3], ["👍", 1] ] which fromEntries turns into { "😱": 3, "👍": 1 }
-  const counts = Object.fromEntries(grouped.map(g => [g.emoji, g._count.emoji]));
+  const counts = Object.fromEntries(grouped.map((g) => [g.emoji, g._count.emoji]));
 
   // ── Fetch the current user's own reactions ────────────────────────────────
   // Which emojis has the current user reacted with?
   // If the user is a guest (userId is null), we skip the DB query and use an empty array.
   const mine = userId
     ? // User is logged in — find all their reactions on this specific comment
-      (await prisma.commentReaction.findMany({
-        where: {
-          commentId, // filter to this comment
-          userId,    // filter to the logged-in user
-        },
-        select: { emoji: true }, // we only need the emoji string, not the full row
-      })).map(r => r.emoji)      // extract just the emoji string from each record
+      (
+        await prisma.commentReaction.findMany({
+          where: {
+            commentId, // filter to this comment
+            userId, // filter to the logged-in user
+          },
+          select: { emoji: true }, // we only need the emoji string, not the full row
+        })
+      ).map((r) => r.emoji) // extract just the emoji string from each record
     : []; // Guest users have no reactions — return an empty array
 
   // Return the combined result as JSON
@@ -144,15 +146,14 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     // Inform the client the reaction was removed so it can update the UI counter
     return NextResponse.json({ action: 'removed' });
-
   } else {
     // Toggle on — add the reaction
     // No existing reaction found — create a new one (the user is reacting for the first time)
     await prisma.commentReaction.create({
       data: {
         commentId, // which comment is being reacted to
-        userId,    // which user is adding the reaction
-        emoji,     // the stored reaction id they chose (see lib/reactions)
+        userId, // which user is adding the reaction
+        emoji, // the stored reaction id they chose (see lib/reactions)
       },
     });
 

@@ -39,7 +39,9 @@ export async function GET(req: Request, { params }: Params) {
   const story = await prisma.story.findUnique({
     where: { id: storyId },
     select: {
-      title: true, content: true, excerpt: true,
+      title: true,
+      content: true,
+      excerpt: true,
       authorId: true,
       author: { select: { username: true } },
       category: { select: { name: true } },
@@ -55,8 +57,12 @@ export async function GET(req: Request, { params }: Params) {
   const format = searchParams.get('format') ?? 'txt';
 
   const plainContent = stripHtml(story.content);
-  const date = story.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  const tags = story.tags.map(t => t.name).join(', ');
+  const date = story.createdAt.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const tags = story.tags.map((t) => t.name).join(', ');
   const safeFilename = story.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
   if (format === 'md') {
@@ -72,7 +78,9 @@ export async function GET(req: Request, { params }: Params) {
       `---`,
       ``,
       plainContent,
-    ].filter(l => l !== undefined).join('\n');
+    ]
+      .filter((l) => l !== undefined)
+      .join('\n');
 
     return new NextResponse(md, {
       headers: {
@@ -99,7 +107,9 @@ export async function GET(req: Request, { params }: Params) {
     ``,
     `${'─'.repeat(60)}`,
     `Exported from Silent Evidence — silentevidence.com`,
-  ].filter(l => l !== undefined).join('\n');
+  ]
+    .filter((l) => l !== undefined)
+    .join('\n');
 
   return new NextResponse(txt, {
     headers: {

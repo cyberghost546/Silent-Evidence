@@ -8,7 +8,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getIronSession } from 'iron-session';
 
-interface SessionData { userId?: number }
+interface SessionData {
+  userId?: number;
+}
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET ?? 'change-me-32-chars-minimum-secret!',
   cookieName: 'se_session',
@@ -34,7 +36,10 @@ export async function GET(req: NextRequest) {
       checks = card?.checks.map((c) => c.cellIndex) ?? [];
     }
 
-    return NextResponse.json({ template: { ...template, cells: JSON.parse(template.cells) }, checks });
+    return NextResponse.json({
+      template: { ...template, cells: JSON.parse(template.cells) },
+      checks,
+    });
   } catch {
     return NextResponse.json({ error: 'Failed to load bingo' }, { status: 500 });
   }

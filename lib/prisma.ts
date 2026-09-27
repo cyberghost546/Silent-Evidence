@@ -6,8 +6,8 @@
 // The DATABASE_URL env variable must be set in .env — it's the full connection string
 // to your MariaDB database (e.g. mysql://user:password@localhost:3306/silent_evidence).
 
-import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from '@prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 // parseDbUrl — breaks the DATABASE_URL connection string into the individual
 // fields that the MariaDB adapter needs (host, port, user, password, database name).
@@ -15,9 +15,9 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 function parseDbUrl() {
   const url = new URL(process.env.DATABASE_URL!);
   return {
-    host:     url.hostname,
-    port:     parseInt(url.port) || 3306, // Default MariaDB/MySQL port is 3306
-    user:     url.username,
+    host: url.hostname,
+    port: parseInt(url.port) || 3306, // Default MariaDB/MySQL port is 3306
+    user: url.username,
     password: url.password,
     database: url.pathname.slice(1), // Remove the leading "/" from the path
   };
@@ -31,8 +31,7 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Re-use the existing instance if it exists (development), or create a new one (production/first load)
 export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
+  globalForPrisma.prisma ?? new PrismaClient({ adapter: new PrismaMariaDb(parseDbUrl()) });
 
 // Only cache on global in development — production always creates one instance at cold start
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

@@ -12,22 +12,22 @@ export default async function HomepageVideos() {
     orderBy: { createdAt: 'desc' },
     take: 100,
     select: {
-      id:        true,
-      title:     true,
-      slug:      true,
-      excerpt:   true,
-      videoUrl:  true,
-      views:     true,
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      videoUrl: true,
+      views: true,
       createdAt: true,
-      author:    { select: { username: true } },
-      category:  { select: { name: true, slug: true } },
-      _count:    { select: { likes: true, comments: true } },
+      author: { select: { username: true } },
+      category: { select: { name: true, slug: true } },
+      _count: { select: { likes: true, comments: true } },
     },
   });
 
-  const videos = stories.filter(
-    (s): s is typeof s & { videoUrl: string } => !!s.videoUrl
-  ).slice(0, 3);
+  const videos = stories
+    .filter((s): s is typeof s & { videoUrl: string } => !!s.videoUrl)
+    .slice(0, 3);
 
   if (videos.length === 0) return null;
 
@@ -48,7 +48,7 @@ export default async function HomepageVideos() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {videos.map(v => (
+        {videos.map((v) => (
           <VideoCard key={v.id} story={v} />
         ))}
       </div>

@@ -18,25 +18,25 @@ const OPTIONS: { value: Frequency; label: string; desc: string }[] = [
   {
     value: 'DAILY',
     label: 'Daily',
-    desc:  'Receive a summary of new comments every morning.',
+    desc: 'Receive a summary of new comments every morning.',
   },
   {
     value: 'WEEKLY',
     label: 'Weekly',
-    desc:  'A roundup of activity from the past week, every Monday.',
+    desc: 'A roundup of activity from the past week, every Monday.',
   },
   {
     value: 'NEVER',
     label: 'Never',
-    desc:  'No digest emails. You can still see comments in the app.',
+    desc: 'No digest emails. You can still see comments in the app.',
   },
 ];
 
 export default function DigestFrequencySelector({ initialFrequency }: Props) {
   const [frequency, setFrequency] = useState<Frequency>(initialFrequency);
-  const [saving, setSaving]       = useState(false);
-  const [saved, setSaved]         = useState(false);
-  const [error, setError]         = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   // Called when the user clicks a different frequency option
   const handleChange = async (next: Frequency) => {
@@ -81,7 +81,7 @@ export default function DigestFrequencySelector({ initialFrequency }: Props) {
 
       {/* Radio button group — one option per frequency */}
       <div className="flex flex-col gap-2">
-        {OPTIONS.map(opt => (
+        {OPTIONS.map((opt) => (
           <button
             key={opt.value}
             onClick={() => handleChange(opt.value)}
@@ -99,14 +99,14 @@ export default function DigestFrequencySelector({ initialFrequency }: Props) {
                 frequency === opt.value ? 'border-red-500' : 'border-gray-600'
               }`}
             >
-              {frequency === opt.value && (
-                <span className="w-2 h-2 rounded-full bg-red-500" />
-              )}
+              {frequency === opt.value && <span className="w-2 h-2 rounded-full bg-red-500" />}
             </span>
 
             {/* Label + description */}
             <div>
-              <p className={`text-sm font-semibold ${frequency === opt.value ? 'text-white' : 'text-gray-300'}`}>
+              <p
+                className={`text-sm font-semibold ${frequency === opt.value ? 'text-white' : 'text-gray-300'}`}
+              >
                 {opt.label}
               </p>
               <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>

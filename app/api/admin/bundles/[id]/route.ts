@@ -70,19 +70,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   // Only update title if the client sent a non-undefined string
   // .trim() removes surrounding whitespace before saving
-  if (typeof body.title       === 'string') data.title       = body.title.trim();
+  if (typeof body.title === 'string') data.title = body.title.trim();
 
   // Only update description if sent; trim() then || null converts empty string to null
   if (typeof body.description === 'string') data.description = body.description.trim() || null;
 
   // Only update coverImage if sent; || null converts empty string to null (removes image)
-  if (typeof body.coverImage  === 'string') data.coverImage  = body.coverImage.trim()  || null;
+  if (typeof body.coverImage === 'string') data.coverImage = body.coverImage.trim() || null;
 
   // Only update price if sent as a number (type check prevents strings sneaking in)
-  if (typeof body.price       === 'number') data.price       = body.price;
+  if (typeof body.price === 'number') data.price = body.price;
 
   // Only update active if sent as a boolean (true/false toggle)
-  if (typeof body.active      === 'boolean') data.active     = body.active;
+  if (typeof body.active === 'boolean') data.active = body.active;
 
   // ── Replace story list if storyIds was provided ───────────────────────────
 
@@ -100,7 +100,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     // createMany inserts multiple rows in a single SQL statement (efficient)
     // skipDuplicates: true prevents errors if the same storyId appears twice in the array
     await prisma.storyBundleItem.createMany({
-      data: storyIds.map(storyId => ({ bundleId, storyId })),
+      data: storyIds.map((storyId) => ({ bundleId, storyId })),
       skipDuplicates: true,
     });
   }

@@ -54,13 +54,20 @@ function dayKey(d: Date): string {
 export async function getAuthorAnalytics(authorId: number): Promise<AuthorAnalytics> {
   // Every story by this author, with the counts Prisma can aggregate for us.
   const stories = await prisma.story.findMany({
-    where:   { authorId },
+    where: { authorId },
     orderBy: { views: 'desc' },
     select: {
-      id: true, title: true, slug: true, status: true, views: true,
+      id: true,
+      title: true,
+      slug: true,
+      status: true,
+      views: true,
       _count: {
         select: {
-          likes: true, comments: true, bookmarks: true, readingHistory: true,
+          likes: true,
+          comments: true,
+          bookmarks: true,
+          readingHistory: true,
         },
       },
     },
@@ -79,17 +86,17 @@ export async function getAuthorAnalytics(authorId: number): Promise<AuthorAnalyt
   const [purchases, tips, recentReads] = await Promise.all([
     storyIds.length
       ? prisma.storyPurchase.findMany({
-          where:  { storyId: { in: storyIds } },
+          where: { storyId: { in: storyIds } },
           select: { storyId: true, amount: true },
         })
       : Promise.resolve([]),
     prisma.tip.findMany({
-      where:  { toUserId: authorId },
+      where: { toUserId: authorId },
       select: { amount: true },
     }),
     storyIds.length
       ? prisma.readingHistory.findMany({
-          where:  { storyId: { in: storyIds }, readAt: { gte: since } },
+          where: { storyId: { in: storyIds }, readAt: { gte: since } },
           select: { readAt: true },
         })
       : Promise.resolve([]),
@@ -125,21 +132,19 @@ export async function getAuthorAnalytics(authorId: number): Promise<AuthorAnalyt
     comments: s._count.comments,
     reads: s._count.readingHistory,
     salesCents: salesByStory.get(s.id) ?? 0,
-    engagementRate: s.views > 0
-      ? Math.round((s._count.likes / s.views) * 1000) / 10
-      : null,
+    engagementRate: s.views > 0 ? Math.round((s._count.likes / s.views) * 1000) / 10 : null,
   }));
 
   return {
     totals: {
-      stories:   stories.length,
+      stories: stories.length,
       published: stories.filter((s) => s.status === 'PUBLISHED').length,
-      views:     stories.reduce((n, s) => n + s.views, 0),
-      likes:     stories.reduce((n, s) => n + s._count.likes, 0),
-      comments:  stories.reduce((n, s) => n + s._count.comments, 0),
+      views: stories.reduce((n, s) => n + s.views, 0),
+      likes: stories.reduce((n, s) => n + s._count.likes, 0),
+      comments: stories.reduce((n, s) => n + s._count.comments, 0),
       bookmarks: stories.reduce((n, s) => n + s._count.bookmarks, 0),
       salesCents: purchases.reduce((n, p) => n + p.amount, 0),
-      tipsCents:  tips.reduce((n, t) => n + t.amount, 0),
+      tipsCents: tips.reduce((n, t) => n + t.amount, 0),
     },
     stories: perStory,
     readsByDay: [...buckets.entries()].map(([date, reads]) => ({ date, reads })),

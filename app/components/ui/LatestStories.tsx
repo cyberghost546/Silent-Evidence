@@ -39,15 +39,14 @@
 //   convert them to strings/numbers before passing to LatestStoriesSection.
 // =============================================================================
 
-import { cookies } from 'next/headers';      // reads HTTP-only cookies server-side
-import { prisma } from '@/lib/prisma';        // the shared Prisma client instance
-import { cache, TTL } from '@/lib/cache';     // in-memory cache helper + TTL constants
+import { cookies } from 'next/headers'; // reads HTTP-only cookies server-side
+import { prisma } from '@/lib/prisma'; // the shared Prisma client instance
+import { cache, TTL } from '@/lib/cache'; // in-memory cache helper + TTL constants
 import LatestStoriesSection from './LatestStoriesSection';
 
 // standalone — when true, removes the outer padding wrapper so this can nest
 // inside another layout container without double-padding.
 export default async function LatestStories({ standalone }: { standalone?: boolean } = {}) {
-
   // ── Read the current user's id from the session cookie ──────────────────
   // cookies() is a Next.js 14 Server Component API that reads the incoming
   // request cookies synchronously. We await it because it returns a Promise
@@ -67,17 +66,17 @@ export default async function LatestStories({ standalone }: { standalone?: boole
   //     This is more efficient than pulling all Likes and then calling .length.
   const stories = await cache('homepage:latest-stories', TTL.MEDIUM, () =>
     prisma.story.findMany({
-      where:   { status: 'PUBLISHED' },   // only show stories the author has published
-      orderBy: { createdAt: 'desc' },     // newest first
-      take: 6,                            // hard limit — 6 cards fit a 3-column grid cleanly
+      where: { status: 'PUBLISHED' }, // only show stories the author has published
+      orderBy: { createdAt: 'desc' }, // newest first
+      take: 6, // hard limit — 6 cards fit a 3-column grid cleanly
       include: {
         // Fetch only the username — we don't need the author's email, bio, etc.
-        author:   { select: { username: true } },
+        author: { select: { username: true } },
         // Fetch only category name + slug for the category pill on each card.
         category: { select: { name: true, slug: true } },
         // Count likes and comments via a SQL aggregate — much faster than
         // loading all Like/Comment rows and counting in JS.
-        _count:   { select: { likes: true, comments: true } },
+        _count: { select: { likes: true, comments: true } },
       },
     })
   );
@@ -97,11 +96,11 @@ export default async function LatestStories({ standalone }: { standalone?: boole
         where: {
           userId,
           // Only check against the ids we already have — avoids a full table scan.
-          storyId: { in: stories.map(s => s.id) },
+          storyId: { in: stories.map((s) => s.id) },
         },
         select: { storyId: true }, // we only need the id, not the full history row
       });
-      readIds = rows.map(r => r.storyId);
+      readIds = rows.map((r) => r.storyId);
     } catch {
       // The readingHistory table may not exist in older DB migrations
       // (it was added later). Safe to skip — badges just won't appear.

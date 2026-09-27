@@ -29,11 +29,7 @@ async function getDraft(token: string) {
   }>;
 }
 
-export default async function DraftPreviewPage({
-  params,
-}: {
-  params: Promise<{ token: string }>;
-}) {
+export default async function DraftPreviewPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const data = await getDraft(token);
 
@@ -57,12 +53,7 @@ export default async function DraftPreviewPage({
       {/* Cover image */}
       {story.coverImage && (
         <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-8">
-          <Image
-            src={story.coverImage}
-            alt={story.title}
-            fill
-            className="object-cover"
-          />
+          <Image src={story.coverImage} alt={story.title} fill className="object-cover" />
         </div>
       )}
 
@@ -93,7 +84,10 @@ export default async function DraftPreviewPage({
             </div>
           )}
           <div>
-            <Link href={`/user/${story.author.username}`} className="text-sm font-semibold text-white hover:text-red-400 transition">
+            <Link
+              href={`/user/${story.author.username}`}
+              className="text-sm font-semibold text-white hover:text-red-400 transition"
+            >
               {story.author.username}
             </Link>
             <p className="text-xs text-gray-500">

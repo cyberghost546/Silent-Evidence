@@ -21,7 +21,7 @@ function timeLeft(expiresAt: string | null): string {
   const ms = new Date(expiresAt).getTime() - Date.now();
   if (ms <= 0) return 'Expired';
   const days = Math.floor(ms / 86_400_000);
-  const hrs  = Math.floor((ms % 86_400_000) / 3_600_000);
+  const hrs = Math.floor((ms % 86_400_000) / 3_600_000);
   if (days > 0) return `${days}d ${hrs}h left`;
   const mins = Math.floor((ms % 3_600_000) / 60_000);
   return hrs > 0 ? `${hrs}h ${mins}m left` : `${mins}m left`;
@@ -35,11 +35,21 @@ export default function WritingPromptBanner() {
   useEffect(() => {
     // Check if user already dismissed this prompt in this session
     const key = 'se_prompt_dismissed';
-    if (sessionStorage.getItem(key)) { setDismissed(true); setLoading(false); return; }
+    if (sessionStorage.getItem(key)) {
+      setDismissed(true);
+      setLoading(false);
+      return;
+    }
 
     fetch('/api/writing-prompts')
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(data => { if (data?.id) setPrompt(data); setLoading(false); })
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((data) => {
+        if (data?.id) setPrompt(data);
+        setLoading(false);
+      })
       .catch(() => setLoading(false)); // hide silently on error — non-critical widget
   }, []);
 

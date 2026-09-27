@@ -10,15 +10,18 @@ import { getRedisClient } from '@/lib/cache';
 export const store = new Map<string, { count: number; windowStart: number }>();
 
 // Clean up old entries every 5 minutes so the Map doesn't grow forever
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of store.entries()) {
-    // Remove entries whose window expired more than 1 hour ago
-    if (now - val.windowStart > 60 * 60 * 1000) {
-      store.delete(key);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, val] of store.entries()) {
+      // Remove entries whose window expired more than 1 hour ago
+      if (now - val.windowStart > 60 * 60 * 1000) {
+        store.delete(key);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  },
+  5 * 60 * 1000
+);
 
 interface RateLimitOptions {
   // Maximum number of requests allowed within the window

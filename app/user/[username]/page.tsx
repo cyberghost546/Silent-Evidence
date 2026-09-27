@@ -119,7 +119,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'profile', // tells Facebook/LinkedIn this is a person profile
     },
     twitter: {
-      card: 'summary',           // square image card (not large image)
+      card: 'summary', // square image card (not large image)
       title: `${username} — Silent Evidence`,
       description,
       images: [image],
@@ -187,14 +187,16 @@ export default async function UserProfilePage({ params }: Props) {
   // Only execute this query when the viewer has permission.  For private
   // profiles we skip the query entirely and return an empty array — saves
   // a DB round-trip and avoids leaking story titles via timing attacks.
-  const stories = canSeeStories ? await prisma.story.findMany({
-    where: { authorId: user.id, status: 'PUBLISHED' },
-    orderBy: { createdAt: 'desc' },
-    include: {
-      category: { select: { name: true, slug: true } },
-      _count: { select: { likes: true, comments: true } },
-    },
-  }) : [];
+  const stories = canSeeStories
+    ? await prisma.story.findMany({
+        where: { authorId: user.id, status: 'PUBLISHED' },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          category: { select: { name: true, slug: true } },
+          _count: { select: { likes: true, comments: true } },
+        },
+      })
+    : [];
 
   // ── Derived stats ─────────────────────────────────────────────────────────
   // Aggregate view/like counts from the story list (already in memory).
@@ -255,13 +257,11 @@ export default async function UserProfilePage({ params }: Props) {
 
         {/* Content — `relative` lifts it above the absolutely-positioned layers */}
         <div className="relative max-w-4xl mx-auto px-4 pt-14 pb-10">
-
           {/* Avatar + name row
               flex-col on mobile (avatar stacked above name), flex-row on sm+
               items-end aligns both to the bottom edge so the name sits at
               the same baseline as the bottom of the avatar. */}
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
-
             {/* ── Avatar ───────────────────────────────────────────────── */}
             <div className="relative flex-shrink-0">
               {/* Glowing red ring behind the avatar — positioned with -inset-1
@@ -276,7 +276,10 @@ export default async function UserProfilePage({ params }: Props) {
                   Positioned in the top-right corner of the avatar using absolute
                   with negative offsets (-top-2 -right-1). */}
               {user.writerOfMonth && (
-                <span className="absolute -top-2 -right-1 text-yellow-500" title="Writer of the Month">
+                <span
+                  className="absolute -top-2 -right-1 text-yellow-500"
+                  title="Writer of the Month"
+                >
                   <Crown className="w-5 h-5" strokeWidth={1.75} aria-hidden="true" />
                 </span>
               )}
@@ -284,13 +287,10 @@ export default async function UserProfilePage({ params }: Props) {
 
             {/* ── Name + actions ──────────────────────────────────────────── */}
             <div className="flex-1 text-center sm:text-left">
-
               {/* Name row — flex-wrap allows the action buttons to wrap to a new
                   line on very small screens without overflowing. */}
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                <h1 className="text-3xl font-bold text-white tracking-tight">
-                  {user.username}
-                </h1>
+                <h1 className="text-3xl font-bold text-white tracking-tight">{user.username}</h1>
 
                 {/* Blue checkmark badge — only rendered when isVerified is true.
                     Conditional rendering: {condition && <Component />} */}
@@ -305,7 +305,11 @@ export default async function UserProfilePage({ params }: Props) {
                   >
                     {/* Inline SVG checkmark icon — avoids importing an icon library */}
                     <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     Apply for verification
                   </Link>
@@ -331,7 +335,11 @@ export default async function UserProfilePage({ params }: Props) {
                     </Link>
                     {/* ComplimentButton — sends an anonymous compliment.
                         Rate-limited to one compliment per 24 hours per sender. */}
-                    <ComplimentButton toUserId={user.id} toUsername={user.username} fromUserId={viewerId} />
+                    <ComplimentButton
+                      toUserId={user.id}
+                      toUsername={user.username}
+                      fromUserId={viewerId}
+                    />
                   </div>
                 )}
               </div>
@@ -352,8 +360,19 @@ export default async function UserProfilePage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 transition mt-1.5"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
                   </svg>
                   {/* Replace strips https:// / http:// for a cleaner display URL */}
                   {user.profile.website.replace(/^https?:\/\//, '')}
@@ -401,12 +420,20 @@ export default async function UserProfilePage({ params }: Props) {
                 styles to the FollowListModal's internal <button> element without
                 needing to add className props to the component itself. */}
             <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-4 py-3 text-center [&_button]:flex [&_button]:flex-col [&_button]:items-center [&_button]:gap-0.5 [&_button_span:first-child]:text-2xl [&_button_span:first-child]:font-bold [&_button_span:last-child]:text-xs [&_button_span:last-child]:text-gray-500">
-              <FollowListModal username={user.username} type="followers" count={user._count.followers} />
+              <FollowListModal
+                username={user.username}
+                type="followers"
+                count={user._count.followers}
+              />
             </div>
 
             {/* Following — same pattern as Followers above */}
             <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-4 py-3 text-center [&_button]:flex [&_button]:flex-col [&_button]:items-center [&_button]:gap-0.5 [&_button_span:first-child]:text-2xl [&_button_span:first-child]:font-bold [&_button_span:last-child]:text-xs [&_button_span:last-child]:text-gray-500">
-              <FollowListModal username={user.username} type="following" count={user._count.following} />
+              <FollowListModal
+                username={user.username}
+                type="following"
+                count={user._count.following}
+              />
             </div>
 
             {/* Total views — toLocaleString() adds thousand separators (e.g. 1,234) */}
@@ -445,7 +472,11 @@ export default async function UserProfilePage({ params }: Props) {
                     title={meta.description}
                     className="inline-flex items-center gap-1.5 bg-gray-800/80 border border-gray-700 hover:border-red-600/40 rounded-full px-3 py-1 text-xs text-gray-300 transition cursor-default"
                   >
-                    <BadgeIcon className="w-3.5 h-3.5 text-red-500/80" strokeWidth={1.75} aria-hidden="true" />
+                    <BadgeIcon
+                      className="w-3.5 h-3.5 text-red-500/80"
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
                     <span>{meta.label}</span>
                   </span>
                 );
@@ -485,7 +516,9 @@ export default async function UserProfilePage({ params }: Props) {
                 Every published story, grouped by category.
               </p>
             </div>
-            <span className="shrink-0 text-xs text-gray-600 group-hover:text-gray-400 transition">View →</span>
+            <span className="shrink-0 text-xs text-gray-600 group-hover:text-gray-400 transition">
+              View →
+            </span>
           </Link>
         </div>
       )}
@@ -510,7 +543,7 @@ export default async function UserProfilePage({ params }: Props) {
         {pinnedStory && (
           <div className="mb-5">
             <p className="text-xs font-bold uppercase tracking-widest text-yellow-500 mb-2 flex items-center gap-1.5">
-               Pinned
+              Pinned
             </p>
             <Link
               href={`/story/${pinnedStory.slug}`}
@@ -524,21 +557,34 @@ export default async function UserProfilePage({ params }: Props) {
                 />
               ) : (
                 // Placeholder thumbnail when no cover image is set
-                <div className="w-32 h-24 bg-gray-800 rounded-xl flex-shrink-0 flex items-center justify-center">
-                </div>
+                <div className="w-32 h-24 bg-gray-800 rounded-xl flex-shrink-0 flex items-center justify-center"></div>
               )}
               <div className="flex flex-col justify-between flex-1 min-w-0">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-red-400">{pinnedStory.category.name}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+                    {pinnedStory.category.name}
+                  </span>
                   {/* group-hover:text-red-300 — changes title colour when the whole
                       card is hovered (group is set on the parent Link element) */}
-                  <h3 className="text-base font-semibold text-white group-hover:text-red-300 transition mt-0.5 line-clamp-1">{pinnedStory.title}</h3>
+                  <h3 className="text-base font-semibold text-white group-hover:text-red-300 transition mt-0.5 line-clamp-1">
+                    {pinnedStory.title}
+                  </h3>
                   {/* line-clamp-2 truncates the excerpt to two lines with an ellipsis */}
-                  {pinnedStory.excerpt && <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">{pinnedStory.excerpt}</p>}
+                  {pinnedStory.excerpt && (
+                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">
+                      {pinnedStory.excerpt}
+                    </p>
+                  )}
                 </div>
                 {/* Metadata row — date, views, likes, comments */}
                 <div className="flex items-center gap-4 text-xs text-gray-600 mt-2">
-                  <span>{new Date(pinnedStory.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span>
+                    {new Date(pinnedStory.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </span>
                   <span>{pinnedStory.views.toLocaleString()}</span>
                   <span>{pinnedStory._count.likes}</span>
                   <span>{pinnedStory._count.comments}</span>
@@ -575,19 +621,19 @@ export default async function UserProfilePage({ params }: Props) {
         ─────────────────────────────────────────────────────────────────── */}
         {canSeeStories && stories.length > 0 && (
           <ProfileStoriesGrid
-            stories={stories.map(s => ({
-              id:         s.id,
-              title:      s.title,
-              slug:       s.slug,
+            stories={stories.map((s) => ({
+              id: s.id,
+              title: s.title,
+              slug: s.slug,
               coverImage: s.coverImage,
-              excerpt:    s.excerpt,
-              views:      s.views,
+              excerpt: s.excerpt,
+              views: s.views,
               // Convert Date to ISO string so it survives the server→client boundary
-              createdAt:  s.createdAt.toISOString(),
+              createdAt: s.createdAt.toISOString(),
               // Pre-compute reading time on the server to keep the client bundle light
-              readTime:   readingTime(s.content),
-              category:   s.category,
-              _count:     s._count,
+              readTime: readingTime(s.content),
+              category: s.category,
+              _count: s._count,
             }))}
             isOwner={isOwner}
             pinnedStoryId={user.pinnedStoryId}

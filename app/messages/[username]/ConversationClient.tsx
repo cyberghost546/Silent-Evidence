@@ -55,7 +55,10 @@ type Partner = {
 };
 
 function avatarUrl(username: string, avatar: string | null) {
-  return avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=64`;
+  return (
+    avatar ??
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=dc2626&color=fff&size=64`
+  );
 }
 
 export default function ConversationClient({
@@ -70,9 +73,9 @@ export default function ConversationClient({
   // messages — starts from server-fetched data; updated on send and on each poll
   const [messages, setMessages] = useState(initialMessages);
   // text — controlled value for the message input textarea
-  const [text, setText]         = useState('');
+  const [text, setText] = useState('');
   // sending — true while the POST is in-flight; disables the Send button
-  const [sending, setSending]   = useState(false);
+  const [sending, setSending] = useState(false);
   // bottomRef — points to an invisible div at the end of the message list
   // used to auto-scroll to the latest message
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -109,29 +112,47 @@ export default function ConversationClient({
     if (res.ok) {
       const msg: Message = await res.json();
       // Append the new message immediately without waiting for the next poll
-      setMessages(prev => [...prev, msg]);
+      setMessages((prev) => [...prev, msg]);
       setText(''); // clear the input
     }
   };
 
   // Keyboard shortcut: Enter sends, Shift+Enter inserts a newline
   const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
   };
 
   const partnerAvatar = avatarUrl(partner.username, partner.profile?.avatar ?? null);
 
   return (
-    <div className="flex flex-col flex-1 max-w-2xl w-full mx-auto px-4 py-6" style={{ height: 'calc(100vh - 68px)' }}>
+    <div
+      className="flex flex-col flex-1 max-w-2xl w-full mx-auto px-4 py-6"
+      style={{ height: 'calc(100vh - 68px)' }}
+    >
       {/* Partner header */}
       <div className="flex items-center gap-3 pb-4 mb-4 border-b border-gray-800">
         <Link href={`/user/${partner.username}`}>
-          <Image src={partnerAvatar} alt={partner.username} width={40} height={40} className="rounded-full object-cover" />
+          <Image
+            src={partnerAvatar}
+            alt={partner.username}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
         </Link>
-        <Link href={`/user/${partner.username}`} className="font-semibold text-white hover:text-red-400 transition">
+        <Link
+          href={`/user/${partner.username}`}
+          className="font-semibold text-white hover:text-red-400 transition"
+        >
           {partner.username}
         </Link>
-        <Link href="/messages" className="ml-auto text-xs text-gray-500 hover:text-gray-300 transition">
+        <Link
+          href="/messages"
+          className="ml-auto text-xs text-gray-500 hover:text-gray-300 transition"
+        >
           ← Inbox
         </Link>
       </div>
@@ -141,21 +162,35 @@ export default function ConversationClient({
         {messages.length === 0 && (
           <p className="text-center text-gray-600 text-sm py-10">No messages yet. Say hello!</p>
         )}
-        {messages.map(msg => {
+        {messages.map((msg) => {
           const isOwn = msg.senderId === userId;
           return (
             <div key={msg.id} className={`flex items-end gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}>
               {!isOwn && (
-                <Image src={partnerAvatar} alt={partner.username} width={28} height={28} className="rounded-full object-cover shrink-0 mb-1" />
+                <Image
+                  src={partnerAvatar}
+                  alt={partner.username}
+                  width={28}
+                  height={28}
+                  className="rounded-full object-cover shrink-0 mb-1"
+                />
               )}
-              <div className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                isOwn
-                  ? 'bg-red-600/20 border border-red-600/30 text-white rounded-br-sm'
-                  : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-bl-sm'
-              }`}>
+              <div
+                className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                  isOwn
+                    ? 'bg-red-600/20 border border-red-600/30 text-white rounded-br-sm'
+                    : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-bl-sm'
+                }`}
+              >
                 <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                <p className={`text-[10px] mt-1 ${isOwn ? 'text-red-400/60 text-right' : 'text-gray-600'}`} suppressHydrationWarning>
-                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <p
+                  className={`text-[10px] mt-1 ${isOwn ? 'text-red-400/60 text-right' : 'text-gray-600'}`}
+                  suppressHydrationWarning
+                >
+                  {new Date(msg.createdAt).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </p>
               </div>
             </div>
@@ -168,7 +203,7 @@ export default function ConversationClient({
       <div className="flex gap-3 pt-4 border-t border-gray-800 mt-4">
         <textarea
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKey}
           placeholder={`Message ${partner.username}…`}
           rows={1}

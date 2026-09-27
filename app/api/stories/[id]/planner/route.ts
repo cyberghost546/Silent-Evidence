@@ -30,7 +30,10 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   // Verify the requester owns this story
-  const story = await prisma.story.findUnique({ where: { id: storyId }, select: { authorId: true } });
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { authorId: true },
+  });
   if (!story || story.authorId !== userId) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
@@ -41,7 +44,7 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   await prisma.storyPlanner.upsert({
-    where:  { storyId },
+    where: { storyId },
     create: { storyId, content },
     update: { content },
   });

@@ -15,7 +15,7 @@ export async function POST() {
 
     await prisma.user.update({
       where: { id: userId },
-      data:  { sessionVersion: { increment: 1 } },
+      data: { sessionVersion: { increment: 1 } },
     });
 
     const res = NextResponse.json({ ok: true });

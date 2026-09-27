@@ -7,7 +7,16 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { BarChart3, Eye, Heart, MessageSquare, Bookmark, DollarSign, Coins, Lock } from 'lucide-react';
+import {
+  BarChart3,
+  Eye,
+  Heart,
+  MessageSquare,
+  Bookmark,
+  DollarSign,
+  Coins,
+  Lock,
+} from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
 import { getAuthorProContext } from '@/lib/authorPro';
@@ -42,8 +51,8 @@ export default async function AuthorAnalyticsPage() {
           </div>
           <h1 className="text-3xl font-bold mb-3">Analytics is an Author Pro feature</h1>
           <p className="text-gray-400 mb-8">
-            See exactly how each story performs — views, reads over time, engagement
-            rate, sales and tips — and find out what your readers actually finish.
+            See exactly how each story performs — views, reads over time, engagement rate, sales and
+            tips — and find out what your readers actually finish.
           </p>
           <Link
             href="/author-pro"
@@ -64,12 +73,12 @@ export default async function AuthorAnalyticsPage() {
   const peak = Math.max(1, ...data.readsByDay.map((d) => d.reads));
 
   const TILES = [
-    { icon: Eye,           label: 'Views',     value: data.totals.views.toLocaleString() },
-    { icon: Heart,         label: 'Likes',     value: data.totals.likes.toLocaleString() },
-    { icon: MessageSquare, label: 'Comments',  value: data.totals.comments.toLocaleString() },
-    { icon: Bookmark,      label: 'Bookmarks', value: data.totals.bookmarks.toLocaleString() },
-    { icon: DollarSign,    label: 'Sales',     value: money(data.totals.salesCents) },
-    { icon: Coins,         label: 'Tips',      value: money(data.totals.tipsCents) },
+    { icon: Eye, label: 'Views', value: data.totals.views.toLocaleString() },
+    { icon: Heart, label: 'Likes', value: data.totals.likes.toLocaleString() },
+    { icon: MessageSquare, label: 'Comments', value: data.totals.comments.toLocaleString() },
+    { icon: Bookmark, label: 'Bookmarks', value: data.totals.bookmarks.toLocaleString() },
+    { icon: DollarSign, label: 'Sales', value: money(data.totals.salesCents) },
+    { icon: Coins, label: 'Tips', value: money(data.totals.tipsCents) },
   ];
 
   return (
@@ -94,7 +103,11 @@ export default async function AuthorAnalyticsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
           {TILES.map((tile) => (
             <div key={tile.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-              <tile.icon className="w-4 h-4 text-gray-600 mb-2" strokeWidth={1.75} aria-hidden="true" />
+              <tile.icon
+                className="w-4 h-4 text-gray-600 mb-2"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <p className="text-xl font-bold leading-none">{tile.value}</p>
               <p className="text-xs text-gray-500 mt-1.5">{tile.label}</p>
             </div>
@@ -113,7 +126,10 @@ export default async function AuthorAnalyticsPage() {
           <div className="overflow-x-auto">
             <div className="flex items-end gap-1 h-32 min-w-[480px]">
               {data.readsByDay.map((d) => (
-                <div key={d.date} className="flex-1 flex flex-col justify-end h-full group relative">
+                <div
+                  key={d.date}
+                  className="flex-1 flex flex-col justify-end h-full group relative"
+                >
                   <div
                     className="w-full bg-amber-500/40 group-hover:bg-amber-400 rounded-sm transition-colors"
                     // Percentage of the busiest day. min-height keeps zero-read
@@ -121,7 +137,9 @@ export default async function AuthorAnalyticsPage() {
                     style={{ height: `${(d.reads / peak) * 100}%`, minHeight: '2px' }}
                   />
                   {/* Hover tooltip — title attr keeps it accessible without JS */}
-                  <span className="sr-only">{d.date}: {d.reads} reads</span>
+                  <span className="sr-only">
+                    {d.date}: {d.reads} reads
+                  </span>
                   <span
                     aria-hidden="true"
                     title={`${d.date}: ${d.reads} reads`}
@@ -143,7 +161,10 @@ export default async function AuthorAnalyticsPage() {
           {data.stories.length === 0 ? (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center">
               <p className="text-sm text-gray-500 mb-4">You haven&apos;t written anything yet.</p>
-              <Link href="/write" className="text-sm text-amber-400 hover:text-amber-300 transition">
+              <Link
+                href="/write"
+                className="text-sm text-amber-400 hover:text-amber-300 transition"
+              >
                 Write your first story →
               </Link>
             </div>
@@ -165,7 +186,10 @@ export default async function AuthorAnalyticsPage() {
                   {data.stories.map((s) => (
                     <tr key={s.id} className="hover:bg-gray-900/60 transition">
                       <td className="px-4 py-3">
-                        <Link href={`/story/${s.slug}`} className="text-white hover:text-amber-300 transition">
+                        <Link
+                          href={`/story/${s.slug}`}
+                          className="text-white hover:text-amber-300 transition"
+                        >
                           {s.title}
                         </Link>
                         {s.status !== 'PUBLISHED' && (
@@ -174,10 +198,18 @@ export default async function AuthorAnalyticsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-400">{s.views.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right text-gray-400">{s.reads.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right text-gray-400">{s.likes.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right text-gray-400">{s.comments.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right text-gray-400">
+                        {s.views.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-right text-gray-400">
+                        {s.reads.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-right text-gray-400">
+                        {s.likes.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-right text-gray-400">
+                        {s.comments.toLocaleString()}
+                      </td>
                       {/* Null (no views yet) shows a dash — 0% would imply readers
                           saw it and didn't care, which isn't what happened. */}
                       <td className="px-4 py-3 text-right text-gray-400">

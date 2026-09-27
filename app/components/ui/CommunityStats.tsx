@@ -10,15 +10,7 @@ import { prisma } from '@/lib/prisma';
 
 // StatCell — renders one icon + number + label tile in the strip.
 // Reusable: pass any emoji as icon, any number or string as value.
-function StatCell({
-  icon,
-  value,
-  label,
-}: {
-  icon: string;
-  value: string | number;
-  label: string;
-}) {
+function StatCell({ icon, value, label }: { icon: string; value: string | number; label: string }) {
   return (
     <div className="flex items-center gap-3 px-6 py-4 min-w-0">
       {/* Large icon on the left */}
@@ -26,12 +18,8 @@ function StatCell({
 
       {/* Text block on the right */}
       <div className="min-w-0">
-        <p className="text-lg font-black text-white leading-none tabular-nums">
-          {value}
-        </p>
-        <p className="text-xs text-gray-500 mt-0.5 leading-none truncate">
-          {label}
-        </p>
+        <p className="text-lg font-black text-white leading-none tabular-nums">{value}</p>
+        <p className="text-xs text-gray-500 mt-0.5 leading-none truncate">{label}</p>
       </div>
     </div>
   );
@@ -72,11 +60,7 @@ export default async function CommunityStats() {
           <StatCell icon="ðŸ‘¥" value={fmt(memberCount)} label="Community members" />
 
           {/* Total categories */}
-          <StatCell
-            icon="ðŸ—‚ï¸"
-            value={fmt(categoryCount)}
-            label="Horror categories"
-          />
+          <StatCell icon="ðŸ—‚ï¸" value={fmt(categoryCount)} label="Horror categories" />
 
           {/* Only show the "today" stat if there is at least one new story. */}
           {todayCount > 0 && (
@@ -89,9 +73,7 @@ export default async function CommunityStats() {
 
           {/* Extra right-side message only visible on larger screens. */}
           <div className="hidden lg:flex items-center justify-end flex-1 px-6 py-4">
-            <p className="text-xs text-gray-600 italic">
-              Real stories. Real fear. Share yours.
-            </p>
+            <p className="text-xs text-gray-600 italic">Real stories. Real fear. Share yours.</p>
           </div>
         </div>
       </div>

@@ -53,7 +53,6 @@ export async function GET(req: NextRequest) {
 
   // Fetch all feed data in parallel for performance
   const [stories, likes, comments] = await Promise.all([
-    
     // Get published stories from followed users
     prisma.story.findMany({
       where: { authorId: { in: followingIds }, status: 'PUBLISHED' },

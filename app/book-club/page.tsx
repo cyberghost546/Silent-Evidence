@@ -15,7 +15,8 @@ export default async function BookClubPage() {
   const userId = Number(cookieStore.get('userId')?.value ?? 0) || null;
 
   const isPremium = userId
-    ? (await prisma.subscription.findUnique({ where: { userId }, select: { status: true } }))?.status === 'active'
+    ? (await prisma.subscription.findUnique({ where: { userId }, select: { status: true } }))
+        ?.status === 'active'
     : false;
 
   return (

@@ -36,13 +36,13 @@ import { useState, useEffect } from 'react';
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime(); // ms since the event
   const secs = Math.floor(diff / 1000);
-  if (secs < 60)  return `${secs}s ago`;             // 0–59 seconds
+  if (secs < 60) return `${secs}s ago`; // 0–59 seconds
   const mins = Math.floor(secs / 60);
-  if (mins < 60)  return `${mins}m ago`;             // 1–59 minutes
+  if (mins < 60) return `${mins}m ago`; // 1–59 minutes
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)   return `${hrs}h ago`;              // 1–23 hours
+  if (hrs < 24) return `${hrs}h ago`; // 1–23 hours
   const days = Math.floor(hrs / 24);
-  if (days < 30)  return `${days}d ago`;             // 1–29 days
+  if (days < 30) return `${days}d ago`; // 1–29 days
   // 30+ days: show the full date for clarity
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short',
@@ -52,7 +52,6 @@ function timeAgo(iso: string): string {
 }
 
 export default function LiveTimer({ iso }: { iso: string }) {
-
   // ── State ─────────────────────────────────────────────────────────────────
   // label starts as '' (empty string) so that server-rendered HTML and the
   // initial client render match exactly — avoiding a React hydration warning.
@@ -85,10 +84,7 @@ export default function LiveTimer({ iso }: { iso: string }) {
     // but a real time string on the client. React would normally flag this as a
     // hydration error; suppressing it is safe because the discrepancy is intentional
     // and very brief (resolved within milliseconds of mount).
-    <span
-      className="inline-flex items-center gap-1 text-xs text-gray-500"
-      suppressHydrationWarning
-    >
+    <span className="inline-flex items-center gap-1 text-xs text-gray-500" suppressHydrationWarning>
       {/* Clock icon — decorative visual affordance that the text is a timestamp.
           flex-shrink-0 prevents the icon from being squashed if the parent
           container is very narrow. */}

@@ -30,13 +30,22 @@ export default async function AdminTagsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Tag Manager</h1>
-      <p className="text-gray-500 text-sm mb-8">View all tags, how many stories use each, and delete unused ones.</p>
+      <p className="text-gray-500 text-sm mb-8">
+        View all tags, how many stories use each, and delete unused ones.
+      </p>
       {/*
         Flatten `_count.stories` into `storyCount` so the prop type is a simple
         number rather than a nested Prisma object — cleaner to work with in the
         client component and avoids passing non-serialisable Prisma objects.
       */}
-      <TagManagerClient tags={tags.map(t => ({ id: t.id, name: t.name, slug: t.slug, storyCount: t._count.stories }))} />
+      <TagManagerClient
+        tags={tags.map((t) => ({
+          id: t.id,
+          name: t.name,
+          slug: t.slug,
+          storyCount: t._count.stories,
+        }))}
+      />
     </div>
   );
 }

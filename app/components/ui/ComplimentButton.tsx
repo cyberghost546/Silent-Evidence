@@ -7,18 +7,18 @@
 import { useState, useRef, useEffect } from 'react';
 
 type Props = {
-  toUserId: number;       // ID of the author receiving the compliment
-  toUsername: string;     // Username shown in the dropdown header
+  toUserId: number; // ID of the author receiving the compliment
+  toUsername: string; // Username shown in the dropdown header
   fromUserId: number | null; // Null when the viewer is not logged in
 };
 
 // The 5 preset compliment options shown in the dropdown
 const COMPLIMENTS = [
-  "Your writing genuinely scared me — great work!",
+  'Your writing genuinely scared me — great work!',
   "I couldn't stop reading. Incredible story!",
-  "The atmosphere you created was perfect",
-  "This gave me chills. Please write more!",
-  "You have a real talent for horror writing. Keep going",
+  'The atmosphere you created was perfect',
+  'This gave me chills. Please write more!',
+  'You have a real talent for horror writing. Keep going',
 ] as const;
 
 export default function ComplimentButton({ toUserId, toUsername, fromUserId }: Props) {
@@ -89,7 +89,7 @@ export default function ComplimentButton({ toUserId, toUsername, fromUserId }: P
     <div ref={containerRef} className="relative inline-block">
       {/* Main trigger button */}
       <button
-        onClick={() => setOpen(prev => !prev)}
+        onClick={() => setOpen((prev) => !prev)}
         disabled={sending}
         suppressHydrationWarning
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-600 text-gray-300 hover:border-pink-500 hover:text-pink-400 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"

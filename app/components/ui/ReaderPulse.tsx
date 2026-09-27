@@ -25,7 +25,7 @@ export default function ReaderPulse({ storyId }: Props) {
         cache: 'no-store',
       });
       if (!res.ok) return; // silently ignore errors — this is non-critical UI
-      const data = await res.json() as { count: number };
+      const data = (await res.json()) as { count: number };
       setCount(data.count ?? 0);
     } catch {
       // Network errors are swallowed — the indicator just won't show

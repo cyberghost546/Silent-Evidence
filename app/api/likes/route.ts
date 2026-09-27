@@ -33,7 +33,6 @@ import { checkAndAwardBadges } from '@/lib/badges';
 // ── POST handler ──────────────────────────────────────────────────────────────
 // Toggles the like state for the current user on the given story.
 export async function POST(req: Request) {
-
   // Read all cookies from the request
   const cookieStore = await cookies();
 
@@ -98,7 +97,6 @@ export async function POST(req: Request) {
 
   // Only send a notification if the story exists AND the liker is not the author
   if (story && story.authorId !== userId) {
-
     // Fetch the liker's username so we can say "Alice liked your story"
     const liker = await prisma.user.findUnique({
       where: { id: userId },
@@ -107,18 +105,20 @@ export async function POST(req: Request) {
 
     // Create the in-app notification — fire and forget so a DB error doesn't
     // break the like response (.catch swallows any error silently)
-    prisma.notification.create({
-      data: {
-        // Send the notification to the story's author
-        userId: story.authorId,
-        // LIKE type lets the UI render a heart icon or like-specific template
-        type: 'LIKE',
-        // Human-readable message for the notification panel
-        message: `${liker?.username ?? 'Someone'} liked your story.`,
-        // Include the storyId so the notification can link to the story
-        storyId,
-      },
-    }).catch(() => {});
+    prisma.notification
+      .create({
+        data: {
+          // Send the notification to the story's author
+          userId: story.authorId,
+          // LIKE type lets the UI render a heart icon or like-specific template
+          type: 'LIKE',
+          // Human-readable message for the notification panel
+          message: `${liker?.username ?? 'Someone'} liked your story.`,
+          // Include the storyId so the notification can link to the story
+          storyId,
+        },
+      })
+      .catch(() => {});
   }
 
   // ── Badge check ─────────────────────────────────────────────────────────

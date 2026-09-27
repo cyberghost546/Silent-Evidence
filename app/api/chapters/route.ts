@@ -42,15 +42,15 @@ export async function GET(req: Request) {
   //         returning full chapter content here would waste bandwidth since we
   //         only need the list view, not the full text of every chapter.
   const chapters = await prisma.storyChapter.findMany({
-    where: { storyId },              // only chapters belonging to this story
-    orderBy: { order: 'asc' },       // ascending position order (1, 2, 3...)
+    where: { storyId }, // only chapters belonging to this story
+    orderBy: { order: 'asc' }, // ascending position order (1, 2, 3...)
 
     // Include views so ChapterManager can show per-chapter read stats
     select: {
-      id: true,        // chapter's unique database ID
-      title: true,     // chapter's display title (e.g. "Chapter 1: The Beginning")
-      order: true,     // the chapter's position number in the story
-      views: true,     // how many times this chapter has been opened
+      id: true, // chapter's unique database ID
+      title: true, // chapter's display title (e.g. "Chapter 1: The Beginning")
+      order: true, // the chapter's position number in the story
+      views: true, // how many times this chapter has been opened
       createdAt: true, // when this chapter was published
     },
   });
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
   const storyId = Number(body.storyId);
 
   // Safely extract the title string and trim whitespace; default to empty string if missing
-  const title   = typeof body.title   === 'string' ? body.title.trim()   : '';
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
 
   // Safely extract the content string and trim whitespace; default to empty string if missing.
   // Content can be empty — some authors add the title first, then fill in the text later.
@@ -114,9 +114,9 @@ export async function POST(req: Request) {
   // This tells us where to place the new chapter (one after the last).
   // Place the new chapter after the last existing one
   const last = await prisma.storyChapter.findFirst({
-    where: { storyId },          // only look at chapters from this story
-    orderBy: { order: 'desc' },  // sort descending so the highest order comes first
-    select: { order: true },     // we only need the order number, nothing else
+    where: { storyId }, // only look at chapters from this story
+    orderBy: { order: 'desc' }, // sort descending so the highest order comes first
+    select: { order: true }, // we only need the order number, nothing else
   });
 
   // Calculate the new chapter's position:
@@ -128,10 +128,10 @@ export async function POST(req: Request) {
   // Insert the new chapter row into the database with all the collected data
   const chapter = await prisma.storyChapter.create({
     data: {
-      storyId,   // which story this chapter belongs to
-      title,     // the chapter's display title
-      content,   // the chapter's full text body (may be empty if added later)
-      order,     // its position in the sequence (1, 2, 3...)
+      storyId, // which story this chapter belongs to
+      title, // the chapter's display title
+      content, // the chapter's full text body (may be empty if added later)
+      order, // its position in the sequence (1, 2, 3...)
     },
   });
 

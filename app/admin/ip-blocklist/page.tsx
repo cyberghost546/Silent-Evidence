@@ -45,21 +45,21 @@ import { useEffect, useState } from 'react';
 type Entry = { ip: string; reason: string; addedAt: string };
 
 export default function AdminIpBlocklistPage() {
-  const [list, setList]           = useState<Entry[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [ip, setIp]               = useState('');
-  const [reason, setReason]       = useState('');
-  const [adding, setAdding]       = useState(false);
-  const [error, setError]         = useState('');
+  const [list, setList] = useState<Entry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [ip, setIp] = useState('');
+  const [reason, setReason] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState('');
   // Tracks which IP is currently being removed so we can disable only that button
-  const [removing, setRemoving]   = useState<string | null>(null);
+  const [removing, setRemoving] = useState<string | null>(null);
 
   // load() fetches the current blocklist and updates state
   const load = () => {
     setLoading(true);
     fetch('/api/admin/ip-blocklist')
-      .then(r => r.json())
-      .then(d => setList(d.blocklist ?? []))
+      .then((r) => r.json())
+      .then((d) => setList(d.blocklist ?? []))
       .finally(() => setLoading(false));
   };
 
@@ -77,11 +77,12 @@ export default function AdminIpBlocklistPage() {
       body: JSON.stringify({ ip: ip.trim(), reason: reason.trim() }),
     });
     const data = await res.json();
-    if (!res.ok) { setError(data.error ?? 'Failed to add.'); }
-    else {
-      setIp('');      // clear the form fields on success
+    if (!res.ok) {
+      setError(data.error ?? 'Failed to add.');
+    } else {
+      setIp(''); // clear the form fields on success
       setReason('');
-      load();         // refresh the list to show the new entry
+      load(); // refresh the list to show the new entry
     }
     setAdding(false);
   };
@@ -101,7 +102,9 @@ export default function AdminIpBlocklistPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">IP Blocklist</h1>
-      <p className="text-gray-500 text-sm mb-6">Block specific IP addresses or CIDR ranges from submitting content.</p>
+      <p className="text-gray-500 text-sm mb-6">
+        Block specific IP addresses or CIDR ranges from submitting content.
+      </p>
 
       {/* Add form */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
@@ -110,14 +113,14 @@ export default function AdminIpBlocklistPage() {
           <input
             type="text"
             value={ip}
-            onChange={e => setIp(e.target.value)}
+            onChange={(e) => setIp(e.target.value)}
             placeholder="e.g. 192.168.1.1 or 10.0.0.0/8"
             className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600/50 transition font-mono"
           />
           <input
             type="text"
             value={reason}
-            onChange={e => setReason(e.target.value)}
+            onChange={(e) => setReason(e.target.value)}
             placeholder="Reason (optional)"
             className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600/50 transition"
           />
@@ -135,7 +138,11 @@ export default function AdminIpBlocklistPage() {
 
       {/* List */}
       {loading ? (
-        <div className="space-y-2">{Array.from({length:3}).map((_,i)=><div key={i} className="h-12 bg-gray-800 rounded-xl animate-pulse"/>)}</div>
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-12 bg-gray-800 rounded-xl animate-pulse" />
+          ))}
+        </div>
       ) : list.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
           <p>No IPs blocked yet.</p>
@@ -143,21 +150,35 @@ export default function AdminIpBlocklistPage() {
       ) : (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
-              <th className="px-4 py-3 text-left">IP / CIDR</th>
-              <th className="px-4 py-3 text-left">Reason</th>
-              <th className="px-4 py-3 text-left">Blocked At</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr></thead>
+            <thead>
+              <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left">IP / CIDR</th>
+                <th className="px-4 py-3 text-left">Reason</th>
+                <th className="px-4 py-3 text-left">Blocked At</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800/60">
-              {list.map(e => (
+              {list.map((e) => (
                 <tr key={e.ip} className="hover:bg-gray-800/30 transition">
                   <td className="px-4 py-3 font-mono text-red-400 text-xs">{e.ip}</td>
-                  <td className="px-4 py-3 text-gray-400 text-sm">{e.reason || <span className="text-gray-600 italic">No reason</span>}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{new Date(e.addedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                  <td className="px-4 py-3 text-gray-400 text-sm">
+                    {e.reason || <span className="text-gray-600 italic">No reason</span>}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">
+                    {new Date(e.addedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </td>
                   <td className="px-4 py-3 text-right">
-                    <button type="button" onClick={() => remove(e.ip)} disabled={removing === e.ip}
-                      className="text-xs px-3 py-1 rounded-lg border border-red-800/40 text-red-500 hover:bg-red-600/10 hover:border-red-600/60 transition disabled:opacity-50">
+                    <button
+                      type="button"
+                      onClick={() => remove(e.ip)}
+                      disabled={removing === e.ip}
+                      className="text-xs px-3 py-1 rounded-lg border border-red-800/40 text-red-500 hover:bg-red-600/10 hover:border-red-600/60 transition disabled:opacity-50"
+                    >
                       {removing === e.ip ? '…' : 'Unblock'}
                     </button>
                   </td>

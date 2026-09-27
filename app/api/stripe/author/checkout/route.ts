@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where:  { id: userId },
+      where: { id: userId },
       select: { id: true, username: true, email: true },
     });
     if (!user) return badRequest('User not found');
@@ -42,20 +42,21 @@ export async function POST(request: NextRequest) {
     // rather than two disconnected customer records.
     const [readerSub, authorSub] = await Promise.all([
       prisma.subscription.findUnique({
-        where: { userId }, select: { stripeCustomerId: true },
+        where: { userId },
+        select: { stripeCustomerId: true },
       }),
       prisma.authorSubscription.findUnique({
-        where: { userId }, select: { stripeCustomerId: true },
+        where: { userId },
+        select: { stripeCustomerId: true },
       }),
     ]);
 
-    let stripeCustomerId =
-      authorSub?.stripeCustomerId ?? readerSub?.stripeCustomerId ?? null;
+    let stripeCustomerId = authorSub?.stripeCustomerId ?? readerSub?.stripeCustomerId ?? null;
 
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
         email: user.email,
-        name:  user.username,
+        name: user.username,
         metadata: { userId: String(userId) },
       });
       stripeCustomerId = customer.id;
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}/author-pro/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${baseUrl}/author-pro`,
+      cancel_url: `${baseUrl}/author-pro`,
       metadata: {
         // The webhook branches on this. Without it, the session would fall
         // through to the reader-subscription handler.

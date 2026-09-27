@@ -12,7 +12,15 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
-  BookOpen, Flame, Heart, Bookmark, Clock, Skull, CalendarDays, Lock, Sparkles,
+  BookOpen,
+  Flame,
+  Heart,
+  Bookmark,
+  Clock,
+  Skull,
+  CalendarDays,
+  Lock,
+  Sparkles,
 } from 'lucide-react';
 import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/Footer';
@@ -49,25 +57,35 @@ export default async function WrappedPage() {
             </span>
           </h1>
           <p className="text-gray-400 mb-10">
-            Every story you read, every scare you rated, every night you couldn&apos;t
-            stop. We&apos;ve been keeping count — members can see the whole picture.
+            Every story you read, every scare you rated, every night you couldn&apos;t stop.
+            We&apos;ve been keeping count — members can see the whole picture.
           </p>
 
           {/* Show the shape of the recap without any real numbers */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10 text-left">
             {[
-              { icon: BookOpen,     label: 'Stories read' },
-              { icon: Clock,        label: 'Hours in the dark' },
-              { icon: Flame,        label: 'Longest streak' },
-              { icon: Skull,        label: 'Your scariest read' },
-              { icon: Sparkles,     label: 'Your signature mood' },
+              { icon: BookOpen, label: 'Stories read' },
+              { icon: Clock, label: 'Hours in the dark' },
+              { icon: Flame, label: 'Longest streak' },
+              { icon: Skull, label: 'Your scariest read' },
+              { icon: Sparkles, label: 'Your signature mood' },
               { icon: CalendarDays, label: 'Your darkest month' },
             ].map((item) => (
-              <div key={item.label} className="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
-                <item.icon className="w-4 h-4 text-gray-600 mb-2" strokeWidth={1.75} aria-hidden="true" />
+              <div
+                key={item.label}
+                className="rounded-xl border border-gray-800 bg-gray-900/60 p-4"
+              >
+                <item.icon
+                  className="w-4 h-4 text-gray-600 mb-2"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
                 <p className="text-xs text-gray-500">{item.label}</p>
                 {/* Blurred placeholder stands in for the hidden figure */}
-                <p className="text-lg font-bold text-gray-700 blur-[5px] select-none" aria-hidden="true">
+                <p
+                  className="text-lg font-bold text-gray-700 blur-[5px] select-none"
+                  aria-hidden="true"
+                >
                   000
                 </p>
               </div>
@@ -81,8 +99,7 @@ export default async function WrappedPage() {
             Unlock your recap
           </Link>
           <p className="text-xs text-gray-600 mt-4">
-            We&apos;ve been recording since the day you joined — nothing is lost by
-            waiting.
+            We&apos;ve been recording since the day you joined — nothing is lost by waiting.
           </p>
         </div>
         <Footer />
@@ -101,8 +118,8 @@ export default async function WrappedPage() {
         <div className="max-w-xl mx-auto px-4 py-24 text-center">
           <h1 className="text-3xl font-bold mb-3">Your {d.year} is a blank page</h1>
           <p className="text-gray-400 mb-8">
-            You haven&apos;t read anything yet this year. Open a story and this page
-            starts filling itself in.
+            You haven&apos;t read anything yet this year. Open a story and this page starts filling
+            itself in.
           </p>
           <Link
             href="/trending"
@@ -119,18 +136,35 @@ export default async function WrappedPage() {
   const peak = Math.max(1, ...d.byMonth);
 
   const HEADLINE = [
-    { icon: BookOpen, label: 'Stories read',   value: d.storiesRead.toLocaleString(),
-      detail: d.finishRate !== null ? `${d.finishRate}% finished` : undefined },
-    { icon: Clock,    label: 'Time in the dark', value: d.minutesRead >= 60
-        ? `${Math.floor(d.minutesRead / 60)}h ${d.minutesRead % 60}m`
-        : `${d.minutesRead}m`,
-      detail: `${d.wordsRead.toLocaleString()} words` },
-    { icon: Flame,    label: 'Longest streak', value: `${d.longestStreak}`,
-      detail: d.longestStreak === 1 ? 'day' : 'days in a row' },
-    { icon: Heart,    label: 'Likes given',    value: d.likesGiven.toLocaleString() },
-    { icon: Bookmark, label: 'Bookmarked',     value: d.bookmarksSaved.toLocaleString() },
-    { icon: Skull,    label: 'Average scare',  value: d.averageScare !== null ? `${d.averageScare}/5` : '—',
-      detail: d.averageScare === null ? 'rate a story to fill this in' : undefined },
+    {
+      icon: BookOpen,
+      label: 'Stories read',
+      value: d.storiesRead.toLocaleString(),
+      detail: d.finishRate !== null ? `${d.finishRate}% finished` : undefined,
+    },
+    {
+      icon: Clock,
+      label: 'Time in the dark',
+      value:
+        d.minutesRead >= 60
+          ? `${Math.floor(d.minutesRead / 60)}h ${d.minutesRead % 60}m`
+          : `${d.minutesRead}m`,
+      detail: `${d.wordsRead.toLocaleString()} words`,
+    },
+    {
+      icon: Flame,
+      label: 'Longest streak',
+      value: `${d.longestStreak}`,
+      detail: d.longestStreak === 1 ? 'day' : 'days in a row',
+    },
+    { icon: Heart, label: 'Likes given', value: d.likesGiven.toLocaleString() },
+    { icon: Bookmark, label: 'Bookmarked', value: d.bookmarksSaved.toLocaleString() },
+    {
+      icon: Skull,
+      label: 'Average scare',
+      value: d.averageScare !== null ? `${d.averageScare}/5` : '—',
+      detail: d.averageScare === null ? 'rate a story to fill this in' : undefined,
+    },
   ];
 
   return (
@@ -153,10 +187,14 @@ export default async function WrappedPage() {
             <p className="text-sm text-gray-500">
               It started on{' '}
               {new Date(d.firstStory.readAt).toLocaleDateString('en-US', {
-                month: 'long', day: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}{' '}
               with{' '}
-              <Link href={`/story/${d.firstStory.slug}`} className="text-gray-300 hover:text-white underline underline-offset-2">
+              <Link
+                href={`/story/${d.firstStory.slug}`}
+                className="text-gray-300 hover:text-white underline underline-offset-2"
+              >
                 {d.firstStory.title}
               </Link>
             </p>
@@ -167,7 +205,11 @@ export default async function WrappedPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
           {HEADLINE.map((s) => (
             <div key={s.label} className="rounded-xl border border-gray-800 bg-gray-900 p-4">
-              <s.icon className="w-4 h-4 text-gray-600 mb-2" strokeWidth={1.75} aria-hidden="true" />
+              <s.icon
+                className="w-4 h-4 text-gray-600 mb-2"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <p className="text-2xl font-extrabold leading-none">{s.value}</p>
               <p className="text-xs text-gray-500 mt-1.5">{s.label}</p>
               {s.detail && <p className="text-xs text-gray-700 mt-0.5">{s.detail}</p>}

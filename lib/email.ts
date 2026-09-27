@@ -47,7 +47,7 @@ export async function sendMail({
   to: string;
   subject: string;
   html: string;
-  type?: string;   // e.g. "password-reset", "newsletter", "2fa", "notification"
+  type?: string; // e.g. "password-reset", "newsletter", "2fa", "notification"
 }): Promise<boolean> {
   const t = getTransporter();
   if (!t) return false; // Silently skip when not configured

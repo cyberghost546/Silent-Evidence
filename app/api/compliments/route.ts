@@ -31,13 +31,7 @@ import { prisma } from '@/lib/prisma';
 // serverError     — 500 for unexpected failures
 // tooManyRequests — 429 when the 24-hour rate limit is exceeded
 // notFound        — 404 when the recipient user doesn't exist
-import {
-  unauthorized,
-  badRequest,
-  serverError,
-  tooManyRequests,
-  notFound,
-} from '@/lib/apiError';
+import { unauthorized, badRequest, serverError, tooManyRequests, notFound } from '@/lib/apiError';
 
 // ── Whitelist of allowed compliment messages ───────────────────────────────────
 // Using a Set gives O(1) lookup — has() is very fast no matter how many items are in it.
@@ -45,11 +39,11 @@ import {
 // This prevents users from sending arbitrary text through the compliment system.
 // Whitelist of allowed compliment messages — prevents arbitrary text being sent
 const ALLOWED_COMPLIMENTS = new Set([
-  "Your writing genuinely scared me — great work!",
+  'Your writing genuinely scared me — great work!',
   "I couldn't stop reading. Incredible story!",
-  "The atmosphere you created was perfect",
-  "This gave me chills. Please write more!",
-  "You have a real talent for horror writing. Keep going",
+  'The atmosphere you created was perfect',
+  'This gave me chills. Please write more!',
+  'You have a real talent for horror writing. Keep going',
 ]);
 
 // ── POST handler ──────────────────────────────────────────────────────────────
@@ -124,20 +118,18 @@ export async function POST(req: Request) {
     // We identify compliments by checking if the message content is in our whitelist.
     const recentCompliment = await prisma.directMessage.findFirst({
       where: {
-        senderId: fromUserId,     // must be from this sender
-        receiverId: toUserId,     // must be to this recipient
+        senderId: fromUserId, // must be from this sender
+        receiverId: toUserId, // must be to this recipient
         // We detect compliments by checking if the content is in our preset list
         content: { in: [...ALLOWED_COMPLIMENTS] }, // spread the Set into an array for Prisma's 'in' filter
-        createdAt: { gte: oneDayAgo },             // 'gte' = greater than or equal to — within last 24h
+        createdAt: { gte: oneDayAgo }, // 'gte' = greater than or equal to — within last 24h
       },
       select: { id: true }, // we only need to know if any record exists, not its full contents
     });
 
     // If a recent compliment was found, the user has already used their daily allowance
     if (recentCompliment) {
-      return tooManyRequests(
-        'You already sent a compliment to this author in the last 24 hours.'
-      );
+      return tooManyRequests('You already sent a compliment to this author in the last 24 hours.');
     }
 
     // ── Create the DirectMessage record ───────────────────────────────────────
@@ -147,9 +139,9 @@ export async function POST(req: Request) {
     // ── Create the DirectMessage record ──────────────────────────────────────
     await prisma.directMessage.create({
       data: {
-        senderId: fromUserId,   // the logged-in user who sent the compliment
-        receiverId: toUserId,   // the user receiving the compliment
-        content: text.trim(),   // the normalised compliment text
+        senderId: fromUserId, // the logged-in user who sent the compliment
+        receiverId: toUserId, // the user receiving the compliment
+        content: text.trim(), // the normalised compliment text
       },
     });
 
@@ -165,18 +157,19 @@ export async function POST(req: Request) {
     // Create the notification record — we use .catch(() => {}) so that if the
     // notification creation fails (e.g. a DB error), it doesn't cause the whole
     // request to fail. Notifications are best-effort — the compliment was already saved.
-    prisma.notification.create({
-      data: {
-        userId: toUserId,  // deliver the notification to the recipient
-        type: 'DIRECT_MESSAGE', // notification type (used by the UI to choose an icon)
-        // ?? 'Someone' fallback handles the rare case where the sender query returned null
-        message: `${sender?.username ?? 'Someone'} sent you a compliment`,
-      },
-    }).catch(() => {}); // swallow errors — notification is best-effort
+    prisma.notification
+      .create({
+        data: {
+          userId: toUserId, // deliver the notification to the recipient
+          type: 'DIRECT_MESSAGE', // notification type (used by the UI to choose an icon)
+          // ?? 'Someone' fallback handles the rare case where the sender query returned null
+          message: `${sender?.username ?? 'Someone'} sent you a compliment`,
+        },
+      })
+      .catch(() => {}); // swallow errors — notification is best-effort
 
     // Return 201 Created — the compliment was saved and the notification was fired
     return NextResponse.json({ ok: true }, { status: 201 });
-
   } catch (err) {
     // Log the error server-side for debugging (includes the compliment route for easy filtering)
     console.error('[POST /api/compliments]', err);

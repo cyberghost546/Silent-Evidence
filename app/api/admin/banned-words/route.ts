@@ -22,12 +22,17 @@ export async function POST(req: Request) {
   const adminId = await requireAdmin();
   if (!adminId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const { word } = await req.json();
-  if (!word || typeof word !== 'string') return NextResponse.json({ error: 'Word required' }, { status: 400 });
+  if (!word || typeof word !== 'string')
+    return NextResponse.json({ error: 'Word required' }, { status: 400 });
   const cleaned = word.toLowerCase().trim();
   const created = await prisma.bannedWord.upsert({
-    where: { word: cleaned }, create: { word: cleaned }, update: {},
+    where: { word: cleaned },
+    create: { word: cleaned },
+    update: {},
   });
-  await prisma.auditLog.create({ data: { adminId, action: 'ADD_BANNED_WORD', detail: `Added banned word: "${cleaned}"` } });
+  await prisma.auditLog.create({
+    data: { adminId, action: 'ADD_BANNED_WORD', detail: `Added banned word: "${cleaned}"` },
+  });
   return NextResponse.json(created);
 }
 
@@ -36,6 +41,8 @@ export async function DELETE(req: Request) {
   if (!adminId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const { id } = await req.json();
   await prisma.bannedWord.delete({ where: { id } });
-  await prisma.auditLog.create({ data: { adminId, action: 'REMOVE_BANNED_WORD', detail: `Removed banned word id ${id}` } });
+  await prisma.auditLog.create({
+    data: { adminId, action: 'REMOVE_BANNED_WORD', detail: `Removed banned word id ${id}` },
+  });
   return NextResponse.json({ ok: true });
 }

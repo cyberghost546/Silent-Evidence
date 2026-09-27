@@ -25,11 +25,16 @@ import { prisma } from '@/lib/prisma';
 // prevent collisions if two bundles share the same title.
 // "title: string" declares the parameter type — must be a string
 function slugify(title: string) {
-  return title.toLowerCase().trim()              // 1. lowercase and strip surrounding whitespace
-    .replace(/[^a-z0-9\s-]/g, '')               // 2. remove any character that isn't a letter, number, space, or hyphen
-    .replace(/\s+/g, '-')                        // 3. replace one or more spaces with a single hyphen
-    .replace(/-+/g, '-')                         // 4. collapse multiple consecutive hyphens into one
-    + '-' + Math.random().toString(36).slice(2, 6); // 5. append 4 random base-36 characters for uniqueness
+  return (
+    title
+      .toLowerCase()
+      .trim() // 1. lowercase and strip surrounding whitespace
+      .replace(/[^a-z0-9\s-]/g, '') // 2. remove any character that isn't a letter, number, space, or hyphen
+      .replace(/\s+/g, '-') // 3. replace one or more spaces with a single hyphen
+      .replace(/-+/g, '-') + // 4. collapse multiple consecutive hyphens into one
+    '-' +
+    Math.random().toString(36).slice(2, 6)
+  ); // 5. append 4 random base-36 characters for uniqueness
 }
 
 // ── Auth helper ───────────────────────────────────────────────────────────────
@@ -96,23 +101,23 @@ export async function POST(req: Request) {
   // typeof check + .trim() prevents saving raw untrimmed strings or wrong types
 
   // title — required; trim whitespace; default to empty string if not a string
-  const title       = typeof body.title       === 'string' ? body.title.trim()       : '';
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
 
   // description — optional; trim whitespace; use null if not provided (null is stored as NULL in DB)
   const description = typeof body.description === 'string' ? body.description.trim() : null;
 
   // coverImage — optional; trim whitespace; use null if not provided
-  const coverImage  = typeof body.coverImage  === 'string' ? body.coverImage.trim()  : null;
+  const coverImage = typeof body.coverImage === 'string' ? body.coverImage.trim() : null;
 
   // price — optional; Number() converts it from any type; || 0 means "default to 0 if NaN or falsy"
   // Stored in cents (e.g. 999 = $9.99)
-  const price       = Number(body.price) || 0;
+  const price = Number(body.price) || 0;
 
   // storyIds — optional array of story IDs to include in the bundle
   // Array.isArray() guards against non-array values
   // .map(Number) converts each element to a number
   // .filter(Boolean) removes any 0 or NaN values that resulted from bad input
-  const storyIds    = Array.isArray(body.storyIds) ? body.storyIds.map(Number).filter(Boolean) : [];
+  const storyIds = Array.isArray(body.storyIds) ? body.storyIds.map(Number).filter(Boolean) : [];
 
   // Title is required — reject blank submissions
   if (!title) return NextResponse.json({ error: 'Title is required.' }, { status: 400 });
@@ -123,9 +128,9 @@ export async function POST(req: Request) {
   const bundle = await prisma.storyBundle.create({
     data: {
       title,
-      slug: slugify(title),           // generate a URL-safe slug from the title
+      slug: slugify(title), // generate a URL-safe slug from the title
       description: description || null, // store null if description was empty string
-      coverImage: coverImage || null,   // store null if coverImage was empty string
+      coverImage: coverImage || null, // store null if coverImage was empty string
       price,
       items: {
         // create multiple StoryBundleItem rows — one per story ID in the list

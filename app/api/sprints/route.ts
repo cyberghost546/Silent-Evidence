@@ -42,9 +42,9 @@ export async function GET() {
 
 // Validation schema for creating a sprint
 const CreateSprintSchema = z.object({
-  title:       z.string().min(1).max(100),
+  title: z.string().min(1).max(100),
   durationMins: z.number().int().min(5).max(180), // 5 minutes to 3 hours
-  startsAt:    z.string().datetime(),              // ISO string from client
+  startsAt: z.string().datetime(), // ISO string from client
 });
 
 // POST — create a sprint (admin only)
@@ -67,14 +67,14 @@ export async function POST(req: Request) {
 
     const { title, durationMins, startsAt } = parsed.data;
     const startDate = new Date(startsAt);
-    const endDate   = new Date(startDate.getTime() + durationMins * 60 * 1000);
+    const endDate = new Date(startDate.getTime() + durationMins * 60 * 1000);
 
     const sprint = await prisma.writingSprint.create({
       data: {
         title,
         durationMins,
         startsAt: startDate,
-        endsAt:   endDate,
+        endsAt: endDate,
       },
     });
 

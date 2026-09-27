@@ -67,7 +67,11 @@ function timeAgo(dateStr: string) {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 // ── Report modal ─────────────────────────────────────────────────
@@ -91,12 +95,15 @@ function ReportModal({
   const [done, setDone] = useState(false);
 
   const reasons = [
-    { value: 'HARASSMENT',  label: 'Harassment or bullying' },
+    { value: 'HARASSMENT', label: 'Harassment or bullying' },
     { value: 'HATE_SPEECH', label: 'Hate speech' },
-    { value: 'SPAM',        label: 'Spam' },
+    { value: 'SPAM', label: 'Spam' },
     { value: 'INAPPROPRIATE', label: 'Inappropriate content' },
-    { value: 'THREATS',     label: 'Threats or violence' },
-    { value: 'OTHER',       label: 'Other' },
+    { value: 'THREATS', label: 'Threats or violence' },
+    // Legally-mandated notice routes — see ForumReportButton for the rationale.
+    { value: 'COPYRIGHT', label: 'Copyright infringement' },
+    { value: 'ILLEGAL_CONTENT', label: 'Illegal content' },
+    { value: 'OTHER', label: 'Other' },
   ];
 
   const submit = async () => {
@@ -266,7 +273,9 @@ function CommentCard({
   return (
     // haunted-comment triggers a CSS keyframe that fades + drifts the card in like a ghost
     // pinned comments get a subtle amber left border to distinguish them
-    <div className={`haunted-comment ${depth > 0 ? 'ml-8 border-l-2 border-gray-700 pl-4' : ''} ${comment.pinned && depth === 0 ? 'border-l-2 border-amber-500 pl-3 -ml-3' : ''}`}>
+    <div
+      className={`haunted-comment ${depth > 0 ? 'ml-8 border-l-2 border-gray-700 pl-4' : ''} ${comment.pinned && depth === 0 ? 'border-l-2 border-amber-500 pl-3 -ml-3' : ''}`}
+    >
       <style>{`
         /* Ghost fade-in: slides up from slightly below and fades in with a subtle flicker */
         @keyframes hauntIn {
@@ -291,10 +300,12 @@ function CommentCard({
           {/* Header row — pinned badge shows for pinned top-level comments */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-semibold text-white">{comment.user.username}</span>
-            <span className="text-xs text-gray-500" suppressHydrationWarning>{timeAgo(comment.createdAt)}</span>
+            <span className="text-xs text-gray-500" suppressHydrationWarning>
+              {timeAgo(comment.createdAt)}
+            </span>
             {comment.pinned && (
               <span className="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full">
- Pinned
+                Pinned
               </span>
             )}
           </div>
@@ -497,7 +508,6 @@ export default function StoryInteractions({
 
   return (
     <div className="mt-12 space-y-10">
-
       {/* ── Like button ───────────────────────────────────── */}
       <div className="flex items-center gap-4">
         <button
@@ -564,7 +574,10 @@ export default function StoryInteractions({
           </div>
         ) : (
           <p className="text-sm text-gray-500 mb-8">
-            <a href="/login" className="text-red-400 hover:underline">Log in</a> to leave a comment.
+            <a href="/login" className="text-red-400 hover:underline">
+              Log in
+            </a>{' '}
+            to leave a comment.
           </p>
         )}
 

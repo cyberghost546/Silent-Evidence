@@ -23,19 +23,15 @@
 
 import { prisma } from '@/lib/prisma';
 
-export const FUNNEL_STAGES = [
-  'premium_viewed',
-  'checkout_started',
-  'subscribed',
-] as const;
+export const FUNNEL_STAGES = ['premium_viewed', 'checkout_started', 'subscribed'] as const;
 
 export type FunnelStage = (typeof FUNNEL_STAGES)[number];
 
 /** Human labels for the admin view. */
 export const STAGE_LABELS: Record<FunnelStage, string> = {
-  premium_viewed:   'Viewed pricing',
+  premium_viewed: 'Viewed pricing',
   checkout_started: 'Started checkout',
-  subscribed:       'Subscribed',
+  subscribed: 'Subscribed',
 };
 
 /**
@@ -68,7 +64,7 @@ function bucketFor(_stage: FunnelStage, now: Date): string {
 export async function recordFunnelEvent(
   stage: FunnelStage,
   userId: number | null | undefined,
-  meta?: string,
+  meta?: string
 ): Promise<void> {
   // Guests have no reading limit and cannot subscribe, so they are not part of
   // the funnel being measured.
@@ -131,7 +127,7 @@ export async function getFunnelSummary(days = 30): Promise<{
 
   const stages: FunnelStageSummary[] = FUNNEL_STAGES.map((stage, i) => {
     const users = counts.get(stage) ?? 0;
-    const prev = i === 0 ? null : counts.get(FUNNEL_STAGES[i - 1]) ?? 0;
+    const prev = i === 0 ? null : (counts.get(FUNNEL_STAGES[i - 1]) ?? 0);
 
     return {
       stage,

@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import bundleAnalyzer from '@next/bundle-analyzer';
 
 // Run `ANALYZE=true npm run build` to open the interactive bundle treemap.
@@ -23,7 +23,17 @@ const securityHeaders = [
   ...(isProd
     ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]
     : []),
-  // Content Security Policy
+  // Content Security Policy.
+  //
+  // script-src still carries 'unsafe-inline' because a strict nonce-based policy
+  // is currently INCOMPATIBLE with this stack: Next.js 16 + Turbopack emits inline
+  // bootstrap/hydration scripts WITHOUT a nonce, so an enforcing nonce CSP (which,
+  // with 'strict-dynamic', ignores 'unsafe-inline') would block Next's own scripts
+  // and render a blank page. This was verified empirically against a production
+  // build before deciding not to ship it. Revisit when Next/Turbopack propagate
+  // the request nonce to their inline scripts, at which point script-src can drop
+  // 'unsafe-inline' in favour of 'nonce-… strict-dynamic' (see lib/csp.ts, kept
+  // ready for that switch).
   {
     key: 'Content-Security-Policy',
     value: [
@@ -33,19 +43,26 @@ const securityHeaders = [
         ? "script-src 'self' 'unsafe-inline' https://js.pusher.com https://js.stripe.com"
         : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.pusher.com https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos https://i.ytimg.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://ui-avatars.com https://picsum.photos https://i.ytimg.com https://res.cloudinary.com",
       "font-src 'self'",
       // api.anthropic.com is called server-side only — kept here for browser fetch fallback
       "connect-src 'self' https://api.anthropic.com wss://*.pusher.com https://*.pusher.com https://api.stripe.com",
-      "frame-src https://js.stripe.com https://hooks.stripe.com",
+      'frame-src https://js.stripe.com https://hooks.stripe.com',
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
+      // Block this site from being framed by anyone (backs up X-Frame-Options,
+      // which older browsers use). This is a real hardening win independent of
+      // the script-src question above.
+      "frame-ancestors 'self'",
     ].join('; '),
   },
 ];
 
 const nextConfig: NextConfig = {
+  // Docker/Railway run the self-contained `.next/standalone` server (see Dockerfile).
+  // Vercel uses its own output format, so leave it unset there.
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Allow Next.js <Image> to optimize images from these external domains.
   // Add any CDN or storage domains your cover images are hosted on.
   images: {
@@ -57,6 +74,8 @@ const nextConfig: NextConfig = {
       // Unsplash — used for story cover images and slideshow backgrounds
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'source.unsplash.com' },
+      // Cloudinary — story covers, slides, and avatars uploaded via lib/cloudinary.ts
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
       // Localhost uploads in development
       { protocol: 'http', hostname: 'localhost' },
       // YouTube thumbnail CDN — used by VideoCard and AddVideoButton

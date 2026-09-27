@@ -14,7 +14,10 @@ export default async function StoryOfWeekAdminPage() {
   const userId = Number(cookieStore.get('userId')?.value ?? 0);
   if (!userId) redirect('/login');
 
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { username: true, role: true } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { username: true, role: true },
+  });
   if (!user || user.role !== 'ADMIN') redirect('/');
 
   // Fetch the currently pinned story ID from site settings
@@ -33,8 +36,8 @@ export default async function StoryOfWeekAdminPage() {
             <h1 className="text-2xl font-bold text-white">Story of the Week</h1>
           </div>
           <p className="text-sm text-gray-400 mb-8">
-            Pin one story to feature prominently on the homepage as this week&apos;s spotlight.
-            If no story is pinned, the homepage will show the highest-rated recent story automatically.
+            Pin one story to feature prominently on the homepage as this week&apos;s spotlight. If
+            no story is pinned, the homepage will show the highest-rated recent story automatically.
           </p>
 
           <StoryOfWeekAdmin currentStoryId={currentStoryId} />

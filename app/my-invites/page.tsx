@@ -37,9 +37,11 @@ export default async function MyInvitesPage() {
       <Header />
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-2xl font-bold text-white mb-2">Co-author Invites</h1>
-        <p className="text-sm text-gray-500 mb-8">Stories you have been invited to collaborate on.</p>
+        <p className="text-sm text-gray-500 mb-8">
+          Stories you have been invited to collaborate on.
+        </p>
         <MyInvitesClient
-          invites={invites.map(inv => ({
+          invites={invites.map((inv) => ({
             id: inv.id,
             accepted: inv.accepted,
             createdAt: inv.createdAt.toISOString(),

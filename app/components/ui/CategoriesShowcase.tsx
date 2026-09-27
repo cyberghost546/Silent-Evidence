@@ -30,8 +30,6 @@ const ACCENTS = [
   'from-amber-900/40 border-amber-800/50 text-amber-400',
 ];
 
-
-
 export default async function CategoriesShowcase() {
   // Fetch categories that actually have something to read, alphabetically.
   // _count.stories gives us the total number of stories in each category
@@ -54,7 +52,6 @@ export default async function CategoriesShowcase() {
   return (
     <section className="bg-gray-900 border-y border-gray-800 py-14">
       <div className="max-w-6xl mx-auto px-4">
-
         {/* ── Section heading ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 mb-8">
           {/* Red accent bar — a visual design element used throughout the site */}
@@ -92,7 +89,9 @@ export default async function CategoriesShowcase() {
                 {/* Category display name */}
                 <p className="text-xs font-semibold text-white leading-tight">{cat.name}</p>
                 {/* Story count — pluralises "story" / "stories" correctly */}
-                <p className="text-xs text-gray-600">{cat._count.stories} {cat._count.stories === 1 ? 'story' : 'stories'}</p>
+                <p className="text-xs text-gray-600">
+                  {cat._count.stories} {cat._count.stories === 1 ? 'story' : 'stories'}
+                </p>
               </Link>
             );
           })}

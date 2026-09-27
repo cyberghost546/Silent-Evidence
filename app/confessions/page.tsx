@@ -18,7 +18,8 @@ export default function ConfessionsPage() {
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-3">Confession Booth</h1>
           <p className="text-gray-400 text-lg">
-            Step inside. Whisper your darkest horror secret.<br />
+            Step inside. Whisper your darkest horror secret.
+            <br />
             The shadows keep no judgement.
           </p>
         </div>

@@ -59,7 +59,8 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   // If no list was found, or the list belongs to someone else, reject with 403 Forbidden.
   // !list handles not found; list.userId !== userId handles ownership check.
-  if (!list || list.userId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!list || list.userId !== userId)
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   // Find the story currently at the END of the list (highest order number).
   // This tells us what order number to assign to the new story.
@@ -111,7 +112,8 @@ export async function DELETE(req: NextRequest, { params }: Props) {
   const list = await prisma.storyList.findUnique({ where: { id: listId } });
 
   // Reject if the list doesn't exist or the caller doesn't own it
-  if (!list || list.userId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!list || list.userId !== userId)
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   // Delete all item rows matching both the listId and storyId.
   // deleteMany is used because there's no single unique primary key being targeted here;

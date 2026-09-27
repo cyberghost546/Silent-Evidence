@@ -34,9 +34,9 @@ export async function generateCsrfToken(): Promise<string> {
   const token = crypto.randomBytes(32).toString('hex');
   const c = await cookies();
   c.set(CSRF_COOKIE, token, {
-    httpOnly: false,         // MUST be readable by JS so the frontend can send it as a header
+    httpOnly: false, // MUST be readable by JS so the frontend can send it as a header
     path: '/',
-    sameSite: 'strict',      // strict: only sent on same-origin requests
+    sameSite: 'strict', // strict: only sent on same-origin requests
     secure: process.env.NODE_ENV === 'production',
     maxAge: TOKEN_MAX_AGE,
   });

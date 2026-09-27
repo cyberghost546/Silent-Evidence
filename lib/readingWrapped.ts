@@ -63,8 +63,18 @@ export interface WrappedData {
 }
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 // A story counts as "finished" at 85% scroll depth rather than 100. Readers
@@ -78,7 +88,10 @@ const WORDS_PER_MINUTE = 200;
 
 /** Strips HTML tags and counts words — story content is stored as HTML. */
 function countWords(html: string): number {
-  const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const text = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   return text ? text.split(' ').length : 0;
 }
 
@@ -93,7 +106,7 @@ function topOf<T>(tally: Map<string, { count: number; payload: T }>) {
 
 export async function getReadingWrapped(
   userId: number,
-  year: number = new Date().getFullYear(),
+  year: number = new Date().getFullYear()
 ): Promise<WrappedData> {
   const start = new Date(year, 0, 1);
   const end = new Date(year + 1, 0, 1);
@@ -177,7 +190,7 @@ export async function getReadingWrapped(
 
   const peakIndex = byMonth.reduce(
     (bestIdx, count, i, arr) => (count > arr[bestIdx] ? i : bestIdx),
-    0,
+    0
   );
 
   const averageScare = ratings.length
@@ -194,9 +207,7 @@ export async function getReadingWrapped(
 
     storiesRead: history.length,
     storiesFinished,
-    finishRate: history.length
-      ? Math.round((storiesFinished / history.length) * 100)
-      : null,
+    finishRate: history.length ? Math.round((storiesFinished / history.length) * 100) : null,
     wordsRead,
     minutesRead: Math.round(wordsRead / WORDS_PER_MINUTE),
 
@@ -209,14 +220,15 @@ export async function getReadingWrapped(
     topCategory: topCat
       ? { name: topCat.payload.name, slug: topCat.payload.slug, count: topCat.count }
       : null,
-    topMood: topMoodEntry && moodInfo
-      ? {
-          value: topMoodEntry.key,
-          label: moodInfo.label,
-          color: moodInfo.color,
-          count: topMoodEntry.count,
-        }
-      : null,
+    topMood:
+      topMoodEntry && moodInfo
+        ? {
+            value: topMoodEntry.key,
+            label: moodInfo.label,
+            color: moodInfo.color,
+            count: topMoodEntry.count,
+          }
+        : null,
     topAuthor: topAuthorEntry
       ? { username: topAuthorEntry.key, count: topAuthorEntry.count }
       : null,
@@ -230,9 +242,8 @@ export async function getReadingWrapped(
         }
       : null,
 
-    peakMonth: byMonth[peakIndex] > 0
-      ? { name: MONTH_NAMES[peakIndex], count: byMonth[peakIndex] }
-      : null,
+    peakMonth:
+      byMonth[peakIndex] > 0 ? { name: MONTH_NAMES[peakIndex], count: byMonth[peakIndex] } : null,
     byMonth,
 
     firstStory: history.length

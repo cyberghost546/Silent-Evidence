@@ -24,8 +24,8 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
 const ContactSchema = z.object({
-  name:    z.string().min(1, 'Name is required.').max(100),
-  email:   z.string().min(1, 'Email is required.').email('Invalid email address.').max(254),
+  name: z.string().min(1, 'Name is required.').max(100),
+  email: z.string().min(1, 'Email is required.').email('Invalid email address.').max(254),
   subject: z.string().min(1, 'Subject is required.').max(200),
   message: z.string().min(1, 'Message is required.').max(5000, 'Message is too long.'),
 });
@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.json();
   const parsed = ContactSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid request', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
   const { name, email, subject, message } = parsed.data;
 
@@ -96,9 +99,7 @@ export async function GET(req: NextRequest) {
     // If filter is 'unread',   only return messages where read is false.
     // If filter is 'resolved', only return messages where resolved is true.
     // If filter is null/other, pass an empty object {} — no filter, return all messages.
-    where: filter === 'unread'   ? { read: false }
-         : filter === 'resolved' ? { resolved: true }
-         : {},
+    where: filter === 'unread' ? { read: false } : filter === 'resolved' ? { resolved: true } : {},
 
     orderBy: { createdAt: 'desc' }, // newest message at the top of the admin list
   });

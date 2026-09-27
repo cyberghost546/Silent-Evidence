@@ -17,44 +17,63 @@ type Club = {
   inviteCode: string;
   owner: { username: string; profile: { avatar: string | null } | null };
   _count: { members: number };
-  story: { title: string; slug: string; coverImage: string | null; author: { username: string } } | null;
+  story: {
+    title: string;
+    slug: string;
+    coverImage: string | null;
+    author: { username: string };
+  } | null;
 };
 
-export default function BookClubList({ userId, isPremium }: { userId: number | null; isPremium?: boolean }) {
+export default function BookClubList({
+  userId,
+  isPremium,
+}: {
+  userId: number | null;
+  isPremium?: boolean;
+}) {
   const router = useRouter();
-  const [clubs, setClubs]               = useState<Club[]>([]);
-  const [loading, setLoading]           = useState(true);
-  const [showCreate, setShowCreate]     = useState(false);
-  const [showJoin, setShowJoin]         = useState(false);
-  const [joinCode, setJoinCode]         = useState('');
-  const [createName, setCreateName]     = useState('');
-  const [createDesc, setCreateDesc]     = useState('');
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showJoin, setShowJoin] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [createName, setCreateName] = useState('');
+  const [createDesc, setCreateDesc] = useState('');
   const [createPrivate, setCreatePrivate] = useState(true);
   const [createPremium, setCreatePremium] = useState(false);
-  const [saving, setSaving]             = useState(false);
-  const [msg, setMsg]                   = useState('');
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
 
   useEffect(() => {
     fetch('/api/book-club')
-      .then(r => r.ok ? r.json() : [])
+      .then((r) => (r.ok ? r.json() : []))
       .then(setClubs)
       .finally(() => setLoading(false));
   }, []);
 
   const createClub = async () => {
     if (!createName.trim()) return;
-    setSaving(true); setMsg('');
+    setSaving(true);
+    setMsg('');
     const res = await fetch('/api/book-club', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: createName, description: createDesc, isPrivate: createPrivate, isPremium: createPremium }),
+      body: JSON.stringify({
+        name: createName,
+        description: createDesc,
+        isPrivate: createPrivate,
+        isPremium: createPremium,
+      }),
     });
     setSaving(false);
     if (res.ok) {
       const club = await res.json();
-      setClubs(prev => [club, ...prev]);
+      setClubs((prev) => [club, ...prev]);
       setShowCreate(false);
-      setCreateName(''); setCreateDesc(''); setCreatePremium(false);
+      setCreateName('');
+      setCreateDesc('');
+      setCreatePremium(false);
     } else {
       const data = await res.json().catch(() => ({}));
       setMsg(data.error ?? 'Failed to create club.');
@@ -63,7 +82,8 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
 
   const joinClub = async () => {
     if (!joinCode.trim()) return;
-    setSaving(true); setMsg('');
+    setSaving(true);
+    setMsg('');
     const res = await fetch('/api/book-club/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,7 +102,9 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
   if (loading) {
     return (
       <div className="grid sm:grid-cols-2 gap-4 animate-pulse">
-        {[...Array(4)].map((_, i) => <div key={i} className="h-40 bg-gray-800 rounded-2xl" />)}
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-40 bg-gray-800 rounded-2xl" />
+        ))}
       </div>
     );
   }
@@ -94,14 +116,22 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
         <div className="flex gap-3 mb-8">
           <button
             type="button"
-            onClick={() => { setShowCreate(true); setShowJoin(false); setMsg(''); }}
+            onClick={() => {
+              setShowCreate(true);
+              setShowJoin(false);
+              setMsg('');
+            }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-semibold transition"
           >
             + Create Club
           </button>
           <button
             type="button"
-            onClick={() => { setShowJoin(true); setShowCreate(false); setMsg(''); }}
+            onClick={() => {
+              setShowJoin(true);
+              setShowCreate(false);
+              setMsg('');
+            }}
             className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-sm font-semibold transition"
           >
             Join with Code
@@ -115,18 +145,26 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
           <h3 className="text-white font-bold">Create a New Club</h3>
           <input
             value={createName}
-            onChange={e => setCreateName(e.target.value)}
-            placeholder="Club name" maxLength={60}
+            onChange={(e) => setCreateName(e.target.value)}
+            placeholder="Club name"
+            maxLength={60}
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
           />
           <textarea
             value={createDesc}
-            onChange={e => setCreateDesc(e.target.value)}
-            placeholder="Description (optional)" rows={2} maxLength={300}
+            onChange={(e) => setCreateDesc(e.target.value)}
+            placeholder="Description (optional)"
+            rows={2}
+            maxLength={300}
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600 resize-none"
           />
           <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
-            <input type="checkbox" checked={createPrivate} onChange={e => setCreatePrivate(e.target.checked)} className="rounded" />
+            <input
+              type="checkbox"
+              checked={createPrivate}
+              onChange={(e) => setCreatePrivate(e.target.checked)}
+              className="rounded"
+            />
             Private (invite-only)
           </label>
 
@@ -136,12 +174,16 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               <input
                 type="checkbox"
                 checked={createPremium}
-                onChange={e => setCreatePremium(e.target.checked)}
+                onChange={(e) => setCreatePremium(e.target.checked)}
                 className="mt-0.5 rounded"
               />
               <div>
-                <p className="text-sm font-semibold text-yellow-300 flex items-center gap-1">Premium-Only Club</p>
-                <p className="text-xs text-gray-500 mt-0.5">Only Horror Elite subscribers can join this club.</p>
+                <p className="text-sm font-semibold text-yellow-300 flex items-center gap-1">
+                  Premium-Only Club
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Only Horror Elite subscribers can join this club.
+                </p>
               </div>
             </label>
           ) : (
@@ -149,7 +191,13 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               <div>
                 <p className="text-sm text-gray-500">Premium-Only Club</p>
                 <p className="text-xs text-gray-600 mt-0.5">
-                  <Link href="/premium" className="text-yellow-600 hover:text-yellow-500 transition underline">Upgrade to Premium</Link> to create members-only discussion rooms.
+                  <Link
+                    href="/premium"
+                    className="text-yellow-600 hover:text-yellow-500 transition underline"
+                  >
+                    Upgrade to Premium
+                  </Link>{' '}
+                  to create members-only discussion rooms.
                 </p>
               </div>
             </div>
@@ -164,7 +212,11 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
             >
               {saving ? 'Creating…' : 'Create'}
             </button>
-            <button type="button" onClick={() => setShowCreate(false)} className="px-5 py-2 text-gray-400 hover:text-white text-sm transition">
+            <button
+              type="button"
+              onClick={() => setShowCreate(false)}
+              className="px-5 py-2 text-gray-400 hover:text-white text-sm transition"
+            >
               Cancel
             </button>
           </div>
@@ -178,8 +230,9 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
           <h3 className="text-white font-bold">Join with Invite Code</h3>
           <input
             value={joinCode}
-            onChange={e => setJoinCode(e.target.value.toUpperCase())}
-            placeholder="Enter 8-character code" maxLength={8}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            placeholder="Enter 8-character code"
+            maxLength={8}
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600 tracking-widest font-mono uppercase"
           />
           <div className="flex gap-3">
@@ -191,7 +244,11 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
             >
               {saving ? 'Joining…' : 'Join'}
             </button>
-            <button type="button" onClick={() => setShowJoin(false)} className="px-5 py-2 text-gray-400 hover:text-white text-sm transition">
+            <button
+              type="button"
+              onClick={() => setShowJoin(false)}
+              className="px-5 py-2 text-gray-400 hover:text-white text-sm transition"
+            >
               Cancel
             </button>
           </div>
@@ -203,13 +260,20 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
       {clubs.length === 0 ? (
         <div className="text-center py-20 text-gray-500">
           <p className="font-medium text-gray-400">No clubs yet.</p>
-          {userId
-            ? <p className="text-sm mt-1">Create one and invite your friends.</p>
-            : <p className="text-sm mt-1"><Link href="/login" className="text-red-400 underline">Log in</Link> to create or join a club.</p>}
+          {userId ? (
+            <p className="text-sm mt-1">Create one and invite your friends.</p>
+          ) : (
+            <p className="text-sm mt-1">
+              <Link href="/login" className="text-red-400 underline">
+                Log in
+              </Link>{' '}
+              to create or join a club.
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
-          {clubs.map(club => (
+          {clubs.map((club) => (
             <Link
               key={club.id}
               href={`/book-club/${club.id}`}
@@ -222,12 +286,28 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    {club.isPremium
-              ? <Crown className="w-4 h-4 text-yellow-500" strokeWidth={1.75} aria-hidden="true" />
-              : club.isPrivate
-                ? <Lock className="w-4 h-4 text-gray-400" strokeWidth={1.75} aria-hidden="true" />
-                : <Globe className="w-4 h-4 text-gray-400" strokeWidth={1.75} aria-hidden="true" />}
-                    <h3 className={`font-semibold text-sm truncate transition ${club.isPremium ? 'text-yellow-200 group-hover:text-yellow-100' : 'text-white group-hover:text-red-300'}`}>
+                    {club.isPremium ? (
+                      <Crown
+                        className="w-4 h-4 text-yellow-500"
+                        strokeWidth={1.75}
+                        aria-hidden="true"
+                      />
+                    ) : club.isPrivate ? (
+                      <Lock
+                        className="w-4 h-4 text-gray-400"
+                        strokeWidth={1.75}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Globe
+                        className="w-4 h-4 text-gray-400"
+                        strokeWidth={1.75}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <h3
+                      className={`font-semibold text-sm truncate transition ${club.isPremium ? 'text-yellow-200 group-hover:text-yellow-100' : 'text-white group-hover:text-red-300'}`}
+                    >
                       {club.name}
                     </h3>
                     {club.isPremium && (
@@ -237,7 +317,8 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    by {club.owner.username} · {club._count.members} member{club._count.members !== 1 ? 's' : ''}
+                    by {club.owner.username} · {club._count.members} member
+                    {club._count.members !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
@@ -249,10 +330,18 @@ export default function BookClubList({ userId, isPremium }: { userId: number | n
               {club.story ? (
                 <div className="flex items-center gap-2 bg-gray-800/60 rounded-xl p-2.5">
                   {club.story.coverImage && (
-                    <Image src={club.story.coverImage} alt={club.story.title} width={32} height={32} className="rounded object-cover shrink-0" />
+                    <Image
+                      src={club.story.coverImage}
+                      alt={club.story.title}
+                      width={32}
+                      height={32}
+                      className="rounded object-cover shrink-0"
+                    />
                   )}
                   <div className="min-w-0">
-                    <p className="text-[10px] text-red-400 font-semibold uppercase tracking-wide">Currently Reading</p>
+                    <p className="text-[10px] text-red-400 font-semibold uppercase tracking-wide">
+                      Currently Reading
+                    </p>
                     <p className="text-xs text-white truncate">{club.story.title}</p>
                   </div>
                 </div>

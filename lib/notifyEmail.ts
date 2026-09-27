@@ -77,9 +77,7 @@ export async function notifyNewComment({
 }) {
   if (!process.env.SMTP_HOST) return;
 
-  const excerpt = commentExcerpt.length > 120
-    ? commentExcerpt.slice(0, 120) + '…'
-    : commentExcerpt;
+  const excerpt = commentExcerpt.length > 120 ? commentExcerpt.slice(0, 120) + '…' : commentExcerpt;
 
   await sendMail({
     to: toEmail,
@@ -113,9 +111,7 @@ export async function notifyCommentReply({
 }) {
   if (!process.env.SMTP_HOST) return;
 
-  const excerpt = replyExcerpt.length > 120
-    ? replyExcerpt.slice(0, 120) + '…'
-    : replyExcerpt;
+  const excerpt = replyExcerpt.length > 120 ? replyExcerpt.slice(0, 120) + '…' : replyExcerpt;
 
   await sendMail({
     to: toEmail,

@@ -9,8 +9,8 @@ import { Star } from 'lucide-react';
 
 // Props — input configuration for the HypeScoreBadge component
 type Props = {
-  storyId:      number;       // database ID of the story
-  isAuthor:     boolean;      // true if the current viewer wrote this story
+  storyId: number; // database ID of the story
+  isAuthor: boolean; // true if the current viewer wrote this story
   initialScore: number | null; // score already in DB (null = not rated yet)
   initialReason?: string | null; // reason already in DB (null = not rated yet)
 };
@@ -42,13 +42,13 @@ export default function HypeScoreBadge({
   initialReason = null,
 }: Props) {
   // score — current hype score (starts from DB value, updated after AI call)
-  const [score,   setScore]   = useState<number | null>(initialScore);
+  const [score, setScore] = useState<number | null>(initialScore);
   // reason — one-sentence AI explanation of the score
-  const [reason,  setReason]  = useState<string | null>(initialReason);
+  const [reason, setReason] = useState<string | null>(initialReason);
   // loading — true while the POST request to the AI is in-flight
   const [loading, setLoading] = useState(false);
   // error — shown if the AI call fails
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // requestScore — calls the POST endpoint to trigger an AI evaluation
   async function requestScore() {
@@ -68,7 +68,7 @@ export default function HypeScoreBadge({
       }
 
       // Parse the score and reason from the successful response
-      const data = await res.json() as { score: number; reason: string };
+      const data = (await res.json()) as { score: number; reason: string };
       setScore(data.score);
       setReason(data.reason);
     } catch (err: unknown) {
@@ -97,8 +97,19 @@ export default function HypeScoreBadge({
             // Spinner animation while the request is in-flight
             <>
               <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                />
               </svg>
               Analyzing...
             </>
@@ -109,9 +120,7 @@ export default function HypeScoreBadge({
         </button>
 
         {/* Error message displayed if the API call failed */}
-        {error && (
-          <p className="text-xs text-green-400">{error}</p>
-        )}
+        {error && <p className="text-xs text-green-400">{error}</p>}
       </div>
     );
   }
@@ -131,16 +140,16 @@ export default function HypeScoreBadge({
       </div>
 
       {/* The star icons — filled up to the score, faded for the rest */}
-      <div className="flex gap-0.5 text-lg leading-none" role="img" aria-label={`Hype score: ${score} out of ${TOTAL_STARS}`}>
+      <div
+        className="flex gap-0.5 text-lg leading-none"
+        role="img"
+        aria-label={`Hype score: ${score} out of ${TOTAL_STARS}`}
+      >
         {renderStars(score)}
       </div>
 
       {/* AI reason — the one-sentence explanation of the hype score */}
-      {reason && (
-        <p className="text-xs text-gray-500 italic mt-0.5 max-w-sm">
-          {reason}
-        </p>
-      )}
+      {reason && <p className="text-xs text-gray-500 italic mt-0.5 max-w-sm">{reason}</p>}
 
       {/* Author can re-run the scorer to refresh the hype score */}
       {isAuthor && (
@@ -156,9 +165,7 @@ export default function HypeScoreBadge({
       )}
 
       {/* Error shown if a re-score attempt fails */}
-      {error && (
-        <p className="text-xs text-green-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-green-400">{error}</p>}
     </div>
   );
 }

@@ -34,13 +34,13 @@ import { Mail, Check } from 'lucide-react';
 // Shape of a single contact form submission
 type Message = {
   id: number;
-  name: string;       // sender's name
-  email: string;      // sender's email address (used to construct mailto: reply link)
-  subject: string;    // subject line shown in the list
-  message: string;    // full message body shown in the detail panel
-  read: boolean;      // true once the admin has opened the message
-  resolved: boolean;  // true once the admin marks it as handled
-  createdAt: string;  // ISO date string — when the form was submitted
+  name: string; // sender's name
+  email: string; // sender's email address (used to construct mailto: reply link)
+  subject: string; // subject line shown in the list
+  message: string; // full message body shown in the detail panel
+  read: boolean; // true once the admin has opened the message
+  resolved: boolean; // true once the admin marks it as handled
+  createdAt: string; // ISO date string — when the form was submitted
 };
 
 // The three tab options for filtering the left panel
@@ -53,7 +53,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
   const [messages, setMessages] = useState(initialMessages);
 
   // Active filter tab — controls which messages appear in the left panel list
-  const [filter, setFilter]     = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>('all');
 
   // The message currently shown in the right panel.
   // null = no selection, show the empty-state placeholder.
@@ -61,20 +61,23 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
 
   // True while any API call is in flight — disables action buttons to prevent
   // duplicate requests (e.g. double-clicking "Delete")
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // ── Derived values ────────────────────────────────────────────────────────
 
   // Compute the visible list each render based on the active filter tab.
   // This runs on the client instantly — no API call needed.
-  const visible = messages.filter(m =>
-    filter === 'unread'   ? !m.read :      // only messages the admin hasn't opened yet
-    filter === 'resolved' ? m.resolved :   // only messages the admin has resolved
-    true                                   // 'all' — show everything
+  const visible = messages.filter(
+    (m) =>
+      filter === 'unread'
+        ? !m.read // only messages the admin hasn't opened yet
+        : filter === 'resolved'
+          ? m.resolved // only messages the admin has resolved
+          : true // 'all' — show everything
   );
 
   // Badge count on the "unread" tab so the admin can see at a glance
-  const unreadCount = messages.filter(m => !m.read).length;
+  const unreadCount = messages.filter((m) => !m.read).length;
 
   // ── Patch a message field (read / resolved) ──────────────────────────────
   // Generic helper for PATCH operations.
@@ -93,7 +96,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
     // The API returns the updated message object — merge it into local state
     const updated: Message = await res.json();
     // Replace only the updated message, keeping all others unchanged
-    setMessages(prev => prev.map(m => m.id === id ? updated : m));
+    setMessages((prev) => prev.map((m) => (m.id === id ? updated : m)));
     // If this message is currently open in the right panel, update it there too
     if (selected?.id === id) setSelected(updated);
   };
@@ -102,7 +105,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
   // Called when the admin clicks a row in the left panel.
   // Selecting an unread message automatically marks it as read via PATCH.
   const open = (msg: Message) => {
-    setSelected(msg);                           // show in the right panel immediately
+    setSelected(msg); // show in the right panel immediately
     if (!msg.read) patch(msg.id, { read: true }); // fire-and-forget the read mark
   };
 
@@ -116,27 +119,23 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
     setLoading(false);
     if (!res.ok) return;
     // Remove the deleted message from local state so the row disappears
-    setMessages(prev => prev.filter(m => m.id !== id));
+    setMessages((prev) => prev.filter((m) => m.id !== id));
     // If the deleted message was open, clear the right panel
     if (selected?.id === id) setSelected(null);
   };
 
   return (
     <div className="flex gap-6 h-[calc(100vh-11rem)]">
-
       {/* ── Left panel: message list ── */}
       <div className="w-full max-w-sm flex flex-col flex-shrink-0">
-
         {/* Filter tabs */}
         <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1 mb-4">
-          {(['all', 'unread', 'resolved'] as Filter[]).map(f => (
+          {(['all', 'unread', 'resolved'] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`flex-1 py-1.5 text-xs font-semibold rounded-lg capitalize transition ${
-                filter === f
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                filter === f ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
               }`}
             >
               {f}
@@ -152,7 +151,7 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
           {visible.length === 0 && (
             <p className="text-center text-sm text-gray-600 py-12">No messages.</p>
           )}
-          {visible.map(msg => (
+          {visible.map((msg) => (
             <button
               key={msg.id}
               onClick={() => open(msg)}
@@ -164,16 +163,23 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
             >
               <div className="flex items-start gap-2">
                 {/* Unread dot */}
-                <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                  msg.read ? 'bg-gray-700' : 'bg-red-500'
-                }`} />
+                <span
+                  className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
+                    msg.read ? 'bg-gray-700' : 'bg-red-500'
+                  }`}
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className={`text-sm font-semibold truncate ${msg.read ? 'text-gray-400' : 'text-white'}`}>
+                    <p
+                      className={`text-sm font-semibold truncate ${msg.read ? 'text-gray-400' : 'text-white'}`}
+                    >
                       {msg.name}
                     </p>
                     <span className="text-[10px] text-gray-600 flex-shrink-0">
-                      {new Date(msg.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(msg.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 truncate">{msg.subject}</p>
@@ -199,7 +205,9 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
             </div>
             <p className="text-gray-400 font-medium">Select a message to read it</p>
             <p className="text-xs text-gray-600 mt-1">
-              {unreadCount > 0 ? `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+              {unreadCount > 0
+                ? `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`
+                : 'All caught up!'}
             </p>
           </div>
         ) : (
@@ -209,15 +217,18 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg font-bold text-white truncate">{selected.subject}</h2>
                 <p className="text-sm text-gray-400 mt-0.5">
-                  From <span className="text-white font-medium">{selected.name}</span>
-                  {' '}·{' '}
-                  <a href={`mailto:${selected.email}`} className="text-red-400 hover:text-red-300 transition">
+                  From <span className="text-white font-medium">{selected.name}</span> ·{' '}
+                  <a
+                    href={`mailto:${selected.email}`}
+                    className="text-red-400 hover:text-red-300 transition"
+                  >
                     {selected.email}
                   </a>
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
                   {new Date(selected.createdAt).toLocaleString('en-US', {
-                    dateStyle: 'medium', timeStyle: 'short',
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
                   })}
                 </p>
               </div>
@@ -242,7 +253,13 @@ export default function ContactInbox({ initialMessages }: { initialMessages: Mes
                       : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                   }`}
                 >
-                  {selected.resolved ? <span className="inline-flex items-center gap-1"><Check className="w-3 h-3" /> Resolved</span> : 'Mark resolved'}
+                  {selected.resolved ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Resolved
+                    </span>
+                  ) : (
+                    'Mark resolved'
+                  )}
                 </button>
 
                 {/* Delete */}

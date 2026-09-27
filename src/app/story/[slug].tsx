@@ -28,12 +28,12 @@ type Story = {
   id: number;
   title: string;
   slug: string;
-  content: string;           // Full HTML body — injected into the WebView
+  content: string; // Full HTML body — injected into the WebView
   excerpt: string | null;
   coverImage: string | null;
   views: number;
   mood: string | null;
-  warnings: string | null;   // Yellow warning bar content
+  warnings: string | null; // Yellow warning bar content
   hypeScore: number | null; // 1-10 AI hype score
   contentRating: string;
   createdAt: string;
@@ -126,14 +126,14 @@ function buildHtml(content: string): string {
 // ── Screen component ──────────────────────────────────────────────────────────
 
 export default function StoryScreen() {
-  const { slug }  = useLocalSearchParams<{ slug: string }>();
-  const router    = useRouter();
+  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const router = useRouter();
   // Ref lets us call scrollTo on the WebView imperatively (e.g. from the CTA button)
   const webViewRef = useRef<WebView>(null);
 
-  const [story, setStory]     = useState<Story | null>(null);
+  const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
   // Track whether the WebView has finished loading so we can show a spinner
   const [webViewReady, setWebViewReady] = useState(false);
 
@@ -144,7 +144,7 @@ export default function StoryScreen() {
     setLoading(true);
 
     try {
-      const res  = await apiFetch(`/api/app/stories/${slug}`);
+      const res = await apiFetch(`/api/app/stories/${slug}`);
       const json = await res.json();
 
       if (!res.ok) {
@@ -203,12 +203,11 @@ export default function StoryScreen() {
     `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author.username)}&background=22c55e&color=fff&size=64`;
 
   // Resolve cover image — relative paths need the base URL prepended
-  const coverUri =
-    story.coverImage
-      ? story.coverImage.startsWith('http')
-        ? story.coverImage
-        : `${BASE_URL}${story.coverImage}`
-      : null;
+  const coverUri = story.coverImage
+    ? story.coverImage.startsWith('http')
+      ? story.coverImage
+      : `${BASE_URL}${story.coverImage}`
+    : null;
 
   // Build the HTML string that will be injected into the WebView
   const storyHtml = buildHtml(story.content);
@@ -250,36 +249,22 @@ export default function StoryScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Cover image */}
-        {coverUri && (
-          <Image
-            source={{ uri: coverUri }}
-            style={styles.cover}
-            contentFit="cover"
-          />
-        )}
+        {coverUri && <Image source={{ uri: coverUri }} style={styles.cover} contentFit="cover" />}
 
         {/* Category badge */}
-        <Text style={styles.categoryBadge}>
-          {story.category.name.toUpperCase()}
-        </Text>
+        <Text style={styles.categoryBadge}>{story.category.name.toUpperCase()}</Text>
 
         {/* Story title */}
         <Text style={styles.storyTitle}>{story.title}</Text>
 
         {/* Author row — avatar, name, verified tick, date */}
         <View style={styles.authorRow}>
-          <Image
-            source={{ uri: authorAvatar }}
-            style={styles.authorAvatar}
-            contentFit="cover"
-          />
+          <Image source={{ uri: authorAvatar }} style={styles.authorAvatar} contentFit="cover" />
           <View style={styles.authorDetails}>
             <View style={styles.authorNameRow}>
               <Text style={styles.authorName}>{story.author.username}</Text>
               {/* Verified badge — only shown for verified authors */}
-              {story.author.isVerified && (
-                <Text style={styles.verifiedBadge}>✓</Text>
-              )}
+              {story.author.isVerified && <Text style={styles.verifiedBadge}>✓</Text>}
             </View>
             <Text style={styles.publishDate}>{publishDate}</Text>
           </View>
@@ -291,9 +276,7 @@ export default function StoryScreen() {
           <Text style={styles.stat}>♥ {story._count.likes.toLocaleString()}</Text>
           <Text style={styles.stat}>💬 {story._count.comments.toLocaleString()}</Text>
           {/* Scare score — only shown when the AI has rated the story */}
-          {story.hypeScore !== null && (
-            <Text style={styles.stat}>💀 {story.hypeScore}/10</Text>
-          )}
+          {story.hypeScore !== null && <Text style={styles.stat}>💀 {story.hypeScore}/10</Text>}
         </View>
 
         {/* Tags — shown as small pill chips below the stats */}
@@ -413,8 +396,8 @@ const styles = StyleSheet.create({
 
   // Scrollable header area above the WebView
   headerScroll: {
-    flexGrow: 0,          // Do not expand to fill remaining height — the WebView does that
-    maxHeight: '45%',     // Give the header at most 45% of the screen so the body is visible
+    flexGrow: 0, // Do not expand to fill remaining height — the WebView does that
+    maxHeight: '45%', // Give the header at most 45% of the screen so the body is visible
   },
   headerContent: {
     paddingHorizontal: 16,

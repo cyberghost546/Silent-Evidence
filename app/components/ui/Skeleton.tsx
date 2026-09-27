@@ -117,7 +117,10 @@ export function TrendingRowSkeleton({ count = 5 }: { count?: number }) {
   return (
     <div className="flex flex-col gap-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 bg-gray-800 border border-gray-700 rounded-xl p-4">
+        <div
+          key={i}
+          className="flex items-center gap-4 bg-gray-800 border border-gray-700 rounded-xl p-4"
+        >
           {/* Rank number */}
           <Skeleton className="w-8 h-8 rounded" />
           {/* Thumbnail */}

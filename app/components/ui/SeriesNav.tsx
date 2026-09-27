@@ -50,7 +50,7 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
 
   // Find where in the ordered list the current story sits.
   // findIndex returns -1 if not found; we use that to safely access prev/next.
-  const currentIndex = series.stories.findIndex(s => s.id === storyId);
+  const currentIndex = series.stories.findIndex((s) => s.id === storyId);
 
   // Previous story: one step back in the list; null if we're at the start
   const prev = series.stories[currentIndex - 1] ?? null;
@@ -64,16 +64,20 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
   return (
     // Dark card sits inside the story page, visually separated from the body text
     <div className="my-8 bg-gray-800 border border-gray-700 rounded-xl p-5">
-
       {/* ── Series header ── */}
       {/* Shows the "Series" label, the series name (links to series index), and the part count */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xs font-bold uppercase tracking-widest text-green-400">Series</span>
-        <Link href={`/series/${series.slug}`} className="text-sm font-semibold text-white hover:text-green-300 transition">
+        <Link
+          href={`/series/${series.slug}`}
+          className="text-sm font-semibold text-white hover:text-green-300 transition"
+        >
           {series.name}
         </Link>
         {/* ml-auto pushes this to the right edge of the flex row */}
-        <span className="ml-auto text-xs text-gray-500">Part {seriesOrder} of {total}</span>
+        <span className="ml-auto text-xs text-gray-500">
+          Part {seriesOrder} of {total}
+        </span>
       </div>
 
       {/* ── Progress bar ── */}
@@ -81,37 +85,55 @@ export default async function SeriesNav({ storyId, seriesId, seriesOrder }: Prop
           Width is calculated as: (position / total) × 100%.
           e.g. Part 2 of 5 → width = 40% */}
       <div className="w-full h-1 bg-gray-700 rounded-full mb-4">
-        <div className="h-1 bg-green-600 rounded-full transition-all" style={{ width: `${(currentIndex + 1) / total * 100}%` }} />
+        <div
+          className="h-1 bg-green-600 rounded-full transition-all"
+          style={{ width: `${((currentIndex + 1) / total) * 100}%` }}
+        />
       </div>
 
       {/* ── Previous / Next navigation ── */}
       <div className="flex gap-3">
-
         {/* Previous story — if there is one; otherwise an empty flex-1 div holds the space
             so the Next button stays on the right side */}
-        {prev ? (
-          <Link href={`/story/${prev.slug}`}
-            className="flex-1 flex items-center gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-purple-600/50 rounded-lg transition group">
-            {/* Arrow changes colour on hover via group-hover */}
-            <span className="text-gray-500 group-hover:text-purple-400 transition text-lg">←</span>
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Previous</p>
-              {/* truncate cuts off long titles with "…" */}
-              <p className="text-sm text-white group-hover:text-purple-300 transition truncate">{prev.title}</p>
-            </div>
-          </Link>
-        ) : <div className="flex-1" /> /* empty spacer when there's no previous part */}
+        {
+          prev ? (
+            <Link
+              href={`/story/${prev.slug}`}
+              className="flex-1 flex items-center gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-purple-600/50 rounded-lg transition group"
+            >
+              {/* Arrow changes colour on hover via group-hover */}
+              <span className="text-gray-500 group-hover:text-purple-400 transition text-lg">
+                ←
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-500">Previous</p>
+                {/* truncate cuts off long titles with "…" */}
+                <p className="text-sm text-white group-hover:text-purple-300 transition truncate">
+                  {prev.title}
+                </p>
+              </div>
+            </Link>
+          ) : (
+            <div className="flex-1" />
+          ) /* empty spacer when there's no previous part */
+        }
 
         {/* Next story — if there is one; otherwise an "End of series" placeholder */}
         {next ? (
-          <Link href={`/story/${next.slug}`}
-            className="flex-1 flex items-center justify-end gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-green-600/50 rounded-lg transition group text-right">
+          <Link
+            href={`/story/${next.slug}`}
+            className="flex-1 flex items-center justify-end gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-700 border border-gray-700 hover:border-green-600/50 rounded-lg transition group text-right"
+          >
             <div className="min-w-0">
               <p className="text-xs text-gray-500">Next</p>
-              <p className="text-sm text-white group-hover:text-green-300 transition truncate">{next.title}</p>
+              <p className="text-sm text-white group-hover:text-green-300 transition truncate">
+                {next.title}
+              </p>
             </div>
             {/* flex-shrink-0 prevents the arrow from being squashed by a long title */}
-            <span className="text-gray-500 group-hover:text-purple-400 transition text-lg flex-shrink-0">→</span>
+            <span className="text-gray-500 group-hover:text-purple-400 transition text-lg flex-shrink-0">
+              →
+            </span>
           </Link>
         ) : (
           // No next part — the reader has finished the series

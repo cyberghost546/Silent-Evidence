@@ -6,7 +6,6 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <div className="relative min-h-screen bg-gray-950 flex items-center justify-center px-4 overflow-hidden">
-
       {/* Fog layers */}
       <div className="animate-fog absolute bottom-0 left-0 w-[200%] h-48 bg-linear-to-t from-red-950/30 to-transparent blur-3xl pointer-events-none" />
       <div className="animate-fog-delayed absolute bottom-0 left-0 w-[200%] h-32 bg-linear-to-t from-gray-900/60 to-transparent blur-2xl pointer-events-none" />
@@ -18,18 +17,21 @@ export default function NotFound() {
       <div className="scanlines absolute inset-0 pointer-events-none opacity-[0.03]" />
 
       <div className="relative text-center max-w-xl z-10">
-
         {/* Glitchy 404 */}
         <div className="relative inline-block mb-6 select-none">
           {/* Ghost layers for glitch effect */}
           <span
             aria-hidden="true"
             className="animate-glitch-1 absolute inset-0 text-[9rem] md:text-[11rem] font-black leading-none"
-          >404</span>
+          >
+            404
+          </span>
           <span
             aria-hidden="true"
             className="animate-glitch-2 absolute inset-0 text-[9rem] md:text-[11rem] font-black leading-none"
-          >404</span>
+          >
+            404
+          </span>
           {/* Real text */}
           <span className="animate-flicker relative text-[9rem] md:text-[11rem] font-black text-red-600 leading-none">
             404
@@ -45,12 +47,12 @@ export default function NotFound() {
 
         {/* Flavour copy */}
         <p className="animate-float-up-delay-1 text-gray-400 text-base leading-relaxed mb-3">
-          Like so many unexplained disappearances, there&apos;s no evidence of what you were looking for.
-          It may have been moved, deleted — or it never existed at all.
+          Like so many unexplained disappearances, there&apos;s no evidence of what you were looking
+          for. It may have been moved, deleted — or it never existed at all.
         </p>
         <p className="animate-float-up-delay-2 text-gray-600 text-sm italic mb-10">
-          &quot;The most terrifying fact about the universe is not that it is hostile,
-          but that it is indifferent.&quot; — Stanley Kubrick
+          &quot;The most terrifying fact about the universe is not that it is hostile, but that it
+          is indifferent.&quot; — Stanley Kubrick
         </p>
 
         {/* Action buttons */}
@@ -74,7 +76,6 @@ export default function NotFound() {
             Discover
           </Link>
         </div>
-
       </div>
     </div>
   );

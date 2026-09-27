@@ -18,15 +18,21 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: 'User not found.' }, { status: 404 });
   if (user.isVerified) return NextResponse.json({ error: 'Already verified.' }, { status: 400 });
   if (user._count.stories < 1) {
-    return NextResponse.json({ error: 'You need at least one published story to apply.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'You need at least one published story to apply.' },
+      { status: 400 }
+    );
   }
 
   const body = await req.json();
   const reason = typeof body.reason === 'string' ? body.reason.trim().slice(0, 1000) : '';
-  const links  = typeof body.links  === 'string' ? body.links.trim().slice(0, 500)   : '';
+  const links = typeof body.links === 'string' ? body.links.trim().slice(0, 500) : '';
 
   if (reason.length < 20) {
-    return NextResponse.json({ error: 'Please provide a reason (at least 20 characters).' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Please provide a reason (at least 20 characters).' },
+      { status: 400 }
+    );
   }
 
   // Store applications as a JSON array in the site_settings table
@@ -36,7 +42,10 @@ export async function POST(req: Request) {
 
   // Prevent duplicate applications
   if (requests.some((r: unknown) => (r as { userId: number }).userId === userId)) {
-    return NextResponse.json({ error: 'You have already submitted an application.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'You have already submitted an application.' },
+      { status: 400 }
+    );
   }
 
   requests.push({

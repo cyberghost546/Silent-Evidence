@@ -20,7 +20,7 @@ export async function GET() {
   if (goal.period === 'weekly') {
     // Start of the current ISO week (Monday)
     const day = now.getDay(); // 0=Sun, 1=Mon…
-    const diff = (day === 0 ? -6 : 1 - day); // days back to Monday
+    const diff = day === 0 ? -6 : 1 - day; // days back to Monday
     periodStart = new Date(now);
     periodStart.setDate(now.getDate() + diff);
     periodStart.setHours(0, 0, 0, 0);

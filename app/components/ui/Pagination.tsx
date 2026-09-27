@@ -54,14 +54,13 @@ export default function Pagination({ page, totalPages, buildHref }: Props) {
   // above totalPages (e.g. page 2 of 100 shows [1, 2, 3, 4] not [-1, 0, 1, 2]).
   const pages: number[] = [];
   const start = Math.max(1, page - 2); // first page number to show
-  const end   = Math.min(totalPages, page + 2); // last page number to show
+  const end = Math.min(totalPages, page + 2); // last page number to show
   for (let i = start; i <= end; i++) pages.push(i);
 
   return (
     // Flex row, centred, with small gaps between each element.
     // mt-12 pushes the bar away from the story grid above it.
     <div className="flex items-center justify-center gap-1 mt-12">
-
       {/* ── Prev button ─────────────────────────────────────────────────────
           When page > 1: a clickable <Link> that navigates to the previous page.
           When on page 1: a non-interactive <span> with dimmed styles and
@@ -101,7 +100,7 @@ export default function Pagination({ page, totalPages, buildHref }: Props) {
           The active page gets a solid red background; all others are ghost buttons
           that turn darker on hover. Using `p === page` as the condition is safe
           because both are numbers. */}
-      {pages.map(p => (
+      {pages.map((p) => (
         <Link
           key={p}
           href={buildHref(p)}

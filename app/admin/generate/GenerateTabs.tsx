@@ -25,7 +25,9 @@ export default function GenerateTabs({ categories }: { categories: Category[] })
         <span className="w-1 h-7 bg-red-500 rounded-full" />
         <div>
           <h1 className="text-2xl font-bold text-white">AI Story Generator</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Generate horror stories with Claude AI + Unsplash images</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Generate horror stories with Claude AI + Unsplash images
+          </p>
         </div>
       </div>
 
@@ -37,7 +39,9 @@ export default function GenerateTabs({ categories }: { categories: Category[] })
             tab === 'batch' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
-          <span className="inline-flex items-center gap-1.5"><Bot className="w-4 h-4" /> Batch (All Categories)</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Bot className="w-4 h-4" /> Batch (All Categories)
+          </span>
         </button>
         <button
           onClick={() => setTab('single')}
@@ -45,7 +49,9 @@ export default function GenerateTabs({ categories }: { categories: Category[] })
             tab === 'single' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
-          <span className="inline-flex items-center gap-1.5"><Pencil className="w-4 h-4" /> Single Story</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Pencil className="w-4 h-4" /> Single Story
+          </span>
         </button>
       </div>
 

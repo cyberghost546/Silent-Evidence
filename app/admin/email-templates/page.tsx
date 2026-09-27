@@ -42,32 +42,39 @@
 import { useEffect, useState } from 'react';
 
 const TEMPLATES = [
-  { key: 'email_welcome',       label: 'Welcome Email',          desc: 'Sent when a new user registers' },
-  { key: 'email_newsletter',    label: 'Weekly Newsletter',       desc: 'Sent every week to subscribers' },
-  { key: 'email_digest',        label: 'Comment Digest',          desc: 'Sent periodically with recent comments' },
-  { key: 'email_follow_notify', label: 'New Story (Follow alert)', desc: 'Sent to followers when an author publishes' },
+  { key: 'email_welcome', label: 'Welcome Email', desc: 'Sent when a new user registers' },
+  { key: 'email_newsletter', label: 'Weekly Newsletter', desc: 'Sent every week to subscribers' },
+  { key: 'email_digest', label: 'Comment Digest', desc: 'Sent periodically with recent comments' },
+  {
+    key: 'email_follow_notify',
+    label: 'New Story (Follow alert)',
+    desc: 'Sent to followers when an author publishes',
+  },
 ];
 
 export default function EmailTemplatesPage() {
   const [templates, setTemplates] = useState<Record<string, string>>({});
   const [activeKey, setActiveKey] = useState(TEMPLATES[0].key);
-  const [draft, setDraft]         = useState('');
-  const [saving, setSaving]       = useState(false);
-  const [saved,  setSaved]        = useState(false);
-  const [loading, setLoading]     = useState(true);
+  const [draft, setDraft] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/admin/email-templates')
-      .then(r => r.json())
-      .then(d => { setTemplates(d.templates ?? {}); setDraft(d.templates?.[activeKey] ?? ''); })
+      .then((r) => r.json())
+      .then((d) => {
+        setTemplates(d.templates ?? {});
+        setDraft(d.templates?.[activeKey] ?? '');
+      })
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // switchTemplate — save the current draft into local state, then swap to the new tab
   // This preserves unsaved edits when the admin flips between templates without saving
   const switchTemplate = (key: string) => {
-    setTemplates(prev => ({ ...prev, [activeKey]: draft })); // cache current draft
+    setTemplates((prev) => ({ ...prev, [activeKey]: draft })); // cache current draft
     setActiveKey(key);
     setDraft(templates[key] ?? ''); // load new template's content into the editor
   };
@@ -79,23 +86,27 @@ export default function EmailTemplatesPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: activeKey, value: draft }),
     });
-    setTemplates(prev => ({ ...prev, [activeKey]: draft }));
+    setTemplates((prev) => ({ ...prev, [activeKey]: draft }));
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const active = TEMPLATES.find(t => t.key === activeKey)!;
+  const active = TEMPLATES.find((t) => t.key === activeKey)!;
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-1">Email Templates</h1>
-      <p className="text-gray-500 text-sm mb-6">Edit the HTML sent in transactional emails. Use <code className="text-red-400 bg-gray-800 px-1 rounded">{'{{PLACEHOLDER}}'}</code> variables shown in each template.</p>
+      <p className="text-gray-500 text-sm mb-6">
+        Edit the HTML sent in transactional emails. Use{' '}
+        <code className="text-red-400 bg-gray-800 px-1 rounded">{'{{PLACEHOLDER}}'}</code> variables
+        shown in each template.
+      </p>
 
       <div className="grid lg:grid-cols-4 gap-6">
         {/* Template selector */}
         <div className="space-y-2">
-          {TEMPLATES.map(t => (
+          {TEMPLATES.map((t) => (
             <button
               key={t.key}
               type="button"
@@ -120,9 +131,14 @@ export default function EmailTemplatesPage() {
               <p className="text-xs text-gray-500">{active.desc}</p>
             </div>
             <div className="flex items-center gap-3">
-              {saved  && <span className="text-xs text-green-400">✓ Saved</span>}
+              {saved && <span className="text-xs text-green-400">✓ Saved</span>}
               {saving && <span className="text-xs text-gray-500 animate-pulse">Saving…</span>}
-              <button type="button" onClick={save} disabled={saving || loading} className="px-4 py-2 text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded-xl transition disabled:opacity-50">
+              <button
+                type="button"
+                onClick={save}
+                disabled={saving || loading}
+                className="px-4 py-2 text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded-xl transition disabled:opacity-50"
+              >
                 Save Template
               </button>
             </div>
@@ -133,7 +149,7 @@ export default function EmailTemplatesPage() {
           ) : (
             <textarea
               value={draft}
-              onChange={e => setDraft(e.target.value)}
+              onChange={(e) => setDraft(e.target.value)}
               rows={22}
               spellCheck={false}
               className="w-full bg-gray-900 border border-gray-700 rounded-2xl p-4 text-sm text-gray-200 font-mono focus:outline-none focus:border-red-600/50 resize-y"
