@@ -22,31 +22,32 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import AvatarPresetPicker from './AvatarPresetPicker';
 
 type InitialData = {
   username: string;
-  bio:      string;
-  avatar:   string;
-  website:  string;
+  bio: string;
+  avatar: string;
+  website: string;
 };
 
 export default function EditProfileForm({ initialData }: { initialData: InitialData }) {
   const router = useRouter();
 
   const [username, setUsername] = useState(initialData.username);
-  const [bio,      setBio]      = useState(initialData.bio);
-  const [avatar,   setAvatar]   = useState(initialData.avatar);
-  const [website,  setWebsite]  = useState(initialData.website);
+  const [bio, setBio] = useState(initialData.bio);
+  const [avatar, setAvatar] = useState(initialData.avatar);
+  const [website, setWebsite] = useState(initialData.website);
 
   // Separate state for the password change section
   const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword,     setNewPassword]     = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [loading,       setLoading]       = useState(false);
-  const [uploading,     setUploading]     = useState(false);
-  const [success,       setSuccess]       = useState('');
-  const [error,         setError]         = useState('');
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   // Hidden file input — triggered by clicking the avatar area
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +72,11 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
     setUploading(false);
 
     let data: { url?: string; error?: string } = {};
-    try { data = await res.json(); } catch { /* empty body */ }
+    try {
+      data = await res.json();
+    } catch {
+      /* empty body */
+    }
 
     if (!res.ok) {
       setError(data.error ?? 'Upload failed.');
@@ -148,7 +153,6 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
 
   return (
     <div className="space-y-8">
-
       {/* ── Global feedback banners ────────────────────────────────────── */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
@@ -174,7 +178,6 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-3">Avatar</label>
           <div className="flex items-center gap-5">
-
             {/* Clickable avatar — opens the file picker */}
             <button
               type="button"
@@ -191,13 +194,35 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
               <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                 {uploading ? (
                   <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                 )}
               </div>
@@ -226,6 +251,10 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
               <p className="text-xs text-gray-600">JPG, PNG, WebP or GIF · Max 5 MB</p>
             </div>
           </div>
+
+          {/* Built-in avatars — an alternative to uploading a photo */}
+          <p className="text-xs text-gray-500 mt-4 mb-2">Or choose one of ours:</p>
+          <AvatarPresetPicker value={avatar} onSelect={setAvatar} />
         </div>
 
         {/* ── Username ──────────────────────────────────────────────── */}
@@ -244,9 +273,7 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
 
         {/* ── Bio ───────────────────────────────────────────────────── */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">
-            Bio
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">Bio</label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -258,9 +285,7 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
 
         {/* ── Website ───────────────────────────────────────────────── */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">
-            Website
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">Website</label>
           <input
             type="url"
             value={website}
@@ -313,7 +338,9 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm New Password</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            Confirm New Password
+          </label>
           <input
             type="password"
             value={confirmPassword}
@@ -332,7 +359,6 @@ export default function EditProfileForm({ initialData }: { initialData: InitialD
           {loading ? 'Updating...' : 'Update Password'}
         </button>
       </form>
-
     </div>
   );
 }
